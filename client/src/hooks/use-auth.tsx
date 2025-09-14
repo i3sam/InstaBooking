@@ -37,8 +37,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      // If Supabase is not available, just set loading to false
+      console.warn('Supabase not available, skipping authentication');
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       setSession(session);
       if (session?.user) {
         // Store Supabase token for API calls
@@ -58,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       setSession(session);
       
       if (session?.user) {
@@ -95,6 +102,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   };
 
   const login = async (email: string, password: string) => {
+    if (!supabase) {
+      throw new Error('Authentication not available');
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -106,6 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   };
 
   const signup = async (email: string, password: string, fullName: string) => {
+    if (!supabase) {
+      throw new Error('Authentication not available');
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -134,6 +147,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   };
 
   const signInWithGoogle = async () => {
+    if (!supabase) {
+      throw new Error('Authentication not available');
+    }
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -147,6 +163,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   };
 
   const logout = async () => {
+    if (!supabase) {
+      throw new Error('Authentication not available');
+    }
     const { error } = await supabase.auth.signOut();
     if (error) {
       throw new Error(error.message);
