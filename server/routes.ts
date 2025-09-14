@@ -7,7 +7,7 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase setup
-const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 let supabase: any = null;
@@ -84,6 +84,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(profile);
     } catch (error) {
       console.error("Get profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/profile", verifyToken, async (req: any, res) => {
+    try {
+      const { fullName, timezone } = req.body;
+      
+      const updates: any = {};
+      if (fullName !== undefined) updates.fullName = fullName;
+      // Add other fields as needed
+      
+      const updatedProfile = await storage.updateProfile(req.user.userId, updates);
+      if (!updatedProfile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      res.json(updatedProfile);
+    } catch (error) {
+      console.error("Update profile error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

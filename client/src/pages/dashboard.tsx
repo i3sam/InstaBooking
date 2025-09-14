@@ -11,6 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Bell, Crown } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
   const { user, profile } = useAuth();
@@ -45,16 +48,12 @@ export default function Dashboard() {
                 <p className="text-muted-foreground">Manage your booking pages and appointments</p>
               </div>
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon" className="relative" data-testid="button-notifications">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></span>
-                </Button>
                 <div className="flex items-center space-x-3">
-                  <img 
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
-                    alt="User profile" 
-                    className="w-10 h-10 rounded-full"
-                  />
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {(user?.fullName || user?.email)?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
                   <div>
                     <p className="text-sm font-medium text-foreground" data-testid="text-username">
                       {profile?.fullName || user?.email}
@@ -86,18 +85,7 @@ function AnalyticsSection() {
         <p className="text-muted-foreground">Track your booking performance and revenue</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Total Revenue</h3>
-              <div className="w-4 h-4 text-green-600">💰</div>
-            </div>
-            <div className="text-3xl font-bold text-foreground mb-2">$0</div>
-            <p className="text-sm text-green-600">Start accepting payments to see revenue</p>
-          </CardContent>
-        </Card>
-        
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -137,7 +125,35 @@ function AnalyticsSection() {
 }
 
 function SettingsSection() {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState({
+    fullName: profile?.fullName || '',
+    email: user?.email || '',
+    timezone: 'pacific'
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: { fullName: string; timezone: string }) => {
+      const response = await apiRequest('PATCH', '/api/profile', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      toast({
+        title: "Profile updated!",
+        description: "Your profile changes have been saved.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
   
   return (
     <div>
@@ -150,13 +166,20 @@ function SettingsSection() {
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-6">Profile Information</h3>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              updateProfileMutation.mutate({
+                fullName: formData.fullName,
+                timezone: formData.timezone
+              });
+            }}>
               <div>
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input 
                   id="fullName"
                   type="text" 
-                  defaultValue={profile?.fullName || ''} 
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                   data-testid="input-fullname"
                 />
               </div>
@@ -165,13 +188,14 @@ function SettingsSection() {
                 <Input 
                   id="email"
                   type="email" 
-                  defaultValue="john@example.com" 
+                  value={formData.email}
+                  disabled
                   data-testid="input-email"
                 />
               </div>
               <div>
                 <Label htmlFor="timezone">Time Zone</Label>
-                <Select>
+                <Select value={formData.timezone} onValueChange={(value) => setFormData(prev => ({ ...prev, timezone: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select timezone" />
                   </SelectTrigger>

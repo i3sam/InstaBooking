@@ -21,12 +21,6 @@ export default function Overview() {
       value: "0",
       icon: Clock,
       color: "bg-orange-100 text-orange-600"
-    },
-    {
-      title: "Revenue",
-      value: "$0",
-      icon: DollarSign,
-      color: "bg-purple-100 text-purple-600"
     }
   ];
 
@@ -74,7 +68,7 @@ export default function Overview() {
   return (
     <div>
       {/* Stats Grid */}
-      <div className="grid lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => (
           <Card key={index}>
             <CardContent className="p-6">

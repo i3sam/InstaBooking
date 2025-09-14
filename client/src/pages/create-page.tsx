@@ -20,8 +20,11 @@ export default function CreatePage() {
     tagline: '',
     primaryColor: '#2563eb',
     calendarLink: '',
+    logoUrl: '',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const createPageMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -175,12 +178,37 @@ export default function CreatePage() {
               
               <div>
                 <Label>Logo Upload</Label>
-                <div className="border-2 border-dashed border-border rounded-xl p-6 text-center">
+                <div 
+                  className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => document.getElementById('logo-upload')?.click()}
+                >
                   <CloudUpload className="h-8 w-8 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground mb-2">
-                    Drop your logo here, or <span className="text-primary cursor-pointer">browse</span>
+                    {logoFile ? logoFile.name : 'Drop your logo here, or'} <span className="text-primary cursor-pointer">browse</span>
                   </p>
                   <p className="text-sm text-muted-foreground">PNG, JPG up to 2MB</p>
+                  <input
+                    id="logo-upload"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                          toast({
+                            title: "File too large",
+                            description: "Please select an image under 2MB",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        setLogoFile(file);
+                        // For now, just store the file name, in a real app you'd upload to a service
+                        setFormData(prev => ({ ...prev, logoUrl: file.name }));
+                      }
+                    }}
+                  />
                 </div>
               </div>
               
