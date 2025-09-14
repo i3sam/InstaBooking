@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPageSchema, insertServiceSchema, insertAppointmentSchema, insertProfileSchema } from "@shared/schema";
+// Removed PostgreSQL schema imports - using Supabase directly
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
@@ -38,19 +38,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
   
-  // Development-only bypass when Supabase is not available
   if (!supabase) {
-    if (process.env.NODE_ENV === 'production') {
-      console.error("Supabase not configured in production environment");
-      return res.status(503).json({ message: "Authentication service unavailable" });
-    }
-    console.warn("Supabase not configured, using development bypass for authentication");
-    // Use a mock user for development only
-    req.user = { 
-      userId: "dev-user-123", 
-      email: "dev@example.com" 
-    };
-    return next();
+    console.error("Supabase not configured");
+    return res.status(503).json({ message: "Authentication service unavailable" });
   }
 
   if (!authHeader) {
@@ -73,9 +63,11 @@ async function verifyToken(req: any, res: any, next: any) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Profile routes
-  app.post("/api/profile", async (req, res) => {
+  app.post("/api/profile", verifyToken, async (req: any, res) => {
     try {
-      const { userId, fullName } = req.body;
+      const { fullName } = req.body;
+      // Use authenticated user ID, not client-provided userId for security
+      const userId = req.user.userId;
       
       // Check if profile already exists
       const existingProfile = await storage.getProfile(userId);
@@ -84,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create new profile
-      const profileData = insertProfileSchema.parse({ id: userId, fullName });
+      const profileData = { id: userId, fullName };
       const profile = await storage.createProfile(profileData);
       
       res.json(profile);
@@ -131,10 +123,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pages routes
   app.post("/api/pages", verifyToken, async (req: any, res) => {
     try {
-      const pageData = insertPageSchema.parse({
+      const pageData = {
         ...req.body,
         ownerId: req.user.userId
-      });
+      };
 
       // Check if slug exists
       const existingPage = await storage.getPageBySlug(pageData.slug);
@@ -219,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Appointments routes
   app.post("/api/appointments", async (req, res) => {
     try {
-      const appointmentData = insertAppointmentSchema.parse(req.body);
+      const appointmentData = req.body;
       const appointment = await storage.createAppointment(appointmentData);
       res.json(appointment);
     } catch (error) {

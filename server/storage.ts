@@ -1,225 +1,300 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import { eq, and, desc } from "drizzle-orm";
-import { 
-  users, profiles, pages, services, appointments, paymentsDemo,
-  type User, type InsertUser, type Profile, type InsertProfile, 
-  type Page, type InsertPage, type Service, type InsertService,
-  type Appointment, type InsertAppointment, type Payment, type InsertPayment
-} from "@shared/schema";
+import { createClient } from '@supabase/supabase-js';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+// Initialize Supabase client for server-side operations
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error("Supabase environment variables are required");
 }
 
-// Parse and properly encode the connection string
-function createDatabaseConnection(connectionString: string) {
-  try {
-    // If it's already working, use it directly
-    return postgres(connectionString);
-  } catch (error) {
-    // If there's a URL parsing error, try to fix encoding issues
-    console.warn("URL parsing failed, attempting to fix encoding...");
-    
-    // Extract components manually and re-encode
-    const urlPattern = /postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;
-    const match = connectionString.match(urlPattern);
-    
-    if (match) {
-      const [, username, password, host, port, database] = match;
-      // URL encode the password to handle special characters
-      const encodedPassword = encodeURIComponent(password);
-      const fixedUrl = `postgresql://${username}:${encodedPassword}@${host}:${port}/${database}`;
-      return postgres(fixedUrl);
-    }
-    
-    throw error;
-  }
+console.log("Server storage initialized with Supabase successfully");
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Helper functions to convert between camelCase and snake_case
+function camelToSnake(obj: any): any {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  
+  const result: any = {};
+  Object.keys(obj).forEach(key => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    result[snakeKey] = camelToSnake(obj[key]);
+  });
+  return result;
 }
 
-const sql = createDatabaseConnection(process.env.DATABASE_URL!);
-const db = drizzle(sql);
+function snakeToCamel(obj: any): any {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(snakeToCamel);
+  
+  const result: any = {};
+  Object.keys(obj).forEach(key => {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    result[camelKey] = snakeToCamel(obj[key]);
+  });
+  return result;
+}
 
 export interface IStorage {
-  // Users
-  createUser(user: InsertUser): Promise<User>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  getUserById(id: string): Promise<User | undefined>;
-  
   // Profiles
-  createProfile(profile: InsertProfile): Promise<Profile>;
-  getProfile(userId: string): Promise<Profile | undefined>;
-  updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | undefined>;
+  createProfile(profile: any): Promise<any>;
+  getProfile(userId: string): Promise<any | undefined>;
+  updateProfile(userId: string, updates: any): Promise<any | undefined>;
   
   // Pages
-  createPage(page: InsertPage): Promise<Page>;
-  getPage(id: string): Promise<Page | undefined>;
-  getPageBySlug(slug: string): Promise<Page | undefined>;
-  getPagesByOwner(ownerId: string): Promise<Page[]>;
-  updatePage(id: string, updates: Partial<Page>): Promise<Page | undefined>;
+  createPage(page: any): Promise<any>;
+  getPage(id: string): Promise<any | undefined>;
+  getPageBySlug(slug: string): Promise<any | undefined>;
+  getPagesByOwner(ownerId: string): Promise<any[]>;
+  updatePage(id: string, updates: any): Promise<any | undefined>;
   deletePage(id: string): Promise<boolean>;
   
   // Services
-  createService(service: InsertService): Promise<Service>;
-  getServicesByPageId(pageId: string): Promise<Service[]>;
-  updateService(id: string, updates: Partial<Service>): Promise<Service | undefined>;
+  createService(service: any): Promise<any>;
+  getServicesByPageId(pageId: string): Promise<any[]>;
+  updateService(id: string, updates: any): Promise<any | undefined>;
   deleteService(id: string): Promise<boolean>;
   
   // Appointments
-  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
-  getAppointmentById(id: string): Promise<Appointment | undefined>;
-  getAppointmentsByOwner(ownerId: string): Promise<Appointment[]>;
-  updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | undefined>;
+  createAppointment(appointment: any): Promise<any>;
+  getAppointmentById(id: string): Promise<any | undefined>;
+  getAppointmentsByOwner(ownerId: string): Promise<any[]>;
+  updateAppointment(id: string, updates: any): Promise<any | undefined>;
   
   // Payments
-  createPayment(payment: InsertPayment): Promise<Payment>;
-  getPaymentsByUser(userId: string): Promise<Payment[]>;
+  createPayment(payment: any): Promise<any>;
+  getPaymentsByUser(userId: string): Promise<any[]>;
 }
 
-export class DatabaseStorage implements IStorage {
-  async createUser(user: InsertUser): Promise<User> {
-    const [created] = await db.insert(users).values(user).returning();
-    return created;
+export class SupabaseStorage implements IStorage {
+  async createProfile(profile: any): Promise<any> {
+    const snakeProfile = camelToSnake(profile);
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert(snakeProfile)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return snakeToCamel(data);
   }
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+  async getProfile(userId: string): Promise<any | undefined> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+    return data ? snakeToCamel(data) : undefined;
   }
 
-  async getUserById(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+  async updateProfile(userId: string, updates: any): Promise<any | undefined> {
+    const snakeUpdates = camelToSnake(updates);
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(snakeUpdates)
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
-  async createProfile(profile: InsertProfile): Promise<Profile> {
-    const [created] = await db.insert(profiles).values(profile).returning();
-    return created;
+  async createPage(page: any): Promise<any> {
+    const snakePage = camelToSnake({ ...page, createdAt: new Date(), updatedAt: new Date() });
+    const { data, error } = await supabase
+      .from('pages')
+      .insert(snakePage)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return snakeToCamel(data);
   }
 
-  async getProfile(userId: string): Promise<Profile | undefined> {
-    const [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
-    return profile;
+  async getPage(id: string): Promise<any | undefined> {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
-  async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | undefined> {
-    const [updated] = await db.update(profiles)
-      .set(updates)
-      .where(eq(profiles.id, userId))
-      .returning();
-    return updated;
+  async getPageBySlug(slug: string): Promise<any | undefined> {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
-  async createPage(page: InsertPage): Promise<Page> {
-    const [created] = await db.insert(pages).values({
-      ...page,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning();
-    return created;
+  async getPagesByOwner(ownerId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data ? data.map(snakeToCamel) : [];
   }
 
-  async getPage(id: string): Promise<Page | undefined> {
-    const [page] = await db.select().from(pages).where(eq(pages.id, id));
-    return page;
-  }
-
-  async getPageBySlug(slug: string): Promise<Page | undefined> {
-    const [page] = await db.select().from(pages).where(eq(pages.slug, slug));
-    return page;
-  }
-
-  async getPagesByOwner(ownerId: string): Promise<Page[]> {
-    return await db.select().from(pages)
-      .where(eq(pages.ownerId, ownerId))
-      .orderBy(desc(pages.createdAt));
-  }
-
-  async updatePage(id: string, updates: Partial<Page>): Promise<Page | undefined> {
-    const [updated] = await db.update(pages)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(pages.id, id))
-      .returning();
-    return updated;
+  async updatePage(id: string, updates: any): Promise<any | undefined> {
+    const snakeUpdates = camelToSnake({ ...updates, updatedAt: new Date() });
+    const { data, error } = await supabase
+      .from('pages')
+      .update(snakeUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
   async deletePage(id: string): Promise<boolean> {
-    const result = await db.delete(pages).where(eq(pages.id, id));
-    return result.length > 0;
+    const { error } = await supabase
+      .from('pages')
+      .delete()
+      .eq('id', id);
+    
+    return !error;
   }
 
-  async createService(service: InsertService): Promise<Service> {
-    const [created] = await db.insert(services).values(service).returning();
-    return created;
+  async createService(service: any): Promise<any> {
+    const snakeService = camelToSnake(service);
+    const { data, error } = await supabase
+      .from('services')
+      .insert(snakeService)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return snakeToCamel(data);
   }
 
-  async getServicesByPageId(pageId: string): Promise<Service[]> {
-    return await db.select().from(services).where(eq(services.pageId, pageId));
+  async getServicesByPageId(pageId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('page_id', pageId);
+    
+    if (error) throw error;
+    return data ? data.map(snakeToCamel) : [];
   }
 
-  async updateService(id: string, updates: Partial<Service>): Promise<Service | undefined> {
-    const [updated] = await db.update(services)
-      .set(updates)
-      .where(eq(services.id, id))
-      .returning();
-    return updated;
+  async updateService(id: string, updates: any): Promise<any | undefined> {
+    const snakeUpdates = camelToSnake(updates);
+    const { data, error } = await supabase
+      .from('services')
+      .update(snakeUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
   async deleteService(id: string): Promise<boolean> {
-    const result = await db.delete(services).where(eq(services.id, id));
-    return result.length > 0;
+    const { error } = await supabase
+      .from('services')
+      .delete()
+      .eq('id', id);
+    
+    return !error;
   }
 
-  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
-    const [created] = await db.insert(appointments).values(appointment).returning();
-    return created;
+  async createAppointment(appointment: any): Promise<any> {
+    const snakeAppointment = camelToSnake(appointment);
+    const { data, error } = await supabase
+      .from('appointments')
+      .insert(snakeAppointment)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return snakeToCamel(data);
   }
 
-  async getAppointmentById(id: string): Promise<Appointment | undefined> {
-    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
-    return appointment;
+  async getAppointmentById(id: string): Promise<any | undefined> {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
   async getAppointmentsByOwner(ownerId: string): Promise<any[]> {
-    return await db.select({
-      id: appointments.id,
-      pageId: appointments.pageId,
-      ownerId: appointments.ownerId,
-      serviceId: appointments.serviceId,
-      customerName: appointments.customerName,
-      customerEmail: appointments.customerEmail,
-      customerPhone: appointments.customerPhone,
-      date: appointments.date,
-      time: appointments.time,
-      status: appointments.status,
-      notes: appointments.notes,
-      createdAt: appointments.createdAt,
-      updatedAt: appointments.updatedAt,
-      serviceName: services.name
-    }).from(appointments)
-      .leftJoin(services, eq(appointments.serviceId, services.id))
-      .where(eq(appointments.ownerId, ownerId))
-      .orderBy(desc(appointments.createdAt));
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        services (name)
+      `)
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data ? data.map(item => {
+      // Handle the nested services name
+      const converted = snakeToCamel(item);
+      if (item.services) {
+        converted.serviceName = item.services.name;
+      }
+      return converted;
+    }) : [];
   }
 
-  async updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | undefined> {
-    const [updated] = await db.update(appointments)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(appointments.id, id))
-      .returning();
-    return updated;
+  async updateAppointment(id: string, updates: any): Promise<any | undefined> {
+    const snakeUpdates = camelToSnake({ ...updates, updatedAt: new Date() });
+    const { data, error } = await supabase
+      .from('appointments')
+      .update(snakeUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data ? snakeToCamel(data) : undefined;
   }
 
-  async createPayment(payment: InsertPayment): Promise<Payment> {
-    const [created] = await db.insert(paymentsDemo).values(payment).returning();
-    return created;
+  async createPayment(payment: any): Promise<any> {
+    const snakePayment = camelToSnake(payment);
+    const { data, error } = await supabase
+      .from('payments')
+      .insert(snakePayment)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return snakeToCamel(data);
   }
 
-  async getPaymentsByUser(userId: string): Promise<Payment[]> {
-    return await db.select().from(paymentsDemo)
-      .where(eq(paymentsDemo.userId, userId))
-      .orderBy(desc(paymentsDemo.createdAt));
+  async getPaymentsByUser(userId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data ? data.map(snakeToCamel) : [];
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new SupabaseStorage();
