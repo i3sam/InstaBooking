@@ -42,6 +42,7 @@ export interface IStorage {
   
   // Appointments
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  getAppointmentById(id: string): Promise<Appointment | undefined>;
   getAppointmentsByOwner(ownerId: string): Promise<Appointment[]>;
   updateAppointment(id: string, updates: Partial<Appointment>): Promise<Appointment | undefined>;
   
@@ -149,8 +150,29 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getAppointmentsByOwner(ownerId: string): Promise<Appointment[]> {
-    return await db.select().from(appointments)
+  async getAppointmentById(id: string): Promise<Appointment | undefined> {
+    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    return appointment;
+  }
+
+  async getAppointmentsByOwner(ownerId: string): Promise<any[]> {
+    return await db.select({
+      id: appointments.id,
+      pageId: appointments.pageId,
+      ownerId: appointments.ownerId,
+      serviceId: appointments.serviceId,
+      customerName: appointments.customerName,
+      customerEmail: appointments.customerEmail,
+      customerPhone: appointments.customerPhone,
+      date: appointments.date,
+      time: appointments.time,
+      status: appointments.status,
+      notes: appointments.notes,
+      createdAt: appointments.createdAt,
+      updatedAt: appointments.updatedAt,
+      serviceName: services.name
+    }).from(appointments)
+      .leftJoin(services, eq(appointments.serviceId, services.id))
       .where(eq(appointments.ownerId, ownerId))
       .orderBy(desc(appointments.createdAt));
   }

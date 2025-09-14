@@ -218,10 +218,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/appointments/:id", verifyToken, async (req: any, res) => {
     try {
-      const updated = await storage.updateAppointment(req.params.id, req.body);
-      if (!updated) {
+      // First get the appointment to verify ownership
+      const appointment = await storage.getAppointmentById(req.params.id);
+      if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
+      
+      // Verify the user owns this appointment
+      if (appointment.ownerId !== req.user.userId) {
+        return res.status(403).json({ message: "Unauthorized to update this appointment" });
+      }
+      
+      const updated = await storage.updateAppointment(req.params.id, req.body);
       res.json(updated);
     } catch (error) {
       console.error("Update appointment error:", error);

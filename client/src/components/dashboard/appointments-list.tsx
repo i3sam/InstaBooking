@@ -1,13 +1,45 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, X, Calendar, Mail, Filter, Download } from 'lucide-react';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AppointmentsList() {
+  const { toast } = useToast();
   const { data: appointments = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/appointments'],
   });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const response = await apiRequest('PATCH', `/api/appointments/${id}`, { status });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      toast({
+        title: "Success",
+        description: "Appointment status updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update appointment status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStatusUpdate = (id: string, status: string) => {
+    updateAppointmentMutation.mutate({ id, status });
+  };
+
+  const handleEmail = (email: string) => {
+    window.open(`mailto:${email}`, '_blank');
+  };
 
   if (isLoading) {
     return (
@@ -116,6 +148,8 @@ export default function AppointmentsList() {
                               variant="ghost" 
                               className="text-green-600 hover:text-green-700 p-1"
                               data-testid={`button-accept-${appointment.id}`}
+                              onClick={() => handleStatusUpdate(appointment.id, 'accepted')}
+                              disabled={updateAppointmentMutation.isPending}
                             >
                               <Check className="h-4 w-4" />
                             </Button>
@@ -124,6 +158,8 @@ export default function AppointmentsList() {
                               variant="ghost" 
                               className="text-red-600 hover:text-red-700 p-1"
                               data-testid={`button-decline-${appointment.id}`}
+                              onClick={() => handleStatusUpdate(appointment.id, 'declined')}
+                              disabled={updateAppointmentMutation.isPending}
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -143,6 +179,7 @@ export default function AppointmentsList() {
                             variant="ghost" 
                             className="text-gray-600 hover:text-gray-700 p-1"
                             data-testid={`button-email-${appointment.id}`}
+                            onClick={() => handleEmail(appointment.customerEmail)}
                           >
                             <Mail className="h-4 w-4" />
                           </Button>

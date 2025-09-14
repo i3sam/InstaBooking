@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import UpgradeModal from '@/components/modals/upgrade-modal';
 
 interface SidebarProps {
   activeSection: string;
@@ -10,6 +12,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const { profile } = useAuth();
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   const navigation = [
     { id: 'overview', label: 'Overview', icon: PieChart },
@@ -66,12 +69,21 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <p className="text-sm text-muted-foreground mb-3">
               Unlock unlimited pages and advanced features
             </p>
-            <Button className="w-full button-gradient text-sm" data-testid="button-upgrade">
+            <Button 
+              className="w-full button-gradient text-sm" 
+              data-testid="button-upgrade"
+              onClick={() => setIsUpgradeModalOpen(true)}
+            >
               Upgrade Now
             </Button>
           </div>
         </div>
       )}
+      
+      <UpgradeModal 
+        isOpen={isUpgradeModalOpen} 
+        onClose={() => setIsUpgradeModalOpen(false)} 
+      />
     </div>
   );
 }
