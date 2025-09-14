@@ -7,12 +7,22 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase setup
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 let supabase: any = null;
 if (supabaseUrl && supabaseServiceKey) {
-  supabase = createClient(supabaseUrl, supabaseServiceKey);
+  try {
+    // Validate URL format before creating client
+    new URL(supabaseUrl); // This will throw if URL is invalid
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("Supabase client initialized successfully");
+  } catch (error) {
+    console.warn("Failed to initialize Supabase client:", error instanceof Error ? error.message : error);
+    console.warn("Application will continue without Supabase authentication");
+  }
+} else {
+  console.warn("Supabase credentials not found. Application will continue without Supabase authentication");
 }
 
 // Razorpay setup (optional for MVP testing)
