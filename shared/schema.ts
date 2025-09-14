@@ -1,0 +1,118 @@
+import { sql } from "drizzle-orm";
+import { pgTable, text, varchar, uuid, timestamp, jsonb, numeric, integer, date } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  fullName: text("full_name"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  membershipStatus: text("membership_status").default("free"), // free | pro
+  membershipPlan: text("membership_plan"),
+  membershipExpires: timestamp("membership_expires"),
+});
+
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const pages = pgTable("pages", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ownerId: uuid("owner_id").references(() => profiles.id),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  tagline: text("tagline"),
+  logoUrl: text("logo_url"),
+  primaryColor: text("primary_color").default("#2563eb"),
+  calendarLink: text("calendar_link"),
+  data: jsonb("data"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
+export const services = pgTable("services", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationMinutes: integer("duration_minutes").notNull(),
+  price: numeric("price").notNull(),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const appointments = pgTable("appointments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
+  ownerId: uuid("owner_id").references(() => profiles.id),
+  serviceId: uuid("service_id").references(() => services.id),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email"),
+  customerPhone: text("customer_phone").notNull(),
+  date: date("date").notNull(),
+  time: text("time").notNull(),
+  status: text("status").default("pending"), // pending|accepted|declined|rescheduled
+  notes: text("notes"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
+export const paymentsDemo = pgTable("payments_demo", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid("user_id").references(() => profiles.id),
+  plan: text("plan"),
+  amount: numeric("amount"),
+  status: text("status"),
+  razorpayOrderId: text("razorpay_order_id"),
+  razorpayPaymentId: text("razorpay_payment_id"),
+  meta: jsonb("meta"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+// Insert schemas
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProfileSchema = createInsertSchema(profiles).omit({
+  createdAt: true,
+});
+
+export const insertPageSchema = createInsertSchema(pages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertServiceSchema = createInsertSchema(services).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPaymentSchema = createInsertSchema(paymentsDemo).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Profile = typeof profiles.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+export type Page = typeof pages.$inferSelect;
+export type InsertPage = z.infer<typeof insertPageSchema>;
+export type Service = typeof services.$inferSelect;
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+export type Payment = typeof paymentsDemo.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
