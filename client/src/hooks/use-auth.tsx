@@ -1,4 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { apiRequest } from '@/lib/queryClient';
 
 interface User {
@@ -18,10 +20,11 @@ interface Profile {
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
-  token: string | null;
+  session: Session | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, fullName: string) => Promise<void>;
-  logout: () => void;
+  signInWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
   loading: boolean;
 }
 
@@ -30,65 +33,136 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      // Verify token and get user data
-      fetchProfile();
-    } else {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: session.user.user_metadata?.full_name
+        });
+        fetchProfile(session.user.id);
+      }
       setLoading(false);
-    }
-  }, [token]);
+    });
 
-  const fetchProfile = async () => {
-    try {
-      const response = await apiRequest('GET', '/api/profile');
-      const profileData = await response.json();
-      setProfile(profileData);
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
       
-      // Get user data from token
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser({ id: payload.userId, email: payload.email, fullName: profileData.fullName });
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: session.user.user_metadata?.full_name
+        });
+        fetchProfile(session.user.id);
+      } else {
+        setUser(null);
+        setProfile(null);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const response = await apiRequest('GET', `/api/profile?userId=${userId}`);
+      if (response.ok) {
+        const profileData = await response.json();
+        setProfile(profileData);
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
-      logout();
-    } finally {
-      setLoading(false);
+      // Don't logout on profile fetch failure
     }
   };
 
   const login = async (email: string, password: string) => {
-    const response = await apiRequest('POST', '/api/auth/login', { email, password });
-    const data = await response.json();
-    
-    setUser(data.user);
-    setProfile(data.profile);
-    setToken(data.token);
-    localStorage.setItem('token', data.token);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
   };
 
   const signup = async (email: string, password: string, fullName: string) => {
-    const response = await apiRequest('POST', '/api/auth/signup', { email, password, fullName });
-    const data = await response.json();
-    
-    setUser(data.user);
-    setToken(data.token);
-    localStorage.setItem('token', data.token);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Create profile in our database
+    if (data.user) {
+      try {
+        await apiRequest('POST', '/api/profile', {
+          userId: data.user.id,
+          fullName: fullName,
+        });
+      } catch (error) {
+        console.error('Failed to create profile:', error);
+      }
+    }
+
+    return data;
   };
 
-  const logout = () => {
-    setUser(null);
-    setProfile(null);
-    setToken(null);
-    localStorage.removeItem('token');
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  };
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw new Error(error.message);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, token, login, signup, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      profile, 
+      session, 
+      login, 
+      signup, 
+      signInWithGoogle, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
