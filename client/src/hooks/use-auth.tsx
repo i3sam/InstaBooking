@@ -41,12 +41,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
+        // Store Supabase token for API calls
+        localStorage.setItem('token', session.access_token);
         setUser({
           id: session.user.id,
           email: session.user.email || '',
           fullName: session.user.user_metadata?.full_name
         });
         fetchProfile(session.user.id);
+      } else {
+        localStorage.removeItem('token');
       }
       setLoading(false);
     });
@@ -58,6 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       setSession(session);
       
       if (session?.user) {
+        // Store Supabase token for API calls
+        localStorage.setItem('token', session.access_token);
         setUser({
           id: session.user.id,
           email: session.user.email || '',
@@ -65,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         });
         fetchProfile(session.user.id);
       } else {
+        localStorage.removeItem('token');
         setUser(null);
         setProfile(null);
       }

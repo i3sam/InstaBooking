@@ -1,11 +1,19 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { insertUserSchema, insertPageSchema, insertServiceSchema, insertAppointmentSchema } from "@shared/schema";
+import { insertPageSchema, insertServiceSchema, insertAppointmentSchema, insertProfileSchema } from "@shared/schema";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase setup
+const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+let supabase: any = null;
+if (supabaseUrl && supabaseServiceKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceKey);
+}
 
 // Razorpay setup (optional for MVP testing)
 let razorpay: Razorpay | null = null;
@@ -16,10 +24,8 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
   });
 }
 
-const JWT_SECRET = process.env.SESSION_SECRET || "your-secret-key";
-
-// Middleware to verify JWT
-function verifyToken(req: any, res: any, next: any) {
+// Middleware to verify Supabase JWT
+async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ message: "No token provided" });
@@ -27,8 +33,16 @@ function verifyToken(req: any, res: any, next: any) {
 
   const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    if (!supabase) {
+      return res.status(500).json({ message: "Supabase not configured" });
+    }
+    
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    
+    req.user = { userId: user.id, email: user.email };
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid token" });
@@ -36,66 +50,34 @@ function verifyToken(req: any, res: any, next: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth routes
-  app.post("/api/auth/signup", async (req, res) => {
-    try {
-      const { email, password, fullName } = req.body;
-      
-      // Check if user exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-
-      // Create user
-      const passwordHash = await bcrypt.hash(password, 10);
-      const user = await storage.createUser({ email, passwordHash });
-      
-      // Create profile
-      await storage.createProfile({ id: user.id, fullName });
-
-      // Generate JWT
-      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET);
-      
-      res.json({ user: { id: user.id, email: user.email, fullName }, token });
-    } catch (error) {
-      console.error("Signup error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      
-      const user = await storage.getUserByEmail(email);
-      if (!user || !user.passwordHash) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const isValid = await bcrypt.compare(password, user.passwordHash);
-      if (!isValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const profile = await storage.getProfile(user.id);
-      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET);
-      
-      res.json({ 
-        user: { id: user.id, email: user.email, fullName: profile?.fullName }, 
-        profile,
-        token 
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
   // Profile routes
+  app.post("/api/profile", async (req, res) => {
+    try {
+      const { userId, fullName } = req.body;
+      
+      // Check if profile already exists
+      const existingProfile = await storage.getProfile(userId);
+      if (existingProfile) {
+        return res.json(existingProfile);
+      }
+
+      // Create new profile
+      const profileData = insertProfileSchema.parse({ id: userId, fullName });
+      const profile = await storage.createProfile(profileData);
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("Create profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/profile", verifyToken, async (req: any, res) => {
     try {
-      const profile = await storage.getProfile(req.user.userId);
+      const { userId } = req.query;
+      const profileUserId = userId || req.user.userId;
+      
+      const profile = await storage.getProfile(profileUserId);
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
       }
