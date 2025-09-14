@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { eq, and, desc } from "drizzle-orm";
 import { 
   users, profiles, pages, services, appointments, paymentsDemo,
@@ -12,7 +12,32 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
-const sql = neon(process.env.DATABASE_URL!);
+// Parse and properly encode the connection string
+function createDatabaseConnection(connectionString: string) {
+  try {
+    // If it's already working, use it directly
+    return postgres(connectionString);
+  } catch (error) {
+    // If there's a URL parsing error, try to fix encoding issues
+    console.warn("URL parsing failed, attempting to fix encoding...");
+    
+    // Extract components manually and re-encode
+    const urlPattern = /postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;
+    const match = connectionString.match(urlPattern);
+    
+    if (match) {
+      const [, username, password, host, port, database] = match;
+      // URL encode the password to handle special characters
+      const encodedPassword = encodeURIComponent(password);
+      const fixedUrl = `postgresql://${username}:${encodedPassword}@${host}:${port}/${database}`;
+      return postgres(fixedUrl);
+    }
+    
+    throw error;
+  }
+}
+
+const sql = createDatabaseConnection(process.env.DATABASE_URL!);
 const db = drizzle(sql);
 
 export interface IStorage {
@@ -120,7 +145,7 @@ export class DatabaseStorage implements IStorage {
 
   async deletePage(id: string): Promise<boolean> {
     const result = await db.delete(pages).where(eq(pages.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async createService(service: InsertService): Promise<Service> {
@@ -142,7 +167,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteService(id: string): Promise<boolean> {
     const result = await db.delete(services).where(eq(services.id, id));
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
