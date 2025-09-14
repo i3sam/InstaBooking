@@ -37,16 +37,28 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 // Middleware to verify Supabase JWT
 async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
+  
+  // Development-only bypass when Supabase is not available
+  if (!supabase) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error("Supabase not configured in production environment");
+      return res.status(503).json({ message: "Authentication service unavailable" });
+    }
+    console.warn("Supabase not configured, using development bypass for authentication");
+    // Use a mock user for development only
+    req.user = { 
+      userId: "dev-user-123", 
+      email: "dev@example.com" 
+    };
+    return next();
+  }
+
   if (!authHeader) {
     return res.status(401).json({ message: "No token provided" });
   }
 
   const token = authHeader.split(" ")[1];
   try {
-    if (!supabase) {
-      return res.status(500).json({ message: "Supabase not configured" });
-    }
-    
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
       return res.status(401).json({ message: "Invalid token" });
@@ -84,10 +96,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/profile", verifyToken, async (req: any, res) => {
     try {
-      const { userId } = req.query;
-      const profileUserId = userId || req.user.userId;
-      
-      const profile = await storage.getProfile(profileUserId);
+      // Only allow users to access their own profile - ignore userId query parameter
+      const profile = await storage.getProfile(req.user.userId);
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
       }
