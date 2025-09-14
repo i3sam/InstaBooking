@@ -96,8 +96,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     if (error) {
       throw new Error(error.message);
     }
-
-    return data;
   };
 
   const signup = async (email: string, password: string, fullName: string) => {
@@ -126,8 +124,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         console.error('Failed to create profile:', error);
       }
     }
-
-    return data;
   };
 
   const signInWithGoogle = async () => {
@@ -141,8 +137,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     if (error) {
       throw new Error(error.message);
     }
-
-    return data;
   };
 
   const logout = async () => {

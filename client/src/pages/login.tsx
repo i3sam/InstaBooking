@@ -11,7 +11,7 @@ import { CalendarDays } from 'lucide-react';
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -39,6 +39,19 @@ export default function Login() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      // Note: Supabase OAuth will handle the redirect, so no need to manually redirect
+    } catch (error) {
+      toast({
+        title: "Google Sign In failed",
+        description: "Failed to sign in with Google. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,6 +133,7 @@ export default function Login() {
               type="button" 
               variant="outline" 
               className="w-full"
+              onClick={handleGoogleSignIn}
               data-testid="button-google-signin"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
