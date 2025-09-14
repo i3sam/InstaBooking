@@ -1,0 +1,265 @@
+**PROMPT FOR REPLIT — FULL BUILD: BookingGen (new project) — Supabase + Razorpay — replicate provided UI**
+
+**OVERVIEW / INSTRUCTION (READ CAREFULLY)**
+You are building a **new BookingGen app from scratch**. This is not a bug-fix; create a brand-new project/repo. Use **Supabase** as the database/auth backend and **Razorpay** as the payment processor. The client has provided exact environment variables — use them only via environment variables (do NOT hard-code into the repo). Recreate the *exact UI* shown in the attached screenshots (copy layout, spacing, colors, rounded corners, modals, buttons, hero, dashboard layout) but implement it as BookingGen. Be strict and precise.
+
+**ABSOLUTE RULES**
+
+* ✅ **New repo / new codebase only**. Do *not* modify the user’s old repo.
+* ✅ Use **Supabase** for DB + Auth + Storage. Use the provided `NEXT_PUBLIC_*` keys in env.
+* ✅ Use **Razorpay** for payments. Use the provided live keys but **never** expose the secret key on the client. Put secret keys in server-only env variables.
+* ❌ **Do NOT commit secrets** to Git. Put them in `.env` locally and set them in Vercel environment variables for production.
+* ❌ **Do NOT add Express servers to Vercel** as long-running servers — backend should be implemented as serverless API routes that run on demand (Vercel `api/` or similar). You may use Express locally for development if you want, but production must be serverless-compatible.
+* ❌ **Do not run or test the user’s old app** or try to salvage it. This is a clean rebuild.
+
+---
+
+## ENVIRONMENT VARIABLES (the client provided — use these exactly via env)
+
+Set these in `.env.local` for dev and in Vercel dashboard for production (never commit to git).
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://arrrigoijifnkcpbfzwd.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFycnJpZ29pamlmbmtjcGJmendkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTYyMTYsImV4cCI6MjA3MzMzMjIxNn0.xWVwKUehCDH8-pEfxc5TEeRNf9Agi9WT2G6kGUysZAA
+
+# Razorpay (server-only secret must be used only on serverless functions)
+RAZORPAY_KEY_ID=rzp_live_RHZikarIfQFg2s
+RAZORPAY_KEY_SECRET=4Ti4sKbfXEswIgmuu3sF1CvH
+```
+
+**IMPORTANT:** `NEXT_PUBLIC_*` vars are safe to be read from client. `RAZORPAY_KEY_SECRET` must be stored only as server-side env and never exposed to the client bundle.
+
+---
+
+## HIGH-LEVEL ARCHITECTURE (what to build)
+
+* **Frontend:** React + Vite (or Next.js with static export + serverless api endpoints). Design must match attached UI screenshots precisely (hero, rounded buttons, modals, dashboard layout, form styles). Use Tailwind CSS (or handcrafted CSS) to achieve identical look — fonts, spacing, rounded 12–16px buttons, subtle shadows.
+* **Backend/API:** Serverless API routes (Vercel `api/*`) that call Supabase and Razorpay securely. Local development may use Express for convenience, but implement code so endpoints can be copied to serverless functions easily.
+* **Database/Auth:** Supabase (Auth for sign-up/login + Postgres for `pages`, `services`, `appointments`, `profiles`, `payments_demo`).
+* **Storage:** Supabase Storage for uploaded logos/images.
+* **Payments:** Razorpay — create orders server-side, sign verification server-side, update membership status server-side.
+
+---
+
+## PAGES / ROUTES (frontend)
+
+* **Home** (`/`) — hero, CTA, login/sign-up, preview area (small hero GIF/video as in screenshots).
+* **Pricing** (`/pricing`) — single plan; “Buy membership” triggers dummy checkout via Razorpay test flow (simulate success/failure but implemented via live keys in sandbox or using test mode if needed).
+* **Auth** (`/login`, `/signup`) — sign in/up flows, include “Login with Google” via Supabase OAuth if desired (optional).
+* **Dashboard** (`/dashboard`) — user-only; shows profile, membership status, Create Page button, list of created booking pages, and new **Appointments** tab. UI must match screenshot layout (left nav if shown, header with user avatar/name, content cards).
+* **Create/Edit Page modal/form** — fields: Title, Slug (editable), Tagline, Logo upload, Services (name, duration, price), Primary color, Calendar link. Follow screenshot UI exactly (rounded modal, full corners consistent).
+* **Public booking page** (`/:slug`) — public view based on slug: hero, services list, contact, buttons “Call us!” and “Book an Appointment”. Book Appointment opens a modal with customer name, phone, optional email, date picker, time slots, service select, notes, Submit.
+* **Appointments** (`/dashboard/appointments`) — table/list showing appointment requests with actions Accept / Decline / Reschedule. Accept triggers status update and optional email (skip email sending for v1).
+* **Footer static pages** — Legal & Support, Terms & Conditions, Privacy Policy, Cancellation & Refunds, How It Works, Contact Us. Add links in the footer exactly as requested.
+
+---
+
+## DATABASE SCHEMA (Supabase) — exact recommended tables
+
+Provide SQL in project and run in Supabase:
+
+```sql
+-- profiles (optional extension of Supabase auth)
+create table profiles (
+  id uuid references auth.users on delete cascade primary key,
+  full_name text,
+  created_at timestamptz default now(),
+  membership_status text default 'free', -- free | pro
+  membership_plan text,
+  membership_expires timestamptz
+);
+
+create table pages (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid references profiles(id),
+  title text not null,
+  slug text not null unique,
+  data jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table services (
+  id uuid primary key default gen_random_uuid(),
+  page_id uuid references pages(id) on delete cascade,
+  name text,
+  duration_minutes int,
+  price numeric,
+  created_at timestamptz default now()
+);
+
+create table appointments (
+  id uuid primary key default gen_random_uuid(),
+  page_id uuid references pages(id) on delete cascade,
+  owner_id uuid references profiles(id),
+  service_id uuid references services(id),
+  customer jsonb, -- {name, email, phone}
+  date date,
+  time text,
+  status text default 'pending', -- pending|accepted|declined|rescheduled
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table payments_demo (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id),
+  plan text,
+  amount numeric,
+  status text,
+  meta jsonb,
+  created_at timestamptz default now()
+);
+```
+
+---
+
+## API ENDPOINTS (serverless) — implement as Vercel function files
+
+Implement each endpoint as an isolated serverless handler (e.g. `/api/pages`, `/api/pages/[slug]`, `/api/appointments`, `/api/payments/dummy`, etc.). Use `SUPABASE_SERVICE_ROLE_KEY` for server-side writes that require privilege (set in server env only).
+
+Required endpoints:
+
+* `POST /api/pages` — create page (auth required). Validate slug uniqueness. Return created page.
+* `GET /api/pages/:slug` — public read (no auth) to return page JSON and services.
+* `PATCH /api/pages/:id` — update page (owner auth).
+* `DELETE /api/pages/:id` — delete page (owner auth).
+* `POST /api/appointments` — create appointment (public). Validate page and service exist, insert row.
+* `GET /api/appointments?ownerId=...` — owner-only list.
+* `PATCH /api/appointments/:id` — owner actions (accept/decline/reschedule).
+* `POST /api/payments/dummy` — server-side Razorpay order creation and membership update:
+
+  * Server uses `RAZORPAY_KEY_SECRET` to create order via Razorpay REST.
+  * For this project, implement a **dummy flow**: create Razorpay order, return order id to client; client opens Razorpay checkout modal; on success callback, server verifies signature (if provided) and updates `profiles.membership_status='pro'` and inserts a `payments_demo` record.
+  * IMPORTANT: For security, **do not** set membership status directly from client; server must verify Razorpay payment/ signature.
+
+**Note on Razorpay**: Implement server-side order creation and verification. Provide fallback/resilience in case Razorpay callback simulation is used in dev.
+
+---
+
+## FRONTEND IMPLEMENTATION DETAILS & UX
+
+* Recreate exact UI from attached images: header spacing, rounded buttons (12–14px), modals with 14px radius and overflow\:hidden to ensure corners consistent, font sizes, color palette (white + blue primary), dashed input borders where shown. Use the images as ground-truth.
+* Buttons: primary (blue filled), secondary (white border). Hover scale and subtle shadow for micro-interactions.
+* Use accessible labels, aria attributes for modals. Modals must be keyboard-closable and trap focus.
+* Public booking page: two visible buttons: **Call us!** (tel: link) and **Book an Appointment** (opens modal).
+* Booking modal: validate fields, disable submit while processing, show success toast with appointment id.
+* Dashboard: show pending appointment count as red badge on sidebar “Appointments” link.
+
+---
+
+## AUTH FLOW
+
+* Use Supabase Auth on client for sign-up/login. After login, create/update profile row in `profiles` table using `supabase.auth.onAuthStateChange` or similar.
+* Protect dashboard routes client-side: if not logged in, redirect to `/login`.
+* Use JWT token from Supabase to authorize serverless API calls. Server verifies token for owner actions (use Supabase server SDK to validate).
+
+---
+
+## PAYMENT FLOW (Razorpay) — secure serverless approach
+
+1. Client clicks “Buy Membership”.
+2. Client calls `POST /api/payments/dummy` (server creates Razorpay order using `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` stored server-side). Server returns `{ orderId, amount, currency }`.
+3. Client opens Razorpay checkout with `orderId` (Razorpay JS included on client).
+4. On payment success, Razorpay calls the client callback returning `razorpay_payment_id`, `razorpay_order_id`, `razorpay_signature`.
+5. Client calls `POST /api/payments/verify` with these details; server verifies signature using `RAZORPAY_KEY_SECRET`. If valid, server updates `profiles.membership_status='pro'` and writes `payments_demo` record. Return success to client and redirect to Dashboard.
+6. If verification fails, show error UI.
+
+**For dummy/testing mode**: server may simulate orders and auto-confirm when running in dev mode — but still follow same API shape.
+
+---
+
+## SLUGS & PUBLIC PAGE ROUTING (avoid URI\_TOO\_LONG)
+
+* Do **NOT** put entire page JSON into the URL or query string. Instead:
+
+  * When a page is created, validate and store `slug` in `pages.slug` (unique).
+  * Public route `/[slug]` should fetch page data server-side (via `/api/pages/:slug`) or by Supabase read and render client-side.
+* Slug generation: sanitize input: lowercase, trim, replace spaces with `-`, remove non-alphanumerics except `-`, max length 50. If slug exists, append `-1`, `-2`, etc., and offer alternative to user.
+
+---
+
+## APPOINTMENTS (public → owner)
+
+* Public booking modal posts to `POST /api/appointments`. Include `pageId` and `serviceId` and customer info.
+* Server inserts into `appointments` with `status='pending'`.
+* Owner Dashboard polls or fetches `GET /api/appointments?ownerId=...` and shows the list. Owner can Accept/Decline/Reschedule using `PATCH /api/appointments/:id` (owner-only).
+* Add optional small snack message to customers after booking.
+
+---
+
+## ASSETS & STORAGE
+
+* Implement logo/image uploads using Supabase Storage. Client uploads via Supabase SDK to `storage.from('logos')` and stores returned public URL in `pages.data.logoUrl`.
+* Optimize images (resize client-side) before upload.
+
+---
+
+## DEV / PROD CONFIG & DEPLOY
+
+* Local dev: run Supabase locally or use the hosted project; run frontend (`npm run dev`) and run local dev server for API if opted. But make sure final code is deployable to Vercel serverless functions.
+* In Vercel, set env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` (for serverless functions only), `APP_ORIGIN`.
+* Vercel config (`vercel.json`) should map `api/*` to serverless functions and route all other paths to the static frontend. Ensure `routes` allow `/[slug]` to serve client `index.html` which will fetch slug content.
+
+---
+
+## SECURITY NOTES (must be implemented)
+
+* Never expose `RAZORPAY_KEY_SECRET` or `SUPABASE_SERVICE_ROLE_KEY` in client code. Use serverless functions for all privileged actions.
+* Validate inputs on server-side (slug, appointment date/time, email/phone).
+* Rate-limit public appointment creation to avoid abuse (simple debounce or recaptcha in later version).
+
+---
+
+## UI MATCHING (attached images)
+
+* Use the provided screenshots as *the source of truth* for the visual design:
+
+  * Exact header spacing, font sizes, cards, modal shape (roundedness), button placements, colors.
+  * Recreate the hero with preview GIF/video and call-to-action placement as shown.
+  * Recreate dashboard layout and appointment list style exactly: left navigation, center content, right utilities if present.
+* If any visual asset (logo, hero GIF) is missing, create a visually-matching placeholder but keep layout identical.
+
+---
+
+## ACCEPTANCE CRITERIA (deliverables)
+
+* New repo with working code, well-structured and documented.
+* README with setup steps for local dev, Supabase schema, env variables, and Vercel deployment.
+* All flows functional:
+
+  * Sign up / Sign in / Sign out (Supabase)
+  * Pro dummy purchase via Razorpay server-side order & verification (membership set on server)
+  * Pro user can create page with slug — saved to Supabase
+  * Public `/:slug` pages render for incognito visitors
+  * Public booking modal works and appointment stored in Supabase
+  * Dashboard shows appointments; owner can Accept/Decline/Reschedule
+  * Services management and page edit/delete works
+* Footer links and static legal pages implemented.
+* UI matches attached screenshots closely.
+
+---
+
+## FINAL INSTRUCTIONS TO DEVELOPER (be strict)
+
+1. **This is a fresh build** — do not touch or attempt to repair old project. Create a new repo/branch.
+2. Use **Supabase** exactly with the provided `NEXT_PUBLIC_SUPABASE_*` keys. Store Razorpay keys in server env.
+3. Implement server logic as **serverless API endpoints** suitable for Vercel. Local Express may be used for development but produce serverless handlers for production.
+4. Do **not** commit secret keys. Add `.env.example` with variable names but no values.
+5. Recreate the UI exactly from screenshots — pay attention to rounded corners, spacing, modals, and button states.
+6. Provide SQL schema file and a `README.md` with deployment steps and environment variable instructions.
+7. After completion, provide a short demo checklist showing how to test each flow locally and on Vercel (login, create page, visit slug, book appointment, accept appointment, dummy payment).
+8. Add inline comments pointing where future features (email notifications, analytics) could be plugged in.
+
+---
+
+**If you understand, begin by scaffolding the new repo and producing a PR that includes:**
+
+* `client/` React app skeleton with pages & styling
+* `api/` serverless endpoint stubs (pages, appointments, payments) wired to Supabase & Razorpay secret use
+* `sql/schema.sql`
+* `README.md` instructions
+* `.env.example`
+
+Make sure to report back in the PR which environment variables you need the user to place in Vercel and confirm the UI asset files you used (indicate any placeholders).
