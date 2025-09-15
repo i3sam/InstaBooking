@@ -6,29 +6,35 @@ import { neon } from '@neondatabase/serverless';
 import { eq, desc } from 'drizzle-orm';
 import { profiles, pages, services, appointments, paymentsDemo } from '@shared/schema';
 
-// Initialize direct database connection using Drizzle ORM
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+// Lazy initialize database connection
+let db: ReturnType<typeof drizzle> | null = null;
+
+function getDb() {
+  if (!db) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL environment variable is required");
+    }
+    
+    console.log("Server storage initialized with Drizzle ORM successfully");
+    const sql = neon(process.env.DATABASE_URL);
+    db = drizzle(sql);
+    
+    // Test database connection
+    testConnection();
+  }
+  return db;
 }
-
-console.log("Server storage initialized with Drizzle ORM successfully");
-
-const sql = neon(process.env.DATABASE_URL);
-const db = drizzle(sql);
 
 // Test database connection
 async function testConnection() {
   try {
     // Simple query to test connection
-    const result = await db.select().from(profiles).limit(1);
+    const result = await getDb().select().from(profiles).limit(1);
     console.log("✅ Database connection successful");
   } catch (error) {
     console.log("⚠️  Database connection test error (may be normal on startup):", error);
   }
 }
-
-// Test connection on startup
-testConnection();
 
 
 export interface IStorage {
@@ -65,7 +71,7 @@ export interface IStorage {
 export class DrizzleStorage implements IStorage {
   async createProfile(profile: any): Promise<any> {
     try {
-      const [result] = await db.insert(profiles).values(profile).returning();
+      const [result] = await getDb().insert(profiles).values(profile).returning();
       return result;
     } catch (error) {
       console.error("Create profile error:", error);
@@ -75,7 +81,7 @@ export class DrizzleStorage implements IStorage {
 
   async getProfile(userId: string): Promise<any | undefined> {
     try {
-      const [result] = await db.select().from(profiles).where(eq(profiles.id, userId));
+      const [result] = await getDb().select().from(profiles).where(eq(profiles.id, userId));
       return result;
     } catch (error) {
       console.error("Get profile error:", error);
@@ -85,7 +91,7 @@ export class DrizzleStorage implements IStorage {
 
   async updateProfile(userId: string, updates: any): Promise<any | undefined> {
     try {
-      const [result] = await db.update(profiles).set(updates).where(eq(profiles.id, userId)).returning();
+      const [result] = await getDb().update(profiles).set(updates).where(eq(profiles.id, userId)).returning();
       return result;
     } catch (error) {
       console.error("Update profile error:", error);
@@ -96,7 +102,7 @@ export class DrizzleStorage implements IStorage {
   async createPage(page: any): Promise<any> {
     try {
       const pageData = { ...page, createdAt: new Date(), updatedAt: new Date() };
-      const [result] = await db.insert(pages).values(pageData).returning();
+      const [result] = await getDb().insert(pages).values(pageData).returning();
       return result;
     } catch (error) {
       console.error("Create page error:", error);
@@ -106,7 +112,7 @@ export class DrizzleStorage implements IStorage {
 
   async getPage(id: string): Promise<any | undefined> {
     try {
-      const [result] = await db.select().from(pages).where(eq(pages.id, id));
+      const [result] = await getDb().select().from(pages).where(eq(pages.id, id));
       return result;
     } catch (error) {
       console.error("Get page error:", error);
@@ -116,7 +122,7 @@ export class DrizzleStorage implements IStorage {
 
   async getPageBySlug(slug: string): Promise<any | undefined> {
     try {
-      const [result] = await db.select().from(pages).where(eq(pages.slug, slug));
+      const [result] = await getDb().select().from(pages).where(eq(pages.slug, slug));
       return result;
     } catch (error) {
       console.error("Get page by slug error:", error);
@@ -126,7 +132,7 @@ export class DrizzleStorage implements IStorage {
 
   async getPagesByOwner(ownerId: string): Promise<any[]> {
     try {
-      const results = await db.select().from(pages).where(eq(pages.ownerId, ownerId)).orderBy(desc(pages.createdAt));
+      const results = await getDb().select().from(pages).where(eq(pages.ownerId, ownerId)).orderBy(desc(pages.createdAt));
       return results;
     } catch (error) {
       console.error("Get pages error:", error);
@@ -137,7 +143,7 @@ export class DrizzleStorage implements IStorage {
   async updatePage(id: string, updates: any): Promise<any | undefined> {
     try {
       const updateData = { ...updates, updatedAt: new Date() };
-      const [result] = await db.update(pages).set(updateData).where(eq(pages.id, id)).returning();
+      const [result] = await getDb().update(pages).set(updateData).where(eq(pages.id, id)).returning();
       return result;
     } catch (error) {
       console.error("Update page error:", error);
@@ -147,7 +153,7 @@ export class DrizzleStorage implements IStorage {
 
   async deletePage(id: string): Promise<boolean> {
     try {
-      await db.delete(pages).where(eq(pages.id, id));
+      await getDb().delete(pages).where(eq(pages.id, id));
       return true;
     } catch (error) {
       console.error("Delete page error:", error);
@@ -157,7 +163,7 @@ export class DrizzleStorage implements IStorage {
 
   async createService(service: any): Promise<any> {
     try {
-      const [result] = await db.insert(services).values(service).returning();
+      const [result] = await getDb().insert(services).values(service).returning();
       return result;
     } catch (error) {
       console.error("Create service error:", error);
@@ -167,7 +173,7 @@ export class DrizzleStorage implements IStorage {
 
   async getServicesByPageId(pageId: string): Promise<any[]> {
     try {
-      const results = await db.select().from(services).where(eq(services.pageId, pageId));
+      const results = await getDb().select().from(services).where(eq(services.pageId, pageId));
       return results;
     } catch (error) {
       console.error("Get services by page ID error:", error);
@@ -177,7 +183,7 @@ export class DrizzleStorage implements IStorage {
 
   async updateService(id: string, updates: any): Promise<any | undefined> {
     try {
-      const [result] = await db.update(services).set(updates).where(eq(services.id, id)).returning();
+      const [result] = await getDb().update(services).set(updates).where(eq(services.id, id)).returning();
       return result;
     } catch (error) {
       console.error("Update service error:", error);
@@ -187,7 +193,7 @@ export class DrizzleStorage implements IStorage {
 
   async deleteService(id: string): Promise<boolean> {
     try {
-      await db.delete(services).where(eq(services.id, id));
+      await getDb().delete(services).where(eq(services.id, id));
       return true;
     } catch (error) {
       console.error("Delete service error:", error);
@@ -197,7 +203,7 @@ export class DrizzleStorage implements IStorage {
 
   async createAppointment(appointment: any): Promise<any> {
     try {
-      const [result] = await db.insert(appointments).values(appointment).returning();
+      const [result] = await getDb().insert(appointments).values(appointment).returning();
       return result;
     } catch (error) {
       console.error("Create appointment error:", error);
@@ -207,7 +213,7 @@ export class DrizzleStorage implements IStorage {
 
   async getAppointmentById(id: string): Promise<any | undefined> {
     try {
-      const [result] = await db.select().from(appointments).where(eq(appointments.id, id));
+      const [result] = await getDb().select().from(appointments).where(eq(appointments.id, id));
       return result;
     } catch (error) {
       console.error("Get appointment by ID error:", error);
@@ -217,7 +223,7 @@ export class DrizzleStorage implements IStorage {
 
   async getAppointmentsByOwner(ownerId: string): Promise<any[]> {
     try {
-      const results = await db.select().from(appointments).where(eq(appointments.ownerId, ownerId)).orderBy(desc(appointments.createdAt));
+      const results = await getDb().select().from(appointments).where(eq(appointments.ownerId, ownerId)).orderBy(desc(appointments.createdAt));
       return results;
     } catch (error) {
       console.error("Get appointments by owner error:", error);
@@ -228,7 +234,7 @@ export class DrizzleStorage implements IStorage {
   async updateAppointment(id: string, updates: any): Promise<any | undefined> {
     try {
       const updateData = { ...updates, updatedAt: new Date() };
-      const [result] = await db.update(appointments).set(updateData).where(eq(appointments.id, id)).returning();
+      const [result] = await getDb().update(appointments).set(updateData).where(eq(appointments.id, id)).returning();
       return result;
     } catch (error) {
       console.error("Update appointment error:", error);
@@ -238,7 +244,7 @@ export class DrizzleStorage implements IStorage {
 
   async createPayment(payment: any): Promise<any> {
     try {
-      const [result] = await db.insert(paymentsDemo).values(payment).returning();
+      const [result] = await getDb().insert(paymentsDemo).values(payment).returning();
       return result;
     } catch (error) {
       console.error("Create payment error:", error);
@@ -248,7 +254,7 @@ export class DrizzleStorage implements IStorage {
 
   async getPaymentsByUser(userId: string): Promise<any[]> {
     try {
-      const results = await db.select().from(paymentsDemo).where(eq(paymentsDemo.userId, userId)).orderBy(desc(paymentsDemo.createdAt));
+      const results = await getDb().select().from(paymentsDemo).where(eq(paymentsDemo.userId, userId)).orderBy(desc(paymentsDemo.createdAt));
       return results;
     } catch (error) {
       console.error("Get payments by user error:", error);
