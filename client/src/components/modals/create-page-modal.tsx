@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { CloudUpload, Plus, X } from 'lucide-react';
+import { CloudUpload, Plus, X, Palette, Image } from 'lucide-react';
 import { uploadFile } from '@/lib/supabase';
 
 interface CreatePageModalProps {
@@ -25,12 +25,34 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
     primaryColor: '#2563eb',
     calendarLink: '',
     logoUrl: '',
+    theme: 'Ocean Blue',
+    backgroundType: 'gradient',
+    backgroundValue: 'blue',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
   
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // Beautiful color themes for booking pages
+  const colorThemes = [
+    { name: 'Ocean Blue', primary: '#2563eb', secondary: '#1e40af', accent: '#3b82f6', gradient: 'from-blue-500 to-blue-600' },
+    { name: 'Forest Green', primary: '#059669', secondary: '#047857', accent: '#10b981', gradient: 'from-emerald-500 to-emerald-600' },
+    { name: 'Sunset Orange', primary: '#ea580c', secondary: '#c2410c', accent: '#fb923c', gradient: 'from-orange-500 to-red-500' },
+    { name: 'Royal Purple', primary: '#7c3aed', secondary: '#6d28d9', accent: '#8b5cf6', gradient: 'from-violet-500 to-purple-600' },
+    { name: 'Rose Gold', primary: '#e11d48', secondary: '#be185d', accent: '#f43f5e', gradient: 'from-rose-500 to-pink-500' },
+    { name: 'Midnight', primary: '#1f2937', secondary: '#111827', accent: '#374151', gradient: 'from-gray-800 to-gray-900' }
+  ];
+
+  const backgroundOptions = [
+    { type: 'gradient', name: 'Blue Gradient', value: 'blue', class: 'bg-gradient-to-br from-blue-100 to-blue-200' },
+    { type: 'gradient', name: 'Green Gradient', value: 'green', class: 'bg-gradient-to-br from-emerald-100 to-emerald-200' },
+    { type: 'gradient', name: 'Purple Gradient', value: 'purple', class: 'bg-gradient-to-br from-violet-100 to-violet-200' },
+    { type: 'gradient', name: 'Rose Gradient', value: 'rose', class: 'bg-gradient-to-br from-rose-100 to-rose-200' },
+    { type: 'solid', name: 'Clean White', value: 'white', class: 'bg-white' },
+    { type: 'solid', name: 'Soft Gray', value: 'gray', class: 'bg-gray-50' }
+  ];
 
   const createPageMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -63,10 +85,21 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
       primaryColor: '#2563eb',
       calendarLink: '',
       logoUrl: '',
+      theme: 'Ocean Blue',
+      backgroundType: 'gradient',
+      backgroundValue: 'blue',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
     });
     setLogoFile(null);
     setLogoPreview('');
+  };
+
+  const selectColorTheme = (theme: any) => {
+    setFormData(prev => ({
+      ...prev,
+      primaryColor: theme.primary,
+      theme: theme.name
+    }));
   };
 
   const handleLogoUpload = async (file: File) => {
@@ -285,22 +318,78 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
             </div>
           </div>
           
-          <div>
-            <Label htmlFor="primaryColor">Primary Color</Label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="color"
-                value={formData.primaryColor}
-                onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                className="w-12 h-12 border border-border rounded-lg"
-                data-testid="input-primary-color"
-              />
-              <Input
-                value={formData.primaryColor}
-                onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                className="flex-1"
-                data-testid="input-primary-color-hex"
-              />
+          <div className="space-y-6">
+            <div>
+              <Label className="flex items-center space-x-2">
+                <Palette className="h-4 w-4" />
+                <span>Color Theme</span>
+              </Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                {colorThemes.map((theme, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => selectColorTheme(theme)}
+                    className={`p-3 rounded-xl border-2 transition-all ${
+                      formData.primaryColor === theme.primary 
+                        ? 'border-primary ring-2 ring-primary/20' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div 
+                      className={`h-8 w-full rounded-lg bg-gradient-to-r ${theme.gradient} mb-2`}
+                    />
+                    <p className="text-sm font-medium text-foreground">{theme.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="flex items-center space-x-2">
+                <Image className="h-4 w-4" />
+                <span>Background Style</span>
+              </Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                {backgroundOptions.map((bg, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      backgroundType: bg.type, 
+                      backgroundValue: bg.value 
+                    }))}
+                    className={`p-3 rounded-xl border-2 transition-all ${
+                      formData.backgroundValue === bg.value 
+                        ? 'border-primary ring-2 ring-primary/20' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className={`h-8 w-full rounded-lg ${bg.class} mb-2 border border-border/20`} />
+                    <p className="text-sm font-medium text-foreground">{bg.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="primaryColor">Custom Primary Color</Label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="color"
+                  value={formData.primaryColor}
+                  onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
+                  className="w-12 h-12 border border-border rounded-lg"
+                  data-testid="input-primary-color"
+                />
+                <Input
+                  value={formData.primaryColor}
+                  onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
+                  className="flex-1"
+                  data-testid="input-primary-color-hex"
+                />
+              </div>
             </div>
           </div>
           
