@@ -85,14 +85,7 @@ export default function Home() {
                   New: Advanced booking features
                 </div>
                 <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-foreground">
-                  Create{" "}
-                  <span className="text-gradient block lg:inline">
-                    beautiful booking
-                  </span>{" "}
-                  <span className="text-gradient block lg:inline">
-                    pages
-                  </span>{" "}
-                  in minutes
+                  Create <span className="text-primary">beautiful booking pages</span> in minutes
                 </h1>
                 <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
                   Design, customize, and launch professional booking pages that convert. 
@@ -103,7 +96,7 @@ export default function Home() {
                 <Button 
                   onClick={() => setLocation('/signup')}
                   size="lg"
-                  className="premium-button px-10 py-6 rounded-xl text-xl h-auto text-white border-0 font-semibold"
+                  className="bg-primary hover:bg-primary/90 px-10 py-6 rounded-xl text-xl h-auto text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   data-testid="button-get-started"
                 >
                   Get Started • It's Free
@@ -112,7 +105,7 @@ export default function Home() {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="glass-effect px-10 py-6 rounded-xl text-xl h-auto border-white/30 hover:bg-white/20 text-foreground"
+                  className="px-10 py-6 rounded-xl text-xl h-auto border-border hover:bg-muted text-foreground"
                   data-testid="button-watch-demo"
                 >
                   <Play className="mr-3 h-6 w-6" />
