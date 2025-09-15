@@ -75,7 +75,7 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="premium-gradient py-24 lg:py-40">
+      <section className="premium-gradient pt-12 pb-24 lg:pt-16 lg:pb-32">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="space-y-10">
@@ -130,11 +130,11 @@ export default function Home() {
               </div>
             </div>
             <div className="relative lg:order-last">
-              <div className="relative">
+              <div className="relative max-w-full overflow-hidden">
                 <img 
                   src={heroImage} 
                   alt="BookingGen dashboard interface" 
-                  className="w-full max-w-none lg:scale-125 xl:scale-150 transform object-cover"
+                  className="w-full h-auto object-contain lg:object-cover lg:max-h-[600px] xl:max-h-[700px]"
                 />
                 <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-2xl -z-10"></div>
               </div>
