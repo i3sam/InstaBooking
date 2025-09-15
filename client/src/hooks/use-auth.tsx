@@ -75,9 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         fetchProfile(session.user.id);
         
         // Handle redirect after successful login
-        if (redirectAfterLogin && event === 'SIGNED_IN') {
-          setLocation(redirectAfterLogin);
-          setRedirectAfterLogin(null);
+        if (redirectAfterLogin && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          setTimeout(() => {
+            setLocation(redirectAfterLogin);
+            setRedirectAfterLogin(null);
+          }, 100);
         }
       } else {
         localStorage.removeItem('token');
