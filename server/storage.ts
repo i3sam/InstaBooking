@@ -173,7 +173,8 @@ export class SupabaseStorage implements IStorage {
       .eq('id', userId)
       .single();
     
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+    // Handle both "not found" and "schema cache" errors gracefully  
+    if (error && error.code !== 'PGRST116' && error.code !== 'PGRST205') throw error;
     return data ? snakeToCamel(data) : undefined;
   }
 
