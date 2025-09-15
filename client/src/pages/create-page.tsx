@@ -22,7 +22,7 @@ export default function CreatePage() {
     primaryColor: '#2563eb',
     calendarLink: '',
     logoUrl: '',
-    theme: 'modern',
+    theme: 'Ocean Blue',
     backgroundType: 'gradient',
     backgroundValue: 'blue',
     fontFamily: 'inter',
