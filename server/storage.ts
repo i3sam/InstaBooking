@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client for server-side operations
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL!;
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseServiceKey) {
@@ -9,8 +9,93 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 console.log("Server storage initialized with Supabase successfully");
+console.log("Supabase URL:", supabaseUrl);
+console.log("Using service role key:", supabaseServiceKey ? "✓ Present" : "✗ Missing");
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Initialize tables if they don't exist
+async function initializeTables() {
+  try {
+    // Create profiles table
+    await supabase.rpc('execute_sql', {
+      query: `
+        CREATE TABLE IF NOT EXISTS public.profiles (
+          id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+          full_name text,
+          membership_status text DEFAULT 'free',
+          membership_plan text,
+          membership_expires timestamptz,
+          created_at timestamptz DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS public.pages (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          owner_id uuid REFERENCES public.profiles(id),
+          title text NOT NULL,
+          slug text UNIQUE NOT NULL,
+          tagline text,
+          logo_url text,
+          primary_color text DEFAULT '#2563eb',
+          calendar_link text,
+          data jsonb,
+          created_at timestamptz DEFAULT now(),
+          updated_at timestamptz DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS public.services (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          page_id uuid REFERENCES public.pages(id) ON DELETE CASCADE,
+          name text NOT NULL,
+          description text,
+          duration_minutes integer NOT NULL,
+          price numeric NOT NULL,
+          created_at timestamptz DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS public.appointments (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          page_id uuid REFERENCES public.pages(id) ON DELETE CASCADE,
+          owner_id uuid REFERENCES public.profiles(id),
+          service_id uuid REFERENCES public.services(id),
+          customer_name text NOT NULL,
+          customer_email text,
+          customer_phone text NOT NULL,
+          date date NOT NULL,
+          time text NOT NULL,
+          status text DEFAULT 'pending',
+          notes text,
+          created_at timestamptz DEFAULT now(),
+          updated_at timestamptz DEFAULT now()
+        );
+        
+        CREATE TABLE IF NOT EXISTS public.payments_demo (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id uuid REFERENCES public.profiles(id),
+          plan text,
+          amount numeric,
+          status text,
+          razorpay_order_id text,
+          razorpay_payment_id text,
+          meta jsonb,
+          created_at timestamptz DEFAULT now()
+        );
+      `
+    });
+    console.log("✅ Database tables initialized successfully");
+    
+    // Refresh PostgREST schema cache
+    await supabase.rpc('execute_sql', {
+      query: "NOTIFY pgrst, 'reload schema';"
+    });
+    console.log("✅ PostgREST schema cache refreshed");
+  } catch (error) {
+    console.error("❌ Failed to initialize tables:", error);
+  }
+}
+
+// Initialize tables on startup
+initializeTables();
 
 // Helper functions to convert between camelCase and snake_case
 function camelToSnake(obj: any): any {

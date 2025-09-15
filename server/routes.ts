@@ -17,6 +17,7 @@ if (supabaseUrl && supabaseServiceKey) {
     new URL(supabaseUrl); // This will throw if URL is invalid
     supabase = createClient(supabaseUrl, supabaseServiceKey);
     console.log("Supabase client initialized successfully");
+    console.log("Routes Supabase URL:", supabaseUrl);
   } catch (error) {
     console.warn("Failed to initialize Supabase client:", error instanceof Error ? error.message : error);
     console.warn("Application will continue without Supabase authentication");
