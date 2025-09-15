@@ -276,7 +276,7 @@ export class SupabaseStorage implements IStorage {
   async createPayment(payment: any): Promise<any> {
     const snakePayment = camelToSnake(payment);
     const { data, error } = await supabase
-      .from('payments')
+      .from('payments_demo')
       .insert(snakePayment)
       .select()
       .single();
@@ -287,7 +287,7 @@ export class SupabaseStorage implements IStorage {
 
   async getPaymentsByUser(userId: string): Promise<any[]> {
     const { data, error } = await supabase
-      .from('payments')
+      .from('payments_demo')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
