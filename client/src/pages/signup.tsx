@@ -142,7 +142,8 @@ export default function Signup() {
             <Button 
               type="submit" 
               size="lg"
-              className="w-full button-gradient h-12"
+              variant="default"
+              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
               disabled={loading}
               data-testid="button-create-account"
             >
