@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { CloudUpload, Plus, X } from 'lucide-react';
+import { uploadFile } from '@/lib/supabase';
 
 interface CreatePageModalProps {
   open: boolean;
@@ -23,8 +24,13 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
     tagline: '',
     primaryColor: '#2563eb',
     calendarLink: '',
+    logoUrl: '',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
+  
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const createPageMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -56,8 +62,49 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
       tagline: '',
       primaryColor: '#2563eb',
       calendarLink: '',
+      logoUrl: '',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
     });
+    setLogoFile(null);
+    setLogoPreview('');
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    setUploadingLogo(true);
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to Supabase
+      const result = await uploadFile(file, 'logos');
+      
+      if (result.success && result.url) {
+        setFormData(prev => ({ ...prev, logoUrl: result.url || '' }));
+        setLogoFile(file);
+        toast({
+          title: "Logo uploaded!",
+          description: "Your logo has been uploaded successfully.",
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: result.error || "Failed to upload logo. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading your logo.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
   };
 
   const generateSlug = (title: string) => {
@@ -178,12 +225,63 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
           
           <div>
             <Label>Logo Upload</Label>
-            <div className="border-2 border-dashed border-border rounded-xl p-6 text-center">
-              <CloudUpload className="h-8 w-8 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground mb-2">
-                Drop your logo here, or <span className="text-primary cursor-pointer">browse</span>
-              </p>
-              <p className="text-sm text-muted-foreground">PNG, JPG up to 2MB</p>
+            <div 
+              className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+              onClick={() => !uploadingLogo && document.getElementById('logo-upload-modal')?.click()}
+            >
+              {logoPreview ? (
+                <div className="space-y-4">
+                  <img 
+                    src={logoPreview} 
+                    alt="Logo preview" 
+                    className="h-16 w-auto mx-auto rounded-lg border border-border"
+                  />
+                  <p className="text-sm text-muted-foreground">{logoFile?.name}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLogoPreview('');
+                      setLogoFile(null);
+                      setFormData(prev => ({ ...prev, logoUrl: '' }));
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <CloudUpload className={`h-8 w-8 mx-auto mb-4 ${uploadingLogo ? 'animate-pulse text-primary' : 'text-muted-foreground'}`} />
+                  <p className="text-muted-foreground mb-2">
+                    {uploadingLogo ? 'Uploading...' : 'Drop your logo here, or'} 
+                    {!uploadingLogo && <span className="text-primary cursor-pointer"> browse</span>}
+                  </p>
+                  <p className="text-sm text-muted-foreground">PNG, JPG up to 2MB</p>
+                </>
+              )}
+              <input
+                id="logo-upload-modal"
+                type="file"
+                accept="image/png,image/jpeg,image/jpg"
+                className="hidden"
+                disabled={uploadingLogo}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > 2 * 1024 * 1024) {
+                      toast({
+                        title: "File too large",
+                        description: "Please select an image under 2MB",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                    handleLogoUpload(file);
+                  }
+                }}
+              />
             </div>
           </div>
           
