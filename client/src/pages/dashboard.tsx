@@ -206,7 +206,7 @@ function SettingsSection() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" size="lg" className="button-gradient px-8" data-testid="button-save-changes">
+              <Button type="submit" size="lg" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md px-8" data-testid="button-save-changes">
                 Save Changes
               </Button>
             </form>
