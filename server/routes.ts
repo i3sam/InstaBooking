@@ -90,10 +90,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/profile", verifyToken, async (req: any, res) => {
     try {
       // Only allow users to access their own profile - ignore userId query parameter
-      const profile = await storage.getProfile(req.user.userId);
+      let profile = await storage.getProfile(req.user.userId);
+      
+      // If no profile exists, create a default one automatically
       if (!profile) {
-        return res.status(404).json({ message: "Profile not found" });
+        console.log(`Creating default profile for user: ${req.user.userId}`);
+        const profileData = { 
+          id: req.user.userId, 
+          fullName: req.user.email || '' // Use email as fallback if no name
+        };
+        profile = await storage.createProfile(profileData);
+        console.log(`Profile created successfully for user: ${req.user.userId}`);
       }
+      
       res.json(profile);
     } catch (error) {
       console.error("Get profile error:", error);

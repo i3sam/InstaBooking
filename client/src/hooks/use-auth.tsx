@@ -94,38 +94,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
 
   const fetchProfile = async (userId: string) => {
     try {
-      const response = await apiRequest('GET', `/api/profile?userId=${userId}`);
-      if (response.ok) {
-        const profileData = await response.json();
-        setProfile(profileData);
-        console.log('Profile fetched successfully:', profileData);
-      } else if (response.status === 404) {
-        // Profile doesn't exist yet, create a default one
-        console.log('Profile not found, will create default profile');
-        setProfile({
-          id: userId,
-          fullName: undefined,
-          membershipStatus: 'free',
-          membershipPlan: undefined,
-          membershipExpires: undefined
-        });
-      } else {
-        console.warn('Profile fetch failed with status:', response.status);
-        // Set a default profile to unblock the UI
-        setProfile({
-          id: userId,
-          fullName: undefined,
-          membershipStatus: 'free',
-          membershipPlan: undefined,
-          membershipExpires: undefined
-        });
-      }
+      const response = await apiRequest('GET', '/api/profile');
+      const profileData = await response.json();
+      setProfile(profileData);
+      console.log('Profile fetched successfully:', profileData);
     } catch (error) {
       console.error('Failed to fetch profile:', error);
-      // Set a default profile to unblock the UI even when backend is failing
+      // Set a default profile to unblock the UI if server is completely down
       setProfile({
         id: userId,
-        fullName: undefined,
+        fullName: session?.user?.user_metadata?.full_name || '',
         membershipStatus: 'free',
         membershipPlan: undefined,
         membershipExpires: undefined
