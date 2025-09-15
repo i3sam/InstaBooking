@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
+import multer from 'multer';
 
 // Supabase setup
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -64,7 +65,6 @@ async function verifyToken(req: any, res: any, next: any) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // File upload route using multer for handling file uploads
-  const multer = require('multer');
   const upload = multer({ 
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
