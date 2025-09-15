@@ -4,19 +4,12 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const profiles = pgTable("profiles", {
-  id: uuid("id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  id: uuid("id").primaryKey(), // This will be the Supabase auth.users.id
   fullName: text("full_name"),
   createdAt: timestamp("created_at").default(sql`now()`),
   membershipStatus: text("membership_status").default("free"), // free | pro
   membershipPlan: text("membership_plan"),
   membershipExpires: timestamp("membership_expires"),
-});
-
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: text("email").notNull().unique(),
-  passwordHash: text("password_hash"),
-  createdAt: timestamp("created_at").default(sql`now()`),
 });
 
 export const pages = pgTable("pages", {
@@ -71,11 +64,7 @@ export const paymentsDemo = pgTable("payments_demo", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-});
+// Insert schemas (users are managed by Supabase auth)
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
   createdAt: true,
@@ -103,9 +92,7 @@ export const insertPaymentSchema = createInsertSchema(paymentsDemo).omit({
   createdAt: true,
 });
 
-// Types
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// Types (User type managed by Supabase auth)
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type Page = typeof pages.$inferSelect;
