@@ -134,10 +134,9 @@ export default function Home() {
                 <img 
                   src={heroImage} 
                   alt="BookingGen dashboard interface" 
-                  className="rounded-3xl shadow-2xl w-full max-w-none lg:scale-110 transform"
+                  className="w-full max-w-none lg:scale-125 xl:scale-150 transform object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent rounded-3xl"></div>
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-3xl blur-2xl -z-10"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-2xl -z-10"></div>
               </div>
             </div>
           </div>
