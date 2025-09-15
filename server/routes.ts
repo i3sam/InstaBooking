@@ -63,6 +63,75 @@ async function verifyToken(req: any, res: any, next: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // File upload route using multer for handling file uploads
+  const multer = require('multer');
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req: any, file: any, cb: any) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'), false);
+      }
+    }
+  });
+
+  app.post("/api/storage/upload", verifyToken, upload.single('file'), async (req: any, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file provided" });
+      }
+
+      if (!supabase) {
+        return res.status(503).json({ message: "Storage service unavailable" });
+      }
+
+      const bucket = req.body.bucket || 'logos';
+      const folder = req.body.folder || '';
+      
+      // Security: Only allow specific buckets
+      const allowedBuckets = ['logos'];
+      if (!allowedBuckets.includes(bucket)) {
+        return res.status(400).json({ message: "Invalid bucket name" });
+      }
+
+      // Generate unique filename
+      const fileExt = req.file.originalname.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = folder ? `${folder}/${fileName}` : fileName;
+
+      // Upload using service role (bypasses RLS)
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        console.error("Upload error:", error);
+        return res.status(500).json({ message: "Failed to upload file" });
+      }
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      res.json({
+        success: true,
+        url: publicUrl,
+        path: filePath
+      });
+
+    } catch (error) {
+      console.error("File upload error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Storage bucket management route
   app.post("/api/storage/ensure-bucket", verifyToken, async (req: any, res) => {
     try {

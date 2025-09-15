@@ -34,31 +34,28 @@ export const uploadFile = async (file: File, bucket: string = 'logos', folder: s
       throw new Error(errorData.message || 'Failed to ensure bucket exists');
     }
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = folder ? `${folder}/${fileName}` : fileName;
+    // Upload file using server-side endpoint (bypasses RLS issues)
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('bucket', bucket);
+    formData.append('folder', folder);
 
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    const uploadResponse = await fetch('/api/storage/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
 
-    if (error) {
-      throw error;
+    if (!uploadResponse.ok) {
+      const errorData = await uploadResponse.json();
+      throw new Error(errorData.message || 'Upload failed');
     }
 
-    // Get the public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
+    const result = await uploadResponse.json();
+    return result;
 
-    return {
-      success: true,
-      url: publicUrl,
-      path: filePath
-    };
   } catch (error) {
     console.error('Error uploading file:', error);
     return {
