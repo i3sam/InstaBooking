@@ -77,7 +77,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       {/* Stats Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => (
-          <Card key={index}>
+          <Card key={index} className="stat-card border-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
@@ -95,7 +95,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
-        <Card>
+        <Card className="premium-card border-0">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-6">Recent Activity</h3>
             <div className="space-y-4">
@@ -123,7 +123,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="premium-card border-0">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-6">Quick Actions</h3>
             <div className="space-y-4">
@@ -132,7 +132,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                   key={index}
                   onClick={action.action}
                   variant="ghost"
-                  className="w-full flex items-center justify-between p-4 h-auto hover:bg-muted"
+                  className="quick-action-button w-full flex items-center justify-between p-4 h-auto"
                   data-testid={`quick-action-${action.title.toLowerCase().replace(' ', '-')}`}
                 >
                   <div className="flex items-center space-x-3">

@@ -124,6 +124,78 @@
   border-radius: 0.75rem;
 }
 
+/* Premium styling enhancements */
+.premium-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.05) 0%, hsl(217.2, 91.2%, 90% / 0.05) 50%, hsl(var(--primary) / 0.1) 100%);
+}
+
+.premium-card {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.98));
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 4px 20px hsl(var(--foreground) / 0.03), 0 1px 3px hsl(var(--foreground) / 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px hsl(var(--foreground) / 0.08), 0 4px 16px hsl(var(--primary) / 0.12);
+}
+
+.stat-card {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: 0 2px 12px hsl(var(--foreground) / 0.04);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px hsl(var(--foreground) / 0.08);
+}
+
+.premium-button {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(217.2, 91.2%, 60%) 100%);
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px hsl(var(--primary) / 0.4);
+}
+
+.glass-effect {
+  background: linear-gradient(145deg, hsl(var(--background) / 0.8), hsl(var(--background) / 0.6));
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(217.2, 91.2%, 65%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dashboard-header {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.98));
+  border-bottom: 1px solid hsl(var(--border) / 0.8);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.05);
+}
+
+.quick-action-button {
+  background: linear-gradient(145deg, hsl(var(--background)), hsl(var(--muted) / 0.3));
+  border: 1px solid hsl(var(--border) / 0.5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quick-action-button:hover {
+  background: linear-gradient(145deg, hsl(var(--muted) / 0.5), hsl(var(--muted) / 0.7));
+  border-color: hsl(var(--primary) / 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(var(--foreground) / 0.06);
+}
+
 .rounded-2xl {
   border-radius: 1rem;
 }

@@ -41,7 +41,7 @@ export default function Dashboard() {
         
         <div className="flex-1">
           {/* Header */}
-          <header className="bg-card border-b border-border px-8 py-6">
+          <header className="dashboard-header px-8 py-6">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
