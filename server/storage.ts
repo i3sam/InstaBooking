@@ -1,126 +1,32 @@
-import { createClient } from '@supabase/supabase-js';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
+import { eq, desc } from 'drizzle-orm';
+import { profiles, pages, services, appointments, paymentsDemo } from '@shared/schema';
 
-// Initialize Supabase client for server-side operations
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error("Supabase environment variables are required");
+// Initialize direct database connection using Drizzle ORM
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is required");
 }
 
-console.log("Server storage initialized with Supabase successfully");
-console.log("Supabase URL:", supabaseUrl);
-console.log("Using service role key:", supabaseServiceKey ? "✓ Present" : "✗ Missing");
+console.log("Server storage initialized with Drizzle ORM successfully");
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const sql = neon(process.env.DATABASE_URL);
+const db = drizzle(sql);
 
-// Initialize tables if they don't exist
-async function initializeTables() {
+// Test database connection
+async function testConnection() {
   try {
-    // Create profiles table
-    await supabase.rpc('execute_sql', {
-      query: `
-        CREATE TABLE IF NOT EXISTS public.profiles (
-          id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-          full_name text,
-          membership_status text DEFAULT 'free',
-          membership_plan text,
-          membership_expires timestamptz,
-          created_at timestamptz DEFAULT now()
-        );
-        
-        CREATE TABLE IF NOT EXISTS public.pages (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          owner_id uuid REFERENCES public.profiles(id),
-          title text NOT NULL,
-          slug text UNIQUE NOT NULL,
-          tagline text,
-          logo_url text,
-          primary_color text DEFAULT '#2563eb',
-          calendar_link text,
-          data jsonb,
-          created_at timestamptz DEFAULT now(),
-          updated_at timestamptz DEFAULT now()
-        );
-        
-        CREATE TABLE IF NOT EXISTS public.services (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          page_id uuid REFERENCES public.pages(id) ON DELETE CASCADE,
-          name text NOT NULL,
-          description text,
-          duration_minutes integer NOT NULL,
-          price numeric NOT NULL,
-          created_at timestamptz DEFAULT now()
-        );
-        
-        CREATE TABLE IF NOT EXISTS public.appointments (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          page_id uuid REFERENCES public.pages(id) ON DELETE CASCADE,
-          owner_id uuid REFERENCES public.profiles(id),
-          service_id uuid REFERENCES public.services(id),
-          customer_name text NOT NULL,
-          customer_email text,
-          customer_phone text NOT NULL,
-          date date NOT NULL,
-          time text NOT NULL,
-          status text DEFAULT 'pending',
-          notes text,
-          created_at timestamptz DEFAULT now(),
-          updated_at timestamptz DEFAULT now()
-        );
-        
-        CREATE TABLE IF NOT EXISTS public.payments_demo (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          user_id uuid REFERENCES public.profiles(id),
-          plan text,
-          amount numeric,
-          status text,
-          razorpay_order_id text,
-          razorpay_payment_id text,
-          meta jsonb,
-          created_at timestamptz DEFAULT now()
-        );
-      `
-    });
-    console.log("✅ Database tables initialized successfully");
-    
-    // Refresh PostgREST schema cache
-    await supabase.rpc('execute_sql', {
-      query: "NOTIFY pgrst, 'reload schema';"
-    });
-    console.log("✅ PostgREST schema cache refreshed");
+    // Simple query to test connection
+    const result = await db.select().from(profiles).limit(1);
+    console.log("✅ Database connection successful");
   } catch (error) {
-    console.error("❌ Failed to initialize tables:", error);
+    console.log("⚠️  Database connection test error (may be normal on startup):", error);
   }
 }
 
-// Initialize tables on startup
-initializeTables();
+// Test connection on startup
+testConnection();
 
-// Helper functions to convert between camelCase and snake_case
-function camelToSnake(obj: any): any {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  
-  const result: any = {};
-  Object.keys(obj).forEach(key => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    result[snakeKey] = camelToSnake(obj[key]);
-  });
-  return result;
-}
-
-function snakeToCamel(obj: any): any {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(snakeToCamel);
-  
-  const result: any = {};
-  Object.keys(obj).forEach(key => {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    result[camelKey] = snakeToCamel(obj[key]);
-  });
-  return result;
-}
 
 export interface IStorage {
   // Profiles
@@ -153,234 +59,199 @@ export interface IStorage {
   getPaymentsByUser(userId: string): Promise<any[]>;
 }
 
-export class SupabaseStorage implements IStorage {
+export class DrizzleStorage implements IStorage {
   async createProfile(profile: any): Promise<any> {
-    const snakeProfile = camelToSnake(profile);
-    const { data, error } = await supabase
-      .from('profiles')
-      .insert(snakeProfile)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return snakeToCamel(data);
+    try {
+      const [result] = await db.insert(profiles).values(profile).returning();
+      return result;
+    } catch (error) {
+      console.error("Create profile error:", error);
+      throw error;
+    }
   }
 
   async getProfile(userId: string): Promise<any | undefined> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    // Handle both "not found" and "schema cache" errors gracefully  
-    if (error && error.code !== 'PGRST116' && error.code !== 'PGRST205') throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.select().from(profiles).where(eq(profiles.id, userId));
+      return result;
+    } catch (error) {
+      console.error("Get profile error:", error);
+      return undefined;
+    }
   }
 
   async updateProfile(userId: string, updates: any): Promise<any | undefined> {
-    const snakeUpdates = camelToSnake(updates);
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(snakeUpdates)
-      .eq('id', userId)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.update(profiles).set(updates).where(eq(profiles.id, userId)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update profile error:", error);
+      throw error;
+    }
   }
 
   async createPage(page: any): Promise<any> {
-    const snakePage = camelToSnake({ ...page, createdAt: new Date(), updatedAt: new Date() });
-    const { data, error } = await supabase
-      .from('pages')
-      .insert(snakePage)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return snakeToCamel(data);
+    try {
+      const pageData = { ...page, createdAt: new Date(), updatedAt: new Date() };
+      const [result] = await db.insert(pages).values(pageData).returning();
+      return result;
+    } catch (error) {
+      console.error("Create page error:", error);
+      throw error;
+    }
   }
 
   async getPage(id: string): Promise<any | undefined> {
-    const { data, error } = await supabase
-      .from('pages')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.select().from(pages).where(eq(pages.id, id));
+      return result;
+    } catch (error) {
+      console.error("Get page error:", error);
+      return undefined;
+    }
   }
 
   async getPageBySlug(slug: string): Promise<any | undefined> {
-    const { data, error } = await supabase
-      .from('pages')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.select().from(pages).where(eq(pages.slug, slug));
+      return result;
+    } catch (error) {
+      console.error("Get page by slug error:", error);
+      return undefined;
+    }
   }
 
   async getPagesByOwner(ownerId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('pages')
-      .select('*')
-      .eq('owner_id', ownerId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data ? data.map(snakeToCamel) : [];
+    try {
+      const results = await db.select().from(pages).where(eq(pages.ownerId, ownerId)).orderBy(desc(pages.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get pages error:", error);
+      throw error;
+    }
   }
 
   async updatePage(id: string, updates: any): Promise<any | undefined> {
-    const snakeUpdates = camelToSnake({ ...updates, updatedAt: new Date() });
-    const { data, error } = await supabase
-      .from('pages')
-      .update(snakeUpdates)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await db.update(pages).set(updateData).where(eq(pages.id, id)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update page error:", error);
+      throw error;
+    }
   }
 
   async deletePage(id: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('pages')
-      .delete()
-      .eq('id', id);
-    
-    return !error;
+    try {
+      await db.delete(pages).where(eq(pages.id, id));
+      return true;
+    } catch (error) {
+      console.error("Delete page error:", error);
+      return false;
+    }
   }
 
   async createService(service: any): Promise<any> {
-    const snakeService = camelToSnake(service);
-    const { data, error } = await supabase
-      .from('services')
-      .insert(snakeService)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return snakeToCamel(data);
+    try {
+      const [result] = await db.insert(services).values(service).returning();
+      return result;
+    } catch (error) {
+      console.error("Create service error:", error);
+      throw error;
+    }
   }
 
   async getServicesByPageId(pageId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .eq('page_id', pageId);
-    
-    if (error) throw error;
-    return data ? data.map(snakeToCamel) : [];
+    try {
+      const results = await db.select().from(services).where(eq(services.pageId, pageId));
+      return results;
+    } catch (error) {
+      console.error("Get services by page ID error:", error);
+      throw error;
+    }
   }
 
   async updateService(id: string, updates: any): Promise<any | undefined> {
-    const snakeUpdates = camelToSnake(updates);
-    const { data, error } = await supabase
-      .from('services')
-      .update(snakeUpdates)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.update(services).set(updates).where(eq(services.id, id)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update service error:", error);
+      throw error;
+    }
   }
 
   async deleteService(id: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('services')
-      .delete()
-      .eq('id', id);
-    
-    return !error;
+    try {
+      await db.delete(services).where(eq(services.id, id));
+      return true;
+    } catch (error) {
+      console.error("Delete service error:", error);
+      return false;
+    }
   }
 
   async createAppointment(appointment: any): Promise<any> {
-    const snakeAppointment = camelToSnake(appointment);
-    const { data, error } = await supabase
-      .from('appointments')
-      .insert(snakeAppointment)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return snakeToCamel(data);
+    try {
+      const [result] = await db.insert(appointments).values(appointment).returning();
+      return result;
+    } catch (error) {
+      console.error("Create appointment error:", error);
+      throw error;
+    }
   }
 
   async getAppointmentById(id: string): Promise<any | undefined> {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const [result] = await db.select().from(appointments).where(eq(appointments.id, id));
+      return result;
+    } catch (error) {
+      console.error("Get appointment by ID error:", error);
+      return undefined;
+    }
   }
 
   async getAppointmentsByOwner(ownerId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        services (name)
-      `)
-      .eq('owner_id', ownerId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data ? data.map(item => {
-      // Handle the nested services name
-      const converted = snakeToCamel(item);
-      if (item.services) {
-        converted.serviceName = item.services.name;
-      }
-      return converted;
-    }) : [];
+    try {
+      const results = await db.select().from(appointments).where(eq(appointments.ownerId, ownerId)).orderBy(desc(appointments.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get appointments by owner error:", error);
+      throw error;
+    }
   }
 
   async updateAppointment(id: string, updates: any): Promise<any | undefined> {
-    const snakeUpdates = camelToSnake({ ...updates, updatedAt: new Date() });
-    const { data, error } = await supabase
-      .from('appointments')
-      .update(snakeUpdates)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data ? snakeToCamel(data) : undefined;
+    try {
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await db.update(appointments).set(updateData).where(eq(appointments.id, id)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update appointment error:", error);
+      throw error;
+    }
   }
 
   async createPayment(payment: any): Promise<any> {
-    const snakePayment = camelToSnake(payment);
-    const { data, error } = await supabase
-      .from('payments_demo')
-      .insert(snakePayment)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return snakeToCamel(data);
+    try {
+      const [result] = await db.insert(paymentsDemo).values(payment).returning();
+      return result;
+    } catch (error) {
+      console.error("Create payment error:", error);
+      throw error;
+    }
   }
 
   async getPaymentsByUser(userId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('payments_demo')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data ? data.map(snakeToCamel) : [];
+    try {
+      const results = await db.select().from(paymentsDemo).where(eq(paymentsDemo.userId, userId)).orderBy(desc(paymentsDemo.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get payments by user error:", error);
+      throw error;
+    }
   }
 }
 
-export const storage = new SupabaseStorage();
+export const storage = new DrizzleStorage();
