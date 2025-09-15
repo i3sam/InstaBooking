@@ -76,7 +76,11 @@ export default function AppointmentsList() {
             <p className="text-muted-foreground mb-6">
               Once people start booking appointments through your pages, they'll appear here.
             </p>
-            <Button className="button-gradient" data-testid="button-create-page-from-appointments">
+            <Button 
+              variant="default"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md" 
+              data-testid="button-create-page-from-appointments"
+            >
               Create Your First Booking Page
             </Button>
           </CardContent>

@@ -287,7 +287,8 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
             </Button>
             <Button 
               type="submit" 
-              className="flex-1 button-gradient"
+              variant="default"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
               disabled={createPageMutation.isPending}
               data-testid="button-create-page"
             >

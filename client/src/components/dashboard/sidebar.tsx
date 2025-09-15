@@ -70,7 +70,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               Unlock unlimited pages and advanced features
             </p>
             <Button 
-              className="w-full button-gradient text-sm" 
+              variant="default"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md text-sm" 
               data-testid="button-upgrade"
               onClick={() => setIsUpgradeModalOpen(true)}
             >

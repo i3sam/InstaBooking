@@ -31,7 +31,8 @@ export default function PagesList() {
         </div>
         <Button 
           onClick={() => setShowCreateModal(true)}
-          className="button-gradient"
+          variant="default"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
           data-testid="button-create-page"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -52,7 +53,8 @@ export default function PagesList() {
               </p>
               <Button 
                 onClick={() => setShowCreateModal(true)}
-                className="button-gradient"
+                variant="default"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 data-testid="button-get-started"
               >
                 Get Started
@@ -101,7 +103,8 @@ export default function PagesList() {
                   </Button>
                   <Button 
                     size="sm" 
-                    className="flex-1 button-gradient"
+                    variant="default"
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                     onClick={() => setLocation(`/${page.slug}`)}
                     data-testid={`button-view-${page.slug}`}
                   >
@@ -125,7 +128,8 @@ export default function PagesList() {
               </p>
               <Button 
                 onClick={() => setShowCreateModal(true)}
-                className="button-gradient"
+                variant="default"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 data-testid="button-create-another-page"
               >
                 Get Started
