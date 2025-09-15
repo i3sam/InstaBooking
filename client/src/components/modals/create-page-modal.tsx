@@ -28,6 +28,7 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
     theme: 'Ocean Blue',
     backgroundType: 'gradient',
     backgroundValue: 'blue',
+    fontFamily: 'inter',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
   
@@ -52,6 +53,13 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
     { type: 'gradient', name: 'Rose Gradient', value: 'rose', class: 'bg-gradient-to-br from-rose-100 to-rose-200' },
     { type: 'solid', name: 'Clean White', value: 'white', class: 'bg-white' },
     { type: 'solid', name: 'Soft Gray', value: 'gray', class: 'bg-gray-50' }
+  ];
+
+  const fontOptions = [
+    { name: 'Inter (Modern)', value: 'inter', class: 'font-inter' },
+    { name: 'Playfair (Elegant)', value: 'playfair', class: 'font-playfair' },
+    { name: 'Roboto (Clean)', value: 'roboto', class: 'font-roboto' },
+    { name: 'Open Sans (Friendly)', value: 'opensans', class: 'font-opensans' }
   ];
 
   const createPageMutation = useMutation({
@@ -88,6 +96,7 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
       theme: 'Ocean Blue',
       backgroundType: 'gradient',
       backgroundValue: 'blue',
+      fontFamily: 'inter',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
     });
     setLogoFile(null);
@@ -340,6 +349,32 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
                       className={`h-8 w-full rounded-lg bg-gradient-to-r ${theme.gradient} mb-2`}
                     />
                     <p className="text-sm font-medium text-foreground">{theme.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="flex items-center space-x-2">
+                <span className="text-sm font-medium">Font Style</span>
+              </Label>
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                {fontOptions.map((font, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, fontFamily: font.value }))}
+                    className={`p-3 rounded-xl border-2 transition-all ${
+                      formData.fontFamily === font.value 
+                        ? 'border-primary ring-2 ring-primary/20' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    data-testid={`button-font-${font.value}`}
+                  >
+                    <div className={`text-center ${font.class}`}>
+                      <p className="text-lg font-semibold mb-1">Sample Text</p>
+                      <p className="text-xs text-muted-foreground">{font.name}</p>
+                    </div>
                   </button>
                 ))}
               </div>
