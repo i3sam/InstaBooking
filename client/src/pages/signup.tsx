@@ -141,7 +141,8 @@ export default function Signup() {
             
             <Button 
               type="submit" 
-              className="w-full button-gradient"
+              size="lg"
+              className="w-full button-gradient h-12"
               disabled={loading}
               data-testid="button-create-account"
             >
@@ -160,7 +161,8 @@ export default function Signup() {
             <Button 
               type="button" 
               variant="outline" 
-              className="w-full"
+              size="lg"
+              className="w-full h-12 border-2 hover:bg-muted/50"
               onClick={handleGoogleSignUp}
               data-testid="button-google-signup"
             >

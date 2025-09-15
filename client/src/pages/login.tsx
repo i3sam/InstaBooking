@@ -113,7 +113,8 @@ export default function Login() {
             
             <Button 
               type="submit" 
-              className="w-full button-gradient"
+              size="lg"
+              className="w-full button-gradient h-12"
               disabled={loading}
               data-testid="button-sign-in"
             >
@@ -132,7 +133,8 @@ export default function Login() {
             <Button 
               type="button" 
               variant="outline" 
-              className="w-full"
+              size="lg"
+              className="w-full h-12 border-2 hover:bg-muted/50"
               onClick={handleGoogleSignIn}
               data-testid="button-google-signin"
             >

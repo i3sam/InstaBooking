@@ -106,10 +106,16 @@ export default function Home() {
                   variant="outline" 
                   size="lg"
                   className="px-10 py-6 rounded-xl text-xl h-auto border-border hover:bg-muted text-foreground"
+                  onClick={() => {
+                    const element = document.querySelector('#how-it-works');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                   data-testid="button-watch-demo"
                 >
                   <Play className="mr-3 h-6 w-6" />
-                  Watch Demo
+                  See How It Works
                 </Button>
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground">
