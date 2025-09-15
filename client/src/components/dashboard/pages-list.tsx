@@ -1,18 +1,64 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from '@/components/ui/alert-dialog';
 import CreatePageModal from '@/components/modals/create-page-modal';
-import { Plus, ExternalLink, Edit, Eye } from 'lucide-react';
+import { Plus, ExternalLink, Edit, Eye, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PagesList() {
   const [, setLocation] = useLocation();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [deletePageId, setDeletePageId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: pages = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/pages'],
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (pageId: string) => {
+      return apiRequest('DELETE', `/api/pages/${pageId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      toast({
+        title: "Page deleted",
+        description: "Your booking page has been successfully deleted.",
+      });
+      setDeletePageId(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete the page. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeletePage = (pageId: string) => {
+    setDeletePageId(pageId);
+  };
+
+  const confirmDelete = () => {
+    if (deletePageId) {
+      deleteMutation.mutate(deletePageId);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -111,6 +157,15 @@ export default function PagesList() {
                     <Eye className="h-4 w-4 mr-1" />
                     View
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    onClick={() => handleDeletePage(page.id)}
+                    data-testid={`button-delete-${page.slug}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -143,6 +198,28 @@ export default function PagesList() {
         open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
       />
+
+      <AlertDialog open={!!deletePageId} onOpenChange={() => setDeletePageId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Booking Page</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this booking page? This action cannot be undone and will permanently remove the page and all its associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+              data-testid="button-confirm-delete"
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete Page'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

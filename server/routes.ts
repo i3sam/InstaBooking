@@ -63,6 +63,55 @@ async function verifyToken(req: any, res: any, next: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Storage bucket management route
+  app.post("/api/storage/ensure-bucket", verifyToken, async (req: any, res) => {
+    try {
+      const { bucketName } = req.body;
+      
+      // Security: Only allow specific bucket names
+      const allowedBuckets = ['logos'];
+      if (!bucketName || !allowedBuckets.includes(bucketName)) {
+        return res.status(400).json({ message: "Invalid bucket name" });
+      }
+
+      if (!supabase) {
+        return res.status(503).json({ message: "Storage service unavailable" });
+      }
+
+      // Check if bucket exists
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      
+      if (!listError && buckets) {
+        const bucketExists = buckets.some((b: any) => b.name === bucketName);
+        if (bucketExists) {
+          return res.json({ success: true, message: "Bucket already exists" });
+        }
+      }
+
+      // Create bucket if it doesn't exist
+      const { data, error } = await supabase.storage.createBucket(bucketName, {
+        public: true,
+        allowedMimeTypes: ['image/*'],
+        fileSizeLimit: 5 * 1024 * 1024 // 5MB in bytes
+      });
+
+      if (error) {
+        // Handle "bucket already exists" gracefully
+        if (error.message?.includes('already exists')) {
+          return res.json({ success: true, message: "Bucket already exists" });
+        }
+        console.error("Failed to create bucket:", error);
+        return res.status(500).json({ message: "Failed to create storage bucket" });
+      }
+
+      console.log("Storage bucket created successfully:", bucketName);
+      res.json({ success: true, message: "Bucket created successfully" });
+    } catch (error) {
+      console.error("Storage bucket error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Profile routes
   app.post("/api/profile", verifyToken, async (req: any, res) => {
     try {
