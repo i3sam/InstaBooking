@@ -75,59 +75,71 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="premium-gradient py-20 lg:py-32">
+      <section className="premium-gradient py-24 lg:py-40">
         <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="inline-flex items-center px-4 py-2 glass-effect rounded-full text-primary text-sm font-medium">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <div className="inline-flex items-center px-6 py-3 glass-effect rounded-full text-primary text-sm font-medium">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
                   New: Advanced booking features
                 </div>
-                <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                  Create <span className="text-gradient">beautiful booking pages</span> in minutes
+                <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-foreground">
+                  Create{" "}
+                  <span className="text-gradient block lg:inline">
+                    beautiful booking
+                  </span>{" "}
+                  <span className="text-gradient block lg:inline">
+                    pages
+                  </span>{" "}
+                  in minutes
                 </h1>
-                <p className="text-xl text-muted-foreground leading-relaxed">
+                <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
                   Design, customize, and launch professional booking pages that convert. 
                   Perfect for freelancers, consultants, and service providers.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-6">
                 <Button 
                   onClick={() => setLocation('/signup')}
-                  className="premium-button px-8 py-4 rounded-xl text-lg h-auto text-white border-0"
+                  size="lg"
+                  className="premium-button px-10 py-6 rounded-xl text-xl h-auto text-white border-0 font-semibold"
                   data-testid="button-get-started"
                 >
                   Get Started • It's Free
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="glass-effect px-8 py-4 rounded-xl text-lg h-auto border-white/20 hover:bg-white/10"
+                  size="lg"
+                  className="glass-effect px-10 py-6 rounded-xl text-xl h-auto border-white/30 hover:bg-white/20 text-foreground"
                   data-testid="button-watch-demo"
                 >
-                  <Play className="mr-2 h-5 w-5" />
+                  <Play className="mr-3 h-6 w-6" />
                   Watch Demo
                 </Button>
               </div>
-              <div className="flex items-center space-x-8 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground">
                 <div className="flex items-center">
-                  <Check className="h-4 w-4 text-green-500 mr-2" />
+                  <Check className="h-5 w-5 text-green-500 mr-3" />
                   No credit card required
                 </div>
                 <div className="flex items-center">
-                  <Check className="h-4 w-4 text-green-500 mr-2" />
+                  <Check className="h-5 w-5 text-green-500 mr-3" />
                   Free forever plan
                 </div>
               </div>
             </div>
-            <div className="relative">
-              <img 
-                src={heroImage} 
-                alt="BookingGen dashboard interface" 
-                className="rounded-2xl shadow-2xl w-full"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-2xl"></div>
+            <div className="relative lg:order-last">
+              <div className="relative">
+                <img 
+                  src={heroImage} 
+                  alt="BookingGen dashboard interface" 
+                  className="rounded-3xl shadow-2xl w-full max-w-none lg:scale-110 transform"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent rounded-3xl"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-3xl blur-2xl -z-10"></div>
+              </div>
             </div>
           </div>
         </div>
