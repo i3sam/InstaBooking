@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import { useLocation } from 'wouter';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { apiRequest } from '@/lib/queryClient';
@@ -21,7 +22,7 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   session: Session | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirectTo?: string) => Promise<void>;
   signup: (email: string, password: string, fullName: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
@@ -31,10 +32,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }): JSX.Element {
+  const [, setLocation] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [redirectAfterLogin, setRedirectAfterLogin] = useState<string | null>(null);
 
   useEffect(() => {
     // Get initial session
@@ -70,6 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
           fullName: session.user.user_metadata?.full_name
         });
         fetchProfile(session.user.id);
+        
+        // Handle redirect after successful login
+        if (redirectAfterLogin && event === 'SIGNED_IN') {
+          setLocation(redirectAfterLogin);
+          setRedirectAfterLogin(null);
+        }
       } else {
         localStorage.removeItem('token');
         setUser(null);
@@ -79,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [redirectAfterLogin, setLocation]);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -122,13 +131,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirectTo: string = '/dashboard') => {
+    setRedirectAfterLogin(redirectTo);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      setRedirectAfterLogin(null);
       throw new Error(error.message);
     }
   };

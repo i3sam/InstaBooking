@@ -25,12 +25,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, '/dashboard');
       toast({
         title: "Welcome back!",
         description: "You have been successfully logged in.",
       });
-      setLocation('/dashboard');
+      // Redirect is now handled by the auth context
     } catch (error) {
       toast({
         title: "Login failed",
