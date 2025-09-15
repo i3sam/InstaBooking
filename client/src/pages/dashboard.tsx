@@ -30,7 +30,7 @@ export default function Dashboard() {
       case 'settings':
         return <SettingsSection />;
       default:
-        return <Overview />;
+        return <Overview onSectionChange={setActiveSection} />;
     }
   };
 

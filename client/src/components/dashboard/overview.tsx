@@ -1,8 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check } from 'lucide-react';
+import { useLocation } from 'wouter';
 
-export default function Overview() {
+interface OverviewProps {
+  onSectionChange?: (section: string) => void;
+}
+
+export default function Overview({ onSectionChange }: OverviewProps) {
+  const [, setLocation] = useLocation();
+
   const stats = [
     {
       title: "Booking Pages",
@@ -42,7 +49,7 @@ export default function Overview() {
       icon: Plus,
       iconBg: "bg-primary/10 text-primary",
       action: () => {
-        // TODO: Navigate to create page
+        setLocation('/create-page');
       }
     },
     {
@@ -51,7 +58,7 @@ export default function Overview() {
       icon: Calendar,
       iconBg: "bg-green-100 text-green-600",
       action: () => {
-        // TODO: Open calendar view
+        onSectionChange?.('appointments');
       }
     },
     {
@@ -60,7 +67,7 @@ export default function Overview() {
       icon: BarChart3,
       iconBg: "bg-purple-100 text-purple-600",
       action: () => {
-        // TODO: Navigate to analytics
+        onSectionChange?.('analytics');
       }
     }
   ];

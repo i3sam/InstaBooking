@@ -3,6 +3,7 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocation } from 'wouter';
+import heroImage from '@assets/image_1757947808618.png';
 import { 
   Palette, 
   CalendarCheck, 
@@ -122,7 +123,7 @@ export default function Home() {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800" 
+                src={heroImage} 
                 alt="BookingGen dashboard interface" 
                 className="rounded-2xl shadow-2xl w-full"
               />
