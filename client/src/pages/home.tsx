@@ -3,7 +3,7 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import heroImage from '@assets/image_1757947808618.png';
+import heroImage from '@assets/Hero image (1)_1757961964946.png';
 import { 
   Palette, 
   CalendarCheck, 
