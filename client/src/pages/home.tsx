@@ -93,11 +93,11 @@ export default function Home() {
       avatar: "SC"
     },
     {
-      name: "Marcus Johnson",
-      role: "Business Consultant",
-      content: "The payment integration saved me so much time. Clients can book and pay instantly, and I get notifications for everything. Perfect for consultants!",
+      name: "David Martinez",
+      role: "Therapist",
+      content: "Managing appointments has never been easier! The automated scheduling and reminders save me hours every week. At just $10, it's incredibly affordable for such a powerful platform.",
       rating: 5,
-      avatar: "MJ"
+      avatar: "DM"
     },
     {
       name: "Elena Rodriguez",
