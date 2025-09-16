@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown } from 'lucide-react';
+import { Bell, Crown, LogOut, Home } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -126,9 +127,10 @@ function AnalyticsSection() {
 }
 
 function SettingsSection() {
-  const { user, profile } = useAuth();
+  const { user, profile, logout } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
@@ -275,6 +277,36 @@ function SettingsSection() {
             </CardContent>
           </Card>
         )}
+
+        {/* Account Actions */}
+        <Card className="mt-8">
+          <CardContent className="p-8">
+            <h3 className="text-lg font-semibold text-foreground mb-6">Account Actions</h3>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                variant="outline"
+                className="flex items-center justify-center h-12"
+                onClick={() => setLocation('/')}
+                data-testid="button-back-home"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Back to Homepage
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex items-center justify-center h-12"
+                onClick={() => {
+                  logout();
+                  setLocation('/');
+                }}
+                data-testid="button-logout"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <UpgradeModal 
