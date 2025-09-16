@@ -188,7 +188,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-3" />
-                  No credit card required
+                  Quick setup
                 </div>
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-3" />
