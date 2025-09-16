@@ -123,7 +123,7 @@ export default function PublicBooking() {
   const page = pageData;
   const services = pageData.services || [];
   const faqs = pageData.faqs || [];
-  const gallery = pageData.data?.gallery || { banners: [], logos: [], images: [] };
+  const gallery = pageData.data?.gallery || pageData.gallery || { banners: [], logos: [], images: [] };
   const themeStyles = page ? getThemeStyles(page) : null;
 
   return (
@@ -165,7 +165,7 @@ export default function PublicBooking() {
 
       {/* Hero Section */}
       <section 
-        className="py-24 relative overflow-hidden"
+        className="py-32 relative overflow-hidden"
         style={{
           background: themeStyles 
             ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 100%)`
@@ -174,18 +174,18 @@ export default function PublicBooking() {
       >
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="container mx-auto px-6 text-center relative z-10">
-          <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
             {page.title}
           </h1>
           {page.tagline && (
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-2xl lg:text-3xl text-muted-foreground mb-12 max-w-4xl mx-auto font-medium leading-relaxed">
               {page.tagline}
             </p>
           )}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => setShowBookingModal(true)}
-              className="px-8 py-4 rounded-xl text-lg h-auto text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-primary hover:bg-primary/90"
+              className="px-12 py-6 rounded-2xl text-xl h-auto text-white font-bold shadow-2xl hover:shadow-3xl transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
               style={{
                 background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
                 color: 'white',

@@ -383,7 +383,10 @@ export default function CreatePage() {
       businessAddress: formData.businessAddress,
       cancellationPolicy: formData.cancellationPolicy,
       showBusinessHours: formData.showBusinessHours,
-      showContactInfo: formData.showContactInfo
+      showContactInfo: formData.showContactInfo,
+      data: {
+        gallery: formData.gallery
+      }
     });
   };
 

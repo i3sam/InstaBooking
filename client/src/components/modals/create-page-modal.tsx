@@ -283,7 +283,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         showBusinessHours: editingPageData.showBusinessHours || 'true',
         showContactInfo: editingPageData.showContactInfo || 'true',
         services: formattedServices,
-        gallery: editingPageData.gallery || {
+        gallery: editingPageData.data?.gallery || editingPageData.gallery || {
           banners: [],
           logos: [],
           images: []
@@ -296,11 +296,12 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       }
       
       // Set gallery previews if there's gallery data
-      if (editingPageData.gallery) {
+      const galleryData = editingPageData.data?.gallery || editingPageData.gallery;
+      if (galleryData) {
         setGalleryPreviews({
-          banners: editingPageData.gallery.banners || [],
-          logos: editingPageData.gallery.logos || [],
-          images: editingPageData.gallery.images || []
+          banners: galleryData.banners || [],
+          logos: galleryData.logos || [],
+          images: galleryData.images || []
         });
       }
     } else if (!isEditing) {
@@ -535,7 +536,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       cancellationPolicy: formData.cancellationPolicy,
       showBusinessHours: formData.showBusinessHours,
       showContactInfo: formData.showContactInfo,
-      gallery: formData.gallery
+      data: {
+        gallery: formData.gallery
+      }
     });
   };
 
