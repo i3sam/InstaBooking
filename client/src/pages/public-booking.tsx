@@ -162,17 +162,31 @@ export default function PublicBooking() {
               <Calendar className="h-5 w-5 mr-2" />
               Book an Appointment
             </Button>
-            <Button
-              variant="outline"
-              className="px-8 py-4 rounded-xl text-lg h-auto"
-              asChild
-              data-testid="button-call-us"
-            >
-              <a href="tel:+1234567890">
-                <Phone className="h-5 w-5 mr-2" />
-                Call Us!
-              </a>
-            </Button>
+            {page.calendarLink ? (
+              <Button
+                variant="outline"
+                className="px-8 py-4 rounded-xl text-lg h-auto"
+                asChild
+                data-testid="button-visit-calendar"
+              >
+                <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  View My Calendar
+                </a>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="px-8 py-4 rounded-xl text-lg h-auto"
+                asChild
+                data-testid="button-call-us"
+              >
+                <a href="tel:+1234567890">
+                  <Phone className="h-5 w-5 mr-2" />
+                  Call Us!
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -256,17 +270,31 @@ export default function PublicBooking() {
               <Calendar className="h-5 w-5 mr-2" />
               Book an Appointment
             </Button>
-            <Button
-              variant="outline"
-              className="px-8 py-4 rounded-xl text-lg h-auto"
-              asChild
-              data-testid="button-call-us-cta"
-            >
-              <a href="tel:+1234567890">
-                <Phone className="h-5 w-5 mr-2" />
-                Call Us: (123) 456-7890
-              </a>
-            </Button>
+            {page.calendarLink ? (
+              <Button
+                variant="outline"
+                className="px-8 py-4 rounded-xl text-lg h-auto"
+                asChild
+                data-testid="button-visit-calendar-cta"
+              >
+                <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  View My Calendar
+                </a>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="px-8 py-4 rounded-xl text-lg h-auto"
+                asChild
+                data-testid="button-call-us-cta"
+              >
+                <a href="tel:+1234567890">
+                  <Phone className="h-5 w-5 mr-2" />
+                  Call Us: (123) 456-7890
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </section>
