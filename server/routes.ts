@@ -395,18 +395,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Payment processing not configured" });
       }
       
-      const { plan, amount } = req.body;
+      const { plan } = req.body;
+      
+      // Server-side canonical pricing - ignore any client-provided amount
+      const PLAN_PRICING = {
+        'pro': { amount: 10, currency: 'USD' }
+      };
+      
+      const planConfig = PLAN_PRICING[plan as keyof typeof PLAN_PRICING];
+      if (!planConfig) {
+        return res.status(400).json({ message: "Invalid plan selected" });
+      }
+      
+      // Use canonical price from server, never trust client
+      const canonicalAmount = planConfig.amount;
+      const currency = planConfig.currency;
       
       const order = await razorpay.orders.create({
-        amount: Math.round(amount * 100), // amount in paise
-        currency: "USD",
+        amount: Math.round(canonicalAmount * 100), // amount in paise
+        currency: currency,
         receipt: `receipt_${Date.now()}`,
       });
 
       await storage.createPayment({
         userId: req.user.userId,
         plan,
-        amount,
+        amount: canonicalAmount, // Store canonical amount
         status: "created",
         razorpayOrderId: order.id,
         meta: { order }
