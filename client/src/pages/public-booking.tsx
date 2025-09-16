@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle } from 'lucide-react';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -121,6 +122,7 @@ export default function PublicBooking() {
 
   const page = pageData;
   const services = pageData.services || [];
+  const faqs = pageData.faqs || [];
   const themeStyles = page ? getThemeStyles(page) : null;
 
   return (
@@ -275,6 +277,49 @@ export default function PublicBooking() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ Section */}
+      {faqs.length > 0 && (
+        <section className="py-20">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center mb-6">
+                <HelpCircle 
+                  className="h-12 w-12 mr-4" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Frequently Asked Questions</h2>
+              </div>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Find answers to common questions about our services</p>
+            </div>
+
+            <div className="max-w-3xl mx-auto">
+              <Accordion type="single" collapsible className="space-y-4">
+                {faqs.map((faq: any, index: number) => (
+                  <AccordionItem 
+                    key={index} 
+                    value={`item-${index}`}
+                    className="bg-card border border-border rounded-xl px-6 data-[state=open]:bg-muted/20"
+                  >
+                    <AccordionTrigger 
+                      className="text-left py-6 hover:no-underline"
+                      data-testid={`faq-question-${index}`}
+                    >
+                      <span className="text-lg font-semibold text-foreground">{faq.question}</span>
+                    </AccordionTrigger>
+                    <AccordionContent 
+                      className="pb-6 text-muted-foreground leading-relaxed"
+                      data-testid={`faq-answer-${index}`}
+                    >
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>

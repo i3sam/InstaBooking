@@ -25,6 +25,8 @@ export const pages = pgTable("pages", {
   backgroundValue: text("background_value").default("blue"),
   fontFamily: text("font_family").default("inter"),
   calendarLink: text("calendar_link"),
+  faqs: jsonb("faqs").default(sql`'[]'`), // Array of {question: string, answer: string}
+  acceptReviews: text("accept_reviews").default("true"), // "true" or "false" 
   data: jsonb("data"),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),

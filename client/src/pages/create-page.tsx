@@ -26,6 +26,8 @@ export default function CreatePage() {
     backgroundType: 'gradient',
     backgroundValue: 'blue',
     fontFamily: 'inter',
+    acceptReviews: 'true',
+    faqs: [{ question: '', answer: '' }],
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
 
@@ -178,6 +180,31 @@ export default function CreatePage() {
     }));
   };
 
+  const addFaq = () => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: [...prev.faqs, { question: '', answer: '' }]
+    }));
+  };
+
+  const removeFaq = (index: number) => {
+    if (formData.faqs.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        faqs: prev.faqs.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateFaq = (index: number, field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.map((faq, i) =>
+        i === index ? { ...faq, [field]: value } : faq
+      )
+    }));
+  };
+
   const handleLogoUpload = async (file: File) => {
     setUploadingLogo(true);
     try {
@@ -242,9 +269,14 @@ export default function CreatePage() {
       durationMinutes: parseInt(service.durationMinutes.toString()) || 60
     }));
 
+    // Filter out empty FAQs
+    const validFaqs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
+
     createPageMutation.mutate({
       ...formData,
-      services: servicesWithNumbers
+      services: servicesWithNumbers,
+      faqs: validFaqs,
+      acceptReviews: formData.acceptReviews
     });
   };
 
@@ -533,6 +565,78 @@ export default function CreatePage() {
                     Add Another Service
                   </Button>
                 </div>
+              </div>
+              
+              <div>
+                <Label>Frequently Asked Questions</Label>
+                <div className="space-y-4">
+                  {formData.faqs.map((faq, index) => (
+                    <div key={index} className="grid gap-4 p-4 border border-border rounded-xl">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-foreground">FAQ #{index + 1}</span>
+                        {formData.faqs.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFaq(index)}
+                            data-testid={`button-remove-faq-${index}`}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor={`faq-question-${index}`}>Question</Label>
+                        <Input
+                          id={`faq-question-${index}`}
+                          placeholder="e.g., What should I bring to my appointment?"
+                          value={faq.question}
+                          onChange={(e) => updateFaq(index, 'question', e.target.value)}
+                          data-testid={`input-faq-question-${index}`}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`faq-answer-${index}`}>Answer</Label>
+                        <Textarea
+                          id={`faq-answer-${index}`}
+                          rows={3}
+                          placeholder="Please bring comfortable workout clothes and a water bottle..."
+                          value={faq.answer}
+                          onChange={(e) => updateFaq(index, 'answer', e.target.value)}
+                          className="resize-none"
+                          data-testid={`textarea-faq-answer-${index}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full border-2 border-dashed"
+                    onClick={addFaq}
+                    data-testid="button-add-faq"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another FAQ
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.acceptReviews === 'true'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, acceptReviews: e.target.checked ? 'true' : 'false' }))}
+                    className="rounded border-border"
+                    data-testid="checkbox-accept-reviews"
+                  />
+                  <span>Accept and display customer reviews on booking page</span>
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  When enabled, customers can leave reviews after appointments that will be displayed on your booking page
+                </p>
               </div>
               
               <div>
