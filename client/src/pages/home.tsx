@@ -62,7 +62,7 @@ export default function Home() {
     {
       icon: Bell,
       title: "Smart Notifications",
-      description: "Automated email and SMS reminders keep you and your clients informed about upcoming appointments."
+      description: "Automated email notifications for appointment approvals and rejections keep you and your clients informed about booking status instantly."
     }
   ];
 
@@ -154,7 +154,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="inline-flex items-center px-6 py-3 glass-effect rounded-full text-primary text-sm font-medium">
                   <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                  New: Advanced booking features
+                  New: Automated appointment notifications
                 </div>
                 <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-foreground">
                   Create <span className="text-primary">beautiful booking pages</span> in minutes
