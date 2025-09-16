@@ -398,7 +398,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Payment processing not configured" });
       }
       
-      const { plan } = req.body;
+      const { plan, currency: requestedCurrency } = req.body;
+      
+      // Currency conversion rates relative to USD
+      const CURRENCY_RATES = {
+        'USD': 1,
+        'EUR': 0.85,
+        'GBP': 0.73,
+        'INR': 83.25,
+        'BHD': 0.376,
+        'AED': 3.67,
+        'SAR': 3.75,
+        'CAD': 1.35,
+        'AUD': 1.52
+      };
       
       // Server-side canonical pricing - ignore any client-provided amount
       const PLAN_PRICING = {
@@ -410,9 +423,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid plan selected" });
       }
       
-      // Use canonical price from server, never trust client
-      const canonicalAmount = planConfig.amount;
-      const currency = planConfig.currency;
+      // Validate and use requested currency
+      const currency = requestedCurrency && CURRENCY_RATES[requestedCurrency as keyof typeof CURRENCY_RATES] 
+        ? requestedCurrency 
+        : 'USD';
+        
+      // Convert price to requested currency
+      const usdAmount = planConfig.amount;
+      const conversionRate = CURRENCY_RATES[currency as keyof typeof CURRENCY_RATES];
+      const canonicalAmount = Math.round((usdAmount * conversionRate) * 100) / 100;
       
       const order = await razorpay.orders.create({
         amount: Math.round(canonicalAmount * 100), // amount in paise
@@ -426,13 +445,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         amount: canonicalAmount, // Store canonical amount
         status: "created",
         razorpayOrderId: order.id,
-        meta: { order }
+        meta: { order, currency, usdAmount }
       });
 
       res.json({ 
         orderId: order.id, 
         amount: order.amount, 
-        currency: order.currency 
+        currency: order.currency,
+        displayAmount: canonicalAmount
       });
     } catch (error) {
       console.error("Create order error:", error);

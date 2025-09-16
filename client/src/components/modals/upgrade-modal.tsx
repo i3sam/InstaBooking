@@ -8,6 +8,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { initializeRazorpay, openRazorpayCheckout } from '@/lib/razorpay';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
+import { useCurrency } from '@/hooks/use-currency';
+import CurrencySelector from '@/components/ui/currency-selector';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const { user, profile } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { formatPrice, convertPrice, selectedCurrency } = useCurrency();
 
   const handleUpgrade = async () => {
     if (!user) return;
@@ -38,7 +41,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       // Create order
       const response = await apiRequest('POST', '/api/payments/create-order', {
         plan: 'pro',
-        amount: 10
+        amount: 10,
+        currency: selectedCurrency.code
       });
       const { orderId, amount, currency } = await response.json();
 
@@ -109,6 +113,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* Currency Selector */}
+          <div className="flex justify-center">
+            <CurrencySelector variant="compact" />
+          </div>
+          
           {/* Plan Details */}
           <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-xl p-6 relative overflow-hidden">
             <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground">
@@ -123,7 +132,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             </div>
             
             <div className="flex items-baseline mb-6">
-              <span className="text-4xl font-bold text-foreground">$10</span>
+              <span className="text-4xl font-bold text-foreground">{formatPrice(10)}</span>
               <span className="text-muted-foreground ml-2">/month</span>
             </div>
             

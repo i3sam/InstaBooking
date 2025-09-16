@@ -5,10 +5,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { Check } from 'lucide-react';
+import { useCurrency } from '@/hooks/use-currency';
+import CurrencySelector from '@/components/ui/currency-selector';
 
 export default function Pricing() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
 
   const plans = [
     {
@@ -49,9 +52,12 @@ export default function Pricing() {
             <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
               One plan, all features
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-muted-foreground mb-6">
               Get everything you need to create beautiful booking pages and grow your business.
             </p>
+            <div className="flex justify-center">
+              <CurrencySelector variant="compact" className="mb-4" />
+            </div>
           </div>
 
           <div className="flex justify-center">
@@ -73,7 +79,7 @@ export default function Pricing() {
                     <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
                     <p className="text-muted-foreground mb-4">{plan.description}</p>
                     <div className="text-4xl font-bold text-foreground">
-                      {plan.price === null ? "Custom" : `$${plan.price}`}
+                      {plan.price === null ? "Custom" : formatPrice(plan.price)}
                       {plan.price !== null && (
                         <span className="text-lg font-normal text-muted-foreground">/month</span>
                       )}
