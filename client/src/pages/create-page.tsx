@@ -323,7 +323,7 @@ export default function CreatePage() {
         <Card className="max-w-4xl mx-auto">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              <Accordion type="multiple" defaultValue={["basic", "styling"]} className="space-y-6">
+              <Accordion type="multiple" defaultValue={["basic"]} className="space-y-6">
                 
                 {/* Basic Information Section */}
                 <AccordionItem value="basic" className="border border-border rounded-xl">

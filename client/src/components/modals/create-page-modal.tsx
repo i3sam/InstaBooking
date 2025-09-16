@@ -441,7 +441,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Accordion type="multiple" defaultValue={["basic", "styling"]} className="space-y-4">
+          <Accordion type="multiple" defaultValue={["basic"]} className="space-y-4">
             
             {/* Basic Information Section */}
             <AccordionItem value="basic" className="border border-border rounded-xl">
