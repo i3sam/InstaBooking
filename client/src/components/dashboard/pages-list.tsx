@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import CreatePageModal from '@/components/modals/create-page-modal';
 import UpgradeModal from '@/components/modals/upgrade-modal';
-import { Plus, ExternalLink, Edit, Eye, Trash2 } from 'lucide-react';
+import { Plus, ExternalLink, Edit, Eye, Trash2, Link } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -81,6 +81,29 @@ export default function PagesList() {
   const handleEditPage = (page: any) => {
     setEditingPage(page);
     setShowCreateModal(true);
+  };
+
+  const handleCopyLink = async (page: any) => {
+    const pageUrl = `https://bookinggen.com/${page.slug}`;
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      toast({
+        title: "Link copied!",
+        description: `Page link has been copied to your clipboard.`,
+      });
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = pageUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast({
+        title: "Link copied!",
+        description: `Page link has been copied to your clipboard.`,
+      });
+    }
   };
 
   if (isLoading) {
@@ -180,6 +203,15 @@ export default function PagesList() {
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                    onClick={() => handleCopyLink(page)}
+                    data-testid={`button-copy-link-${page.slug}`}
+                  >
+                    <Link className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
