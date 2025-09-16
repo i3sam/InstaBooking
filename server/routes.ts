@@ -409,22 +409,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle services update if provided
       if (services && Array.isArray(services)) {
-        // Delete existing services for this page
         const existingServices = await storage.getServicesByPageId(req.params.id);
-        for (const existingService of existingServices) {
-          await storage.deleteService(existingService.id);
-        }
-
-        // Create new services
+        const existingServiceIds = existingServices.map(s => s.id);
+        const submittedServiceIds = services.filter(s => s.id).map(s => s.id);
+        
+        // Update existing services and create new ones
         for (const service of services) {
-          await storage.createService({
-            ...service,
-            pageId: req.params.id
-          });
+          if (service.id) {
+            // Security check: Only allow updates to services that belong to this page
+            if (!existingServiceIds.includes(service.id)) {
+              return res.status(400).json({ 
+                message: "Invalid service ID", 
+                details: "One or more service IDs do not belong to this page" 
+              });
+            }
+            // Update existing service - only allow specific fields to be updated
+            const { id, name, description, durationMinutes, price } = service;
+            await storage.updateService(id, {
+              name,
+              description, 
+              durationMinutes,
+              price
+            });
+          } else {
+            // Create new service
+            await storage.createService({
+              ...service,
+              pageId: req.params.id
+            });
+          }
         }
+        
+        // Handle removed services
+        const servicesToRemove = existingServiceIds.filter(id => !submittedServiceIds.includes(id));
+        const servicesNotDeleted = [];
+        
+        for (const serviceId of servicesToRemove) {
+          try {
+            await storage.deleteService(serviceId);
+          } catch (error: any) {
+            // If deletion fails due to foreign key constraint (appointments exist),
+            // we'll skip the deletion but track it
+            if (error.code === '23503') {
+              const service = existingServices.find(s => s.id === serviceId);
+              servicesNotDeleted.push({
+                id: serviceId,
+                name: service?.name || 'Unknown Service',
+                reason: 'Service has existing appointments and cannot be deleted'
+              });
+              console.warn(`Cannot delete service ${serviceId} - it has associated appointments`);
+            } else {
+              throw error;
+            }
+          }
+        }
+        
+        // Include information about services that couldn't be deleted in the response
+        const response = { ...updated };
+        if (servicesNotDeleted.length > 0) {
+          response.warnings = {
+            servicesNotDeleted,
+            message: `${servicesNotDeleted.length} service(s) could not be deleted because they have existing appointments`
+          };
+        }
+        
+        res.json(response);
+      } else {
+        res.json(updated);
       }
-
-      res.json(updated);
     } catch (error) {
       console.error("Update page error:", error);
       res.status(500).json({ message: "Internal server error" });

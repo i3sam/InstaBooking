@@ -84,7 +84,7 @@ export default function PagesList() {
   };
 
   const handleCopyLink = async (page: any) => {
-    const pageUrl = `https://bookinggen.com/${page.slug}`;
+    const pageUrl = `${window.location.origin}/${page.slug}`;
     try {
       await navigator.clipboard.writeText(pageUrl);
       toast({
@@ -93,16 +93,29 @@ export default function PagesList() {
       });
     } catch (error) {
       // Fallback for browsers that don't support clipboard API
-      const textArea = document.createElement('textarea');
-      textArea.value = pageUrl;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      toast({
-        title: "Link copied!",
-        description: `Page link has been copied to your clipboard.`,
-      });
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = pageUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+          toast({
+            title: "Link copied!",
+            description: `Page link has been copied to your clipboard.`,
+          });
+        } else {
+          throw new Error('Copy command failed');
+        }
+      } catch (fallbackError) {
+        toast({
+          title: "Copy failed",
+          description: "Unable to copy link. Please copy it manually from the URL bar.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -209,6 +222,8 @@ export default function PagesList() {
                     size="sm" 
                     className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                     onClick={() => handleCopyLink(page)}
+                    aria-label={`Copy link for ${page.title}`}
+                    title="Copy page link to clipboard"
                     data-testid={`button-copy-link-${page.slug}`}
                   >
                     <Link className="h-4 w-4" />

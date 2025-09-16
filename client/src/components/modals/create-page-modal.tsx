@@ -84,12 +84,25 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         return response.json();
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
-      toast({
-        title: isEditing ? "Page updated!" : "Page created!",
-        description: isEditing ? "Your booking page has been updated successfully." : "Your booking page has been created successfully.",
-      });
+      
+      // Check if there are warnings about services that couldn't be deleted
+      if (data.warnings?.servicesNotDeleted?.length > 0) {
+        toast({
+          title: isEditing ? "Page updated with warnings" : "Page created!",
+          description: isEditing 
+            ? `Page updated, but ${data.warnings.servicesNotDeleted.length} service(s) with existing appointments couldn't be removed.`
+            : "Your booking page has been created successfully.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: isEditing ? "Page updated!" : "Page created!",
+          description: isEditing ? "Your booking page has been updated successfully." : "Your booking page has been created successfully.",
+        });
+      }
+      
       onClose();
       resetForm();
     },
@@ -127,6 +140,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       const services = editingPageData.services || [];
       const formattedServices = services.length > 0 
         ? services.map((service: any) => ({
+            id: service.id, // Preserve service ID for editing
             name: service.name || '',
             description: service.description || '',
             durationMinutes: service.durationMinutes || 60,
