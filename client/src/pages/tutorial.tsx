@@ -18,6 +18,7 @@ import {
   Expand
 } from 'lucide-react';
 import dashboardImage from '@assets/image_1758020681382.png';
+import demoVideo from '@assets/0916_1758025696817.mp4';
 
 export default function Tutorial() {
   const [, setLocation] = useLocation();
@@ -122,7 +123,7 @@ export default function Tutorial() {
                         preload="metadata"
                         data-testid="demo-video"
                       >
-                        <source src="/attached_assets/0916_1758025696817.mp4" type="video/mp4" />
+                        <source src={demoVideo} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
@@ -144,7 +145,7 @@ export default function Tutorial() {
                         autoPlay
                         data-testid="demo-video-fullscreen"
                       >
-                        <source src="/attached_assets/0916_1758025696817.mp4" type="video/mp4" />
+                        <source src={demoVideo} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     </div>

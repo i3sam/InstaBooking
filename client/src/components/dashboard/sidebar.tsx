@@ -59,7 +59,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       </nav>
       
       {/* Enhanced Upgrade Card at Bottom */}
-      {profile?.membershipStatus !== 'pro' && (
+      {profile && profile.membershipStatus !== 'pro' && (
         <div className="p-6 mt-auto">
           <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 rounded-xl p-5 overflow-hidden">
             {/* Background decoration */}

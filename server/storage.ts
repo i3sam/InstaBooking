@@ -2,12 +2,25 @@
 import 'dotenv/config';
 
 import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
+import { neon, neonConfig } from '@neondatabase/serverless';
 import { eq, desc } from 'drizzle-orm';
+
+// Enable connection caching for better performance
+neonConfig.fetchConnectionCache = true;
+neonConfig.poolQueryViaFetch = true;
 import { profiles, pages, services, appointments, paymentsDemo } from '@shared/schema';
 
 // Lazy initialize database connection
 let db: ReturnType<typeof drizzle> | null = null;
+
+// In-memory profile cache to reduce database queries
+interface CachedProfile {
+  data: any;
+  expiresAt: number;
+}
+
+const profileCache = new Map<string, CachedProfile>();
+const PROFILE_CACHE_TTL = 15000; // 15 seconds
 
 function getDb() {
   if (!db) {
@@ -72,6 +85,14 @@ export class DrizzleStorage implements IStorage {
   async createProfile(profile: any): Promise<any> {
     try {
       const [result] = await getDb().insert(profiles).values(profile).returning();
+      
+      // Cache the newly created profile
+      const now = Date.now();
+      profileCache.set(result.id, {
+        data: result,
+        expiresAt: now + PROFILE_CACHE_TTL
+      });
+      
       return result;
     } catch (error) {
       console.error("Create profile error:", error);
@@ -81,7 +102,24 @@ export class DrizzleStorage implements IStorage {
 
   async getProfile(userId: string): Promise<any | undefined> {
     try {
+      // Check cache first
+      const cached = profileCache.get(userId);
+      const now = Date.now();
+      
+      if (cached && cached.expiresAt > now) {
+        return cached.data;
+      }
+
       const [result] = await getDb().select().from(profiles).where(eq(profiles.id, userId));
+      
+      // Cache the result
+      if (result) {
+        profileCache.set(userId, {
+          data: result,
+          expiresAt: now + PROFILE_CACHE_TTL
+        });
+      }
+      
       return result;
     } catch (error) {
       console.error("Get profile error:", error);
@@ -92,6 +130,10 @@ export class DrizzleStorage implements IStorage {
   async updateProfile(userId: string, updates: any): Promise<any | undefined> {
     try {
       const [result] = await getDb().update(profiles).set(updates).where(eq(profiles.id, userId)).returning();
+      
+      // Invalidate cache on update
+      profileCache.delete(userId);
+      
       return result;
     } catch (error) {
       console.error("Update profile error:", error);
