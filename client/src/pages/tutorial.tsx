@@ -3,7 +3,7 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useLocation } from 'wouter';
 import { 
   Play, 
@@ -246,6 +246,10 @@ export default function Tutorial() {
                     </div>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl w-full" data-testid="dialog-dashboard-enlarged">
+                    <DialogTitle>Dashboard Preview</DialogTitle>
+                    <DialogDescription>
+                      Full-size view of the BookingGen dashboard interface
+                    </DialogDescription>
                     <img 
                       src={dashboardImage} 
                       alt="BookingGen Dashboard - Full View" 
