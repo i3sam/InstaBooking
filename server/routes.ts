@@ -251,12 +251,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pages routes
   app.post("/api/pages", verifyToken, async (req: any, res) => {
     try {
-      // Check if user has Pro membership
+      // Check if user has Pro membership and it hasn't expired
       const userProfile = await storage.getProfile(req.user.userId);
-      if (!userProfile || userProfile.membershipStatus !== 'pro') {
+      const now = new Date();
+      const membershipExpired = userProfile?.membershipExpires && new Date(userProfile.membershipExpires) <= now;
+      
+      if (!userProfile || userProfile.membershipStatus !== 'pro' || membershipExpired) {
         return res.status(403).json({ 
-          message: "Pro membership required", 
-          details: "Upgrade to Pro to create booking pages" 
+          message: "Active Pro membership required", 
+          details: membershipExpired ? "Your Pro membership has expired. Please renew to continue creating pages." : "Upgrade to Pro to create booking pages"
         });
       }
 

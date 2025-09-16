@@ -29,7 +29,10 @@ export default function PagesList() {
   const { toast } = useToast();
   const { profile } = useAuth();
 
-  const isProUser = profile?.membershipStatus === 'pro';
+  // Check if user has Pro membership and it hasn't expired
+  const now = new Date();
+  const membershipExpired = profile?.membershipExpires && new Date(profile.membershipExpires) <= now;
+  const isProUser = profile?.membershipStatus === 'pro' && !membershipExpired;
 
   const { data: pages = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/pages'],
