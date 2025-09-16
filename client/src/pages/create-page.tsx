@@ -464,70 +464,6 @@ export default function CreatePage() {
                         </p>
                       </div>
 
-                      <div>
-                        <Label>Logo Upload</Label>
-                <div 
-                  className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                  onClick={() => !uploadingLogo && document.getElementById('logo-upload')?.click()}
-                >
-                  {logoPreview ? (
-                    <div className="space-y-4">
-                      <img 
-                        src={logoPreview} 
-                        alt="Logo preview" 
-                        className="h-16 w-auto mx-auto rounded-lg border border-border"
-                      />
-                      <p className="text-sm text-muted-foreground">{logoFile?.name}</p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLogoPreview('');
-                          setLogoFile(null);
-                          setFormData(prev => ({ ...prev, logoUrl: '' }));
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <CloudUpload className={`h-8 w-8 mx-auto mb-4 ${uploadingLogo ? 'animate-pulse text-primary' : 'text-muted-foreground'}`} />
-                      <p className="text-muted-foreground mb-2">
-                        {uploadingLogo ? 'Uploading...' : 'Drop your logo here, or'} 
-                        {!uploadingLogo && <span className="text-primary cursor-pointer"> browse</span>}
-                      </p>
-                      <p className="text-sm text-muted-foreground">PNG, JPG up to 2MB</p>
-                    </>
-                  )}
-                  <input
-                    id="logo-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={uploadingLogo}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 2 * 1024 * 1024) {
-                          toast({
-                            title: "File too large",
-                            description: "Please select an image under 2MB",
-                            variant: "destructive"
-                          });
-                          return;
-                        }
-                        handleLogoUpload(file);
-                      }
-                    }}
-                  />
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Upload your company or service logo (optional)
-                        </p>
-                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -954,6 +890,75 @@ export default function CreatePage() {
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-6">
                     <div className="space-y-6">
+                      
+                      {/* Main Logo Section */}
+                      <div>
+                        <Label className="flex items-center space-x-2 mb-3">
+                          <Image className="h-4 w-4" />
+                          <span>Main Logo</span>
+                        </Label>
+                        <div 
+                          className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                          onClick={() => !uploadingLogo && document.getElementById('main-logo-upload')?.click()}
+                        >
+                          {logoPreview ? (
+                            <div className="space-y-4">
+                              <img 
+                                src={logoPreview} 
+                                alt="Logo preview" 
+                                className="h-16 w-auto mx-auto rounded-lg border border-border"
+                              />
+                              <p className="text-sm text-muted-foreground">{logoFile?.name}</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLogoPreview('');
+                                  setLogoFile(null);
+                                  setFormData(prev => ({ ...prev, logoUrl: '' }));
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          ) : (
+                            <>
+                              <CloudUpload className={`h-8 w-8 mx-auto mb-4 ${uploadingLogo ? 'animate-pulse text-primary' : 'text-muted-foreground'}`} />
+                              <p className="text-muted-foreground mb-2">
+                                {uploadingLogo ? 'Uploading...' : 'Drop your main logo here, or'} 
+                                {!uploadingLogo && <span className="text-primary cursor-pointer"> browse</span>}
+                              </p>
+                              <p className="text-sm text-muted-foreground">PNG, JPG up to 2MB</p>
+                            </>
+                          )}
+                          <input
+                            id="main-logo-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={uploadingLogo}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 2 * 1024 * 1024) {
+                                  toast({
+                                    title: "File too large",
+                                    description: "Please select an image under 2MB",
+                                    variant: "destructive"
+                                  });
+                                  return;
+                                }
+                                handleLogoUpload(file);
+                              }
+                            }}
+                          />
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Upload your company or service logo (optional)
+                        </p>
+                      </div>
                       
                       {/* Banners Section */}
                       <div>

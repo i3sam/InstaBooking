@@ -151,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const folder = req.body.folder || '';
       
       // Security: Only allow specific buckets
-      const allowedBuckets = ['logos'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images'];
       if (!allowedBuckets.includes(bucket)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
@@ -198,7 +198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { bucketName } = req.body;
       
       // Security: Only allow specific bucket names
-      const allowedBuckets = ['logos'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images'];
       if (!bucketName || !allowedBuckets.includes(bucketName)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
