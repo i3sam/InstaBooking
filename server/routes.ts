@@ -6,6 +6,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
+import { Resend } from 'resend';
 
 // Supabase setup
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -34,6 +35,65 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
   });
+}
+
+// Resend setup for email notifications
+let resend: Resend | null = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+  console.log("Resend email service initialized successfully");
+} else {
+  console.warn("RESEND_API_KEY not found. Email notifications will be disabled");
+}
+
+// Email notification functions
+async function sendAppointmentApprovalEmail(customerEmail: string, customerName: string, date: string, time: string) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
+      to: customerEmail,
+      subject: 'Your appointment has been approved!',
+      html: `
+        <h2>Great news, ${customerName}!</h2>
+        <p>Your appointment request has been approved.</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Time:</strong> ${time}</p>
+        <p>We look forward to seeing you!</p>
+      `,
+    });
+    console.log(`Approval email sent to ${customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send approval email:", error);
+  }
+}
+
+async function sendAppointmentRejectionEmail(customerEmail: string, customerName: string) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
+      to: customerEmail,
+      subject: 'Your appointment request has been declined',
+      html: `
+        <h2>Hello ${customerName},</h2>
+        <p>We regret to inform you that your appointment request has been declined.</p>
+        <p>Please feel free to submit another request for a different date and time.</p>
+        <p>Thank you for your understanding.</p>
+      `,
+    });
+    console.log(`Rejection email sent to ${customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send rejection email:", error);
+  }
 }
 
 // Middleware to verify Supabase JWT
@@ -384,6 +444,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updated = await storage.updateAppointment(req.params.id, req.body);
+      
+      // Send email notification if status changed to approved or rejected
+      if (req.body.status && appointment.customerEmail) {
+        if (req.body.status === 'accepted') {
+          await sendAppointmentApprovalEmail(
+            appointment.customerEmail,
+            appointment.customerName,
+            appointment.date,
+            appointment.time
+          );
+        } else if (req.body.status === 'declined') {
+          await sendAppointmentRejectionEmail(
+            appointment.customerEmail,
+            appointment.customerName
+          );
+        }
+      }
+      
       res.json(updated);
     } catch (error) {
       console.error("Update appointment error:", error);
