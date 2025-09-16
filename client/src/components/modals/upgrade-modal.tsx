@@ -173,9 +173,12 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               Maybe Later
             </Button>
             <Button
+              type="button"
+              size="lg"
+              variant="default"
               onClick={handleUpgrade}
               disabled={isProcessing}
-              className="flex-1 button-gradient"
+              className="flex-1 h-12 button-gradient"
               data-testid="button-confirm-upgrade"
             >
               {isProcessing ? (
