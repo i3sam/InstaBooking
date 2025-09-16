@@ -3,13 +3,14 @@ import { useLocation } from 'wouter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { uploadFile } from '@/lib/supabase';
-import { ArrowLeft, CloudUpload, Plus, X, Palette, Image } from 'lucide-react';
+import { ArrowLeft, CloudUpload, Plus, X, Palette, Image, FileText, MapPin, Settings, Calendar, HelpCircle, Trash2 } from 'lucide-react';
 
 export default function CreatePage() {
   const [, setLocation] = useLocation();
@@ -322,50 +323,65 @@ export default function CreatePage() {
         <Card className="max-w-4xl mx-auto">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="title">Page Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Personal Training"
-                    value={formData.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    required
-                    data-testid="input-page-title"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="slug">URL Slug</Label>
-                  <div className="flex">
-                    <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                      bookinggen.com/
-                    </span>
-                    <Input
-                      id="slug"
-                      placeholder="personal-training"
-                      value={formData.slug}
-                      onChange={(e) => setFormData(prev => ({ ...prev, slug: generateSlug(e.target.value) }))}
-                      className="rounded-l-none"
-                      required
-                      data-testid="input-page-slug"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="tagline">Tagline</Label>
-                <Input
-                  id="tagline"
-                  placeholder="Transform your fitness journey with personalized training"
-                  value={formData.tagline}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
-                  data-testid="input-tagline"
-                />
-              </div>
-              
-              <div>
-                <Label>Logo Upload</Label>
+              <Accordion type="multiple" defaultValue={["basic", "styling"]} className="space-y-6">
+                
+                {/* Basic Information Section */}
+                <AccordionItem value="basic" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Basic Information</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <Label htmlFor="title">Page Title</Label>
+                          <Input
+                            id="title"
+                            placeholder="e.g., Personal Training"
+                            value={formData.title}
+                            onChange={(e) => handleTitleChange(e.target.value)}
+                            required
+                            data-testid="input-page-title"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="slug">URL Slug</Label>
+                          <div className="flex">
+                            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-border bg-muted text-muted-foreground text-sm">
+                              bookinggen.com/
+                            </span>
+                            <Input
+                              id="slug"
+                              placeholder="personal-training"
+                              value={formData.slug}
+                              onChange={(e) => setFormData(prev => ({ ...prev, slug: generateSlug(e.target.value) }))}
+                              className="rounded-l-none"
+                              required
+                              data-testid="input-page-slug"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="tagline">Tagline</Label>
+                        <Input
+                          id="tagline"
+                          placeholder="Transform your fitness journey with personalized training"
+                          value={formData.tagline}
+                          onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                          data-testid="input-tagline"
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          A catchy subtitle that describes what you offer
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label>Logo Upload</Label>
                 <div 
                   className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => !uploadingLogo && document.getElementById('logo-upload')?.click()}
@@ -423,10 +439,25 @@ export default function CreatePage() {
                       }
                     }}
                   />
-                </div>
-              </div>
-              
-              <div className="space-y-6">
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Upload your company or service logo (optional)
+                        </p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Styling & Appearance Section */}
+                <AccordionItem value="styling" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <Palette className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Styling & Appearance</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-6">
                 <div>
                   <Label className="flex items-center space-x-2">
                     <Palette className="h-4 w-4" />
@@ -531,9 +562,21 @@ export default function CreatePage() {
                   </div>
                 </div>
               </div>
-              
-              <div>
-                <Label>Services</Label>
+            </AccordionContent>
+                </AccordionItem>
+
+                {/* Services Section */}
+                <AccordionItem value="services" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <Settings className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Services & Pricing</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-6">
+                      <div>
+                        <Label>Services</Label>
                 <div className="space-y-4">
                   {formData.services.map((service, index) => (
                     <div key={index} className="grid md:grid-cols-4 gap-4 p-4 border border-border rounded-xl">
@@ -588,9 +631,22 @@ export default function CreatePage() {
                   </Button>
                 </div>
               </div>
-              
-              <div>
-                <Label>Frequently Asked Questions</Label>
+            </div>
+          </AccordionContent>
+                </AccordionItem>
+
+                {/* Content Management Section */}
+                <AccordionItem value="content" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <HelpCircle className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Content & FAQ Management</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-6">
+                      <div>
+                        <Label>Frequently Asked Questions</Label>
                 <div className="space-y-4">
                   {formData.faqs.map((faq, index) => (
                     <div key={index} className="grid gap-4 p-4 border border-border rounded-xl">
@@ -642,27 +698,40 @@ export default function CreatePage() {
                     <Plus className="h-4 w-4 mr-2" />
                     Add Another FAQ
                   </Button>
-                </div>
-              </div>
+                        </div>
+                      </div>
               
-              <div>
-                <Label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.acceptReviews === 'true'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, acceptReviews: e.target.checked ? 'true' : 'false' }))}
-                    className="rounded border-border"
-                    data-testid="checkbox-accept-reviews"
-                  />
-                  <span>Accept and display customer reviews on booking page</span>
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  When enabled, customers can leave reviews after appointments that will be displayed on your booking page
-                </p>
-              </div>
+                      <div>
+                        <Label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={formData.acceptReviews === 'true'}
+                            onChange={(e) => setFormData(prev => ({ ...prev, acceptReviews: e.target.checked ? 'true' : 'false' }))}
+                            className="rounded border-border"
+                            data-testid="checkbox-accept-reviews"
+                          />
+                          <span>Accept and display customer reviews on booking page</span>
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          When enabled, customers can leave reviews after appointments that will be displayed on your booking page
+                        </p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-              <div>
-                <Label>Business Information</Label>
+                {/* Business Information Section */}
+                <AccordionItem value="business" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Business Information</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-6">
+                      <div>
+                        <Label>Business Information</Label>
                 <div className="space-y-4 mt-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -739,40 +808,59 @@ export default function CreatePage() {
                     </Label>
                   </div>
                 </div>
-              </div>
+                        </div>
 
-              <div>
-                <Label>Business Hours</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  {Object.entries(formData.businessHours).map(([day, hours]) => (
-                    <div key={day} className="flex items-center space-x-2">
-                      <Label className="w-20 capitalize text-sm">{day}:</Label>
-                      <Input
-                        placeholder="9:00-17:00 or Closed"
-                        value={hours}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
-                          businessHours: { ...prev.businessHours, [day]: e.target.value }
-                        }))}
-                        className="flex-1"
-                        data-testid={`input-hours-${day}`}
-                      />
+                      <div>
+                        <Label>Business Hours</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          {Object.entries(formData.businessHours).map(([day, hours]) => (
+                            <div key={day} className="flex items-center space-x-2">
+                              <Label className="w-20 capitalize text-sm">{day}:</Label>
+                              <Input
+                                placeholder="9:00-17:00 or Closed"
+                                value={hours}
+                                onChange={(e) => setFormData(prev => ({ 
+                                  ...prev, 
+                                  businessHours: { ...prev.businessHours, [day]: e.target.value }
+                                }))}
+                                className="flex-1"
+                                data-testid={`input-hours-${day}`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="calendarLink">Calendar Integration</Label>
-                <Input
-                  id="calendarLink"
-                  type="url"
-                  placeholder="Google Calendar, Calendly, or other calendar link"
-                  value={formData.calendarLink}
-                  onChange={(e) => setFormData(prev => ({ ...prev, calendarLink: e.target.value }))}
-                  data-testid="input-calendar-link"
-                />
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Integration Section */}
+                <AccordionItem value="integration" className="border border-border rounded-xl">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Calendar Integration</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div>
+                      <Label htmlFor="calendarLink">Calendar Integration</Label>
+                      <Input
+                        id="calendarLink"
+                        type="url"
+                        placeholder="Google Calendar, Calendly, or other calendar link"
+                        value={formData.calendarLink}
+                        onChange={(e) => setFormData(prev => ({ ...prev, calendarLink: e.target.value }))}
+                        data-testid="input-calendar-link"
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Add your booking calendar link (Google Calendar, Calendly, etc.)
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+              </Accordion>
               
               <div className="flex space-x-4 pt-6">
                 <Button 
