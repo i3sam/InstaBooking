@@ -28,6 +28,21 @@ export default function CreatePage() {
     fontFamily: 'inter',
     acceptReviews: 'true',
     faqs: [{ question: '', answer: '' }],
+    businessHours: {
+      monday: '9:00-17:00',
+      tuesday: '9:00-17:00',
+      wednesday: '9:00-17:00',
+      thursday: '9:00-17:00',
+      friday: '9:00-17:00',
+      saturday: 'Closed',
+      sunday: 'Closed'
+    },
+    contactPhone: '',
+    contactEmail: '',
+    businessAddress: '',
+    cancellationPolicy: '',
+    showBusinessHours: 'true',
+    showContactInfo: 'true',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
   });
 
@@ -276,7 +291,14 @@ export default function CreatePage() {
       ...formData,
       services: servicesWithNumbers,
       faqs: validFaqs,
-      acceptReviews: formData.acceptReviews
+      acceptReviews: formData.acceptReviews,
+      businessHours: formData.businessHours,
+      contactPhone: formData.contactPhone,
+      contactEmail: formData.contactEmail,
+      businessAddress: formData.businessAddress,
+      cancellationPolicy: formData.cancellationPolicy,
+      showBusinessHours: formData.showBusinessHours,
+      showContactInfo: formData.showContactInfo
     });
   };
 
@@ -637,6 +659,107 @@ export default function CreatePage() {
                 <p className="text-sm text-muted-foreground mt-1">
                   When enabled, customers can leave reviews after appointments that will be displayed on your booking page
                 </p>
+              </div>
+
+              <div>
+                <Label>Business Information</Label>
+                <div className="space-y-4 mt-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="contactPhone">Phone Number</Label>
+                      <Input
+                        id="contactPhone"
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        value={formData.contactPhone}
+                        onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+                        data-testid="input-contact-phone"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contactEmail">Email Address</Label>
+                      <Input
+                        id="contactEmail"
+                        type="email"
+                        placeholder="hello@example.com"
+                        value={formData.contactEmail}
+                        onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+                        data-testid="input-contact-email"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="businessAddress">Business Address</Label>
+                    <Textarea
+                      id="businessAddress"
+                      rows={2}
+                      placeholder="123 Main Street, City, State 12345"
+                      value={formData.businessAddress}
+                      onChange={(e) => setFormData(prev => ({ ...prev, businessAddress: e.target.value }))}
+                      className="resize-none"
+                      data-testid="input-business-address"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
+                    <Textarea
+                      id="cancellationPolicy"
+                      rows={3}
+                      placeholder="Please provide 24 hours notice for cancellations..."
+                      value={formData.cancellationPolicy}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cancellationPolicy: e.target.value }))}
+                      className="resize-none"
+                      data-testid="input-cancellation-policy"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.showContactInfo === 'true'}
+                        onChange={(e) => setFormData(prev => ({ ...prev, showContactInfo: e.target.checked ? 'true' : 'false' }))}
+                        className="rounded border-border"
+                        data-testid="checkbox-show-contact-info"
+                      />
+                      <span>Display contact information on booking page</span>
+                    </Label>
+                    
+                    <Label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.showBusinessHours === 'true'}
+                        onChange={(e) => setFormData(prev => ({ ...prev, showBusinessHours: e.target.checked ? 'true' : 'false' }))}
+                        className="rounded border-border"
+                        data-testid="checkbox-show-business-hours"
+                      />
+                      <span>Display business hours on booking page</span>
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label>Business Hours</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {Object.entries(formData.businessHours).map(([day, hours]) => (
+                    <div key={day} className="flex items-center space-x-2">
+                      <Label className="w-20 capitalize text-sm">{day}:</Label>
+                      <Input
+                        placeholder="9:00-17:00 or Closed"
+                        value={hours}
+                        onChange={(e) => setFormData(prev => ({ 
+                          ...prev, 
+                          businessHours: { ...prev.businessHours, [day]: e.target.value }
+                        }))}
+                        className="flex-1"
+                        data-testid={`input-hours-${day}`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div>

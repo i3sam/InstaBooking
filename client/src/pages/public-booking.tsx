@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3 } from 'lucide-react';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -320,6 +320,129 @@ export default function PublicBooking() {
                   </AccordionItem>
                 ))}
               </Accordion>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Business Hours Section */}
+      {page.showBusinessHours === 'true' && page.businessHours && (
+        <section className="py-20">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center mb-6">
+                <Clock3 
+                  className="h-12 w-12 mr-4" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Business Hours</h2>
+              </div>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">When we're available for appointments</p>
+            </div>
+
+            <div className="max-w-2xl mx-auto">
+              <Card className="border-0 shadow-lg">
+                <CardContent className="p-8">
+                  <div className="grid gap-4">
+                    {Object.entries(page.businessHours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between items-center py-2 border-b border-border last:border-0">
+                        <span className="text-lg font-medium text-foreground capitalize">{day}</span>
+                        <span className={`text-lg ${String(hours) === 'Closed' ? 'text-muted-foreground' : 'font-semibold text-foreground'}`}>
+                          {String(hours)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Contact Information Section */}
+      {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress) && (
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">Contact Information</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Get in touch with us</p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {page.contactPhone && (
+                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
+                    <CardContent className="p-8">
+                      <Phone 
+                        className="h-12 w-12 mx-auto mb-6" 
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      />
+                      <h3 className="text-xl font-semibold text-foreground mb-4">Phone</h3>
+                      <a 
+                        href={`tel:${page.contactPhone}`}
+                        className="text-lg text-muted-foreground hover:text-foreground transition-colors"
+                        data-testid="contact-phone"
+                      >
+                        {page.contactPhone}
+                      </a>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {page.contactEmail && (
+                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
+                    <CardContent className="p-8">
+                      <Mail 
+                        className="h-12 w-12 mx-auto mb-6" 
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      />
+                      <h3 className="text-xl font-semibold text-foreground mb-4">Email</h3>
+                      <a 
+                        href={`mailto:${page.contactEmail}`}
+                        className="text-lg text-muted-foreground hover:text-foreground transition-colors"
+                        data-testid="contact-email"
+                      >
+                        {page.contactEmail}
+                      </a>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {page.businessAddress && (
+                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
+                    <CardContent className="p-8">
+                      <MapPin 
+                        className="h-12 w-12 mx-auto mb-6" 
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      />
+                      <h3 className="text-xl font-semibold text-foreground mb-4">Address</h3>
+                      <address 
+                        className="text-lg text-muted-foreground not-italic"
+                        data-testid="contact-address"
+                      >
+                        {page.businessAddress}
+                      </address>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Cancellation Policy Section */}
+      {page.cancellationPolicy && (
+        <section className="py-16">
+          <div className="container mx-auto px-6">
+            <div className="max-w-3xl mx-auto text-center">
+              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-6">Cancellation Policy</h3>
+              <div className="bg-muted/30 rounded-xl p-6">
+                <p className="text-muted-foreground leading-relaxed" data-testid="cancellation-policy">
+                  {page.cancellationPolicy}
+                </p>
+              </div>
             </div>
           </div>
         </section>

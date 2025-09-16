@@ -27,6 +27,13 @@ export const pages = pgTable("pages", {
   calendarLink: text("calendar_link"),
   faqs: jsonb("faqs").default(sql`'[]'`), // Array of {question: string, answer: string}
   acceptReviews: text("accept_reviews").default("true"), // "true" or "false" 
+  businessHours: jsonb("business_hours").default(sql`'{"monday":"9:00-17:00","tuesday":"9:00-17:00","wednesday":"9:00-17:00","thursday":"9:00-17:00","friday":"9:00-17:00","saturday":"Closed","sunday":"Closed"}'`),
+  contactPhone: text("contact_phone"),
+  contactEmail: text("contact_email"),
+  businessAddress: text("business_address"),
+  cancellationPolicy: text("cancellation_policy"),
+  showBusinessHours: text("show_business_hours").default("true"),
+  showContactInfo: text("show_contact_info").default("true"),
   data: jsonb("data"),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
