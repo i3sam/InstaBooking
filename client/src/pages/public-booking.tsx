@@ -25,12 +25,43 @@ export default function PublicBooking() {
     
     // Background style mapping
     const backgroundClasses = {
+      // Original gradients
       'blue': backgroundType === 'gradient' ? 'bg-gradient-to-br from-blue-50 to-blue-100' : 'bg-blue-50',
       'green': backgroundType === 'gradient' ? 'bg-gradient-to-br from-emerald-50 to-emerald-100' : 'bg-emerald-50',
       'purple': backgroundType === 'gradient' ? 'bg-gradient-to-br from-violet-50 to-violet-100' : 'bg-violet-50',
       'rose': backgroundType === 'gradient' ? 'bg-gradient-to-br from-rose-50 to-rose-100' : 'bg-rose-50',
       'white': 'bg-white',
-      'gray': 'bg-gray-50'
+      'gray': 'bg-gray-50',
+      
+      // New gradient backgrounds
+      'teal': backgroundType === 'gradient' ? 'bg-gradient-to-br from-teal-50 to-teal-100' : 'bg-teal-50',
+      'orange': backgroundType === 'gradient' ? 'bg-gradient-to-br from-orange-50 to-orange-100' : 'bg-orange-50',
+      'indigo': backgroundType === 'gradient' ? 'bg-gradient-to-br from-indigo-50 to-indigo-100' : 'bg-indigo-50',
+      'amber': backgroundType === 'gradient' ? 'bg-gradient-to-br from-amber-50 to-amber-100' : 'bg-amber-50',
+      
+      // Diagonal gradients  
+      'ocean': 'bg-gradient-to-r from-cyan-50 to-blue-100',
+      'sunset': 'bg-gradient-to-r from-orange-50 to-pink-100',
+      'forest': 'bg-gradient-to-r from-green-50 to-emerald-100',
+      'lavender': 'bg-gradient-to-r from-purple-50 to-pink-100',
+      
+      // Multi-color gradients
+      'rainbow': 'bg-gradient-to-r from-red-50 via-yellow-50 to-green-50',
+      'tropical': 'bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50',
+      'warm-sunset': 'bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50',
+      'cool-mint': 'bg-gradient-to-br from-green-50 via-teal-50 to-blue-50',
+      
+      // Solid backgrounds
+      'cream': 'bg-amber-50',
+      'ice': 'bg-blue-50',
+      'soft-mint': 'bg-green-50',
+      'light-lavender': 'bg-purple-50',
+      
+      // Pattern backgrounds (simplified for now - patterns would need CSS)
+      'dots': 'bg-gray-50',
+      'lines': 'bg-gray-50', 
+      'mesh': 'bg-gray-50',
+      'paper': 'bg-stone-50'
     };
     
     // Font family mapping

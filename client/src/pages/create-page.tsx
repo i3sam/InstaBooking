@@ -40,16 +40,71 @@ export default function CreatePage() {
     { name: 'Sunset Orange', primary: '#ea580c', secondary: '#c2410c', accent: '#fb923c', gradient: 'from-orange-500 to-red-500' },
     { name: 'Royal Purple', primary: '#7c3aed', secondary: '#6d28d9', accent: '#8b5cf6', gradient: 'from-violet-500 to-purple-600' },
     { name: 'Rose Gold', primary: '#e11d48', secondary: '#be185d', accent: '#f43f5e', gradient: 'from-rose-500 to-pink-500' },
-    { name: 'Midnight', primary: '#1f2937', secondary: '#111827', accent: '#374151', gradient: 'from-gray-800 to-gray-900' }
+    { name: 'Midnight', primary: '#1f2937', secondary: '#111827', accent: '#374151', gradient: 'from-gray-800 to-gray-900' },
+    
+    // New vibrant themes
+    { name: 'Electric Teal', primary: '#14b8a6', secondary: '#0d9488', accent: '#2dd4bf', gradient: 'from-teal-500 to-cyan-500' },
+    { name: 'Coral Sunset', primary: '#f97316', secondary: '#ea580c', accent: '#fb923c', gradient: 'from-orange-400 to-rose-500' },
+    { name: 'Lavender Dreams', primary: '#a855f7', secondary: '#9333ea', accent: '#c084fc', gradient: 'from-purple-400 to-pink-400' },
+    { name: 'Golden Hour', primary: '#f59e0b', secondary: '#d97706', accent: '#fbbf24', gradient: 'from-amber-400 to-orange-500' },
+    { name: 'Arctic Blue', primary: '#0ea5e9', secondary: '#0284c7', accent: '#38bdf8', gradient: 'from-sky-400 to-blue-500' },
+    { name: 'Cherry Blossom', primary: '#ec4899', secondary: '#db2777', accent: '#f472b6', gradient: 'from-pink-400 to-rose-500' },
+    
+    // Professional themes
+    { name: 'Corporate Navy', primary: '#1e3a8a', secondary: '#1e40af', accent: '#3b82f6', gradient: 'from-blue-700 to-indigo-800' },
+    { name: 'Sage Green', primary: '#65a30d', secondary: '#4d7c0f', accent: '#84cc16', gradient: 'from-lime-500 to-green-600' },
+    { name: 'Warm Terracotta', primary: '#dc2626', secondary: '#b91c1c', accent: '#ef4444', gradient: 'from-red-500 to-orange-600' },
+    { name: 'Deep Indigo', primary: '#4338ca', secondary: '#3730a3', accent: '#6366f1', gradient: 'from-indigo-500 to-purple-600' },
+    
+    // Modern minimalist themes  
+    { name: 'Soft Mint', primary: '#10b981', secondary: '#059669', accent: '#34d399', gradient: 'from-emerald-400 to-teal-500' },
+    { name: 'Dusty Rose', primary: '#be123c', secondary: '#9f1239', accent: '#f43f5e', gradient: 'from-rose-400 to-pink-500' },
+    { name: 'Stone Gray', primary: '#57534e', secondary: '#44403c', accent: '#78716c', gradient: 'from-stone-500 to-gray-600' },
+    { name: 'Slate Blue', primary: '#475569', secondary: '#334155', accent: '#64748b', gradient: 'from-slate-500 to-slate-600' },
+    
+    // Creative & vibrant themes
+    { name: 'Tropical Paradise', primary: '#06b6d4', secondary: '#0891b2', accent: '#22d3ee', gradient: 'from-cyan-400 to-teal-500' },
+    { name: 'Sunset Magenta', primary: '#c026d3', secondary: '#a21caf', accent: '#d946ef', gradient: 'from-fuchsia-400 to-pink-500' },
+    { name: 'Ocean Breeze', primary: '#0369a1', secondary: '#075985', accent: '#0284c7', gradient: 'from-sky-500 to-blue-600' },
+    { name: 'Autumn Spice', primary: '#c2410c', secondary: '#9a3412', accent: '#ea580c', gradient: 'from-orange-500 to-red-500' }
   ];
 
   const backgroundOptions = [
+    // Gradient backgrounds
     { type: 'gradient', name: 'Blue Gradient', value: 'blue', class: 'bg-gradient-to-br from-blue-100 to-blue-200' },
     { type: 'gradient', name: 'Green Gradient', value: 'green', class: 'bg-gradient-to-br from-emerald-100 to-emerald-200' },
     { type: 'gradient', name: 'Purple Gradient', value: 'purple', class: 'bg-gradient-to-br from-violet-100 to-violet-200' },
     { type: 'gradient', name: 'Rose Gradient', value: 'rose', class: 'bg-gradient-to-br from-rose-100 to-rose-200' },
+    { type: 'gradient', name: 'Teal Gradient', value: 'teal', class: 'bg-gradient-to-br from-teal-100 to-teal-200' },
+    { type: 'gradient', name: 'Orange Gradient', value: 'orange', class: 'bg-gradient-to-br from-orange-100 to-orange-200' },
+    { type: 'gradient', name: 'Indigo Gradient', value: 'indigo', class: 'bg-gradient-to-br from-indigo-100 to-indigo-200' },
+    { type: 'gradient', name: 'Amber Gradient', value: 'amber', class: 'bg-gradient-to-br from-amber-100 to-amber-200' },
+    
+    // Diagonal gradients
+    { type: 'gradient', name: 'Ocean Waves', value: 'ocean', class: 'bg-gradient-to-r from-cyan-100 to-blue-200' },
+    { type: 'gradient', name: 'Sunset Sky', value: 'sunset', class: 'bg-gradient-to-r from-orange-100 to-pink-200' },
+    { type: 'gradient', name: 'Forest Mist', value: 'forest', class: 'bg-gradient-to-r from-green-100 to-emerald-200' },
+    { type: 'gradient', name: 'Lavender Fields', value: 'lavender', class: 'bg-gradient-to-r from-purple-100 to-pink-200' },
+    
+    // Multi-color gradients
+    { type: 'gradient', name: 'Rainbow Light', value: 'rainbow', class: 'bg-gradient-to-r from-red-100 via-yellow-100 to-green-100' },
+    { type: 'gradient', name: 'Tropical Breeze', value: 'tropical', class: 'bg-gradient-to-br from-teal-100 via-cyan-100 to-blue-100' },
+    { type: 'gradient', name: 'Warm Sunset', value: 'warm-sunset', class: 'bg-gradient-to-br from-yellow-100 via-orange-100 to-red-100' },
+    { type: 'gradient', name: 'Cool Mint', value: 'cool-mint', class: 'bg-gradient-to-br from-green-100 via-teal-100 to-blue-100' },
+    
+    // Solid backgrounds
     { type: 'solid', name: 'Clean White', value: 'white', class: 'bg-white' },
-    { type: 'solid', name: 'Soft Gray', value: 'gray', class: 'bg-gray-50' }
+    { type: 'solid', name: 'Soft Gray', value: 'gray', class: 'bg-gray-50' },
+    { type: 'solid', name: 'Warm Cream', value: 'cream', class: 'bg-amber-50' },
+    { type: 'solid', name: 'Cool Ice', value: 'ice', class: 'bg-blue-50' },
+    { type: 'solid', name: 'Soft Mint', value: 'soft-mint', class: 'bg-green-50' },
+    { type: 'solid', name: 'Light Lavender', value: 'light-lavender', class: 'bg-purple-50' },
+    
+    // Subtle patterns (using gradients with opacity for pattern-like effects)
+    { type: 'pattern', name: 'Subtle Dots', value: 'dots', class: 'bg-gray-50 bg-dots-pattern' },
+    { type: 'pattern', name: 'Soft Lines', value: 'lines', class: 'bg-gray-50 bg-lines-pattern' },
+    { type: 'pattern', name: 'Light Mesh', value: 'mesh', class: 'bg-gray-50 bg-mesh-pattern' },
+    { type: 'pattern', name: 'Paper Texture', value: 'paper', class: 'bg-stone-50 bg-paper-pattern' }
   ];
 
   const fontOptions = [
@@ -321,54 +376,59 @@ export default function CreatePage() {
                 <div>
                   <Label className="flex items-center space-x-2">
                     <Palette className="h-4 w-4" />
-                    <span>Color Theme</span>
+                    <span>Color Theme ({colorThemes.length} options)</span>
                   </Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                    {colorThemes.map((theme, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => selectColorTheme(theme)}
-                        className={`p-3 rounded-xl border-2 transition-all ${
-                          formData.primaryColor === theme.primary 
-                            ? 'border-primary ring-2 ring-primary/20' 
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                      >
-                        <div 
-                          className={`h-8 w-full rounded-lg bg-gradient-to-r ${theme.gradient} mb-2`}
-                        />
-                        <p className="text-sm font-medium text-foreground">{theme.name}</p>
-                      </button>
-                    ))}
+                  <div className="max-h-96 overflow-y-auto border border-border rounded-xl p-4 mt-3">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {colorThemes.map((theme, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => selectColorTheme(theme)}
+                          className={`p-3 rounded-xl border-2 transition-all ${
+                            formData.primaryColor === theme.primary 
+                              ? 'border-primary ring-2 ring-primary/20' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <div 
+                            className={`h-6 w-full rounded-lg bg-gradient-to-r ${theme.gradient} mb-2`}
+                          />
+                          <p className="text-xs font-medium text-foreground">{theme.name}</p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 <div>
                   <Label className="flex items-center space-x-2">
                     <Image className="h-4 w-4" />
-                    <span>Background Style</span>
+                    <span>Background Style ({backgroundOptions.length} options)</span>
                   </Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                    {backgroundOptions.map((bg, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => setFormData(prev => ({ 
-                          ...prev, 
-                          backgroundType: bg.type, 
-                          backgroundValue: bg.value 
-                        }))}
-                        className={`p-3 rounded-xl border-2 transition-all ${
-                          formData.backgroundValue === bg.value 
-                            ? 'border-primary ring-2 ring-primary/20' 
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                      >
-                        <div className={`h-8 w-full rounded-lg ${bg.class} mb-2 border border-border/20`} />
-                        <p className="text-sm font-medium text-foreground">{bg.name}</p>
-                      </button>
-                    ))}
+                  <div className="max-h-96 overflow-y-auto border border-border rounded-xl p-4 mt-3">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {backgroundOptions.map((bg, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ 
+                            ...prev, 
+                            backgroundType: bg.type, 
+                            backgroundValue: bg.value 
+                          }))}
+                          className={`p-3 rounded-xl border-2 transition-all ${
+                            formData.backgroundValue === bg.value 
+                              ? 'border-primary ring-2 ring-primary/20' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <div className={`h-6 w-full rounded-lg ${bg.class} mb-2 border border-border/20`} />
+                          <p className="text-xs font-medium text-foreground">{bg.name}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{bg.type}</p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
