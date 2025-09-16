@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,11 +13,13 @@ import { uploadFile } from '@/lib/supabase';
 interface CreatePageModalProps {
   open: boolean;
   onClose: () => void;
+  editingPage?: any | null;
 }
 
-export default function CreatePageModal({ open, onClose }: CreatePageModalProps) {
+export default function CreatePageModal({ open, onClose, editingPage }: CreatePageModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isEditing = !!editingPage;
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -35,6 +37,16 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // Fetch page data for editing
+  const { data: editingPageData } = useQuery({
+    queryKey: ['/api/pages/edit', editingPage?.id],
+    enabled: !!(isEditing && editingPage?.id),
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/pages/${editingPage.id}/edit`);
+      return response.json();
+    },
+  });
 
   // Beautiful color themes for booking pages
   const colorThemes = [
@@ -64,21 +76,26 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
 
   const createPageMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/pages', data);
-      return response.json();
+      if (isEditing) {
+        const response = await apiRequest('PATCH', `/api/pages/${editingPage.id}`, data);
+        return response.json();
+      } else {
+        const response = await apiRequest('POST', '/api/pages', data);
+        return response.json();
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
       toast({
-        title: "Page created!",
-        description: "Your booking page has been created successfully.",
+        title: isEditing ? "Page updated!" : "Page created!",
+        description: isEditing ? "Your booking page has been updated successfully." : "Your booking page has been created successfully.",
       });
       onClose();
       resetForm();
     },
     onError: (error: any) => {
       toast({
-        title: "Error creating page",
+        title: isEditing ? "Error updating page" : "Error creating page",
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
@@ -86,7 +103,7 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
   });
 
   const resetForm = () => {
-    setFormData({
+    const defaultFormData = {
       title: '',
       slug: '',
       tagline: '',
@@ -98,10 +115,47 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
       backgroundValue: 'blue',
       fontFamily: 'inter',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
-    });
+    };
+    setFormData(defaultFormData);
     setLogoFile(null);
     setLogoPreview('');
   };
+
+  // Pre-populate form when editing
+  useEffect(() => {
+    if (isEditing && editingPageData) {
+      const services = editingPageData.services || [];
+      const formattedServices = services.length > 0 
+        ? services.map((service: any) => ({
+            name: service.name || '',
+            description: service.description || '',
+            durationMinutes: service.durationMinutes || 60,
+            price: service.price?.toString() || '0'
+          }))
+        : [{ name: '', description: '', durationMinutes: 60, price: '0' }];
+
+      setFormData({
+        title: editingPageData.title || '',
+        slug: editingPageData.slug || '',
+        tagline: editingPageData.tagline || '',
+        primaryColor: editingPageData.primaryColor || '#2563eb',
+        calendarLink: editingPageData.calendarLink || '',
+        logoUrl: editingPageData.logoUrl || '',
+        theme: editingPageData.theme || 'Ocean Blue',
+        backgroundType: editingPageData.backgroundType || 'gradient',
+        backgroundValue: editingPageData.backgroundValue || 'blue',
+        fontFamily: editingPageData.fontFamily || 'inter',
+        services: formattedServices
+      });
+      
+      // Set logo preview if there's a logoUrl
+      if (editingPageData.logoUrl) {
+        setLogoPreview(editingPageData.logoUrl);
+      }
+    } else if (!isEditing) {
+      resetForm();
+    }
+  }, [isEditing, editingPageData]);
 
   const selectColorTheme = (theme: any) => {
     setFormData(prev => ({
@@ -203,6 +257,12 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
       return;
     }
 
+    // For editing, don't check slug uniqueness
+    if (isEditing && editingPage && formData.slug !== editingPage.slug) {
+      // If slug is being changed during edit, we still need to validate it
+      // This will be handled by the backend
+    }
+
     const servicesWithNumbers = formData.services.map(service => ({
       ...service,
       price: parseFloat(service.price) || 0,
@@ -219,7 +279,7 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Booking Page</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Booking Page' : 'Create Booking Page'}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -512,9 +572,9 @@ export default function CreatePageModal({ open, onClose }: CreatePageModalProps)
               variant="default"
               className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
               disabled={createPageMutation.isPending}
-              data-testid="button-create-page"
+              data-testid={isEditing ? "button-update-page" : "button-create-page"}
             >
-              {createPageMutation.isPending ? 'Creating...' : 'Create Page'}
+              {createPageMutation.isPending ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Page' : 'Create Page')}
             </Button>
           </div>
         </form>

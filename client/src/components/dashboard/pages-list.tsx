@@ -25,6 +25,7 @@ export default function PagesList() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [deletePageId, setDeletePageId] = useState<string | null>(null);
+  const [editingPage, setEditingPage] = useState<any | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { profile } = useAuth();
@@ -75,6 +76,11 @@ export default function PagesList() {
     } else {
       setShowUpgradeModal(true);
     }
+  };
+
+  const handleEditPage = (page: any) => {
+    setEditingPage(page);
+    setShowCreateModal(true);
   };
 
   if (isLoading) {
@@ -159,6 +165,7 @@ export default function PagesList() {
                     variant="outline" 
                     size="sm" 
                     className="flex-1"
+                    onClick={() => handleEditPage(page)}
                     data-testid={`button-edit-${page.slug}`}
                   >
                     <Edit className="h-4 w-4 mr-1" />
@@ -213,7 +220,11 @@ export default function PagesList() {
 
       <CreatePageModal 
         open={showCreateModal} 
-        onClose={() => setShowCreateModal(false)} 
+        onClose={() => {
+          setShowCreateModal(false);
+          setEditingPage(null);
+        }}
+        editingPage={editingPage}
       />
 
       <UpgradeModal 

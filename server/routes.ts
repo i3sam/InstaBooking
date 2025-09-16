@@ -363,6 +363,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get page by ID with services (for editing)
+  app.get("/api/pages/:id/edit", verifyToken, async (req: any, res) => {
+    try {
+      const page = await storage.getPage(req.params.id);
+      if (!page || page.ownerId !== req.user.userId) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+
+      const services = await storage.getServicesByPageId(page.id);
+      res.json({ ...page, services });
+    } catch (error) {
+      console.error("Get page for edit error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/pages/:slug", async (req, res) => {
     try {
       const page = await storage.getPageBySlug(req.params.slug);
@@ -385,7 +401,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Page not found" });
       }
 
-      const updated = await storage.updatePage(req.params.id, req.body);
+      // Extract services from request body
+      const { services, ...pageData } = req.body;
+
+      // Update page data
+      const updated = await storage.updatePage(req.params.id, pageData);
+
+      // Handle services update if provided
+      if (services && Array.isArray(services)) {
+        // Delete existing services for this page
+        const existingServices = await storage.getServicesByPageId(req.params.id);
+        for (const existingService of existingServices) {
+          await storage.deleteService(existingService.id);
+        }
+
+        // Create new services
+        for (const service of services) {
+          await storage.createService({
+            ...service,
+            pageId: req.params.id
+          });
+        }
+      }
+
       res.json(updated);
     } catch (error) {
       console.error("Update page error:", error);
