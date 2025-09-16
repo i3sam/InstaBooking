@@ -49,12 +49,21 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     cancellationPolicy: '',
     showBusinessHours: 'true',
     showContactInfo: 'true',
-    services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
+    services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+    gallery: {
+      banners: [],
+      logos: [],
+      images: []
+    }
   });
   
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  
+  // Gallery state
+  const [uploadingGallery, setUploadingGallery] = useState<{[key: string]: boolean}>({});
+  const [galleryPreviews, setGalleryPreviews] = useState<{[key: string]: any[]}>({ banners: [], logos: [], images: [] });
 
   // Fetch page data for editing
   const { data: editingPageData } = useQuery({
@@ -217,11 +226,18 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       cancellationPolicy: '',
       showBusinessHours: 'true',
       showContactInfo: 'true',
-      services: [{ name: '', description: '', durationMinutes: 60, price: '0' }]
+      services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+      gallery: {
+        banners: [],
+        logos: [],
+        images: []
+      }
     };
     setFormData(defaultFormData);
     setLogoFile(null);
     setLogoPreview('');
+    setGalleryPreviews({ banners: [], logos: [], images: [] });
+    setUploadingGallery({});
   };
 
   // Pre-populate form when editing
@@ -266,12 +282,26 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         cancellationPolicy: editingPageData.cancellationPolicy || '',
         showBusinessHours: editingPageData.showBusinessHours || 'true',
         showContactInfo: editingPageData.showContactInfo || 'true',
-        services: formattedServices
+        services: formattedServices,
+        gallery: editingPageData.gallery || {
+          banners: [],
+          logos: [],
+          images: []
+        }
       });
       
       // Set logo preview if there's a logoUrl
       if (editingPageData.logoUrl) {
         setLogoPreview(editingPageData.logoUrl);
+      }
+      
+      // Set gallery previews if there's gallery data
+      if (editingPageData.gallery) {
+        setGalleryPreviews({
+          banners: editingPageData.gallery.banners || [],
+          logos: editingPageData.gallery.logos || [],
+          images: editingPageData.gallery.images || []
+        });
       }
     } else if (!isEditing) {
       resetForm();
@@ -391,6 +421,81 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     }));
   };
 
+  // Gallery functions
+  const handleGalleryUpload = async (files: FileList, type: 'banners' | 'logos' | 'images') => {
+    setUploadingGallery(prev => ({ ...prev, [type]: true }));
+    
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          toast({
+            title: "File too large",
+            description: `${file.name} is over 5MB. Please select a smaller file.`,
+            variant: "destructive"
+          });
+          return null;
+        }
+        
+        const result = await uploadFile(file, `gallery-${type}`);
+        if (result.success && result.url) {
+          return {
+            name: file.name,
+            url: result.url,
+            type: file.type,
+            size: file.size
+          };
+        }
+        return null;
+      });
+      
+      const uploadedFiles = (await Promise.all(uploadPromises)).filter(Boolean);
+      
+      if (uploadedFiles.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          gallery: {
+            ...prev.gallery,
+            [type]: [...prev.gallery[type], ...uploadedFiles]
+          }
+        }));
+        
+        // Update previews
+        setGalleryPreviews(prev => ({
+          ...prev,
+          [type]: [...prev[type], ...uploadedFiles]
+        }));
+        
+        toast({
+          title: "Images uploaded!",
+          description: `${uploadedFiles.length} ${type} uploaded successfully.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Upload error",
+        description: `Failed to upload ${type}. Please try again.`,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingGallery(prev => ({ ...prev, [type]: false }));
+    }
+  };
+  
+  const removeGalleryImage = (type: 'banners' | 'logos' | 'images', index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gallery: {
+        ...prev.gallery,
+        [type]: prev.gallery[type].filter((_, i) => i !== index)
+      }
+    }));
+    
+    setGalleryPreviews(prev => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -429,7 +534,8 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       businessAddress: formData.businessAddress,
       cancellationPolicy: formData.cancellationPolicy,
       showBusinessHours: formData.showBusinessHours,
-      showContactInfo: formData.showContactInfo
+      showContactInfo: formData.showContactInfo,
+      gallery: formData.gallery
     });
   };
 
@@ -539,7 +645,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                       <input
                         id="logo-upload-modal"
                         type="file"
-                        accept="image/png,image/jpeg,image/jpg"
+                        accept="image/*"
                         className="hidden"
                         disabled={uploadingLogo}
                         onChange={(e) => {
@@ -972,6 +1078,213 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <p className="text-sm text-muted-foreground mt-1">
                     Add your booking calendar link (Google Calendar, Calendly, etc.)
                   </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Gallery Section */}
+            <AccordionItem value="gallery" className="border border-border rounded-xl">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                <div className="flex items-center space-x-3">
+                  <Image className="h-4 w-4 text-primary" />
+                  <span className="text-base font-semibold">Gallery</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-4">
+                  
+                  {/* Banners Section */}
+                  <div>
+                    <Label className="flex items-center space-x-2 mb-2">
+                      <Image className="h-4 w-4" />
+                      <span>Banner Images</span>
+                    </Label>
+                    <div className="space-y-2">
+                      <div 
+                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => document.getElementById('banner-upload-modal')?.click()}
+                      >
+                        {uploadingGallery.banners ? (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
+                            <p className="text-sm text-muted-foreground">Uploading banners...</p>
+                          </>
+                        ) : (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-1">Drop banner images here, or <span className="text-primary cursor-pointer">browse</span></p>
+                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
+                          </>
+                        )}
+                        <input
+                          id="banner-upload-modal"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          disabled={uploadingGallery.banners}
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              handleGalleryUpload(e.target.files, 'banners');
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      {galleryPreviews.banners.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {galleryPreviews.banners.map((banner, index) => (
+                            <div key={index} className="relative group">
+                              <img 
+                                src={banner.url} 
+                                alt={banner.name}
+                                className="w-full h-16 object-cover rounded-lg border border-border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                onClick={() => removeGalleryImage('banners', index)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">{banner.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Additional Logos Section */}
+                  <div>
+                    <Label className="flex items-center space-x-2 mb-2">
+                      <Image className="h-4 w-4" />
+                      <span>Logo Variations</span>
+                    </Label>
+                    <div className="space-y-2">
+                      <div 
+                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => document.getElementById('logos-upload-modal')?.click()}
+                      >
+                        {uploadingGallery.logos ? (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
+                            <p className="text-sm text-muted-foreground">Uploading logos...</p>
+                          </>
+                        ) : (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-1">Drop logo variations here, or <span className="text-primary cursor-pointer">browse</span></p>
+                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
+                          </>
+                        )}
+                        <input
+                          id="logos-upload-modal"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          disabled={uploadingGallery.logos}
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              handleGalleryUpload(e.target.files, 'logos');
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      {galleryPreviews.logos.length > 0 && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {galleryPreviews.logos.map((logo, index) => (
+                            <div key={index} className="relative group">
+                              <img 
+                                src={logo.url} 
+                                alt={logo.name}
+                                className="w-full h-12 object-contain rounded-lg border border-border bg-white p-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 p-0"
+                                onClick={() => removeGalleryImage('logos', index)}
+                              >
+                                <Trash2 className="h-2 w-2" />
+                              </Button>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">{logo.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* General Images Section */}
+                  <div>
+                    <Label className="flex items-center space-x-2 mb-2">
+                      <Image className="h-4 w-4" />
+                      <span>Additional Images</span>
+                    </Label>
+                    <div className="space-y-2">
+                      <div 
+                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => document.getElementById('images-upload-modal')?.click()}
+                      >
+                        {uploadingGallery.images ? (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
+                            <p className="text-sm text-muted-foreground">Uploading images...</p>
+                          </>
+                        ) : (
+                          <>
+                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground mb-1">Drop additional images here, or <span className="text-primary cursor-pointer">browse</span></p>
+                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
+                          </>
+                        )}
+                        <input
+                          id="images-upload-modal"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          disabled={uploadingGallery.images}
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              handleGalleryUpload(e.target.files, 'images');
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      {galleryPreviews.images.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {galleryPreviews.images.map((image, index) => (
+                            <div key={index} className="relative group">
+                              <img 
+                                src={image.url} 
+                                alt={image.name}
+                                className="w-full h-16 object-cover rounded-lg border border-border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                onClick={() => removeGalleryImage('images', index)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">{image.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
                 </div>
               </AccordionContent>
             </AccordionItem>
