@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3 } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image } from 'lucide-react';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -123,6 +123,7 @@ export default function PublicBooking() {
   const page = pageData;
   const services = pageData.services || [];
   const faqs = pageData.faqs || [];
+  const gallery = pageData.data?.gallery || { banners: [], logos: [], images: [] };
   const themeStyles = page ? getThemeStyles(page) : null;
 
   return (
@@ -276,6 +277,102 @@ export default function PublicBooking() {
                     </Button>
                   </CardContent>
                 </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Banner Gallery Section */}
+      {gallery.banners && gallery.banners.length > 0 && (
+        <section className="py-20">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center mb-6">
+                <Image 
+                  className="h-12 w-12 mr-4" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Featured Images</h2>
+              </div>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Explore our work and get inspired</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {gallery.banners.map((banner: any, index: number) => (
+                <Card key={index} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img
+                      src={banner.url}
+                      alt={banner.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      data-testid={`banner-image-${index}`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Photo Gallery Section */}
+      {gallery.images && gallery.images.length > 0 && (
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center mb-6">
+                <Image 
+                  className="h-12 w-12 mr-4" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Photo Gallery</h2>
+              </div>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">A closer look at what we do</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+              {gallery.images.map((image: any, index: number) => (
+                <Card key={index} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden">
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      data-testid={`gallery-image-${index}`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Brand Variations Section */}
+      {gallery.logos && gallery.logos.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">Our Brand</h3>
+              <p className="text-muted-foreground max-w-xl mx-auto">Different variations of our logo and branding</p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl mx-auto">
+              {gallery.logos.map((logo: any, index: number) => (
+                <div 
+                  key={index}
+                  className="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-border hover:shadow-md transition-shadow"
+                >
+                  <img
+                    src={logo.url}
+                    alt={logo.name}
+                    className="max-h-16 w-auto object-contain"
+                    data-testid={`logo-variation-${index}`}
+                  />
+                </div>
               ))}
             </div>
           </div>
