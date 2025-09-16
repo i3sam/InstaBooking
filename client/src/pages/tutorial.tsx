@@ -108,28 +108,61 @@ export default function Tutorial() {
             Learn how to create your professional booking page and start accepting appointments in under 10 minutes.
           </p>
           
-          {/* Video placeholder - user will provide video later */}
+          {/* Demo Video */}
           <Card className="max-w-2xl mx-auto mb-8">
             <CardContent className="p-8">
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-4" data-testid="video-placeholder">
-                <div className="text-center">
-                  <PlayCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Demo Video</h3>
-                  <p className="text-muted-foreground">Complete walkthrough coming soon</p>
-                </div>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Demo Video</h3>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className="relative aspect-video bg-black rounded-lg overflow-hidden cursor-pointer group" data-testid="video-container">
+                      <video 
+                        className="w-full h-full object-cover"
+                        controls
+                        preload="metadata"
+                        data-testid="demo-video"
+                      >
+                        <source src="/attached_assets/0916_1758025696817.mp4" type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                        <div className="bg-white/90 rounded-full p-3">
+                          <Expand className="h-6 w-6 text-gray-800" />
+                        </div>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-5xl w-full" data-testid="dialog-video-fullscreen">
+                    <DialogTitle>Demo Video - Full Screen</DialogTitle>
+                    <DialogDescription>
+                      Complete walkthrough of BookingGen features and setup process
+                    </DialogDescription>
+                    <div className="aspect-video">
+                      <video 
+                        className="w-full h-full rounded-lg"
+                        controls
+                        autoPlay
+                        data-testid="demo-video-fullscreen"
+                      >
+                        <source src="/attached_assets/0916_1758025696817.mp4" type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
               <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 mr-1" />
-                  8 minutes
+                  Complete walkthrough
                 </div>
                 <div className="flex items-center">
                   <Monitor className="h-4 w-4 mr-1" />
                   Full demo
                 </div>
                 <div className="flex items-center">
-                  <Smartphone className="h-4 w-4 mr-1" />
-                  Mobile-friendly
+                  <Expand className="h-4 w-4 mr-1" />
+                  Fullscreen mode
                 </div>
               </div>
             </CardContent>
