@@ -88,8 +88,10 @@ export default function Pricing() {
                     ))}
                   </ul>
                   <Button
+                    type="button"
+                    size="lg"
                     onClick={plan.buttonAction}
-                    className={`w-full ${plan.isPrimary ? 'button-gradient' : ''}`}
+                    className={`w-full h-12 ${plan.isPrimary ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md' : ''}`}
                     variant={plan.isPrimary ? 'default' : 'outline'}
                     data-testid={`button-${plan.name.toLowerCase()}-plan`}
                   >

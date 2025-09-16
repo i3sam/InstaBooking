@@ -178,7 +178,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               variant="default"
               onClick={handleUpgrade}
               disabled={isProcessing}
-              className="flex-1 h-12 button-gradient"
+              className="flex-1 h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
               data-testid="button-confirm-upgrade"
             >
               {isProcessing ? (
