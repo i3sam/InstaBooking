@@ -12,31 +12,20 @@ export default function Pricing() {
 
   const plans = [
     {
-      name: "Starter",
-      description: "Perfect for getting started",
-      price: 0,
-      features: [
-        "1 booking page",
-        "Basic customization",
-        "50 bookings/month",
-        "Email support"
-      ],
-      buttonText: "Get Started Free",
-      buttonAction: () => setLocation(user ? '/dashboard' : '/signup'),
-      isPrimary: false
-    },
-    {
-      name: "Professional",
-      description: "For growing businesses",
-      price: 29,
+      name: "Pro",
+      description: "Everything you need to succeed",
+      price: 10,
       features: [
         "Unlimited booking pages",
-        "Advanced customization",
+        "Full customization",
         "Unlimited bookings",
         "Payment processing",
-        "Priority support"
+        "Analytics dashboard",
+        "Priority support",
+        "Custom branding",
+        "Mobile optimized"
       ],
-      buttonText: "Upgrade to Pro",
+      buttonText: user ? "Upgrade to Pro" : "Get Started",
       buttonAction: () => {
         if (user) {
           // TODO: Open payment modal
@@ -46,23 +35,7 @@ export default function Pricing() {
         }
       },
       isPrimary: true,
-      badge: "Most Popular"
-    },
-    {
-      name: "Enterprise",
-      description: "For large organizations",
-      price: null,
-      features: [
-        "Everything in Pro",
-        "Custom integrations",
-        "White-label solution",
-        "Dedicated support"
-      ],
-      buttonText: "Contact Sales",
-      buttonAction: () => {
-        // TODO: Contact sales
-      },
-      isPrimary: false
+      badge: "Essential"
     }
   ];
 
@@ -74,15 +47,16 @@ export default function Pricing() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Simple, transparent pricing
+              One plan, all features
             </h1>
             <p className="text-xl text-muted-foreground">
-              Start free and scale as you grow. No hidden fees, no surprises.
+              Get everything you need to create beautiful booking pages and grow your business.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {plans.map((plan, index) => (
+          <div className="flex justify-center">
+            <div className="max-w-md w-full">
+              {plans.map((plan, index) => (
               <Card 
                 key={index} 
                 className={`relative ${plan.isPrimary ? 'border-2 border-primary' : ''}`}
@@ -123,7 +97,8 @@ export default function Pricing() {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>

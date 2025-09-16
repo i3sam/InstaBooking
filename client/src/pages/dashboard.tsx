@@ -14,6 +14,7 @@ import { Bell, Crown } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import UpgradeModal from '@/components/modals/upgrade-modal';
 
 export default function Dashboard() {
   const { user, profile } = useAuth();
@@ -128,6 +129,7 @@ function SettingsSection() {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
     email: user?.email || '',
@@ -162,7 +164,7 @@ function SettingsSection() {
         <p className="text-muted-foreground">Manage your account and preferences</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-3 gap-8">
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-6">Profile Information</h3>
@@ -241,7 +243,60 @@ function SettingsSection() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-6">Subscription</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Current Plan</p>
+                  <p className="text-sm text-muted-foreground">
+                    {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Free Trial (Upgrade Required)'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {profile?.membershipStatus === 'pro' ? (
+                    <div className="text-sm text-green-600 font-medium">Active</div>
+                  ) : (
+                    <Button 
+                      onClick={() => setShowUpgradeModal(true)} 
+                      size="sm"
+                      data-testid="button-upgrade-pro"
+                    >
+                      Upgrade to Pro
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {profile?.membershipStatus === 'pro' && profile?.membershipExpires && (
+                <div className="flex items-center justify-between border-t pt-4">
+                  <div>
+                    <p className="font-medium text-foreground">Renewal Date</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(profile.membershipExpires).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  {profile?.membershipStatus === 'pro' 
+                    ? 'You have full access to all BookingGen features including unlimited booking pages, payment processing, and analytics.' 
+                    : 'Upgrade to Pro ($10/month) to create unlimited booking pages and access all features.'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
     </div>
   );
 }

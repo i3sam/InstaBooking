@@ -37,8 +37,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
       // Create order
       const response = await apiRequest('POST', '/api/payments/create-order', {
-        plan: 'professional',
-        amount: 29
+        plan: 'pro',
+        amount: 10
       });
       const { orderId, amount, currency } = await response.json();
 
@@ -48,7 +48,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
         amount,
         currency,
         name: 'BookingGen',
-        description: 'Professional Plan - Monthly',
+        description: 'Pro Plan - Monthly',
         order_id: orderId,
         handler: async (paymentResponse: any) => {
           try {

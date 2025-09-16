@@ -251,6 +251,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pages routes
   app.post("/api/pages", verifyToken, async (req: any, res) => {
     try {
+      // Check if user has Pro membership
+      const userProfile = await storage.getProfile(req.user.userId);
+      if (!userProfile || userProfile.membershipStatus !== 'pro') {
+        return res.status(403).json({ 
+          message: "Pro membership required", 
+          details: "Upgrade to Pro to create booking pages" 
+        });
+      }
+
       const pageData = {
         ...req.body,
         ownerId: req.user.userId
@@ -433,7 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createPayment({
         userId: req.user.userId,
         plan: "pro",
-        amount: "29",
+        amount: "10",
         status: "completed",
         razorpayOrderId: razorpay_order_id,
         razorpayPaymentId: razorpay_payment_id,
@@ -443,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update profile membership
       await storage.updateProfile(req.user.userId, {
         membershipStatus: "pro",
-        membershipPlan: "professional",
+        membershipPlan: "pro",
         membershipExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
       });
 

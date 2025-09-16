@@ -13,17 +13,23 @@ import {
   AlertDialogTitle 
 } from '@/components/ui/alert-dialog';
 import CreatePageModal from '@/components/modals/create-page-modal';
+import UpgradeModal from '@/components/modals/upgrade-modal';
 import { Plus, ExternalLink, Edit, Eye, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function PagesList() {
   const [, setLocation] = useLocation();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [deletePageId, setDeletePageId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { profile } = useAuth();
+
+  const isProUser = profile?.membershipStatus === 'pro';
 
   const { data: pages = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/pages'],
@@ -60,6 +66,14 @@ export default function PagesList() {
     }
   };
 
+  const handleCreatePage = () => {
+    if (isProUser) {
+      setShowCreateModal(true);
+    } else {
+      setShowUpgradeModal(true);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -76,7 +90,7 @@ export default function PagesList() {
           <p className="text-muted-foreground">Create and manage your booking pages</p>
         </div>
         <Button 
-          onClick={() => setShowCreateModal(true)}
+          onClick={handleCreatePage}
           variant="default"
           className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
           data-testid="button-create-page"
@@ -98,7 +112,7 @@ export default function PagesList() {
                 Set up a booking page for your services and start accepting appointments
               </p>
               <Button 
-                onClick={() => setShowCreateModal(true)}
+                onClick={handleCreatePage}
                 variant="default"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 data-testid="button-get-started"
@@ -182,7 +196,7 @@ export default function PagesList() {
                 Set up another booking page for different services
               </p>
               <Button 
-                onClick={() => setShowCreateModal(true)}
+                onClick={handleCreatePage}
                 variant="default"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                 data-testid="button-create-another-page"
@@ -197,6 +211,11 @@ export default function PagesList() {
       <CreatePageModal 
         open={showCreateModal} 
         onClose={() => setShowCreateModal(false)} 
+      />
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
       />
 
       <AlertDialog open={!!deletePageId} onOpenChange={() => setDeletePageId(null)}>
