@@ -60,7 +60,7 @@ export default function Dashboard() {
                       {profile?.fullName || user?.email}
                     </p>
                     <p className="text-xs text-muted-foreground" data-testid="text-membership-status">
-                      {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Free Plan'}
+                      {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Starter Plan'}
                     </p>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ function SettingsSection() {
                 <div>
                   <p className="font-medium text-foreground">Current Plan</p>
                   <p className="text-sm text-muted-foreground">
-                    {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Free Trial (Upgrade Required)'}
+                    {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Starter Plan (Upgrade Required)'}
                   </p>
                 </div>
                 <div className="text-right">

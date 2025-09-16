@@ -150,14 +150,14 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">
-                  Current Plan: {profile?.membershipStatus === 'pro' ? 'Pro' : 'Free Trial'}
+                  Current Plan: {profile?.membershipStatus === 'pro' ? 'Pro' : 'Starter'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {profile?.membershipStatus === 'pro' ? 'All features included' : 'Upgrade required to create pages'}
                 </p>
               </div>
               <Badge variant={profile?.membershipStatus === 'pro' ? 'default' : 'outline'}>
-                {profile?.membershipStatus === 'pro' ? 'Pro' : 'Free Trial'}
+                {profile?.membershipStatus === 'pro' ? 'Pro' : 'Starter'}
               </Badge>
             </div>
           </div>

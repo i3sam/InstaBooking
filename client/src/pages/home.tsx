@@ -171,7 +171,7 @@ export default function Home() {
                   className="bg-primary hover:bg-primary/90 px-10 py-6 rounded-xl text-xl h-auto text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   data-testid="button-get-started"
                 >
-                  Get Started • It's Free
+                  Get Started
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
                 <Button 
@@ -192,7 +192,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-3" />
-                  Free forever plan
+                  Professional features
                 </div>
               </div>
             </div>
@@ -492,7 +492,7 @@ export default function Home() {
                 className="bg-primary text-primary-foreground hover:bg-primary/90 px-8"
                 data-testid="button-cta-signup"
               >
-                Start Free Trial
+                Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
@@ -507,7 +507,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground mt-6">
               <div className="flex items-center">
                 <Check className="h-4 w-4 text-green-500 mr-2" />
-                Free forever plan
+                Professional features
               </div>
               <div className="flex items-center">
                 <Check className="h-4 w-4 text-green-500 mr-2" />
