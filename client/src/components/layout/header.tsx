@@ -85,7 +85,7 @@ export default function Header() {
                 </Button>
                 <Button 
                   onClick={() => setLocation('/signup')}
-                  className="button-gradient"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                   data-testid="nav-signup"
                 >
                   Get Started
@@ -168,7 +168,7 @@ export default function Header() {
                       setLocation('/signup');
                       setMobileMenuOpen(false);
                     }}
-                    className="button-gradient"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 justify-start"
                     data-testid="mobile-nav-signup"
                   >
                     Get Started
