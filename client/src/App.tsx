@@ -11,6 +11,7 @@ import Dashboard from "@/pages/dashboard";
 import CreatePage from "@/pages/create-page";
 import PublicBooking from "@/pages/public-booking";
 import Pricing from "@/pages/pricing";
+import Tutorial from "@/pages/tutorial";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
 
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/tutorial" component={Tutorial} />
       <Route path="/dashboard">
         <AuthGuard>
           <Dashboard />
