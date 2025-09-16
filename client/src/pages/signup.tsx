@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Home } from 'lucide-react';
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -70,6 +70,18 @@ export default function Signup() {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
+          <div className="flex justify-start mb-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setLocation('/')}
+              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+              data-testid="button-back-home"
+            >
+              <Home className="h-4 w-4" />
+              <span>Back to Homepage</span>
+            </Button>
+          </div>
           <div className="text-center mb-8">
             <div className="flex items-center justify-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
