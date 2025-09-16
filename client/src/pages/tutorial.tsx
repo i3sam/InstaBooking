@@ -3,6 +3,7 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { useLocation } from 'wouter';
 import { 
   Play, 
@@ -13,8 +14,10 @@ import {
   CheckCircle,
   PlayCircle,
   Monitor,
-  Smartphone
+  Smartphone,
+  Expand
 } from 'lucide-react';
+import dashboardImage from '@assets/image_1758020681382.png';
 
 export default function Tutorial() {
   const [, setLocation] = useLocation();
@@ -226,12 +229,31 @@ export default function Tutorial() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card data-testid="card-screenshot-1">
               <CardContent className="p-6">
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-4">
-                  <div className="text-center">
-                    <Monitor className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">Dashboard Screenshot</p>
-                  </div>
-                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className="relative aspect-video bg-muted rounded-lg overflow-hidden mb-4 cursor-pointer group">
+                      <img 
+                        src={dashboardImage} 
+                        alt="BookingGen Dashboard Screenshot" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        data-testid="img-dashboard-preview"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="bg-white/90 rounded-full p-2">
+                          <Expand className="h-4 w-4 text-gray-800" />
+                        </div>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl w-full" data-testid="dialog-dashboard-enlarged">
+                    <img 
+                      src={dashboardImage} 
+                      alt="BookingGen Dashboard - Full View" 
+                      className="w-full h-auto rounded-lg"
+                      data-testid="img-dashboard-full"
+                    />
+                  </DialogContent>
+                </Dialog>
                 <h3 className="font-semibold mb-2">Your Dashboard</h3>
                 <p className="text-sm text-muted-foreground">
                   Manage all your bookings from one clean, organized dashboard
