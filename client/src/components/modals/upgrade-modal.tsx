@@ -104,7 +104,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center text-xl">
             <Crown className="h-6 w-6 text-primary mr-2" />
-            Upgrade to Professional
+            Upgrade to Pro
           </DialogTitle>
         </DialogHeader>
         
@@ -117,25 +117,25 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             <div className="flex items-center mb-4">
               <Crown className="h-8 w-8 text-primary mr-3" />
               <div>
-                <h3 className="text-2xl font-bold text-foreground">Professional</h3>
-                <p className="text-muted-foreground">Perfect for growing businesses</p>
+                <h3 className="text-2xl font-bold text-foreground">Pro</h3>
+                <p className="text-muted-foreground">All features included</p>
               </div>
             </div>
             
             <div className="flex items-baseline mb-6">
-              <span className="text-4xl font-bold text-foreground">$29</span>
+              <span className="text-4xl font-bold text-foreground">$10</span>
               <span className="text-muted-foreground ml-2">/month</span>
             </div>
             
             <div className="grid grid-cols-1 gap-3">
               {[
                 "Unlimited booking pages",
-                "Advanced customization options",
-                "Unlimited appointments",
+                "Custom branding",
                 "Payment processing",
-                "Priority customer support",
-                "Analytics & reporting",
-                "Custom branding"
+                "Analytics dashboard",
+                "Priority support",
+                "Full customization",
+                "No usage limits"
               ].map((feature) => (
                 <div key={feature} className="flex items-center">
                   <Check className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
@@ -149,10 +149,16 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           <div className="bg-muted/50 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">Current Plan: Free</p>
-                <p className="text-sm text-muted-foreground">Limited features</p>
+                <p className="font-medium text-foreground">
+                  Current Plan: {profile?.membershipStatus === 'pro' ? 'Pro' : 'Free Trial'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {profile?.membershipStatus === 'pro' ? 'All features included' : 'Upgrade required to create pages'}
+                </p>
               </div>
-              <Badge variant="outline">Free</Badge>
+              <Badge variant={profile?.membershipStatus === 'pro' ? 'default' : 'outline'}>
+                {profile?.membershipStatus === 'pro' ? 'Pro' : 'Free Trial'}
+              </Badge>
             </div>
           </div>
 
