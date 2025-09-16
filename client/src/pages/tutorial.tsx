@@ -85,9 +85,9 @@ export default function Tutorial() {
       description: "Provide clients with a professional, easy-to-use booking experience"
     },
     {
-      icon: CreditCard,
-      title: "Secure Payments",
-      description: "Accept payments online with built-in payment processing"
+      icon: Monitor,
+      title: "Real-time Analytics",
+      description: "Track your business performance with detailed insights and reporting"
     }
   ];
 

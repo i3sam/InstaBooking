@@ -45,9 +45,9 @@ export default function Home() {
       description: "Intelligent calendar integration with availability management, time zone detection, and automated confirmations."
     },
     {
-      icon: CreditCard,
-      title: "Secure Payments",
-      description: "Accept payments instantly with Razorpay integration. Secure, fast, and supports multiple payment methods."
+      icon: Users,
+      title: "Customer Management",
+      description: "Build stronger relationships with comprehensive customer profiles, booking history, and communication tools."
     },
     {
       icon: Smartphone,
