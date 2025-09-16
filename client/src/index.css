@@ -165,6 +165,26 @@
   border-radius: 0.75rem;
 }
 
+/* Upgrade button shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 14px hsl(var(--primary) / 0.3); }
+  50% { box-shadow: 0 6px 20px hsl(var(--primary) / 0.5); }
+}
+
+.shake-animation {
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+.pulse-glow-animation {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
 /* Premium styling enhancements */
 .premium-gradient {
   background: linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(217.2, 91.2%, 90% / 0.08) 50%, hsl(var(--primary) / 0.12) 100%);

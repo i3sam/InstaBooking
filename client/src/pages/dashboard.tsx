@@ -164,133 +164,117 @@ function SettingsSection() {
         <p className="text-muted-foreground">Manage your account and preferences</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Profile Information</h3>
-            <form className="space-y-4" onSubmit={(e) => {
-              e.preventDefault();
-              updateProfileMutation.mutate({
-                fullName: formData.fullName,
-                timezone: formData.timezone
-              });
-            }}>
-              <div>
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input 
-                  id="fullName"
-                  type="text" 
-                  value={formData.fullName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                  data-testid="input-fullname"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email"
-                  type="email" 
-                  value={formData.email}
-                  disabled
-                  data-testid="input-email"
-                />
-              </div>
-              <div>
-                <Label htmlFor="timezone">Time Zone</Label>
-                <Select value={formData.timezone} onValueChange={(value) => setFormData(prev => ({ ...prev, timezone: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pacific">UTC-08:00 (Pacific Time)</SelectItem>
-                    <SelectItem value="eastern">UTC-05:00 (Eastern Time)</SelectItem>
-                    <SelectItem value="gmt">UTC+00:00 (GMT)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" size="lg" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md px-8" data-testid="button-save-changes">
-                Save Changes
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <div className="max-w-4xl">
+        <div className="grid lg:grid-cols-2 gap-8">
+          <Card>
+            <CardContent className="p-8">
+              <h3 className="text-lg font-semibold text-foreground mb-6">Profile Information</h3>
+              <form className="space-y-6" onSubmit={(e) => {
+                e.preventDefault();
+                updateProfileMutation.mutate({
+                  fullName: formData.fullName,
+                  timezone: formData.timezone
+                });
+              }}>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input 
+                    id="fullName"
+                    type="text" 
+                    value={formData.fullName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                    className="h-12"
+                    data-testid="input-fullname"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input 
+                    id="email"
+                    type="email" 
+                    value={formData.email}
+                    disabled
+                    className="h-12 bg-muted/50"
+                    data-testid="input-email"
+                  />
+                  <p className="text-sm text-muted-foreground">Email cannot be changed</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Time Zone</Label>
+                  <Select value={formData.timezone} onValueChange={(value) => setFormData(prev => ({ ...prev, timezone: value }))}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select timezone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pacific">UTC-08:00 (Pacific Time)</SelectItem>
+                      <SelectItem value="eastern">UTC-05:00 (Eastern Time)</SelectItem>
+                      <SelectItem value="gmt">UTC+00:00 (GMT)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md" 
+                  data-testid="button-save-changes"
+                >
+                  Save Changes
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Notification Preferences</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">Email Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive booking confirmations via email</p>
+          <Card>
+            <CardContent className="p-8">
+              <h3 className="text-lg font-semibold text-foreground mb-6">Notification Preferences</h3>
+              <div className="space-y-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">Email Notifications</p>
+                    <p className="text-sm text-muted-foreground mt-1">Receive booking confirmations and updates via email</p>
+                  </div>
+                  <Checkbox defaultChecked className="mt-1" />
                 </div>
-                <Checkbox defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">SMS Reminders</p>
-                  <p className="text-sm text-muted-foreground">Get text reminders for upcoming appointments</p>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">SMS Reminders</p>
+                    <p className="text-sm text-muted-foreground mt-1">Get text reminders for upcoming appointments</p>
+                  </div>
+                  <Checkbox className="mt-1" />
                 </div>
-                <Checkbox />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">Marketing Updates</p>
-                  <p className="text-sm text-muted-foreground">Receive product updates and tips</p>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">Marketing Updates</p>
+                    <p className="text-sm text-muted-foreground mt-1">Receive product updates and helpful tips</p>
+                  </div>
+                  <Checkbox defaultChecked className="mt-1" />
                 </div>
-                <Checkbox defaultChecked />
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Subscription</h3>
-            <div className="space-y-4">
+        {/* Current Plan Status - Clean and Simple */}
+        {profile?.membershipStatus === 'pro' && (
+          <Card className="mt-8">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Current Plan</p>
-                  <p className="text-sm text-muted-foreground">
-                    {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Starter Plan (Upgrade Required)'}
-                  </p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Current Plan</h3>
+                  <p className="text-muted-foreground">Pro Plan - All features unlocked</p>
                 </div>
                 <div className="text-right">
-                  {profile?.membershipStatus === 'pro' ? (
-                    <div className="text-sm text-green-600 font-medium">Active</div>
-                  ) : (
-                    <Button 
-                      onClick={() => setShowUpgradeModal(true)} 
-                      size="sm"
-                      data-testid="button-upgrade-pro"
-                    >
-                      Upgrade to Pro
-                    </Button>
+                  <div className="text-sm text-green-600 font-medium mb-1">Active</div>
+                  {profile?.membershipExpires && (
+                    <p className="text-sm text-muted-foreground">
+                      Renews {new Date(profile.membershipExpires).toLocaleDateString()}
+                    </p>
                   )}
                 </div>
               </div>
-              
-              {profile?.membershipStatus === 'pro' && profile?.membershipExpires && (
-                <div className="flex items-center justify-between border-t pt-4">
-                  <div>
-                    <p className="font-medium text-foreground">Renewal Date</p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(profile.membershipExpires).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              )}
-              
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  {profile?.membershipStatus === 'pro' 
-                    ? 'You have full access to all BookingGen features including unlimited booking pages, payment processing, and analytics.' 
-                    : 'Upgrade to Pro ($10/month) to create unlimited booking pages and access all features.'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <UpgradeModal 

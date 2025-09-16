@@ -23,7 +23,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   ];
 
   return (
-    <div className="w-64 bg-card border-r border-border h-screen">
+    <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center space-x-3">
@@ -35,7 +35,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       </div>
       
       {/* Navigation */}
-      <nav className="px-6 space-y-2">
+      <nav className="px-6 space-y-2 flex-1">
         {navigation.map((item) => (
           <button
             key={item.id}
@@ -58,25 +58,50 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         ))}
       </nav>
       
-      {/* Upgrade Card */}
+      {/* Enhanced Upgrade Card at Bottom */}
       {profile?.membershipStatus !== 'pro' && (
         <div className="p-6 mt-auto">
-          <div className="bg-muted/50 rounded-xl p-4">
-            <div className="flex items-center mb-2">
-              <Crown className="h-5 w-5 text-primary mr-2" />
-              <h4 className="font-semibold text-foreground">Upgrade to Pro</h4>
+          <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 rounded-xl p-5 overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-primary/5 rounded-full translate-y-8 -translate-x-8"></div>
+            
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center mb-3">
+                <Crown className="h-6 w-6 text-primary mr-2" />
+                <h4 className="font-bold text-foreground">Upgrade to Pro</h4>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                Unlock unlimited booking pages, advanced analytics, and premium features
+              </p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></div>
+                  Unlimited booking pages
+                </div>
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></div>
+                  Payment processing
+                </div>
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></div>
+                  Advanced analytics
+                </div>
+              </div>
+              <Button 
+                variant="default"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg text-sm h-10 font-semibold shake-animation pulse-glow-animation" 
+                data-testid="button-upgrade"
+                onClick={() => setIsUpgradeModalOpen(true)}
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade Now
+              </Button>
+              <p className="text-center text-xs text-muted-foreground mt-2">
+                $10/month • Cancel anytime
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              Unlock unlimited pages and advanced features
-            </p>
-            <Button 
-              variant="default"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md text-sm" 
-              data-testid="button-upgrade"
-              onClick={() => setIsUpgradeModalOpen(true)}
-            >
-              Upgrade Now
-            </Button>
           </div>
         </div>
       )}
