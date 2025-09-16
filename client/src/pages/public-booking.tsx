@@ -151,9 +151,11 @@ export default function PublicBooking() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => setShowBookingModal(true)}
-              className="px-8 py-4 rounded-xl text-lg h-auto text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="px-8 py-4 rounded-xl text-lg h-auto text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 bg-primary hover:bg-primary/90"
               style={{
-                background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                color: 'white',
+                border: 'none'
               }}
               data-testid="button-book-appointment"
             >
@@ -215,9 +217,11 @@ export default function PublicBooking() {
                     </div>
                     <Button 
                       onClick={() => setShowBookingModal(true)}
-                      className="w-full text-white font-semibold rounded-lg py-3 hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                      className="w-full text-white font-semibold rounded-lg py-3 hover:shadow-lg transform hover:scale-105 transition-all duration-200 bg-primary hover:bg-primary/90"
                       style={{
-                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                        color: 'white',
+                        border: 'none'
                       }}
                       data-testid={`button-book-${service.id}`}
                     >
@@ -241,7 +245,12 @@ export default function PublicBooking() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => setShowBookingModal(true)}
-              className="button-gradient px-8 py-4 rounded-xl text-lg h-auto"
+              className="px-8 py-4 rounded-xl text-lg h-auto bg-primary hover:bg-primary/90 text-white font-semibold"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(217.2, 91.2%, 60%) 100%)',
+                color: 'white',
+                border: 'none'
+              }}
               data-testid="button-book-appointment-cta"
             >
               <Calendar className="h-5 w-5 mr-2" />

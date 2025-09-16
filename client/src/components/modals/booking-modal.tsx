@@ -66,10 +66,10 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.customerName || !formData.customerPhone || !formData.serviceId || !formData.date || !formData.time) {
+    if (!formData.customerName || !formData.customerPhone || !formData.customerEmail || !formData.serviceId || !formData.date || !formData.time) {
       toast({
         title: "Missing required fields",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including email.",
         variant: "destructive",
       });
       return;
@@ -128,13 +128,14 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
           </div>
           
           <div>
-            <Label htmlFor="customerEmail">Email (Optional)</Label>
+            <Label htmlFor="customerEmail">Email *</Label>
             <Input
               id="customerEmail"
               type="email"
               placeholder="your@email.com"
               value={formData.customerEmail}
               onChange={(e) => setFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
+              required
               data-testid="input-customer-email"
             />
           </div>
@@ -217,9 +218,14 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
             </Button>
             <Button 
               type="submit" 
-              className="flex-1 button-gradient"
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
               disabled={createAppointmentMutation.isPending}
               data-testid="button-submit-booking"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(217.2, 91.2%, 60%) 100%)',
+                color: 'white',
+                border: 'none'
+              }}
             >
               {createAppointmentMutation.isPending ? 'Submitting...' : 'Submit Booking Request'}
             </Button>
