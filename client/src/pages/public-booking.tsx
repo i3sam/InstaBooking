@@ -1529,7 +1529,7 @@ export default function PublicBooking() {
       )}
 
       {/* Enhanced Contact Information Section */}
-      {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress) && (
+      {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress || page.locationLink) && (
         <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
           {/* Sophisticated background */}
           <div className="absolute inset-0">
@@ -1564,14 +1564,14 @@ export default function PublicBooking() {
               </p>
               
               {/* Contact info display */}
-              {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length > 0 && (
+              {[page.contactPhone, page.contactEmail, page.businessAddress, page.locationLink].filter(Boolean).length > 0 && (
                 <div className="inline-flex items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
                   <div className="text-center">
                     <div 
                       className="text-xl sm:text-2xl font-bold mb-1"
                       style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                     >
-                      {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length}
+                      {[page.contactPhone, page.contactEmail, page.businessAddress, page.locationLink].filter(Boolean).length}
                     </div>
                     <div className="text-sm text-muted-foreground font-medium">Contact Methods</div>
                   </div>
@@ -1761,6 +1761,96 @@ export default function PublicBooking() {
                       </div>
                       <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         Visit us in person
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {page.locationLink && (
+                  <Card className="group text-center border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 bg-card/80 backdrop-blur-md relative overflow-hidden">
+                    {/* Hover gradient overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                      }}
+                    ></div>
+                    
+                    <CardContent className="p-6 sm:p-8 lg:p-10 relative z-10">
+                      <div 
+                        className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          background: themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                        }}
+                      >
+                        <MapPin className="h-10 w-10 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-foreground mb-6">Find Us</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center gap-3">
+                          <a 
+                            href={page.locationLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-6 py-3 rounded-xl text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                            style={{
+                              background: themeStyles 
+                                ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                                : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                              color: 'white'
+                            }}
+                            data-testid="button-location-link"
+                          >
+                            <ExternalLink className="h-5 w-5 mr-2" />
+                            Open in Maps
+                          </a>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(page.locationLink, 'Location link')}
+                                  className="h-10 w-10 p-0 hover:bg-background/80 transition-all duration-300"
+                                  data-testid="button-copy-location"
+                                >
+                                  {copiedField === 'Location link' ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{copiedField === 'Location link' ? 'Copied!' : 'Copy link'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                          {page.locationLink.includes('maps.google.com') && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-background/50">
+                              📍 Google Maps
+                            </span>
+                          )}
+                          {page.locationLink.includes('maps.apple.com') && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-background/50">
+                              🗺️ Apple Maps
+                            </span>
+                          )}
+                          {!page.locationLink.includes('maps.google.com') && !page.locationLink.includes('maps.apple.com') && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-background/50">
+                              🗺️ Map Link
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Get directions to our location
                       </p>
                     </CardContent>
                   </Card>
