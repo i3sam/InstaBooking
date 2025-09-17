@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -1948,52 +1948,157 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Contact Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Take the first step toward your goals. Book your session today and let's create a plan that works for you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => setShowBookingModal(true)}
-              className="px-8 py-4 rounded-xl text-lg h-auto bg-primary hover:bg-primary/90 text-white font-semibold"
-              style={{
-                background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(217.2, 91.2%, 60%) 100%)',
-                color: 'white',
-                border: 'none'
-              }}
-              data-testid="button-book-appointment-cta"
-            >
-              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              Book an Appointment
-            </Button>
-            {page.calendarLink ? (
-              <Button
-                variant="outline"
-                className="px-8 py-4 rounded-xl text-lg h-auto"
-                asChild
-                data-testid="button-visit-calendar-cta"
-              >
-                <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                  View My Calendar
-                </a>
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="px-8 py-4 rounded-xl text-lg h-auto"
-                asChild
-                data-testid="button-call-us-cta"
-              >
-                <a href="tel:+1234567890">
-                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                  Call Us: (123) 456-7890
-                </a>
-              </Button>
-            )}
+      {/* Business Info & Policies Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Business Information</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to know before booking your appointment
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Business Hours */}
+            <Card className="bg-card/60 backdrop-blur-sm border-border/20 hover:border-border/40 transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${themeStyles?.primaryColor || '#2563eb'}20` }}
+                  >
+                    <Clock className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Hours</h3>
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground" data-testid="business-hours">
+                  <div className="flex justify-between">
+                    <span>Mon - Fri</span>
+                    <span className="font-medium">9:00 AM - 6:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Saturday</span>
+                    <span className="font-medium">10:00 AM - 4:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Sunday</span>
+                    <span className="font-medium">Closed</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location */}
+            <Card className="bg-card/60 backdrop-blur-sm border-border/20 hover:border-border/40 transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${themeStyles?.primaryColor || '#2563eb'}20` }}
+                  >
+                    <MapPin className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Location</h3>
+                </div>
+                <div className="text-sm text-muted-foreground space-y-1" data-testid="business-location">
+                  <p>123 Business Street</p>
+                  <p>Suite 456</p>
+                  <p>City, State 12345</p>
+                  <a 
+                    href="https://maps.google.com/?q=123+Business+Street,+City,+State+12345" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-xs mt-2 text-primary hover:underline"
+                    data-testid="link-map"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    View on Map
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact */}
+            <Card className="bg-card/60 backdrop-blur-sm border-border/20 hover:border-border/40 transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${themeStyles?.primaryColor || '#2563eb'}20` }}
+                  >
+                    <Phone className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Contact</h3>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Phone:</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-1 text-foreground hover:bg-primary/10"
+                      onClick={() => {
+                        navigator.clipboard.writeText('(123) 456-7890');
+                        toast({ title: 'Phone number copied to clipboard!' });
+                      }}
+                      data-testid="button-copy-phone"
+                    >
+                      <span className="mr-2">(123) 456-7890</span>
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Email:</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-1 text-foreground hover:bg-primary/10"
+                      onClick={() => {
+                        navigator.clipboard.writeText('hello@business.com');
+                        toast({ title: 'Email copied to clipboard!' });
+                      }}
+                      data-testid="button-copy-email"
+                    >
+                      <span className="mr-2">hello@business.com</span>
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Policies */}
+            <Card className="bg-card/60 backdrop-blur-sm border-border/20 hover:border-border/40 transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${themeStyles?.primaryColor || '#2563eb'}20` }}
+                  >
+                    <FileText className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Policies</h3>
+                </div>
+                <div className="space-y-2 text-xs text-muted-foreground" data-testid="business-policies">
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                    <span>24-hour cancellation required</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                    <span>Payment due at time of service</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                    <span>Please arrive 10 minutes early</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                    <span>Rescheduling available online</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
