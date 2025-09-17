@@ -705,39 +705,6 @@ export default function PublicBooking() {
             </div>
             
             {/* Services summary */}
-            <div className="text-center mt-20">
-              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    {services.length}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">Services</div>
-                </div>
-                <div className="w-px h-12 bg-border"></div>
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    {Math.min(...services.map((s: any) => s.durationMinutes))}-{Math.max(...services.map((s: any) => s.durationMinutes))}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">Minutes</div>
-                </div>
-                <div className="w-px h-12 bg-border"></div>
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    ${Math.min(...services.map((s: any) => parseInt(s.price)))}-{Math.max(...services.map((s: any) => parseInt(s.price)))}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">Price Range</div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
       )}
