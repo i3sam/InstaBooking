@@ -663,15 +663,35 @@ export default function PublicBooking() {
                             </div>
                           </div>
                           
-                          {/* Quick action */}
+                          {/* Explore Services Action Button */}
                           <div className="flex items-center justify-center">
-                            <div className="text-xs text-muted-foreground">Scroll down to explore services</div>
-                            <div className="ml-2 animate-bounce">
-                              <div 
-                                className="w-1 h-4 rounded-full"
-                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', opacity: 0.6 }}
-                              ></div>
-                            </div>
+                            <Button
+                              onClick={() => {
+                                const servicesSection = document.querySelector('[data-services-section]');
+                                if (servicesSection) {
+                                  servicesSection.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              variant="outline"
+                              className="group px-6 py-3 rounded-full text-sm font-semibold border-2 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                              style={{
+                                borderColor: themeStyles?.primaryColor || '#2563eb',
+                                color: themeStyles?.primaryColor || '#2563eb'
+                              }}
+                              data-testid="button-explore-services"
+                            >
+                              <div className="flex items-center">
+                                Explore Services
+                                <div className="ml-2 group-hover:translate-x-1 transition-transform duration-300">
+                                  <div 
+                                    className="flex items-center"
+                                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    →
+                                  </div>
+                                </div>
+                              </div>
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -726,7 +746,7 @@ export default function PublicBooking() {
 
       {/* Enhanced Services Section */}
       {services.length > 0 && (
-        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
+        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden" data-services-section>
           {/* Background enhancements */}
           <div className="absolute inset-0">
             <div 
