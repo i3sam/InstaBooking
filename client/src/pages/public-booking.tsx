@@ -284,22 +284,22 @@ export default function PublicBooking() {
       )}
 
       {/* Banner Gallery Section */}
-      {gallery.banners && gallery.banners.length > 0 && (
-        <section className="py-20">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center mb-6">
-                <Image 
-                  className="h-12 w-12 mr-4" 
-                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                />
-                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Featured Images</h2>
-              </div>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Explore our work and get inspired</p>
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-6">
+              <Image 
+                className="h-12 w-12 mr-4" 
+                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+              />
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Featured Images</h2>
             </div>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Explore our work and get inspired</p>
+          </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {gallery.banners.map((banner: any, index: number) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {gallery.banners && gallery.banners.length > 0 ? (
+              gallery.banners.map((banner: any, index: number) => (
                 <Card key={index} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img
@@ -311,29 +311,45 @@ export default function PublicBooking() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 </Card>
-              ))}
-            </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-16">
+                <div 
+                  className="w-24 h-24 mx-auto rounded-2xl flex items-center justify-center mb-6"
+                  style={{
+                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}10 0%, ${themeStyles.primaryColor}05 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
+                  }}
+                >
+                  <Image 
+                    className="h-12 w-12" 
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  />
+                </div>
+                <h3 className="text-2xl font-semibold text-foreground mb-4">Coming Soon</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">We're working on showcasing our best work here. Check back soon for featured images!</p>
+              </div>
+            )}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Photo Gallery Section */}
-      {gallery.images && gallery.images.length > 0 && (
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center mb-6">
-                <Image 
-                  className="h-12 w-12 mr-4" 
-                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                />
-                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Photo Gallery</h2>
-              </div>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">A closer look at what we do</p>
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-6">
+              <Image 
+                className="h-12 w-12 mr-4" 
+                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+              />
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Photo Gallery</h2>
             </div>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">A closer look at what we do</p>
+          </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-              {gallery.images.map((image: any, index: number) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {gallery.images && gallery.images.length > 0 ? (
+              gallery.images.map((image: any, index: number) => (
                 <Card key={index} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
                   <div className="relative aspect-square overflow-hidden">
                     <img
@@ -345,23 +361,39 @@ export default function PublicBooking() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 </Card>
-              ))}
-            </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-16">
+                <div 
+                  className="w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-6"
+                  style={{
+                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
+                  }}
+                >
+                  <Image 
+                    className="h-10 w-10" 
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-3">Photo Gallery Coming Soon</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">We're curating beautiful photos to showcase our work and atmosphere.</p>
+              </div>
+            )}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Brand Variations Section */}
-      {gallery.logos && gallery.logos.length > 0 && (
-        <section className="py-16">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
-              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">Our Brand</h3>
-              <p className="text-muted-foreground max-w-xl mx-auto">Different variations of our logo and branding</p>
-            </div>
+      <section className="py-16 bg-muted/20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">Our Brand</h3>
+            <p className="text-muted-foreground max-w-xl mx-auto">Different variations of our logo and branding</p>
+          </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl mx-auto">
-              {gallery.logos.map((logo: any, index: number) => (
+          <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl mx-auto">
+            {gallery.logos && gallery.logos.length > 0 ? (
+              gallery.logos.map((logo: any, index: number) => (
                 <div 
                   key={index}
                   className="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-border hover:shadow-md transition-shadow"
@@ -373,11 +405,150 @@ export default function PublicBooking() {
                     data-testid={`logo-variation-${index}`}
                   />
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <div 
+                  className="w-16 h-16 mx-auto rounded-lg flex items-center justify-center mb-4"
+                  style={{
+                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}12 0%, ${themeStyles.primaryColor}06 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.06) 100%)'
+                  }}
+                >
+                  <Image 
+                    className="h-8 w-8" 
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  />
+                </div>
+                <h4 className="text-lg font-medium text-foreground mb-2">Brand Assets Coming Soon</h4>
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto">We're developing brand variations and logo designs.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Customer Reviews & Testimonials Section */}
+      <section className="py-24 bg-gradient-to-br from-background to-muted/50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-20">
+            <div className="flex items-center justify-center mb-6">
+              <div 
+                className="w-3 h-3 rounded-full mr-3"
+                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+              ></div>
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">What Our Clients Say</h2>
+              <div 
+                className="w-3 h-3 rounded-full ml-3"
+                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+              ></div>
+            </div>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Hear from our satisfied customers about their experiences</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Sample testimonials - in a real app, these would come from the database */}
+            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
+              <div className="flex mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div key={star} className="w-5 h-5 mr-1">
+                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                ))}
+              </div>
+              <blockquote className="text-foreground mb-6 leading-relaxed italic">
+                "Exceptional service and attention to detail. The booking process was seamless and the experience exceeded all my expectations."
+              </blockquote>
+              <div className="flex items-center">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                >
+                  S.M.
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Sarah Mitchell</div>
+                  <div className="text-sm text-muted-foreground">Verified Customer</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
+              <div className="flex mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div key={star} className="w-5 h-5 mr-1">
+                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                ))}
+              </div>
+              <blockquote className="text-foreground mb-6 leading-relaxed italic">
+                "Professional, reliable, and truly cares about client satisfaction. I've been a repeat customer for months now."
+              </blockquote>
+              <div className="flex items-center">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                >
+                  D.K.
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">David Kim</div>
+                  <div className="text-sm text-muted-foreground">Regular Client</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm md:col-span-2 lg:col-span-1">
+              <div className="flex mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div key={star} className="w-5 h-5 mr-1">
+                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                ))}
+              </div>
+              <blockquote className="text-foreground mb-6 leading-relaxed italic">
+                "Outstanding quality and customer service. The whole team is friendly, professional, and goes above and beyond."
+              </blockquote>
+              <div className="flex items-center">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                >
+                  E.R.
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Emily Rodriguez</div>
+                  <div className="text-sm text-muted-foreground">Happy Customer</div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="text-center mt-16">
+            <div className="inline-flex items-center justify-center space-x-8 px-8 py-4 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-foreground mb-1">500+</div>
+                <div className="text-sm text-muted-foreground">Happy Clients</div>
+              </div>
+              <div className="w-px h-12 bg-border"></div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-foreground mb-1">4.9</div>
+                <div className="text-sm text-muted-foreground">Average Rating</div>
+              </div>
+              <div className="w-px h-12 bg-border"></div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-foreground mb-1">2+</div>
+                <div className="text-sm text-muted-foreground">Years Experience</div>
+              </div>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* FAQ Section */}
       {faqs.length > 0 && (
