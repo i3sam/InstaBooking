@@ -873,27 +873,27 @@ export default function CreatePage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Integration Section */}
-                <AccordionItem value="integration" className="border border-border rounded-xl">
+                {/* Location Link Section */}
+                <AccordionItem value="location" className="border border-border rounded-xl">
                   <AccordionTrigger className="px-6 py-4 hover:no-underline">
                     <div className="flex items-center space-x-3">
-                      <Calendar className="h-5 w-5 text-primary" />
-                      <span className="text-lg font-semibold">Calendar Integration</span>
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <span className="text-lg font-semibold">Location Link</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-6 pb-6">
                     <div>
-                      <Label htmlFor="calendarLink">Calendar Integration</Label>
+                      <Label htmlFor="locationLink">Store Location Link</Label>
                       <Input
-                        id="calendarLink"
+                        id="locationLink"
                         type="url"
-                        placeholder="Google Calendar, Calendly, or other calendar link"
-                        value={formData.calendarLink}
-                        onChange={(e) => setFormData(prev => ({ ...prev, calendarLink: e.target.value }))}
-                        data-testid="input-calendar-link"
+                        placeholder="https://maps.google.com/... or https://maps.apple.com/..."
+                        value={formData.locationLink}
+                        onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
+                        data-testid="input-location-link"
                       />
                       <p className="text-sm text-muted-foreground mt-1">
-                        Add your booking calendar link (Google Calendar, Calendly, etc.)
+                        Add your Google Maps or Apple Maps link so customers can easily find your store
                       </p>
                     </div>
                   </AccordionContent>
