@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -1049,78 +1050,46 @@ export default function PublicBooking() {
         );
       })()}
 
-      {/* Enhanced Reviews Section */}
-      <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
-        {/* Elegant background */}
-        <div className="absolute inset-0">
-          <div 
-            className="absolute inset-0 opacity-40"
-            style={{
-              background: themeStyles 
-                ? `radial-gradient(ellipse at 30% 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.04) 0%, transparent 50%)`
-                : 'radial-gradient(ellipse at 30% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 50%)'
-            }}
-          ></div>
-        </div>
-        
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Enhanced section header */}
-          <div className="text-center mb-12 sm:mb-16 lg:mb-24">
-            <div 
-              className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
-              style={{
-                background: themeStyles 
-                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
-                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
-              }}
-            >
-              <MessageSquare 
-                className="h-8 w-8 sm:h-10 sm:w-10" 
-                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-              />
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Customer Reviews</h2>
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8">
-              Discover what our valued customers have to say about their experiences with our professional services
-            </p>
-            
-            {/* Review stats */}
-            {reviews.length > 0 && (
-              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    {reviews.length}
+      {/* Reviews Dropdown */}
+      <section className="py-8 relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-md">
+              <Collapsible>
+                <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors duration-200" data-testid="button-reviews">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <MessageSquare className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                      <div>
+                        <h3 className="text-lg font-semibold">Customer Reviews</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {reviews.length > 0 ? (
+                            <>
+                              {reviews.length} reviews • {(reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)} avg rating
+                              <span className="inline-flex ml-1">
+                                {[1, 2, 3, 4, 5].map((star) => {
+                                  const avgRating = reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length;
+                                  return (
+                                    <Star 
+                                      key={star} 
+                                      className={`h-3 w-3 ${star <= avgRating ? 'fill-current' : 'fill-muted/20'}`}
+                                      style={{ color: star <= avgRating ? (themeStyles?.primaryColor || '#2563eb') : undefined }}
+                                    />
+                                  );
+                                })}
+                              </span>
+                            </>
+                          ) : (
+                            'No reviews yet • Be the first to leave a review'
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown className="h-4 w-4 transform transition-transform duration-200 group-data-[state=open]:rotate-180" />
                   </div>
-                  <div className="text-sm text-muted-foreground font-medium">Reviews</div>
-                </div>
-                <div className="w-px h-8 bg-border"></div>
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    {reviews.length > 0 ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1) : '0.0'}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">Average</div>
-                </div>
-                <div className="w-px h-8 bg-border"></div>
-                <div className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const avgRating = reviews.length > 0 ? reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length : 0;
-                    return (
-                      <Star 
-                        key={star} 
-                        className={`h-5 w-5 ${star <= avgRating ? 'fill-current' : 'fill-muted'}`}
-                        style={{ color: star <= avgRating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-6 pb-6">
           </div>
 
           {/* Enhanced reviews display */}
@@ -1499,6 +1468,10 @@ export default function PublicBooking() {
                 </form>
               </CardContent>
             </Card>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
           </div>
         </div>
       </section>
@@ -1571,67 +1544,37 @@ export default function PublicBooking() {
         <section className="py-8 relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-              <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-md relative overflow-hidden">
-                {/* Elegant top accent */}
-                <div 
-                  className="absolute top-0 left-0 w-full h-2"
-                  style={{
-                    background: themeStyles 
-                      ? `linear-gradient(90deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
-                      : 'linear-gradient(90deg, #2563eb 0%, #2563ebdd 100%)'
-                  }}
-                ></div>
-                
-                <CardContent className="p-6 sm:p-8 lg:p-10">
-                  {/* Current status indicator */}
-                  <div className="text-center mb-8">
-                    <div 
-                      className="inline-flex items-center px-6 py-3 rounded-2xl text-lg font-semibold shadow-lg"
-                      style={{
-                        background: themeStyles 
-                          ? `${themeStyles.primaryColor}15`
-                          : 'rgba(37, 99, 235, 0.15)',
-                        color: themeStyles?.primaryColor || '#2563eb',
-                        border: `2px solid ${themeStyles?.primaryColor || '#2563eb'}20`
-                      }}
-                    >
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center">
-                              <Timer className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                              Currently {(() => {
-                                const now = new Date();
-                                const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                                const currentHours = page.businessHours[currentDay];
-                                const isOpen = String(currentHours) !== 'Closed';
-                                return (
-                                  <span className="flex items-center">
-                                    {isOpen ? 'Open' : 'Closed'}
-                                    <div 
-                                      className={`w-2 h-2 rounded-full ml-2 ${isOpen ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}
-                                    ></div>
-                                  </span>
-                                );
-                              })()}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {(() => {
-                                const now = new Date();
-                                const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                                const currentHours = page.businessHours[currentDay];
-                                return String(currentHours) === 'Closed' 
-                                  ? 'We are currently closed'
-                                  : `We are open today: ${currentHours}`;
-                              })()}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+              <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-md">
+                <Collapsible>
+                  <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors duration-200" data-testid="button-business-hours">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Timer className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        <div>
+                          <h3 className="text-lg font-semibold">Business Hours</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Currently {(() => {
+                              const now = new Date();
+                              const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                              const currentHours = page.businessHours[currentDay];
+                              const isOpen = String(currentHours) !== 'Closed';
+                              return (
+                                <span className="flex items-center">
+                                  {isOpen ? 'Open' : 'Closed'}
+                                  <div 
+                                    className={`w-2 h-2 rounded-full ml-1 ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}
+                                  ></div>
+                                </span>
+                              );
+                            })()}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown className="h-4 w-4 transform transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </div>
-                  </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-6 pb-6">
                   
                   <div className="grid gap-6">
                     {Object.entries(page.businessHours).map(([day, hours], index) => {
@@ -1718,7 +1661,9 @@ export default function PublicBooking() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </Card>
             </div>
           </div>
