@@ -24,7 +24,7 @@ export const pages = pgTable("pages", {
   backgroundType: text("background_type").default("gradient"),
   backgroundValue: text("background_value").default("blue"),
   fontFamily: text("font_family").default("inter"),
-  calendarLink: text("calendar_link"),
+  locationLink: text("location_link"),
   faqs: jsonb("faqs").default(sql`'[]'`), // Array of {question: string, answer: string}
   acceptReviews: text("accept_reviews").default("true"), // "true" or "false" 
   businessHours: jsonb("business_hours").default(sql`'{"monday":"9:00-17:00","tuesday":"9:00-17:00","wednesday":"9:00-17:00","thursday":"9:00-17:00","friday":"9:00-17:00","saturday":"Closed","sunday":"Closed"}'`),
