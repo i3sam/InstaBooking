@@ -317,28 +317,21 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 h-14 text-base font-semibold text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 relative overflow-hidden group"
+                className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
                 disabled={createAppointmentMutation.isPending}
                 data-testid="button-submit-booking"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%)',
-                  border: 'none'
-                }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <div className="flex items-center justify-center space-x-2 relative z-10">
-                  {createAppointmentMutation.isPending ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-5 w-5" />
-                      <span>Book My Appointment</span>
-                    </>
-                  )}
-                </div>
+                {createAppointmentMutation.isPending ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
+                    <span>Submitting...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center space-x-2">
+                    <Sparkles className="h-5 w-5" />
+                    <span>Book My Appointment</span>
+                  </div>
+                )}
               </Button>
             </div>
           </form>
