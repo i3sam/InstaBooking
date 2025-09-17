@@ -244,88 +244,214 @@ export default function PublicBooking() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section 
-        className="py-40 relative overflow-hidden"
-        style={{
-          background: themeStyles 
-            ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 50%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
-            : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 50%, rgba(37, 99, 235, 0.08) 100%)'
-        }}
-      >
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* Enhanced Hero Section */}
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+        {/* Dynamic layered background */}
+        <div className="absolute inset-0">
+          {/* Primary gradient background */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: themeStyles 
+                ? `radial-gradient(ellipse at 50% 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.15) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 25%, transparent 60%), linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 50%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+                : 'radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.05) 25%, transparent 60%), linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 50%, rgba(37, 99, 235, 0.08) 100%)'
+            }}
+          ></div>
+          
+          {/* Enhanced animated elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div 
+              className="absolute top-20 -right-20 w-96 h-96 rounded-full blur-3xl opacity-70 animate-pulse"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(circle, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, transparent 70%)`
+                  : 'radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%)',
+                animationDuration: '4s'
+              }}
+            ></div>
+            <div 
+              className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full blur-3xl opacity-60 animate-pulse"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(circle, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 70%)`
+                  : 'radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%)',
+                animationDuration: '6s',
+                animationDelay: '1s'
+              }}
+            ></div>
+            <div 
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full blur-3xl opacity-30 animate-pulse"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(ellipse, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.04) 0%, transparent 70%)`
+                  : 'radial-gradient(ellipse, rgba(37, 99, 235, 0.04) 0%, transparent 70%)',
+                animationDuration: '8s',
+                animationDelay: '2s'
+              }}
+            ></div>
+          </div>
+          
+          {/* Floating geometric elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div 
+              className="absolute top-32 left-20 w-2 h-2 rounded-full opacity-40 animate-bounce"
+              style={{
+                backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                animationDuration: '3s',
+                animationDelay: '0.5s'
+              }}
+            ></div>
+            <div 
+              className="absolute top-48 right-32 w-3 h-3 rotate-45 opacity-30 animate-bounce"
+              style={{
+                backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                animationDuration: '4s',
+                animationDelay: '1.5s'
+              }}
+            ></div>
+            <div 
+              className="absolute bottom-40 left-1/3 w-1.5 h-1.5 rounded-full opacity-50 animate-bounce"
+              style={{
+                backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                animationDuration: '5s',
+                animationDelay: '2.5s'
+              }}
+            ></div>
+          </div>
         </div>
         
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <div className="max-w-5xl mx-auto">
-            <div className="mb-8">
+        {/* Main content */}
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-6xl mx-auto text-center">
+            {/* Professional badge */}
+            <div className="mb-12">
               <div 
-                className="inline-flex items-center px-6 py-3 rounded-full text-sm font-medium mb-8 backdrop-blur-sm shadow-lg border border-white/10"
+                className="inline-flex items-center px-8 py-4 rounded-full text-sm font-semibold backdrop-blur-md shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300"
                 style={{
-                  background: themeStyles ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.15) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)',
                   color: themeStyles?.primaryColor || '#2563eb'
                 }}
+                data-testid="hero-professional-badge"
               >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Professional Services Available
+                <div 
+                  className="w-2 h-2 rounded-full mr-3 animate-pulse"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                ></div>
+                ✨ Premium Professional Services
               </div>
             </div>
             
-            <h1 className="text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground mb-8 leading-tight tracking-tight">
-              {page.title}
-            </h1>
-            {page.tagline && (
-              <p className="text-2xl lg:text-3xl text-muted-foreground mb-16 max-w-4xl mx-auto font-medium leading-relaxed">
-                {page.tagline}
-              </p>
-            )}
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button 
-                onClick={() => setShowBookingModal(true)}
-                className="px-12 py-6 rounded-2xl text-xl h-auto text-white font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden group"
-                style={{
-                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
-                  color: 'white',
-                  border: 'none'
-                }}
-                data-testid="button-book-appointment"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <div className="flex items-center relative z-10">
-                  <Calendar className="h-6 w-6 mr-3" />
-                  Book an Appointment
-                </div>
-              </Button>
-            {page.calendarLink ? (
-              <Button
-                variant="outline"
-                className="px-8 py-4 rounded-xl text-lg h-auto"
-                asChild
-                data-testid="button-visit-calendar"
-              >
-                <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
-                  <Calendar className="h-5 w-5 mr-2" />
-                  View My Calendar
-                </a>
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="px-8 py-4 rounded-xl text-lg h-auto"
-                asChild
-                data-testid="button-call-us"
-              >
-                <a href="tel:+1234567890">
-                  <Phone className="h-5 w-5 mr-2" />
-                  Call Us!
-                </a>
-              </Button>
-            )}
+            {/* Main heading with enhanced typography */}
+            <div className="mb-12">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground mb-6 leading-[0.95] tracking-tight">
+                <span className="block">{page.title}</span>
+              </h1>
+              {page.tagline && (
+                <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-5xl mx-auto font-medium leading-relaxed opacity-90">
+                  {page.tagline}
+                </p>
+              )}
             </div>
+            
+            {/* Enhanced CTA section */}
+            <div className="mb-16">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+                <Button 
+                  onClick={() => setShowBookingModal(true)}
+                  className="group px-12 py-6 rounded-2xl text-xl h-auto font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden"
+                  style={{
+                    background: themeStyles 
+                      ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                      : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                  data-testid="button-book-appointment"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  <div className="flex items-center relative z-10">
+                    <Calendar className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                    Book Appointment
+                  </div>
+                </Button>
+                
+                {page.calendarLink ? (
+                  <Button
+                    variant="outline"
+                    className="group px-8 py-4 rounded-xl text-lg h-auto font-semibold border-2 hover:shadow-lg transition-all duration-300"
+                    style={{
+                      borderColor: themeStyles?.primaryColor || '#2563eb',
+                      color: themeStyles?.primaryColor || '#2563eb'
+                    }}
+                    asChild
+                    data-testid="button-visit-calendar"
+                  >
+                    <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
+                      <Calendar className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                      View Calendar
+                    </a>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="group px-8 py-4 rounded-xl text-lg h-auto font-semibold border-2 hover:shadow-lg transition-all duration-300"
+                    style={{
+                      borderColor: themeStyles?.primaryColor || '#2563eb',
+                      color: themeStyles?.primaryColor || '#2563eb'
+                    }}
+                    asChild
+                    data-testid="button-call-us"
+                  >
+                    <a href="tel:+1234567890">
+                      <Phone className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                      Call Now
+                    </a>
+                  </Button>
+                )}
+              </div>
+              
+              {/* Trust indicators */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
+                <div className="flex items-center">
+                  <div 
+                    className="w-3 h-3 rounded-full mr-2"
+                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                  ></div>
+                  <span className="font-medium">Instant Confirmation</span>
+                </div>
+                <div className="hidden sm:block w-px h-4 bg-border"></div>
+                <div className="flex items-center">
+                  <div 
+                    className="w-3 h-3 rounded-full mr-2"
+                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                  ></div>
+                  <span className="font-medium">Professional Service</span>
+                </div>
+                <div className="hidden sm:block w-px h-4 bg-border"></div>
+                <div className="flex items-center">
+                  <div 
+                    className="w-3 h-3 rounded-full mr-2"
+                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                  ></div>
+                  <span className="font-medium">Secure Booking</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div 
+            className="w-6 h-10 border-2 rounded-full flex justify-center"
+            style={{ borderColor: `${themeStyles?.primaryColor || '#2563eb'}40` }}
+          >
+            <div 
+              className="w-1 h-3 rounded-full mt-2 animate-pulse"
+              style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+            ></div>
           </div>
         </div>
       </section>
