@@ -1,20 +1,67 @@
 import { useState } from 'react';
 import { useParams } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare } from 'lucide-react';
 
 export default function PublicBooking() {
   const { slug } = useParams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [reviewFormData, setReviewFormData] = useState({
+    customerName: '',
+    customerEmail: '',
+    rating: 0,
+    reviewText: ''
+  });
 
   const { data: pageData, isLoading, error } = useQuery<any>({
     queryKey: [`/api/pages/${slug}`],
     enabled: !!slug,
+  });
+
+  // Fetch reviews for this page
+  const { data: reviews = [] } = useQuery<any[]>({
+    queryKey: [`/api/reviews/${pageData?.id}`],
+    enabled: !!pageData?.id,
+  });
+
+  // Review submission mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (reviewData: any) => {
+      const response = await apiRequest('POST', '/api/reviews', reviewData);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Review submitted!",
+        description: "Thank you for your feedback. Your review is pending approval.",
+      });
+      setReviewFormData({
+        customerName: '',
+        customerEmail: '',
+        rating: 0,
+        reviewText: ''
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/reviews/${pageData?.id}`] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error submitting review",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Create dynamic styles based on page theme data
@@ -90,6 +137,37 @@ export default function PublicBooking() {
     return result 
       ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
       : '37, 99, 235'; // fallback to blue
+  };
+
+  // Review form handlers
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!reviewFormData.customerName || !reviewFormData.rating) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in your name and select a rating.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (reviewFormData.rating < 1 || reviewFormData.rating > 5) {
+      toast({
+        title: "Invalid rating",
+        description: "Please select a rating between 1 and 5 stars.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    submitReviewMutation.mutate({
+      pageId: pageData.id,
+      customerName: reviewFormData.customerName,
+      customerEmail: reviewFormData.customerEmail,
+      rating: reviewFormData.rating,
+      reviewText: reviewFormData.reviewText
+    });
   };
 
   if (isLoading) {
@@ -283,269 +361,215 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Banner Gallery Section */}
+      {/* Gallery Section - Consolidated single gallery */}
+      {(gallery.banners?.length > 0 || gallery.images?.length > 0 || gallery.logos?.length > 0) && (
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Gallery</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Take a look at our work and environment</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {/* Render all images from all gallery types */}
+              {gallery.banners?.map((image: any, index: number) => (
+                <Card key={`banner-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden">
+                    <img
+                      src={image.url}
+                      alt={image.name || 'Gallery image'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      data-testid={`gallery-image-${index}`}
+                    />
+                  </div>
+                </Card>
+              ))}
+              {gallery.images?.map((image: any, index: number) => (
+                <Card key={`image-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden">
+                    <img
+                      src={image.url}
+                      alt={image.name || 'Gallery image'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      data-testid={`gallery-image-${gallery.banners?.length + index}`}
+                    />
+                  </div>
+                </Card>
+              ))}
+              {gallery.logos?.map((image: any, index: number) => (
+                <Card key={`logo-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-square overflow-hidden bg-white flex items-center justify-center p-4">
+                    <img
+                      src={image.url}
+                      alt={image.name || 'Logo'}
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                      data-testid={`gallery-logo-${index}`}
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Reviews Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-6">
-              <Image 
+              <MessageSquare 
                 className="h-12 w-12 mr-4" 
                 style={{ color: themeStyles?.primaryColor || '#2563eb' }}
               />
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Featured Images</h2>
+              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Customer Reviews</h2>
             </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Explore our work and get inspired</p>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">See what our customers have to say</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {gallery.banners && gallery.banners.length > 0 ? (
-              gallery.banners.map((banner: any, index: number) => (
-                <Card key={index} className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={banner.url}
-                      alt={banner.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      data-testid={`banner-image-${index}`}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          {/* Display existing reviews */}
+          {reviews.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-16">
+              {reviews.map((review: any) => (
+                <Card key={review.id} className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="flex mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        className={`h-5 w-5 ${star <= review.rating ? 'fill-current' : 'fill-muted'}`}
+                        style={{ color: star <= review.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
+                      />
+                    ))}
+                  </div>
+                  {review.reviewText && (
+                    <blockquote className="text-foreground mb-4 italic leading-relaxed">
+                      "{review.reviewText}"
+                    </blockquote>
+                  )}
+                  <div className="flex items-center">
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center mr-3 text-white font-semibold text-sm"
+                      style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                    >
+                      {review.customerName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-foreground">{review.customerName}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
                 </Card>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-16">
-                <div 
-                  className="w-24 h-24 mx-auto rounded-2xl flex items-center justify-center mb-6"
-                  style={{
-                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}10 0%, ${themeStyles.primaryColor}05 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
-                  }}
-                >
-                  <Image 
-                    className="h-12 w-12" 
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  />
-                </div>
-                <h3 className="text-2xl font-semibold text-foreground mb-4">Coming Soon</h3>
-                <p className="text-muted-foreground max-w-md mx-auto">We're working on showcasing our best work here. Check back soon for featured images!</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Photo Gallery Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="flex items-center justify-center mb-6">
-              <Image 
-                className="h-12 w-12 mr-4" 
-                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-              />
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Photo Gallery</h2>
+              ))}
             </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">A closer look at what we do</p>
-          </div>
+          ) : (
+            <div className="text-center py-12 mb-16">
+              <div 
+                className="w-16 h-16 mx-auto rounded-xl flex items-center justify-center mb-4"
+                style={{
+                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
+                }}
+              >
+                <MessageSquare 
+                  className="h-8 w-8" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">No reviews yet</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto">Be the first to share your experience!</p>
+            </div>
+          )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            {gallery.images && gallery.images.length > 0 ? (
-              gallery.images.map((image: any, index: number) => (
-                <Card key={index} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden">
-                    <img
-                      src={image.url}
-                      alt={image.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      data-testid={`gallery-image-${index}`}
+          {/* Leave a Review Form */}
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-foreground mb-6 text-center">Leave a Review</h3>
+                <form onSubmit={handleReviewSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="customerName" className="text-foreground font-medium">
+                        Your Name *
+                      </Label>
+                      <Input
+                        id="customerName"
+                        value={reviewFormData.customerName}
+                        onChange={(e) => setReviewFormData(prev => ({ ...prev, customerName: e.target.value }))}
+                        placeholder="Enter your name"
+                        className="mt-2"
+                        data-testid="input-customer-name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="customerEmail" className="text-foreground font-medium">
+                        Email (Optional)
+                      </Label>
+                      <Input
+                        id="customerEmail"
+                        type="email"
+                        value={reviewFormData.customerEmail}
+                        onChange={(e) => setReviewFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
+                        placeholder="Enter your email"
+                        className="mt-2"
+                        data-testid="input-customer-email"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-foreground font-medium mb-3 block">
+                      Rating *
+                    </Label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewFormData(prev => ({ ...prev, rating: star }))}
+                          className="p-1 rounded-lg hover:bg-muted transition-colors"
+                          data-testid={`star-rating-${star}`}
+                        >
+                          <Star 
+                            className={`h-8 w-8 ${star <= reviewFormData.rating ? 'fill-current' : 'fill-muted'}`}
+                            style={{ color: star <= reviewFormData.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="reviewText" className="text-foreground font-medium">
+                      Your Review
+                    </Label>
+                    <Textarea
+                      id="reviewText"
+                      value={reviewFormData.reviewText}
+                      onChange={(e) => setReviewFormData(prev => ({ ...prev, reviewText: e.target.value }))}
+                      placeholder="Share your experience..."
+                      rows={4}
+                      className="mt-2"
+                      data-testid="textarea-review-text"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                </Card>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-16">
-                <div 
-                  className="w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-6"
-                  style={{
-                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
-                  }}
-                >
-                  <Image 
-                    className="h-10 w-10" 
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">Photo Gallery Coming Soon</h3>
-                <p className="text-muted-foreground max-w-sm mx-auto">We're curating beautiful photos to showcase our work and atmosphere.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* Brand Variations Section */}
-      <section className="py-16 bg-muted/20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">Our Brand</h3>
-            <p className="text-muted-foreground max-w-xl mx-auto">Different variations of our logo and branding</p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl mx-auto">
-            {gallery.logos && gallery.logos.length > 0 ? (
-              gallery.logos.map((logo: any, index: number) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-border hover:shadow-md transition-shadow"
-                >
-                  <img
-                    src={logo.url}
-                    alt={logo.name}
-                    className="max-h-16 w-auto object-contain"
-                    data-testid={`logo-variation-${index}`}
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <div 
-                  className="w-16 h-16 mx-auto rounded-lg flex items-center justify-center mb-4"
-                  style={{
-                    background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}12 0%, ${themeStyles.primaryColor}06 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.06) 100%)'
-                  }}
-                >
-                  <Image 
-                    className="h-8 w-8" 
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  />
-                </div>
-                <h4 className="text-lg font-medium text-foreground mb-2">Brand Assets Coming Soon</h4>
-                <p className="text-muted-foreground text-sm max-w-xs mx-auto">We're developing brand variations and logo designs.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Customer Reviews & Testimonials Section */}
-      <section className="py-24 bg-gradient-to-br from-background to-muted/50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <div className="flex items-center justify-center mb-6">
-              <div 
-                className="w-3 h-3 rounded-full mr-3"
-                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-              ></div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">What Our Clients Say</h2>
-              <div 
-                className="w-3 h-3 rounded-full ml-3"
-                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-              ></div>
-            </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Hear from our satisfied customers about their experiences</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Sample testimonials - in a real app, these would come from the database */}
-            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-              <div className="flex mb-6">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <div key={star} className="w-5 h-5 mr-1">
-                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                ))}
-              </div>
-              <blockquote className="text-foreground mb-6 leading-relaxed italic">
-                "Exceptional service and attention to detail. The booking process was seamless and the experience exceeded all my expectations."
-              </blockquote>
-              <div className="flex items-center">
-                <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
-                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                >
-                  S.M.
-                </div>
-                <div>
-                  <div className="font-semibold text-foreground">Sarah Mitchell</div>
-                  <div className="text-sm text-muted-foreground">Verified Customer</div>
-                </div>
-              </div>
+                  <Button
+                    type="submit"
+                    disabled={submitReviewMutation.isPending}
+                    className="w-full text-white font-semibold py-3 rounded-lg"
+                    style={{
+                      background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                      color: 'white',
+                      border: 'none'
+                    }}
+                    data-testid="button-submit-review"
+                  >
+                    {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                  </Button>
+                </form>
+              </CardContent>
             </Card>
-
-            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-              <div className="flex mb-6">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <div key={star} className="w-5 h-5 mr-1">
-                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                ))}
-              </div>
-              <blockquote className="text-foreground mb-6 leading-relaxed italic">
-                "Professional, reliable, and truly cares about client satisfaction. I've been a repeat customer for months now."
-              </blockquote>
-              <div className="flex items-center">
-                <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
-                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                >
-                  D.K.
-                </div>
-                <div>
-                  <div className="font-semibold text-foreground">David Kim</div>
-                  <div className="text-sm text-muted-foreground">Regular Client</div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="group p-8 border-0 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm md:col-span-2 lg:col-span-1">
-              <div className="flex mb-6">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <div key={star} className="w-5 h-5 mr-1">
-                    <svg fill="currentColor" viewBox="0 0 20 20" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                ))}
-              </div>
-              <blockquote className="text-foreground mb-6 leading-relaxed italic">
-                "Outstanding quality and customer service. The whole team is friendly, professional, and goes above and beyond."
-              </blockquote>
-              <div className="flex items-center">
-                <div 
-                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white font-semibold"
-                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                >
-                  E.R.
-                </div>
-                <div>
-                  <div className="font-semibold text-foreground">Emily Rodriguez</div>
-                  <div className="text-sm text-muted-foreground">Happy Customer</div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <div className="text-center mt-16">
-            <div className="inline-flex items-center justify-center space-x-8 px-8 py-4 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground mb-1">500+</div>
-                <div className="text-sm text-muted-foreground">Happy Clients</div>
-              </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground mb-1">4.9</div>
-                <div className="text-sm text-muted-foreground">Average Rating</div>
-              </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground mb-1">2+</div>
-                <div className="text-sm text-muted-foreground">Years Experience</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

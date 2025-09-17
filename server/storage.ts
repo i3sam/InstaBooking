@@ -8,7 +8,7 @@ import { eq, desc } from 'drizzle-orm';
 // Enable connection caching for better performance
 neonConfig.fetchConnectionCache = true;
 neonConfig.poolQueryViaFetch = true;
-import { profiles, pages, services, appointments, paymentsDemo } from '@shared/schema';
+import { profiles, pages, services, appointments, paymentsDemo, reviews } from '@shared/schema';
 
 // Lazy initialize database connection
 let db: ReturnType<typeof drizzle> | null = null;
@@ -79,6 +79,12 @@ export interface IStorage {
   // Payments
   createPayment(payment: any): Promise<any>;
   getPaymentsByUser(userId: string): Promise<any[]>;
+  
+  // Reviews
+  createReview(review: any): Promise<any>;
+  getReviewsByPageId(pageId: string): Promise<any[]>;
+  getApprovedReviewsByPageId(pageId: string): Promise<any[]>;
+  updateReview(id: string, updates: any): Promise<any | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -300,6 +306,48 @@ export class DrizzleStorage implements IStorage {
       return results;
     } catch (error) {
       console.error("Get payments by user error:", error);
+      throw error;
+    }
+  }
+
+  async createReview(review: any): Promise<any> {
+    try {
+      const [result] = await getDb().insert(reviews).values(review).returning();
+      return result;
+    } catch (error) {
+      console.error("Create review error:", error);
+      throw error;
+    }
+  }
+
+  async getReviewsByPageId(pageId: string): Promise<any[]> {
+    try {
+      const results = await getDb().select().from(reviews).where(eq(reviews.pageId, pageId)).orderBy(desc(reviews.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get reviews by page ID error:", error);
+      throw error;
+    }
+  }
+
+  async getApprovedReviewsByPageId(pageId: string): Promise<any[]> {
+    try {
+      const results = await getDb().select().from(reviews)
+        .where(eq(reviews.pageId, pageId) && eq(reviews.isApproved, 'approved'))
+        .orderBy(desc(reviews.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get approved reviews by page ID error:", error);
+      throw error;
+    }
+  }
+
+  async updateReview(id: string, updates: any): Promise<any | undefined> {
+    try {
+      const [result] = await getDb().update(reviews).set(updates).where(eq(reviews.id, id)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update review error:", error);
       throw error;
     }
   }

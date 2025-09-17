@@ -498,6 +498,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reviews routes
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      const { pageId, customerName, customerEmail, rating, reviewText } = req.body;
+      
+      // Validate required fields
+      if (!pageId || !customerName || !rating) {
+        return res.status(400).json({ message: "Page ID, customer name, and rating are required" });
+      }
+      
+      // Validate rating range
+      if (rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "Rating must be between 1 and 5" });
+      }
+      
+      const review = await storage.createReview({
+        pageId,
+        customerName,
+        customerEmail: customerEmail || null,
+        rating,
+        reviewText: reviewText || null,
+        isApproved: 'pending' // Reviews start as pending
+      });
+      
+      res.json(review);
+    } catch (error) {
+      console.error("Create review error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/reviews/:pageId", async (req, res) => {
+    try {
+      const reviews = await storage.getApprovedReviewsByPageId(req.params.pageId);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Get reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Appointments routes
   app.post("/api/appointments", async (req, res) => {
     try {

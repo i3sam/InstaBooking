@@ -65,6 +65,17 @@ export const appointments = pgTable("appointments", {
   updatedAt: timestamp("updated_at").default(sql`now()`),
 });
 
+export const reviews = pgTable("reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email"),
+  rating: integer("rating").notNull(), // 1-5 stars
+  reviewText: text("review_text"),
+  isApproved: text("is_approved").default("pending"), // pending|approved|rejected
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
 export const paymentsDemo = pgTable("payments_demo", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid("user_id").references(() => profiles.id),
@@ -100,6 +111,11 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   updatedAt: true,
 });
 
+export const insertReviewSchema = createInsertSchema(reviews).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertPaymentSchema = createInsertSchema(paymentsDemo).omit({
   id: true,
   createdAt: true,
@@ -114,5 +130,7 @@ export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Payment = typeof paymentsDemo.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
