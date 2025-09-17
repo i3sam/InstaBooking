@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -20,6 +20,7 @@ import UpgradeModal from '@/components/modals/upgrade-modal';
 export default function Dashboard() {
   const { user, profile } = useAuth();
   const [activeSection, setActiveSection] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -36,27 +37,66 @@ export default function Dashboard() {
     }
   };
 
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    setIsMobileMenuOpen(false); // Close mobile menu when section changes
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden lg:block">
+          <Sidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
+        </div>
         
-        <div className="flex-1">
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            {/* Mobile Sidebar */}
+            <div className="relative w-64 h-full">
+              <Sidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
+            </div>
+          </div>
+        )}
+        
+        <div className="flex-1 w-full lg:w-auto">
           {/* Header */}
-          <header className="dashboard-header px-8 py-6">
+          <header className="dashboard-header px-4 lg:px-8 py-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-                <p className="text-muted-foreground">Manage your booking pages and appointments</p>
+              <div className="flex items-center space-x-4">
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
+                  data-testid="button-mobile-menu"
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-6 w-6 text-foreground" />
+                  ) : (
+                    <Menu className="h-6 w-6 text-foreground" />
+                  )}
+                </button>
+                
+                <div>
+                  <h1 className="text-xl lg:text-2xl font-bold text-foreground">Dashboard</h1>
+                  <p className="text-muted-foreground text-sm lg:text-base">Manage your booking pages and appointments</p>
+                </div>
               </div>
+              
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-sm font-medium text-muted-foreground">
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-muted flex items-center justify-center">
+                    <span className="text-xs lg:text-sm font-medium text-muted-foreground">
                       {(user?.fullName || user?.email)?.charAt(0)?.toUpperCase() || 'U'}
                     </span>
                   </div>
-                  <div>
+                  <div className="hidden sm:block">
                     <p className="text-sm font-medium text-foreground" data-testid="text-username">
                       {profile?.fullName || user?.email}
                     </p>
@@ -70,7 +110,7 @@ export default function Dashboard() {
           </header>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-4 lg:p-8">
             {renderContent()}
           </div>
         </div>
