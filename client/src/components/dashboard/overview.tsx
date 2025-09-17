@@ -135,21 +135,32 @@ export default function Overview({ onSectionChange }: OverviewProps) {
     <div>
       {/* Stats Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <Card key={index} className="stat-card border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
+        {statsError ? (
+          <div className="col-span-full">
+            <Card className="border-red-200">
+              <CardContent className="p-6 text-center">
+                <div className="text-4xl text-red-500 mb-4">⚠️</div>
+                <p className="text-red-600">Failed to load dashboard statistics</p>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          stats.map((stat, index) => (
+            <Card key={index} className="stat-card border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                  <span className="text-2xl font-bold text-foreground" data-testid={`stat-${stat.title.toLowerCase().replace(' ', '-')}`}>
+                    {stat.value}
+                  </span>
                 </div>
-                <span className="text-2xl font-bold text-foreground" data-testid={`stat-${stat.title.toLowerCase().replace(' ', '-')}`}>
-                  {stat.value}
-                </span>
-              </div>
-              <h3 className="text-sm font-medium text-muted-foreground">{stat.title}</h3>
-            </CardContent>
-          </Card>
-        ))}
+                <h3 className="text-sm font-medium text-muted-foreground">{stat.title}</h3>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -158,7 +169,17 @@ export default function Overview({ onSectionChange }: OverviewProps) {
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-6">Recent Activity</h3>
             <div className="space-y-4">
-              {activities.length === 0 ? (
+              {activityLoading ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl text-muted-foreground mb-4">⏳</div>
+                  <p className="text-muted-foreground">Loading recent activity...</p>
+                </div>
+              ) : activityError ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl text-muted-foreground mb-4">⚠️</div>
+                  <p className="text-muted-foreground text-red-600">Failed to load recent activity</p>
+                </div>
+              ) : activities.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl text-muted-foreground mb-4">📋</div>
                   <p className="text-muted-foreground">No recent activity</p>

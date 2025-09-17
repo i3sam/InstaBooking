@@ -12,9 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Bell, Crown, LogOut, Home, Menu, X } from 'lucide-react';
 import { useLocation } from 'wouter';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrency } from '@/hooks/use-currency';
 import UpgradeModal from '@/components/modals/upgrade-modal';
 
 export default function Dashboard() {
@@ -119,7 +120,42 @@ export default function Dashboard() {
   );
 }
 
+interface DashboardStats {
+  pagesCount: number;
+  totalAppointments: number;
+  pendingAppointments: number;
+  totalRevenue: number;
+  conversionRate: number;
+  avgBookingValue: number;
+}
+
 function AnalyticsSection() {
+  const { formatPrice } = useCurrency();
+
+  // Fetch dashboard statistics for analytics
+  const { data: dashboardStats, isLoading: statsLoading } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats'],
+    enabled: true
+  });
+
+  // Check for errors first
+  if (!statsLoading && dashboardStats === undefined) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Analytics</h2>
+          <p className="text-muted-foreground">Track your booking performance and revenue</p>
+        </div>
+        <Card className="border-red-200">
+          <CardContent className="p-6 text-center">
+            <div className="text-4xl text-red-500 mb-4">⚠️</div>
+            <p className="text-red-600">Failed to load analytics data</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -134,8 +170,17 @@ function AnalyticsSection() {
               <h3 className="text-sm font-medium text-muted-foreground">Conversion Rate</h3>
               <div className="w-4 h-4 text-blue-600">📊</div>
             </div>
-            <div className="text-3xl font-bold text-foreground mb-2">--%</div>
-            <p className="text-sm text-blue-600">Create pages to track conversions</p>
+            <div className="text-3xl font-bold text-foreground mb-2">
+              {statsLoading ? "..." : `${dashboardStats?.conversionRate || 0}%`}
+            </div>
+            <p className="text-sm text-blue-600">
+              {statsLoading 
+                ? "Loading..." 
+                : (dashboardStats?.totalAppointments || 0) === 0 
+                  ? "Create pages to track conversions" 
+                  : `From ${dashboardStats?.totalAppointments || 0} total bookings`
+              }
+            </p>
           </CardContent>
         </Card>
         
@@ -145,21 +190,58 @@ function AnalyticsSection() {
               <h3 className="text-sm font-medium text-muted-foreground">Avg. Booking Value</h3>
               <div className="w-4 h-4 text-purple-600">📈</div>
             </div>
-            <div className="text-3xl font-bold text-foreground mb-2">$0</div>
-            <p className="text-sm text-purple-600">No bookings yet</p>
+            <div className="text-3xl font-bold text-foreground mb-2">
+              {statsLoading ? "..." : formatPrice(dashboardStats?.avgBookingValue || 0)}
+            </div>
+            <p className="text-sm text-purple-600">
+              {statsLoading 
+                ? "Loading..." 
+                : (dashboardStats?.totalAppointments || 0) === 0 
+                  ? "No bookings yet" 
+                  : `Total revenue: ${formatPrice(dashboardStats?.totalRevenue || 0)}`
+              }
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-6">Booking Trends</h3>
-          <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl text-muted-foreground mb-4">📊</div>
-              <p className="text-muted-foreground">Analytics will appear here once you have booking data</p>
+          <h3 className="text-lg font-semibold text-foreground mb-6">Key Metrics</h3>
+          {statsLoading ? (
+            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl text-muted-foreground mb-4">⏳</div>
+                <p className="text-muted-foreground">Loading analytics data...</p>
+              </div>
             </div>
-          </div>
+          ) : dashboardStats?.totalAppointments === 0 ? (
+            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl text-muted-foreground mb-4">📊</div>
+                <p className="text-muted-foreground">Analytics will appear here once you have booking data</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center p-4 bg-muted/30 rounded-lg">
+                <div className="text-2xl font-bold text-primary mb-2">{dashboardStats?.pagesCount || 0}</div>
+                <p className="text-sm text-muted-foreground">Active Pages</p>
+              </div>
+              <div className="text-center p-4 bg-muted/30 rounded-lg">
+                <div className="text-2xl font-bold text-green-600 mb-2">{dashboardStats?.totalAppointments || 0}</div>
+                <p className="text-sm text-muted-foreground">Total Bookings</p>
+              </div>
+              <div className="text-center p-4 bg-muted/30 rounded-lg">
+                <div className="text-2xl font-bold text-orange-600 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
+                <p className="text-sm text-muted-foreground">Pending Approval</p>
+              </div>
+              <div className="text-center p-4 bg-muted/30 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
+                <p className="text-sm text-muted-foreground">Total Revenue</p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

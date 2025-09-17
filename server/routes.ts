@@ -657,36 +657,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get all pages for this user
       const pages = await storage.getPagesByOwner(userId);
-      const pagesCount = pages.length;
+      const pagesCount = Math.max(0, pages?.length || 0);
       
       // Get all appointments for this user
       const appointments = await storage.getAppointmentsByOwner(userId);
-      const totalAppointments = appointments.length;
+      const totalAppointments = Math.max(0, appointments?.length || 0);
       
       // Count pending appointments
-      const pendingAppointments = appointments.filter(apt => apt.status === 'pending').length;
+      const pendingAppointments = Math.max(0, appointments?.filter(apt => apt.status === 'pending')?.length || 0);
       
       // Calculate total revenue (from accepted appointments)
-      const acceptedAppointments = appointments.filter(apt => apt.status === 'accepted');
-      const totalRevenue = acceptedAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+      const acceptedAppointments = appointments?.filter(apt => apt.status === 'accepted') || [];
+      const totalRevenue = Math.max(0, acceptedAppointments.reduce((sum, apt) => sum + (Number(apt.price) || 0), 0));
       
-      // Calculate conversion rate
-      const conversionRate = totalAppointments > 0 ? (acceptedAppointments.length / totalAppointments * 100) : 0;
+      // Calculate conversion rate (safe division)
+      const conversionRate = totalAppointments > 0 && acceptedAppointments.length >= 0
+        ? Math.round((acceptedAppointments.length / totalAppointments * 100) * 10) / 10
+        : 0;
       
-      // Average booking value
-      const avgBookingValue = acceptedAppointments.length > 0 ? (totalRevenue / acceptedAppointments.length) : 0;
+      // Average booking value (safe division)
+      const avgBookingValue = acceptedAppointments.length > 0 && totalRevenue > 0
+        ? Math.round((totalRevenue / acceptedAppointments.length) * 100) / 100
+        : 0;
       
-      res.json({
-        pagesCount,
-        totalAppointments,
-        pendingAppointments,
-        totalRevenue,
-        conversionRate: Math.round(conversionRate * 10) / 10, // Round to 1 decimal
-        avgBookingValue: Math.round(avgBookingValue * 100) / 100 // Round to 2 decimals
-      });
+      // Ensure all values are valid numbers
+      const response = {
+        pagesCount: Number(pagesCount) || 0,
+        totalAppointments: Number(totalAppointments) || 0,
+        pendingAppointments: Number(pendingAppointments) || 0,
+        totalRevenue: Number(totalRevenue) || 0,
+        conversionRate: Number(conversionRate) || 0,
+        avgBookingValue: Number(avgBookingValue) || 0
+      };
+      
+      res.json(response);
     } catch (error) {
       console.error("Get dashboard stats error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ 
+        message: "Internal server error",
+        // Return safe defaults on error
+        pagesCount: 0,
+        totalAppointments: 0,
+        pendingAppointments: 0,
+        totalRevenue: 0,
+        conversionRate: 0,
+        avgBookingValue: 0
+      });
     }
   });
 
@@ -698,23 +714,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get recent appointments (last 10)
       const appointments = await storage.getAppointmentsByOwner(userId);
       
+      // Ensure we have a valid array
+      const validAppointments = Array.isArray(appointments) ? appointments : [];
+      
       // Sort by creation date (most recent first) and take last 10
-      const recentAppointments = appointments
-        .sort((a, b) => new Date(b.createdAt || b.id).getTime() - new Date(a.createdAt || a.id).getTime())
-        .slice(0, 10)
+      const recentAppointments = validAppointments
+        .filter(apt => apt && apt.id) // Filter out invalid appointments
+        .sort((a, b) => {
+          // Use a fallback date if createdAt doesn't exist
+          const dateA = new Date(a.createdAt || a.id || Date.now()).getTime();
+          const dateB = new Date(b.createdAt || b.id || Date.now()).getTime();
+          return dateB - dateA; // Most recent first
+        })
+        .slice(0, 10) // Limit to 10 items
         .map(apt => ({
-          id: apt.id,
+          id: String(apt.id || ''),
           type: 'appointment',
-          title: `New appointment from ${apt.customerName}`,
-          description: `${apt.serviceName || 'Service'} on ${apt.date} at ${apt.time}`,
-          time: apt.createdAt || apt.id,
-          status: apt.status
+          title: `New appointment from ${apt.customerName || 'Unknown Customer'}`,
+          description: `${apt.serviceName || 'Service'} on ${apt.date || 'TBD'} at ${apt.time || 'TBD'}`,
+          time: apt.createdAt || apt.id || new Date().toISOString(),
+          status: apt.status || 'pending'
         }));
       
       res.json(recentAppointments);
     } catch (error) {
       console.error("Get recent activity error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json([]); // Return empty array on error instead of error object
     }
   });
 
