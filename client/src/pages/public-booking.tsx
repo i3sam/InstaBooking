@@ -899,96 +899,267 @@ export default function PublicBooking() {
         );
       })()}
 
-      {/* Reviews Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="flex items-center justify-center mb-6">
+      {/* Enhanced Reviews Section */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Elegant background */}
+        <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 opacity-40"
+            style={{
+              background: themeStyles 
+                ? `radial-gradient(ellipse at 30% 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.04) 0%, transparent 50%)`
+                : 'radial-gradient(ellipse at 30% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 100%, rgba(37, 99, 235, 0.04) 0%, transparent 50%)'
+            }}
+          ></div>
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          {/* Enhanced section header */}
+          <div className="text-center mb-24">
+            <div 
+              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+              style={{
+                background: themeStyles 
+                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+              }}
+            >
               <MessageSquare 
-                className="h-12 w-12 mr-4" 
+                className="h-10 w-10" 
                 style={{ color: themeStyles?.primaryColor || '#2563eb' }}
               />
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Customer Reviews</h2>
             </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">See what our customers have to say</p>
-          </div>
-
-          {/* Display existing reviews */}
-          {reviews.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-16">
-              {reviews.map((review: any) => (
-                <Card key={review.id} className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="flex mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
+            <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Customer Reviews</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+              Discover what our valued customers have to say about their experiences with our professional services
+            </p>
+            
+            {/* Review stats */}
+            {reviews.length > 0 && (
+              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    {reviews.length}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Reviews</div>
+                </div>
+                <div className="w-px h-8 bg-border"></div>
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    {reviews.length > 0 ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1) : '0.0'}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Average</div>
+                </div>
+                <div className="w-px h-8 bg-border"></div>
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const avgRating = reviews.length > 0 ? reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length : 0;
+                    return (
                       <Star 
                         key={star} 
-                        className={`h-5 w-5 ${star <= review.rating ? 'fill-current' : 'fill-muted'}`}
-                        style={{ color: star <= review.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
+                        className={`h-5 w-5 ${star <= avgRating ? 'fill-current' : 'fill-muted'}`}
+                        style={{ color: star <= avgRating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
                       />
-                    ))}
-                  </div>
-                  {review.reviewText && (
-                    <blockquote className="text-foreground mb-4 italic leading-relaxed">
-                      "{review.reviewText}"
-                    </blockquote>
-                  )}
-                  <div className="flex items-center">
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center mr-3 text-white font-semibold text-sm"
-                      style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                    >
-                      {review.customerName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground">{review.customerName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(review.createdAt).toLocaleDateString()}
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Enhanced reviews display */}
+          {reviews.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+              {reviews.map((review: any, index: number) => (
+                <Card 
+                  key={review.id} 
+                  className="group border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-card/60 backdrop-blur-md relative overflow-hidden"
+                  style={{
+                    animationDelay: `${index * 150}ms`
+                  }}
+                  data-testid={`review-card-${review.id}`}
+                >
+                  {/* Subtle gradient overlay */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+                        : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                    }}
+                  ></div>
+                  
+                  <CardContent className="p-8 relative z-10">
+                    {/* Rating stars with enhanced styling */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star 
+                            key={star} 
+                            className={`h-6 w-6 ${star <= review.rating ? 'fill-current' : 'fill-muted'} transition-colors duration-300`}
+                            style={{ color: star <= review.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
+                          />
+                        ))}
+                      </div>
+                      <div 
+                        className="text-sm font-bold px-3 py-1 rounded-full"
+                        style={{
+                          background: themeStyles 
+                            ? `${themeStyles.primaryColor}20`
+                            : 'rgba(37, 99, 235, 0.2)',
+                          color: themeStyles?.primaryColor || '#2563eb'
+                        }}
+                      >
+                        {review.rating}.0
                       </div>
                     </div>
-                  </div>
+                    
+                    {/* Review text with better typography */}
+                    {review.reviewText && (
+                      <blockquote className="text-foreground mb-8 leading-relaxed text-lg relative">
+                        <div 
+                          className="absolute -top-2 -left-1 text-6xl font-serif opacity-20"
+                          style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                        >
+                          “
+                        </div>
+                        <div className="relative pl-6">
+                          {review.reviewText}
+                        </div>
+                      </blockquote>
+                    )}
+                    
+                    {/* Enhanced customer info */}
+                    <div className="flex items-center">
+                      <div className="relative">
+                        <div 
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg"
+                          style={{
+                            background: themeStyles 
+                              ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                              : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                          }}
+                        >
+                          {review.customerName.charAt(0).toUpperCase()}
+                        </div>
+                        <div 
+                          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        >
+                          <Star className="h-3 w-3 fill-current text-white" />
+                        </div>
+                      </div>
+                      <div className="ml-4 flex-1">
+                        <div className="font-bold text-foreground text-lg">{review.customerName}</div>
+                        <div className="text-muted-foreground font-medium">
+                          {new Date(review.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 mb-16">
+            <div className="text-center py-20 mb-20">
               <div 
-                className="w-16 h-16 mx-auto rounded-xl flex items-center justify-center mb-4"
+                className="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl"
                 style={{
-                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
                 }}
               >
                 <MessageSquare 
-                  className="h-8 w-8" 
+                  className="h-12 w-12" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">No reviews yet</h3>
-              <p className="text-muted-foreground max-w-sm mx-auto">Be the first to share your experience!</p>
+              <h3 className="text-3xl font-bold text-foreground mb-4">No reviews yet</h3>
+              <p className="text-xl text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
+                Be the first to share your experience and help others discover our exceptional service!
+              </p>
+              <div className="flex justify-center">
+                <div className="flex items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star 
+                      key={star} 
+                      className="h-6 w-6 fill-current opacity-30"
+                      style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                    />
+                  ))}
+                  <span className="ml-3 text-muted-foreground font-medium">Awaiting your first review</span>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Leave a Review Form */}
-          <div className="max-w-2xl mx-auto">
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-foreground mb-6 text-center">Leave a Review</h3>
-                <form onSubmit={handleReviewSubmit} className="space-y-6">
+          {/* Enhanced Review Form */}
+          <div className="max-w-3xl mx-auto">
+            <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-md relative overflow-hidden">
+              {/* Form background accent */}
+              <div 
+                className="absolute top-0 left-0 w-full h-2"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(90deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                    : 'linear-gradient(90deg, #2563eb 0%, #2563ebdd 100%)'
+                }}
+              ></div>
+              
+              <CardContent className="p-10">
+                <div className="text-center mb-10">
+                  <div 
+                    className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 shadow-lg"
+                    style={{
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                        : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                    }}
+                  >
+                    <Star 
+                      className="h-8 w-8" 
+                      style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                    />
+                  </div>
+                  <h3 className="text-3xl font-bold text-foreground mb-4">Share Your Experience</h3>
+                  <p className="text-muted-foreground text-lg leading-relaxed">
+                    Your feedback helps us improve and helps others make informed decisions
+                  </p>
+                </div>
+                
+                <form onSubmit={handleReviewSubmit} className="space-y-8">
+                  {/* Enhanced form fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="customerName" className="text-foreground font-medium">
+                      <Label htmlFor="customerName" className="text-foreground font-semibold text-lg mb-3 block">
                         Your Name *
                       </Label>
                       <Input
                         id="customerName"
                         value={reviewFormData.customerName}
                         onChange={(e) => setReviewFormData(prev => ({ ...prev, customerName: e.target.value }))}
-                        placeholder="Enter your name"
-                        className="mt-2"
+                        placeholder="Enter your full name"
+                        className="h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20"
+                        style={{
+                          borderColor: reviewFormData.customerName ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                          '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                        } as React.CSSProperties}
                         data-testid="input-customer-name"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="customerEmail" className="text-foreground font-medium">
+                      <Label htmlFor="customerEmail" className="text-foreground font-semibold text-lg mb-3 block">
                         Email (Optional)
                       </Label>
                       <Input
@@ -996,63 +1167,104 @@ export default function PublicBooking() {
                         type="email"
                         value={reviewFormData.customerEmail}
                         onChange={(e) => setReviewFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
-                        placeholder="Enter your email"
-                        className="mt-2"
+                        placeholder="your.email@example.com"
+                        className="h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20"
+                        style={{
+                          borderColor: reviewFormData.customerEmail ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                          '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                        } as React.CSSProperties}
                         data-testid="input-customer-email"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label className="text-foreground font-medium mb-3 block">
-                      Rating *
+                  {/* Enhanced rating section */}
+                  <div className="text-center">
+                    <Label className="text-foreground font-semibold text-lg mb-6 block">
+                      How would you rate your experience? *
                     </Label>
-                    <div className="flex gap-2">
+                    <div className="inline-flex items-center gap-3 p-4 rounded-2xl bg-background/50 border border-border/20">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
                           type="button"
                           onClick={() => setReviewFormData(prev => ({ ...prev, rating: star }))}
-                          className="p-1 rounded-lg hover:bg-muted transition-colors"
+                          className="p-2 rounded-xl hover:bg-background/80 transition-all duration-300 transform hover:scale-110"
                           data-testid={`star-rating-${star}`}
                         >
                           <Star 
-                            className={`h-8 w-8 ${star <= reviewFormData.rating ? 'fill-current' : 'fill-muted'}`}
-                            style={{ color: star <= reviewFormData.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb' }}
+                            className={`h-10 w-10 transition-all duration-300 ${star <= reviewFormData.rating ? 'fill-current scale-110' : 'fill-muted hover:scale-105'}`}
+                            style={{ 
+                              color: star <= reviewFormData.rating ? (themeStyles?.primaryColor || '#2563eb') : '#e5e7eb'
+                            }}
                           />
                         </button>
                       ))}
                     </div>
+                    {reviewFormData.rating > 0 && (
+                      <div className="mt-4 text-muted-foreground font-medium">
+                        {reviewFormData.rating === 5 && "Excellent! ⭐"}
+                        {reviewFormData.rating === 4 && "Great! 👍"}
+                        {reviewFormData.rating === 3 && "Good 👌"}
+                        {reviewFormData.rating === 2 && "Fair 😐"}
+                        {reviewFormData.rating === 1 && "Poor 😔"}
+                      </div>
+                    )}
                   </div>
 
+                  {/* Enhanced review text area */}
                   <div>
-                    <Label htmlFor="reviewText" className="text-foreground font-medium">
-                      Your Review
+                    <Label htmlFor="reviewText" className="text-foreground font-semibold text-lg mb-3 block">
+                      Tell us about your experience
                     </Label>
                     <Textarea
                       id="reviewText"
                       value={reviewFormData.reviewText}
                       onChange={(e) => setReviewFormData(prev => ({ ...prev, reviewText: e.target.value }))}
-                      placeholder="Share your experience..."
-                      rows={4}
-                      className="mt-2"
+                      placeholder="Share what you loved about our service, what could be improved, or any other feedback..."
+                      rows={6}
+                      className="text-lg border-2 rounded-xl resize-none focus:ring-2 focus:ring-opacity-20"
+                      style={{
+                        borderColor: reviewFormData.reviewText ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                        '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                      } as React.CSSProperties}
                       data-testid="textarea-review-text"
                     />
                   </div>
 
+                  {/* Enhanced submit button */}
                   <Button
                     type="submit"
-                    disabled={submitReviewMutation.isPending}
-                    className="w-full text-white font-semibold py-3 rounded-lg"
+                    disabled={submitReviewMutation.isPending || !reviewFormData.customerName || reviewFormData.rating === 0}
+                    className="w-full h-14 text-xl font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden group"
                     style={{
-                      background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                        : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
                       color: 'white',
                       border: 'none'
                     }}
                     data-testid="button-submit-review"
                   >
-                    {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    <div className="flex items-center justify-center relative z-10">
+                      {submitReviewMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                          Submitting Review...
+                        </>
+                      ) : (
+                        <>
+                          <MessageSquare className="h-6 w-6 mr-3" />
+                          Publish Your Review
+                        </>
+                      )}
+                    </div>
                   </Button>
+                  
+                  <p className="text-center text-sm text-muted-foreground mt-4">
+                    Your review will be published after a quick moderation process to ensure quality and authenticity.
+                  </p>
                 </form>
               </CardContent>
             </Card>
