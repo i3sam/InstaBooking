@@ -305,6 +305,7 @@ export default function CreatePage() {
       cancellationPolicy: formData.cancellationPolicy,
       showBusinessHours: formData.showBusinessHours,
       showContactInfo: formData.showContactInfo,
+      locationLink: formData.locationLink,
     });
   };
 
@@ -382,6 +383,23 @@ export default function CreatePage() {
                         />
                         <p className="text-sm text-muted-foreground mt-1">
                           A catchy subtitle that describes what you offer
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="locationLink" className="flex items-center space-x-2">
+                          <MapPin className="h-4 w-4" />
+                          <span>Location Link (Optional)</span>
+                        </Label>
+                        <Input
+                          id="locationLink"
+                          placeholder="https://maps.google.com/... or https://maps.apple.com/..."
+                          value={formData.locationLink}
+                          onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
+                          data-testid="input-location-link"
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Add a Google Maps or Apple Maps link to help customers find your location
                         </p>
                       </div>
 

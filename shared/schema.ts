@@ -24,6 +24,7 @@ export const pages = pgTable("pages", {
   backgroundType: text("background_type").default("gradient"),
   backgroundValue: text("background_value").default("blue"),
   fontFamily: text("font_family").default("inter"),
+  calendarLink: text("calendar_link"),
   locationLink: text("location_link"),
   faqs: jsonb("faqs").default(sql`'[]'`), // Array of {question: string, answer: string}
   acceptReviews: text("accept_reviews").default("true"), // "true" or "false" 
