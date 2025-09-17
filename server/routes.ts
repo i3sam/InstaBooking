@@ -48,6 +48,32 @@ if (process.env.RESEND_API_KEY) {
 }
 
 // Email notification functions
+async function sendNewAppointmentNotification(ownerEmail: string, customerName: string, date: string, time: string, serviceName: string) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
+      to: ownerEmail,
+      subject: 'You have a new appointment!',
+      html: `
+        <h2>New Appointment Request</h2>
+        <p>You have received a new appointment request from <strong>${customerName}</strong>.</p>
+        <p><strong>Service:</strong> ${serviceName}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Time:</strong> ${time}</p>
+        <p>Please log in to your dashboard to review and approve this appointment.</p>
+      `,
+    });
+    console.log(`New appointment notification sent to ${ownerEmail}`);
+  } catch (error) {
+    console.error("Failed to send new appointment notification:", error);
+  }
+}
+
 async function sendAppointmentApprovalEmail(customerEmail: string, customerName: string, date: string, time: string) {
   if (!resend) {
     console.warn("Email service not available - skipping email notification");
@@ -546,6 +572,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const appointmentData = req.body;
       const appointment = await storage.createAppointment(appointmentData);
+      
+      // Send email notification to business owner about new appointment
+      try {
+        // Get the page owner's profile and service details for the notification
+        const page = await storage.getPage(appointmentData.pageId);
+        if (page) {
+          const profile = await storage.getProfile(page.ownerId);
+          if (profile && profile.email) {
+            await sendNewAppointmentNotification(
+              profile.email,
+              appointmentData.customerName,
+              appointmentData.date,
+              appointmentData.time,
+              appointmentData.serviceName || 'Service'
+            );
+          }
+        }
+      } catch (emailError) {
+        console.error("Failed to send new appointment notification:", emailError);
+        // Don't fail the appointment creation if email fails
+      }
+      
       res.json(appointment);
     } catch (error) {
       console.error("Create appointment error:", error);
@@ -598,6 +646,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updated);
     } catch (error) {
       console.error("Update appointment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Dashboard statistics route
+  app.get("/api/dashboard/stats", verifyToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Get all pages for this user
+      const pages = await storage.getPagesByOwner(userId);
+      const pagesCount = pages.length;
+      
+      // Get all appointments for this user
+      const appointments = await storage.getAppointmentsByOwner(userId);
+      const totalAppointments = appointments.length;
+      
+      // Count pending appointments
+      const pendingAppointments = appointments.filter(apt => apt.status === 'pending').length;
+      
+      // Calculate total revenue (from accepted appointments)
+      const acceptedAppointments = appointments.filter(apt => apt.status === 'accepted');
+      const totalRevenue = acceptedAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+      
+      // Calculate conversion rate
+      const conversionRate = totalAppointments > 0 ? (acceptedAppointments.length / totalAppointments * 100) : 0;
+      
+      // Average booking value
+      const avgBookingValue = acceptedAppointments.length > 0 ? (totalRevenue / acceptedAppointments.length) : 0;
+      
+      res.json({
+        pagesCount,
+        totalAppointments,
+        pendingAppointments,
+        totalRevenue,
+        conversionRate: Math.round(conversionRate * 10) / 10, // Round to 1 decimal
+        avgBookingValue: Math.round(avgBookingValue * 100) / 100 // Round to 2 decimals
+      });
+    } catch (error) {
+      console.error("Get dashboard stats error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Recent activity route
+  app.get("/api/dashboard/recent-activity", verifyToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Get recent appointments (last 10)
+      const appointments = await storage.getAppointmentsByOwner(userId);
+      
+      // Sort by creation date (most recent first) and take last 10
+      const recentAppointments = appointments
+        .sort((a, b) => new Date(b.createdAt || b.id).getTime() - new Date(a.createdAt || a.id).getTime())
+        .slice(0, 10)
+        .map(apt => ({
+          id: apt.id,
+          type: 'appointment',
+          title: `New appointment from ${apt.customerName}`,
+          description: `${apt.serviceName || 'Service'} on ${apt.date} at ${apt.time}`,
+          time: apt.createdAt || apt.id,
+          status: apt.status
+        }));
+      
+      res.json(recentAppointments);
+    } catch (error) {
+      console.error("Get recent activity error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
