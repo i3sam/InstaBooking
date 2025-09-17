@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -420,89 +421,204 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Gallery Section - Modern redesign */}
-      {(gallery.banners?.length > 0 || gallery.images?.length > 0 || gallery.logos?.length > 0) && (
-        <section className="py-32 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-muted/20 via-background to-muted/10"></div>
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl mb-8">
-                <Image className="h-8 w-8 text-primary" />
+      {/* Gallery Section - Modern Slideshow */}
+      {(() => {
+        // Combine all gallery images into one array for the slideshow
+        const allImages = [
+          ...(gallery.banners || []).map((img: any) => ({ ...img, type: 'banner' })),
+          ...(gallery.images || []).map((img: any) => ({ ...img, type: 'image' })),
+          ...(gallery.logos || []).map((img: any) => ({ ...img, type: 'logo' }))
+        ];
+        
+        if (allImages.length === 0) return null;
+        
+        return (
+          <section className="py-32 relative overflow-hidden">
+            {/* Enhanced background */}
+            <div className="absolute inset-0">
+              <div 
+                className="absolute inset-0 opacity-30"
+                style={{
+                  background: themeStyles 
+                    ? `radial-gradient(circle at 30% 20%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, transparent 50%)`
+                    : 'radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(37, 99, 235, 0.06) 0%, transparent 50%)'
+                }}
+              ></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10">
+              {/* Header */}
+              <div className="text-center mb-20">
+                <div 
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                  style={{
+                    background: themeStyles 
+                      ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                      : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                  }}
+                >
+                  <Image 
+                    className="h-10 w-10" 
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  />
+                </div>
+                <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Gallery</h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  Discover our work through this curated collection showcasing the quality and style that defines our service
+                </p>
+                <div className="flex items-center justify-center mt-8">
+                  <div className="flex space-x-2">
+                    {Array.from({ length: Math.min(allImages.length, 5) }, (_, i) => (
+                      <div 
+                        key={i}
+                        className="w-2 h-2 rounded-full"
+                        style={{ 
+                          backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                          opacity: 0.3 + (i * 0.15)
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Our Gallery</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Experience our work through these carefully curated moments and see the quality that defines our service</p>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {/* Render all images from all gallery types with enhanced design */}
-              {gallery.banners?.map((image: any, index: number) => (
-                <div 
-                  key={`banner-${index}`} 
-                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
-                  style={{
-                    animationDelay: `${index * 50}ms`
+              {/* Carousel Container */}
+              <div className="max-w-6xl mx-auto">
+                <Carousel 
+                  className="w-full" 
+                  opts={{
+                    align: "center",
+                    loop: true,
+                    skipSnaps: false,
+                    dragFree: true
                   }}
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
-                    <img
-                      src={image.url}
-                      alt={image.name || 'Gallery image'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      data-testid={`gallery-image-${index}`}
-                    />
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    {/* Sparkle effect overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <CarouselContent className="-ml-4">
+                    {allImages.map((image: any, index: number) => (
+                      <CarouselItem key={`${image.type}-${index}`} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                        <div className="group relative">
+                          {/* Main image container with enhanced styling */}
+                          <div className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 group-hover:-translate-y-3">
+                            {image.type === 'logo' ? (
+                              /* Logo specific styling */
+                              <div className="aspect-square bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-black flex items-center justify-center p-8 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-white/50 via-transparent to-white/20 dark:from-gray-700/50 dark:to-gray-800/20"></div>
+                                <img
+                                  src={image.url}
+                                  alt={image.name || 'Logo'}
+                                  className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10 filter drop-shadow-lg"
+                                  data-testid={`gallery-logo-${index}`}
+                                  loading="lazy"
+                                />
+                              </div>
+                            ) : (
+                              /* Regular image styling */
+                              <div className="aspect-[4/3] relative overflow-hidden">
+                                <img
+                                  src={image.url}
+                                  alt={image.name || 'Gallery image'}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                  data-testid={`gallery-image-${index}`}
+                                  loading="lazy"
+                                />
+                                {/* Dynamic gradient overlay */}
+                                <div 
+                                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                  style={{
+                                    background: themeStyles 
+                                      ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 50%, transparent 100%)`
+                                      : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 50%, transparent 100%)'
+                                  }}
+                                ></div>
+                              </div>
+                            )}
+                            
+                            {/* Elegant border glow effect */}
+                            <div 
+                              className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                              style={{
+                                boxShadow: themeStyles 
+                                  ? `0 0 0 2px rgba(${hexToRgb(themeStyles.primaryColor)}, 0.3), 0 0 20px rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1)`
+                                  : '0 0 0 2px rgba(37, 99, 235, 0.3), 0 0 20px rgba(37, 99, 235, 0.1)'
+                              }}
+                            ></div>
+                          </div>
+                          
+                          {/* Image name/caption */}
+                          {image.name && (
+                            <div className="mt-6 text-center">
+                              <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                                {image.name}
+                              </h4>
+                            </div>
+                          )}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  
+                  {/* Custom styled navigation buttons */}
+                  <CarouselPrevious 
+                    className="-left-16 sm:left-2 w-12 h-12 border-0 shadow-xl hover:shadow-2xl transition-all duration-300"
+                    style={{
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                        : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                      color: 'white'
+                    }}
+                    data-testid="gallery-previous-button"
+                  />
+                  <CarouselNext 
+                    className="-right-16 sm:right-2 w-12 h-12 border-0 shadow-xl hover:shadow-2xl transition-all duration-300"
+                    style={{
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                        : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                      color: 'white'
+                    }}
+                    data-testid="gallery-next-button"
+                  />
+                </Carousel>
+                
+                {/* Gallery stats */}
+                <div className="text-center mt-16">
+                  <div className="inline-flex items-center space-x-8 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                    <div className="text-center">
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      >
+                        {allImages.length}
+                      </div>
+                      <div className="text-sm text-muted-foreground font-medium">Images</div>
+                    </div>
+                    <div className="w-px h-8 bg-border"></div>
+                    <div className="text-center">
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      >
+                        {gallery.banners?.length || 0}
+                      </div>
+                      <div className="text-sm text-muted-foreground font-medium">Banners</div>
+                    </div>
+                    <div className="w-px h-8 bg-border"></div>
+                    <div className="text-center">
+                      <div 
+                        className="text-2xl font-bold"
+                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                      >
+                        {gallery.logos?.length || 0}
+                      </div>
+                      <div className="text-sm text-muted-foreground font-medium">Logos</div>
+                    </div>
                   </div>
                 </div>
-              ))}
-              {gallery.images?.map((image: any, index: number) => (
-                <div 
-                  key={`image-${index}`} 
-                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
-                  style={{
-                    animationDelay: `${(gallery.banners?.length || 0 + index) * 50}ms`
-                  }}
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
-                    <img
-                      src={image.url}
-                      alt={image.name || 'Gallery image'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      data-testid={`gallery-image-${(gallery.banners?.length || 0) + index}`}
-                    />
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    {/* Sparkle effect overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  </div>
-                </div>
-              ))}
-              {gallery.logos?.map((image: any, index: number) => (
-                <div 
-                  key={`logo-${index}`} 
-                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
-                  style={{
-                    animationDelay: `${((gallery.banners?.length || 0) + (gallery.images?.length || 0) + index) * 50}ms`
-                  }}
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
-                    <img
-                      src={image.url}
-                      alt={image.name || 'Logo'}
-                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
-                      data-testid={`gallery-logo-${index}`}
-                    />
-                    {/* Subtle gradient overlay for logos */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* Reviews Section */}
       <section className="py-20">
