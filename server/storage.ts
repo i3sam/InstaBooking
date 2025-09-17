@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon, neonConfig } from '@neondatabase/serverless';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 
 // Enable connection caching for better performance
 neonConfig.fetchConnectionCache = true;
@@ -38,9 +38,23 @@ function getDb() {
   return db;
 }
 
+// Ensure database schema is up to date
+async function ensureSchema() {
+  try {
+    // Add location_link column if it doesn't exist
+    await getDb().execute(sql`ALTER TABLE "pages" ADD COLUMN IF NOT EXISTS "location_link" text;`);
+    console.log("✅ Schema migration: location_link column ensured");
+  } catch (error) {
+    console.error("⚠️  Schema migration error:", error);
+  }
+}
+
 // Test database connection
 async function testConnection() {
   try {
+    // First ensure schema is up to date
+    await ensureSchema();
+    
     // Simple query to test connection
     const result = await getDb().select().from(profiles).limit(1);
     console.log("✅ Database connection successful");

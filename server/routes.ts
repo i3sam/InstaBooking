@@ -7,7 +7,7 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
 import { Resend } from 'resend';
-import { insertReviewSchema } from '@shared/schema';
+import { insertReviewSchema, insertPageSchema } from '@shared/schema';
 
 // Supabase setup
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -347,6 +347,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ 
           message: "Active Pro membership required", 
           details: membershipExpired ? "Your Pro membership has expired. Please renew to continue creating pages." : "Upgrade to Pro to create booking pages"
+        });
+      }
+
+      // Validate request body
+      const validation = insertPageSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validation.error.errors 
         });
       }
 

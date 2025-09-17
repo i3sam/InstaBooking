@@ -283,6 +283,20 @@ export default function CreatePage() {
       return;
     }
 
+    // Validate location link URL if provided
+    if (formData.locationLink && formData.locationLink.trim() !== '') {
+      try {
+        new URL(formData.locationLink);
+      } catch {
+        toast({
+          title: "Invalid location link",
+          description: "Please enter a valid URL (e.g., https://maps.google.com/...)",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     const servicesWithNumbers = formData.services.map(service => ({
       ...service,
       price: service.price || '0',

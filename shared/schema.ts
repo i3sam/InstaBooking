@@ -100,6 +100,18 @@ export const insertPageSchema = createInsertSchema(pages).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  locationLink: z.string().optional().refine((val) => {
+    if (!val || val.trim() === '') return true;
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, {
+    message: "Location link must be a valid URL (e.g., https://maps.google.com/...)"
+  })
 });
 
 export const insertServiceSchema = createInsertSchema(services).omit({
