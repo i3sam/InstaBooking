@@ -377,40 +377,13 @@ export default function PublicBooking() {
             ></div>
           </div>
           
-          {/* Floating geometric elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div 
-              className="absolute top-32 left-20 w-2 h-2 rounded-full opacity-40 animate-bounce"
-              style={{
-                backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                animationDuration: '3s',
-                animationDelay: '0.5s'
-              }}
-            ></div>
-            <div 
-              className="absolute top-48 right-32 w-3 h-3 rotate-45 opacity-30 animate-bounce"
-              style={{
-                backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                animationDuration: '4s',
-                animationDelay: '1.5s'
-              }}
-            ></div>
-            <div 
-              className="absolute bottom-40 left-1/3 w-1.5 h-1.5 rounded-full opacity-50 animate-bounce"
-              style={{
-                backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                animationDuration: '5s',
-                animationDelay: '2.5s'
-              }}
-            ></div>
-          </div>
         </div>
         
         {/* Main content */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-6xl mx-auto text-center">
             {/* Professional badge */}
-            <div className="mb-8 sm:mb-12 lg:mb-16">
+            <div className="mt-8 sm:mt-12 mb-8 sm:mb-12 lg:mb-16">
               <div 
                 className="inline-flex items-center px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 rounded-full text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300"
                 style={{
@@ -446,11 +419,6 @@ export default function PublicBooking() {
                   <span className="block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                     {page.title}
                   </span>
-                  {/* Subtle underline accent */}
-                  <div 
-                    className="w-16 sm:w-20 h-1 sm:h-1.5 rounded-full mx-auto mt-2 sm:mt-4 opacity-80"
-                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                  ></div>
                 </h1>
               </div>
               
@@ -459,9 +427,6 @@ export default function PublicBooking() {
                   <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto font-medium leading-relaxed opacity-95 px-4">
                     {page.tagline}
                   </p>
-                  {/* Decorative quotes */}
-                  <div className="absolute -top-2 -left-2 text-4xl opacity-20 font-bold" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>"</div>
-                  <div className="absolute -bottom-2 -right-2 text-4xl opacity-20 font-bold" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>"</div>
                 </div>
               )}
             </div>
@@ -673,49 +638,10 @@ export default function PublicBooking() {
                       </div>
                     </div>
                   )}
-                  
-                  {/* Decorative accent line */}
-                  <div className="flex items-center justify-center mt-8 sm:mt-12">
-                    <div className="flex items-center space-x-2">
-                      <div 
-                        className="w-2 h-2 rounded-full animate-pulse"
-                        style={{ 
-                          backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                          animationDelay: '0s',
-                          animationDuration: '2s'
-                        }}
-                      ></div>
-                      <div 
-                        className="w-8 h-0.5 rounded-full"
-                        style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', opacity: 0.3 }}
-                      ></div>
-                      <div 
-                        className="w-2 h-2 rounded-full animate-pulse"
-                        style={{ 
-                          backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                          animationDelay: '1s',
-                          animationDuration: '2s'
-                        }}
-                      ></div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
             </div>
-          </div>
-        </div>
-        
-        {/* Improved mobile-friendly scroll indicator */}
-        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div 
-            className="w-5 h-8 sm:w-6 sm:h-10 border-2 rounded-full flex justify-center"
-            style={{ borderColor: `${themeStyles?.primaryColor || '#2563eb'}40` }}
-          >
-            <div 
-              className="w-0.5 sm:w-1 h-2 sm:h-3 rounded-full mt-2 animate-pulse"
-              style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-            ></div>
           </div>
         </div>
       </section>
