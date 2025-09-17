@@ -81,10 +81,6 @@ export default function Legal() {
       answer: "Go to your dashboard and click 'Create Page' to start customizing your booking page with your branding, services, and availability."
     },
     {
-      question: "Can I accept payments through BookingGen?",
-      answer: "Yes, we integrate with secure payment processors to handle transactions safely and efficiently."
-    },
-    {
       question: "Is my data secure with BookingGen?",
       answer: "Absolutely. We use enterprise-grade security measures including SSL encryption and secure data storage to protect your information."
     },
