@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles } from 'lucide-react';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -210,16 +210,26 @@ export default function PublicBooking() {
       style={themeStyles?.cssVariables}
     >
       {/* Header */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+      <header className="border-b border-border/10 bg-card/60 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-xl font-bold text-primary-foreground">
+            <div className="flex items-center space-x-4">
+              <div 
+                className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                style={{
+                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                }}
+              >
+                <span className="text-xl font-bold text-white">
                   {page.title?.charAt(0) || 'B'}
                 </span>
               </div>
-              <span className="text-xl font-bold text-foreground">{page.title}</span>
+              <div>
+                <span className="text-xl font-bold text-foreground">{page.title}</span>
+                {page.tagline && (
+                  <p className="text-sm text-muted-foreground mt-0.5">{page.tagline}</p>
+                )}
+              </div>
             </div>
             <Button 
               variant="ghost"
@@ -235,37 +245,60 @@ export default function PublicBooking() {
 
       {/* Hero Section */}
       <section 
-        className="py-32 relative overflow-hidden"
+        className="py-40 relative overflow-hidden"
         style={{
           background: themeStyles 
-            ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 100%)`
-            : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
+            ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 50%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+            : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 50%, rgba(37, 99, 235, 0.08) 100%)'
         }}
       >
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
         <div className="container mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
-            {page.title}
-          </h1>
-          {page.tagline && (
-            <p className="text-2xl lg:text-3xl text-muted-foreground mb-12 max-w-4xl mx-auto font-medium leading-relaxed">
-              {page.tagline}
-            </p>
-          )}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => setShowBookingModal(true)}
-              className="px-12 py-6 rounded-2xl text-xl h-auto text-white font-bold shadow-2xl hover:shadow-3xl transform hover:scale-110 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
-              style={{
-                background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
-                color: 'white',
-                border: 'none'
-              }}
-              data-testid="button-book-appointment"
-            >
-              <Calendar className="h-5 w-5 mr-2" />
-              Book an Appointment
-            </Button>
+          <div className="max-w-5xl mx-auto">
+            <div className="mb-8">
+              <div 
+                className="inline-flex items-center px-6 py-3 rounded-full text-sm font-medium mb-8 backdrop-blur-sm shadow-lg border border-white/10"
+                style={{
+                  background: themeStyles ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.1) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+                  color: themeStyles?.primaryColor || '#2563eb'
+                }}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Professional Services Available
+              </div>
+            </div>
+            
+            <h1 className="text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground mb-8 leading-tight tracking-tight">
+              {page.title}
+            </h1>
+            {page.tagline && (
+              <p className="text-2xl lg:text-3xl text-muted-foreground mb-16 max-w-4xl mx-auto font-medium leading-relaxed">
+                {page.tagline}
+              </p>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button 
+                onClick={() => setShowBookingModal(true)}
+                className="px-12 py-6 rounded-2xl text-xl h-auto text-white font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 relative overflow-hidden group"
+                style={{
+                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                  color: 'white',
+                  border: 'none'
+                }}
+                data-testid="button-book-appointment"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <div className="flex items-center relative z-10">
+                  <Calendar className="h-6 w-6 mr-3" />
+                  Book an Appointment
+                </div>
+              </Button>
             {page.calendarLink ? (
               <Button
                 variant="outline"
@@ -291,60 +324,94 @@ export default function PublicBooking() {
                 </a>
               </Button>
             )}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Services Section */}
       {services.length > 0 && (
-        <section className="py-24">
+        <section className="py-32 relative">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">Our Services</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Choose the perfect session for your journey and experience our professional services</p>
+            <div className="text-center mb-24">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl mb-8">
+                <Sparkles className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Our Services</h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Choose the perfect session for your journey and experience our professional services crafted just for you</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {services.map((service: any) => (
-                <Card key={service.id} className="group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg hover:-translate-y-2">
-                  <CardContent className="p-8 h-full flex flex-col">
+              {services.map((service: any, index: number) => (
+                <Card 
+                  key={service.id} 
+                  className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-3 bg-card/50 backdrop-blur-sm relative overflow-hidden"
+                  style={{
+                    animationDelay: `${index * 100}ms`
+                  }}
+                >
+                  {/* Gradient overlay on hover */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: themeStyles ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                    }}
+                  ></div>
+                  
+                  <CardContent className="p-8 h-full flex flex-col relative z-10">
                     <div 
-                      className="w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200"
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
                       style={{
-                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
                       }}
                     >
                       <Calendar 
-                        className="h-8 w-8" 
+                        className="h-10 w-10" 
                         style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                       />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">{service.name}</h3>
+                    
+                    <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-200">{service.name}</h3>
                     {service.description && (
-                      <p className="text-muted-foreground mb-6">{service.description}</p>
+                      <p className="text-muted-foreground mb-8 leading-relaxed flex-grow">{service.description}</p>
                     )}
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center text-2xl font-bold text-foreground">
-                        <DollarSign className="h-6 w-6" />
-                        {service.price}
+                    
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
+                            style={{
+                              background: themeStyles ? `${themeStyles.primaryColor}20` : 'rgba(37, 99, 235, 0.2)'
+                            }}
+                          >
+                            <DollarSign className="h-4 w-4" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                          </div>
+                          <span className="text-3xl font-bold text-foreground">${service.price}</span>
+                        </div>
+                        <div className="flex items-center text-muted-foreground">
+                          <Clock className="h-5 w-5 mr-2" />
+                          <span className="font-medium">{service.durationMinutes} min</span>
+                        </div>
                       </div>
-                      <div className="flex items-center text-muted-foreground">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {service.durationMinutes} minutes
-                      </div>
+                      
+                      <Button 
+                        onClick={() => setShowBookingModal(true)}
+                        className="w-full text-white font-semibold rounded-xl py-4 h-auto hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
+                        style={{
+                          background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                          color: 'white',
+                          border: 'none'
+                        }}
+                        data-testid={`button-book-service-${service.id}`}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <div className="flex items-center justify-center relative z-10">
+                          <Calendar className="h-5 w-5 mr-2" />
+                          Book This Service
+                        </div>
+                      </Button>
                     </div>
-                    <Button 
-                      onClick={() => setShowBookingModal(true)}
-                      className="w-full text-white font-semibold rounded-lg py-3 hover:shadow-lg transform hover:scale-105 transition-all duration-200 bg-primary hover:bg-primary/90"
-                      style={{
-                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
-                        color: 'white',
-                        border: 'none'
-                      }}
-                      data-testid={`button-book-${service.id}`}
-                    >
-                      Book Now
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -353,52 +420,84 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Gallery Section - Consolidated single gallery */}
+      {/* Gallery Section - Modern redesign */}
       {(gallery.banners?.length > 0 || gallery.images?.length > 0 || gallery.logos?.length > 0) && (
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">Gallery</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">Take a look at our work and environment</p>
+        <section className="py-32 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-muted/20 via-background to-muted/10"></div>
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl mb-8">
+                <Image className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Our Gallery</h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Experience our work through these carefully curated moments and see the quality that defines our service</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {/* Render all images from all gallery types */}
+              {/* Render all images from all gallery types with enhanced design */}
               {gallery.banners?.map((image: any, index: number) => (
-                <Card key={`banner-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden">
+                <div 
+                  key={`banner-${index}`} 
+                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
+                  style={{
+                    animationDelay: `${index * 50}ms`
+                  }}
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
                     <img
                       src={image.url}
                       alt={image.name || 'Gallery image'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       data-testid={`gallery-image-${index}`}
                     />
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    {/* Sparkle effect overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
-                </Card>
+                </div>
               ))}
               {gallery.images?.map((image: any, index: number) => (
-                <Card key={`image-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden">
+                <div 
+                  key={`image-${index}`} 
+                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
+                  style={{
+                    animationDelay: `${(gallery.banners?.length || 0 + index) * 50}ms`
+                  }}
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
                     <img
                       src={image.url}
                       alt={image.name || 'Gallery image'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      data-testid={`gallery-image-${gallery.banners?.length + index}`}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      data-testid={`gallery-image-${(gallery.banners?.length || 0) + index}`}
                     />
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    {/* Sparkle effect overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
-                </Card>
+                </div>
               ))}
               {gallery.logos?.map((image: any, index: number) => (
-                <Card key={`logo-${index}`} className="group overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="relative aspect-square overflow-hidden bg-white flex items-center justify-center p-4">
+                <div 
+                  key={`logo-${index}`} 
+                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:-translate-y-2"
+                  style={{
+                    animationDelay: `${((gallery.banners?.length || 0) + (gallery.images?.length || 0) + index) * 50}ms`
+                  }}
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
                     <img
                       src={image.url}
                       alt={image.name || 'Logo'}
-                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-700"
                       data-testid={`gallery-logo-${index}`}
                     />
+                    {/* Subtle gradient overlay for logos */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                   </div>
-                </Card>
+                </div>
               ))}
             </div>
           </div>
