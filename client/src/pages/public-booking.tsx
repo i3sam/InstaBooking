@@ -439,19 +439,11 @@ export default function PublicBooking() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mb-4 sm:mb-6 max-w-md sm:max-w-none mx-auto">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
-                  className="group px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 sm:duration-500 relative overflow-hidden"
-                  style={{
-                    background: themeStyles 
-                      ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
-                      : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
-                    color: 'white',
-                    border: 'none'
-                  }}
+                  className="px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300"
                   data-testid="button-book-appointment"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  <div className="flex items-center justify-center relative z-10">
-                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                  <div className="flex items-center justify-center">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3" />
                     Book Appointment
                   </div>
                 </Button>
