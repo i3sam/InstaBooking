@@ -11,8 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function PublicBooking() {
   const { slug } = useParams();
@@ -25,6 +26,8 @@ export default function PublicBooking() {
     rating: 0,
     reviewText: ''
   });
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const { data: pageData, isLoading, error } = useQuery<any>({
     queryKey: [`/api/pages/${slug}`],
@@ -166,23 +169,65 @@ export default function PublicBooking() {
     return Calendar;
   };
 
+  // Enhanced validation function
+  const validateField = (field: string, value: any) => {
+    const errors: {[key: string]: string} = {};
+    
+    switch (field) {
+      case 'customerName':
+        if (!value.trim()) errors.customerName = 'Name is required';
+        else if (value.trim().length < 2) errors.customerName = 'Name must be at least 2 characters';
+        break;
+      case 'customerEmail':
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          errors.customerEmail = 'Please enter a valid email address';
+        }
+        break;
+      case 'rating':
+        if (value === 0) errors.rating = 'Please select a rating';
+        break;
+      case 'reviewText':
+        if (value && value.length > 500) errors.reviewText = 'Review must be under 500 characters';
+        break;
+    }
+    
+    setValidationErrors(prev => ({ ...prev, ...errors }));
+    return Object.keys(errors).length === 0;
+  };
+
+  // Copy to clipboard function
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(label);
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+      });
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (err) {
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Review form handlers
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!reviewFormData.customerName || !reviewFormData.rating) {
+    // Validate all fields
+    const nameValid = validateField('customerName', reviewFormData.customerName);
+    const emailValid = validateField('customerEmail', reviewFormData.customerEmail);
+    const ratingValid = validateField('rating', reviewFormData.rating);
+    const textValid = validateField('reviewText', reviewFormData.reviewText);
+    
+    if (!nameValid || !emailValid || !ratingValid || !textValid) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in your name and select a rating.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (reviewFormData.rating < 1 || reviewFormData.rating > 5) {
-      toast({
-        title: "Invalid rating",
-        description: "Please select a rating between 1 and 5 stars.",
+        title: "Please check your inputs",
+        description: "Some fields need attention before submitting.",
         variant: "destructive",
       });
       return;
@@ -195,6 +240,19 @@ export default function PublicBooking() {
       rating: reviewFormData.rating,
       reviewText: reviewFormData.reviewText
     });
+  };
+
+  // Handle input changes with real-time validation
+  const handleInputChange = (field: string, value: any) => {
+    setReviewFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    
+    // Validate on blur (after a slight delay)
+    setTimeout(() => validateField(field, value), 300);
   };
 
   if (isLoading) {
@@ -439,31 +497,161 @@ export default function PublicBooking() {
                 )}
               </div>
               
-              {/* Trust indicators */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2"
-                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                  ></div>
-                  <span className="font-medium">Instant Confirmation</span>
-                </div>
+              {/* Enhanced Trust indicators with stats */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 text-xs sm:text-sm text-muted-foreground mb-8">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        ></div>
+                        <span className="font-medium">Instant Confirmation</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Get immediate booking confirmation</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <div className="hidden sm:block w-px h-4 bg-border"></div>
-                <div className="flex items-center">
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2"
-                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                  ></div>
-                  <span className="font-medium">Professional Service</span>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        ></div>
+                        <span className="font-medium">Professional Service</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Certified and experienced professionals</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <div className="hidden sm:block w-px h-4 bg-border"></div>
-                <div className="flex items-center">
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2"
-                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                  ></div>
-                  <span className="font-medium">Secure Booking</span>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        ></div>
+                        <span className="font-medium">Secure Booking</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Your data is safe and secure</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              {/* Professional Stats Widgets */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
+                        <div className="flex items-center justify-center mb-2">
+                          <Users 
+                            className="h-5 w-5 mr-2" 
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          />
+                          <span 
+                            className="text-lg sm:text-xl font-bold"
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            500+
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Happy Clients</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Over 500 satisfied customers</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
+                        <div className="flex items-center justify-center mb-2">
+                          <Award 
+                            className="h-5 w-5 mr-2" 
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          />
+                          <span 
+                            className="text-lg sm:text-xl font-bold"
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            5.0
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Rating</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Perfect 5-star average rating</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
+                        <div className="flex items-center justify-center mb-2">
+                          <TrendingUp 
+                            className="h-5 w-5 mr-2" 
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          />
+                          <span 
+                            className="text-lg sm:text-xl font-bold"
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            99%
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Success Rate</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>99% customer satisfaction rate</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
+                        <div className="flex items-center justify-center mb-2">
+                          <Timer 
+                            className="h-5 w-5 mr-2" 
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          />
+                          <span 
+                            className="text-lg sm:text-xl font-bold"
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            24h
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Response</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>24-hour response guarantee</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           </div>
@@ -1146,36 +1334,83 @@ export default function PublicBooking() {
                       <Label htmlFor="customerName" className="text-foreground font-semibold text-lg mb-3 block">
                         Your Name *
                       </Label>
-                      <Input
-                        id="customerName"
-                        value={reviewFormData.customerName}
-                        onChange={(e) => setReviewFormData(prev => ({ ...prev, customerName: e.target.value }))}
-                        placeholder="Enter your full name"
-                        className="h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20"
-                        style={{
-                          borderColor: reviewFormData.customerName ? (themeStyles?.primaryColor || '#2563eb') : undefined,
-                          '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
-                        } as React.CSSProperties}
-                        data-testid="input-customer-name"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="customerName"
+                          value={reviewFormData.customerName}
+                          onChange={(e) => handleInputChange('customerName', e.target.value)}
+                          placeholder="Enter your full name"
+                          className={`h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20 pr-10 ${
+                            validationErrors.customerName ? 'border-red-500 focus:border-red-500' : 
+                            reviewFormData.customerName && !validationErrors.customerName ? 'border-green-500' : ''
+                          }`}
+                          style={{
+                            borderColor: !validationErrors.customerName && reviewFormData.customerName ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                            '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                          } as React.CSSProperties}
+                          data-testid="input-customer-name"
+                          aria-invalid={!!validationErrors.customerName}
+                          required
+                        />
+                        {reviewFormData.customerName && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {validationErrors.customerName ? (
+                              <AlertCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {validationErrors.customerName && (
+                        <p className="text-sm text-red-500 mt-1 flex items-center" data-testid="error-customer-name">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {validationErrors.customerName}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="customerEmail" className="text-foreground font-semibold text-lg mb-3 block">
                         Email (Optional)
                       </Label>
-                      <Input
-                        id="customerEmail"
-                        type="email"
-                        value={reviewFormData.customerEmail}
-                        onChange={(e) => setReviewFormData(prev => ({ ...prev, customerEmail: e.target.value }))}
-                        placeholder="your.email@example.com"
-                        className="h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20"
-                        style={{
-                          borderColor: reviewFormData.customerEmail ? (themeStyles?.primaryColor || '#2563eb') : undefined,
-                          '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
-                        } as React.CSSProperties}
-                        data-testid="input-customer-email"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="customerEmail"
+                          type="email"
+                          value={reviewFormData.customerEmail}
+                          onChange={(e) => handleInputChange('customerEmail', e.target.value)}
+                          placeholder="your.email@example.com"
+                          className={`h-12 text-lg border-2 rounded-xl focus:ring-2 focus:ring-opacity-20 pr-10 ${
+                            validationErrors.customerEmail ? 'border-red-500 focus:border-red-500' : 
+                            reviewFormData.customerEmail && !validationErrors.customerEmail ? 'border-green-500' : ''
+                          }`}
+                          style={{
+                            borderColor: !validationErrors.customerEmail && reviewFormData.customerEmail ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                            '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                          } as React.CSSProperties}
+                          data-testid="input-customer-email"
+                          aria-invalid={!!validationErrors.customerEmail}
+                        />
+                        {reviewFormData.customerEmail && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {validationErrors.customerEmail ? (
+                              <AlertCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {validationErrors.customerEmail ? (
+                        <p className="text-sm text-red-500 mt-1 flex items-center" data-testid="error-customer-email">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {validationErrors.customerEmail}
+                        </p>
+                      ) : (
+                        reviewFormData.customerEmail && (
+                          <p className="text-xs text-muted-foreground mt-1">Great! We'll use this to verify your review</p>
+                        )
+                      )}
                     </div>
                   </div>
 
@@ -1189,7 +1424,7 @@ export default function PublicBooking() {
                         <button
                           key={star}
                           type="button"
-                          onClick={() => setReviewFormData(prev => ({ ...prev, rating: star }))}
+                          onClick={() => handleInputChange('rating', star)}
                           className="p-2 rounded-xl hover:bg-background/80 transition-all duration-300 transform hover:scale-110"
                           data-testid={`star-rating-${star}`}
                         >
@@ -1211,6 +1446,12 @@ export default function PublicBooking() {
                         {reviewFormData.rating === 1 && "Poor 😔"}
                       </div>
                     )}
+                    {validationErrors.rating && (
+                      <p className="text-sm text-red-500 mt-2 flex items-center justify-center" data-testid="error-rating">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        {validationErrors.rating}
+                      </p>
+                    )}
                   </div>
 
                   {/* Enhanced review text area */}
@@ -1218,19 +1459,47 @@ export default function PublicBooking() {
                     <Label htmlFor="reviewText" className="text-foreground font-semibold text-lg mb-3 block">
                       Tell us about your experience
                     </Label>
-                    <Textarea
-                      id="reviewText"
-                      value={reviewFormData.reviewText}
-                      onChange={(e) => setReviewFormData(prev => ({ ...prev, reviewText: e.target.value }))}
-                      placeholder="Share what you loved about our service, what could be improved, or any other feedback..."
-                      rows={6}
-                      className="text-lg border-2 rounded-xl resize-none focus:ring-2 focus:ring-opacity-20"
-                      style={{
-                        borderColor: reviewFormData.reviewText ? (themeStyles?.primaryColor || '#2563eb') : undefined,
-                        '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
-                      } as React.CSSProperties}
-                      data-testid="textarea-review-text"
-                    />
+                    <div className="relative">
+                      <Textarea
+                        id="reviewText"
+                        value={reviewFormData.reviewText}
+                        onChange={(e) => handleInputChange('reviewText', e.target.value)}
+                        placeholder="Share what you loved about our service, what could be improved, or any other feedback..."
+                        rows={6}
+                        className={`text-lg border-2 rounded-xl resize-none focus:ring-2 focus:ring-opacity-20 ${
+                          validationErrors.reviewText ? 'border-red-500 focus:border-red-500' : ''
+                        }`}
+                        style={{
+                          borderColor: !validationErrors.reviewText && reviewFormData.reviewText ? (themeStyles?.primaryColor || '#2563eb') : undefined,
+                          '--tw-ring-color': themeStyles?.primaryColor || '#2563eb'
+                        } as React.CSSProperties}
+                        data-testid="textarea-review-text"
+                        aria-invalid={!!validationErrors.reviewText}
+                        maxLength={500}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div>
+                        {validationErrors.reviewText ? (
+                          <p className="text-sm text-red-500 flex items-center" data-testid="error-review-text">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            {validationErrors.reviewText}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">Optional - help others understand your experience</p>
+                        )}
+                      </div>
+                      <span 
+                        className={`text-xs font-medium ${
+                          reviewFormData.reviewText.length > 450 ? 'text-red-500' : 
+                          reviewFormData.reviewText.length > 400 ? 'text-yellow-500' : 
+                          'text-muted-foreground'
+                        }`} 
+                        data-testid="text-character-counter"
+                      >
+                        {reviewFormData.reviewText.length}/500
+                      </span>
+                    </div>
                   </div>
 
                   {/* Enhanced submit button */}
@@ -1251,7 +1520,7 @@ export default function PublicBooking() {
                     <div className="flex items-center justify-center relative z-10">
                       {submitReviewMutation.isPending ? (
                         <>
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                          <Loader2 className="h-6 w-6 mr-3 animate-spin" />
                           Submitting Review...
                         </>
                       ) : (
@@ -1297,10 +1566,30 @@ export default function PublicBooking() {
                     className="bg-card border border-border rounded-xl px-6 data-[state=open]:bg-muted/20"
                   >
                     <AccordionTrigger 
-                      className="text-left py-6 hover:no-underline"
+                      className="text-left py-6 hover:no-underline group"
                       data-testid={`faq-question-${index}`}
                     >
-                      <span className="text-base sm:text-lg font-semibold text-foreground">{faq.question}</span>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-base sm:text-lg font-semibold text-foreground">{faq.question}</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center ml-4">
+                                <HelpCircle 
+                                  className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors duration-300" 
+                                />
+                                <ChevronRight 
+                                  className="h-4 w-4 ml-2 text-muted-foreground transform group-data-[state=open]:rotate-90 transition-transform duration-300"
+                                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                                />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Click to {faq.answer ? 'expand answer' : 'show more'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     </AccordionTrigger>
                     <AccordionContent 
                       className="pb-6 text-muted-foreground leading-relaxed"
@@ -1377,13 +1666,41 @@ export default function PublicBooking() {
                         border: `2px solid ${themeStyles?.primaryColor || '#2563eb'}20`
                       }}
                     >
-                      <Clock3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                      Currently {(() => {
-                        const now = new Date();
-                        const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                        const currentHours = page.businessHours[currentDay];
-                        return String(currentHours) === 'Closed' ? 'Closed' : 'Open';
-                      })()}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center">
+                              <Timer className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                              Currently {(() => {
+                                const now = new Date();
+                                const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                                const currentHours = page.businessHours[currentDay];
+                                const isOpen = String(currentHours) !== 'Closed';
+                                return (
+                                  <span className="flex items-center">
+                                    {isOpen ? 'Open' : 'Closed'}
+                                    <div 
+                                      className={`w-2 h-2 rounded-full ml-2 ${isOpen ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}
+                                    ></div>
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {(() => {
+                                const now = new Date();
+                                const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                                const currentHours = page.businessHours[currentDay];
+                                return String(currentHours) === 'Closed' 
+                                  ? 'We are currently closed'
+                                  : `We are open today: ${currentHours}`;
+                              })()}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </div>
                   
@@ -1564,13 +1881,37 @@ export default function PublicBooking() {
                         <Phone className="h-10 w-10 text-white" />
                       </div>
                       <h3 className="text-2xl font-bold text-foreground mb-6">Phone</h3>
-                      <a 
-                        href={`tel:${page.contactPhone}`}
-                        className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold"
-                        data-testid="contact-phone"
-                      >
-                        {page.contactPhone}
-                      </a>
+                      <div className="flex items-center justify-center gap-3">
+                        <a 
+                          href={`tel:${page.contactPhone}`}
+                          className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold"
+                          data-testid="contact-phone"
+                        >
+                          {page.contactPhone}
+                        </a>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(page.contactPhone, 'Phone number')}
+                                className="h-8 w-8 p-0 hover:bg-background/80 transition-all duration-300"
+                                data-testid="button-copy-phone"
+                              >
+                                {copiedField === 'Phone number' ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copiedField === 'Phone number' ? 'Copied!' : 'Copy phone'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         Click to call directly
                       </p>
@@ -1602,13 +1943,37 @@ export default function PublicBooking() {
                         <Mail className="h-10 w-10 text-white" />
                       </div>
                       <h3 className="text-2xl font-bold text-foreground mb-6">Email</h3>
-                      <a 
-                        href={`mailto:${page.contactEmail}`}
-                        className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold break-all"
-                        data-testid="contact-email"
-                      >
-                        {page.contactEmail}
-                      </a>
+                      <div className="flex items-center justify-center gap-3 flex-wrap">
+                        <a 
+                          href={`mailto:${page.contactEmail}`}
+                          className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold break-all"
+                          data-testid="contact-email"
+                        >
+                          {page.contactEmail}
+                        </a>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(page.contactEmail, 'Email address')}
+                                className="h-8 w-8 p-0 hover:bg-background/80 transition-all duration-300 flex-shrink-0"
+                                data-testid="button-copy-email"
+                              >
+                                {copiedField === 'Email address' ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copiedField === 'Email address' ? 'Copied!' : 'Copy email'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         Send us a message
                       </p>
@@ -1640,12 +2005,36 @@ export default function PublicBooking() {
                         <MapPin className="h-10 w-10 text-white" />
                       </div>
                       <h3 className="text-2xl font-bold text-foreground mb-6">Address</h3>
-                      <address 
-                        className="text-xl text-muted-foreground not-italic font-medium group-hover:font-semibold transition-all duration-300 leading-relaxed"
-                        data-testid="contact-address"
-                      >
-                        {page.businessAddress}
-                      </address>
+                      <div className="flex items-start justify-center gap-3">
+                        <address 
+                          className="text-xl text-muted-foreground not-italic font-medium group-hover:font-semibold transition-all duration-300 leading-relaxed text-center"
+                          data-testid="contact-address"
+                        >
+                          {page.businessAddress}
+                        </address>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(page.businessAddress, 'Address')}
+                                className="h-8 w-8 p-0 hover:bg-background/80 transition-all duration-300 flex-shrink-0 mt-1"
+                                data-testid="button-copy-address"
+                              >
+                                {copiedField === 'Address' ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copiedField === 'Address' ? 'Copied!' : 'Copy address'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         Visit us in person
                       </p>
