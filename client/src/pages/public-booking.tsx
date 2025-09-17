@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default function PublicBooking() {
@@ -138,6 +138,32 @@ export default function PublicBooking() {
     return result 
       ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
       : '37, 99, 235'; // fallback to blue
+  };
+  
+  // Smart icon assignment based on service name
+  const getServiceIcon = (serviceName: string) => {
+    const name = serviceName.toLowerCase();
+    
+    if (name.includes('cut') || name.includes('hair') || name.includes('style')) return Scissors;
+    if (name.includes('coffee') || name.includes('café') || name.includes('cafe')) return Coffee;
+    if (name.includes('massage') || name.includes('spa') || name.includes('relax')) return Heart;
+    if (name.includes('consult') || name.includes('meeting') || name.includes('session')) return User;
+    if (name.includes('design') || name.includes('web') || name.includes('digital')) return Monitor;
+    if (name.includes('photo') || name.includes('picture') || name.includes('shoot')) return Camera;
+    if (name.includes('art') || name.includes('paint') || name.includes('creative')) return Palette;
+    if (name.includes('fitness') || name.includes('training') || name.includes('workout')) return Zap;
+    if (name.includes('coaching') || name.includes('mentor') || name.includes('goal')) return Target;
+    if (name.includes('security') || name.includes('protect') || name.includes('safe')) return Shield;
+    if (name.includes('business') || name.includes('corporate') || name.includes('professional')) return Briefcase;
+    if (name.includes('repair') || name.includes('fix') || name.includes('service')) return Wrench;
+    if (name.includes('audio') || name.includes('sound') || name.includes('podcast')) return Headphones;
+    if (name.includes('music') || name.includes('lesson') || name.includes('instrument')) return Music;
+    if (name.includes('education') || name.includes('tutor') || name.includes('learn')) return BookOpen;
+    if (name.includes('marketing') || name.includes('growth') || name.includes('launch')) return Rocket;
+    if (name.includes('wellness') || name.includes('health') || name.includes('therapy')) return Leaf;
+    
+    // Default fallback
+    return Calendar;
   };
 
   // Review form handlers
@@ -456,92 +482,219 @@ export default function PublicBooking() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Enhanced Services Section */}
       {services.length > 0 && (
-        <section className="py-32 relative">
-          <div className="container mx-auto px-6">
+        <section className="py-32 relative overflow-hidden">
+          {/* Background enhancements */}
+          <div className="absolute inset-0">
+            <div 
+              className="absolute inset-0 opacity-30"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(ellipse at 20% 80%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, transparent 50%)`
+                  : 'radial-gradient(ellipse at 20% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(37, 99, 235, 0.06) 0%, transparent 50%)'
+              }}
+            ></div>
+          </div>
+          
+          <div className="container mx-auto px-6 relative z-10">
+            {/* Enhanced header */}
             <div className="text-center mb-24">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl mb-8">
-                <Sparkles className="h-8 w-8 text-primary" />
+              <div 
+                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                }}
+              >
+                <Sparkles 
+                  className="h-10 w-10" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
               </div>
               <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Our Services</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Choose the perfect session for your journey and experience our professional services crafted just for you</p>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+                Discover our expertly crafted services designed to exceed your expectations and deliver exceptional results
+              </p>
+              
+              {/* Services count indicator */}
+              <div className="inline-flex items-center px-6 py-3 rounded-full bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                <div 
+                  className="w-2 h-2 rounded-full mr-3"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                ></div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {services.length} Professional Service{services.length !== 1 ? 's' : ''} Available
+                </span>
+              </div>
             </div>
 
+            {/* Enhanced services grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {services.map((service: any, index: number) => (
-                <Card 
-                  key={service.id} 
-                  className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-3 bg-card/50 backdrop-blur-sm relative overflow-hidden"
-                  style={{
-                    animationDelay: `${index * 100}ms`
-                  }}
-                >
-                  {/* Gradient overlay on hover */}
-                  <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              {services.map((service: any, index: number) => {
+                const IconComponent = getServiceIcon(service.name);
+                
+                return (
+                  <Card 
+                    key={service.id} 
+                    className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-4 bg-card/60 backdrop-blur-md relative overflow-hidden"
                     style={{
-                      background: themeStyles ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                      animationDelay: `${index * 150}ms`
                     }}
-                  ></div>
-                  
-                  <CardContent className="p-8 h-full flex flex-col relative z-10">
+                    data-testid={`service-card-${service.id}`}
+                  >
+                    {/* Enhanced gradient overlay */}
                     <div 
-                      className="w-20 h-20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg"
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{
-                        background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)` : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 50%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 50%, rgba(37, 99, 235, 0.08) 100%)'
                       }}
-                    >
-                      <Calendar 
-                        className="h-10 w-10" 
-                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                      />
-                    </div>
+                    ></div>
                     
-                    <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-200">{service.name}</h3>
-                    {service.description && (
-                      <p className="text-muted-foreground mb-8 leading-relaxed flex-grow">{service.description}</p>
-                    )}
+                    {/* Decorative corner accent */}
+                    <div 
+                      className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `radial-gradient(circle at 0 0, ${themeStyles.primaryColor} 0%, transparent 70%)`
+                          : 'radial-gradient(circle at 0 0, #2563eb 0%, transparent 70%)'
+                      }}
+                    ></div>
                     
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
-                            style={{
-                              background: themeStyles ? `${themeStyles.primaryColor}20` : 'rgba(37, 99, 235, 0.2)'
-                            }}
-                          >
-                            <DollarSign className="h-4 w-4" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                          </div>
-                          <span className="text-3xl font-bold text-foreground">${service.price}</span>
+                    <CardContent className="p-8 h-full flex flex-col relative z-10">
+                      {/* Enhanced icon container */}
+                      <div className="relative mb-8">
+                        <div 
+                          className="w-24 h-24 rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl"
+                          style={{
+                            background: themeStyles 
+                              ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                              : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                          }}
+                        >
+                          <IconComponent 
+                            className="h-12 w-12" 
+                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                          />
                         </div>
-                        <div className="flex items-center text-muted-foreground">
-                          <Clock className="h-5 w-5 mr-2" />
-                          <span className="font-medium">{service.durationMinutes} min</span>
-                        </div>
+                        
+                        {/* Floating accent dots */}
+                        <div 
+                          className="absolute -top-2 -right-2 w-3 h-3 rounded-full opacity-60 animate-pulse"
+                          style={{ 
+                            backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                            animationDuration: '2s',
+                            animationDelay: `${index * 0.3}s`
+                          }}
+                        ></div>
                       </div>
                       
-                      <Button 
-                        onClick={() => setShowBookingModal(true)}
-                        className="w-full text-white font-semibold rounded-xl py-4 h-auto hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
-                        style={{
-                          background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
-                          color: 'white',
-                          border: 'none'
-                        }}
-                        data-testid={`button-book-service-${service.id}`}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                        <div className="flex items-center justify-center relative z-10">
-                          <Calendar className="h-5 w-5 mr-2" />
-                          Book This Service
+                      {/* Service title and description */}
+                      <div className="mb-8 flex-grow">
+                        <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300 leading-tight">
+                          {service.name}
+                        </h3>
+                        {service.description && (
+                          <p className="text-muted-foreground leading-relaxed text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                            {service.description}
+                          </p>
+                        )}
+                      </div>
+                      
+                      {/* Enhanced pricing and duration */}
+                      <div className="space-y-6">
+                        <div className="bg-background/50 backdrop-blur-sm rounded-2xl p-4 border border-border/10">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                              <div 
+                                className="w-10 h-10 rounded-xl flex items-center justify-center mr-3 shadow-md"
+                                style={{
+                                  background: themeStyles 
+                                    ? `${themeStyles.primaryColor}25`
+                                    : 'rgba(37, 99, 235, 0.25)'
+                                }}
+                              >
+                                <DollarSign 
+                                  className="h-5 w-5" 
+                                  style={{ color: themeStyles?.primaryColor || '#2563eb' }} 
+                                />
+                              </div>
+                              <span className="text-3xl lg:text-4xl font-bold text-foreground">
+                                ${service.price}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="flex items-center text-muted-foreground mb-1">
+                                <Clock className="h-4 w-4 mr-1" />
+                                <span className="text-sm font-medium">{service.durationMinutes} min</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground opacity-75">Duration</div>
+                            </div>
+                          </div>
                         </div>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        
+                        {/* Enhanced booking button */}
+                        <Button 
+                          onClick={() => setShowBookingModal(true)}
+                          className="w-full font-bold rounded-2xl py-5 h-auto hover:shadow-2xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden group text-lg"
+                          style={{
+                            background: themeStyles 
+                              ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                              : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                            color: 'white',
+                            border: 'none'
+                          }}
+                          data-testid={`button-book-service-${service.id}`}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-800"></div>
+                          <div className="flex items-center justify-center relative z-10">
+                            <Calendar className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                            <span>Book This Service</span>
+                          </div>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            
+            {/* Services summary */}
+            <div className="text-center mt-20">
+              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    {services.length}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Services</div>
+                </div>
+                <div className="w-px h-12 bg-border"></div>
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    {Math.min(...services.map((s: any) => s.durationMinutes))}-{Math.max(...services.map((s: any) => s.durationMinutes))}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Minutes</div>
+                </div>
+                <div className="w-px h-12 bg-border"></div>
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    ${Math.min(...services.map((s: any) => parseInt(s.price)))}-{Math.max(...services.map((s: any) => parseInt(s.price)))}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Price Range</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
