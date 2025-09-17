@@ -524,31 +524,7 @@ export default function PublicBooking() {
               </div>
               
               {/* Enhanced Trust indicators with better mobile design */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto mb-8">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            <CheckCircle className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
-                          </div>
-                          <div className="text-center sm:text-left">
-                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Instant Confirmation</span>
-                            <span className="text-xs text-muted-foreground hidden sm:block">Immediate response</span>
-                          </div>
-                        </div>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Get immediate booking confirmation</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-xl mx-auto mb-8">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
