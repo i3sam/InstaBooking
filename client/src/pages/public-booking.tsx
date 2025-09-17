@@ -1826,30 +1826,6 @@ export default function PublicBooking() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {/* Business Hours - Only show if hours exist and showBusinessHours is enabled */}
-              {page.businessHours && page.showBusinessHours === 'true' && (
-                <Card className="bg-card/60 backdrop-blur-sm border-border/20 hover:border-border/40 transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${themeStyles?.primaryColor || '#2563eb'}20` }}
-                      >
-                        <Clock className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                      </div>
-                      <h3 className="font-semibold text-foreground">Hours</h3>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground" data-testid="business-hours">
-                      {Object.entries(page.businessHours).map(([day, hours]) => (
-                        <div key={day} className="flex justify-between">
-                          <span className="capitalize">{day}</span>
-                          <span className="font-medium">{String(hours)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
 
               {/* Location - Only show if address exists */}
               {page.businessAddress && (
