@@ -20,6 +20,8 @@ import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import Refunds from "@/pages/refunds";
 import Contact from "@/pages/contact";
+import ReportBug from "@/pages/report-bug";
+import RequestFeature from "@/pages/request-feature";
 
 function Router() {
   return (
@@ -42,6 +44,16 @@ function Router() {
       <Route path="/create-page">
         <AuthGuard>
           <CreatePage />
+        </AuthGuard>
+      </Route>
+      <Route path="/report-bug">
+        <AuthGuard>
+          <ReportBug />
+        </AuthGuard>
+      </Route>
+      <Route path="/request-feature">
+        <AuthGuard>
+          <RequestFeature />
         </AuthGuard>
       </Route>
       <Route path="/:slug" component={PublicBooking} />

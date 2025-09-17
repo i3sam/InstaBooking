@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -399,6 +399,33 @@ function SettingsSection() {
             </CardContent>
           </Card>
         )}
+
+        {/* Extras Section */}
+        <Card className="mt-8">
+          <CardContent className="p-8">
+            <h3 className="text-lg font-semibold text-foreground mb-6">Extras</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Button
+                variant="outline"
+                className="flex items-center justify-center h-12 text-left"
+                onClick={() => setLocation('/report-bug')}
+                data-testid="button-report-bug"
+              >
+                <Bug className="h-4 w-4 mr-2 text-red-500" />
+                Report a Bug
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-center h-12 text-left"
+                onClick={() => setLocation('/request-feature')}
+                data-testid="button-request-feature"
+              >
+                <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
+                Request a Feature
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Account Actions */}
         <Card className="mt-8">
