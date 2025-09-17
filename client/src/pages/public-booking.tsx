@@ -1315,33 +1315,161 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Business Hours Section */}
+      {/* Enhanced Business Hours Section */}
       {page.showBusinessHours === 'true' && page.businessHours && (
-        <section className="py-20">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center mb-6">
+        <section className="py-32 relative overflow-hidden">
+          {/* Elegant background with theme colors */}
+          <div className="absolute inset-0">
+            <div 
+              className="absolute inset-0 opacity-30"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(ellipse at 50% 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 70%)`
+                  : 'radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 70%)'
+              }}
+            ></div>
+          </div>
+          
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-20">
+              <div 
+                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                }}
+              >
                 <Clock3 
-                  className="h-12 w-12 mr-4" 
+                  className="h-10 w-10" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
-                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Business Hours</h2>
               </div>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">When we're available for appointments</p>
+              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">Business Hours</h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                Plan your visit during our convenient hours. We're here to serve you when you need us most.
+              </p>
             </div>
 
-            <div className="max-w-2xl mx-auto">
-              <Card className="border-0 shadow-lg">
-                <CardContent className="p-8">
-                  <div className="grid gap-4">
-                    {Object.entries(page.businessHours).map(([day, hours]) => (
-                      <div key={day} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                        <span className="text-lg font-medium text-foreground capitalize">{day}</span>
-                        <span className={`text-lg ${String(hours) === 'Closed' ? 'text-muted-foreground' : 'font-semibold text-foreground'}`}>
-                          {String(hours)}
-                        </span>
+            <div className="max-w-3xl mx-auto">
+              <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-md relative overflow-hidden">
+                {/* Elegant top accent */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-2"
+                  style={{
+                    background: themeStyles 
+                      ? `linear-gradient(90deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                      : 'linear-gradient(90deg, #2563eb 0%, #2563ebdd 100%)'
+                  }}
+                ></div>
+                
+                <CardContent className="p-10">
+                  {/* Current status indicator */}
+                  <div className="text-center mb-8">
+                    <div 
+                      className="inline-flex items-center px-6 py-3 rounded-2xl text-lg font-semibold shadow-lg"
+                      style={{
+                        background: themeStyles 
+                          ? `${themeStyles.primaryColor}15`
+                          : 'rgba(37, 99, 235, 0.15)',
+                        color: themeStyles?.primaryColor || '#2563eb',
+                        border: `2px solid ${themeStyles?.primaryColor || '#2563eb'}20`
+                      }}
+                    >
+                      <Clock3 className="h-5 w-5 mr-2" />
+                      Currently {(() => {
+                        const now = new Date();
+                        const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                        const currentHours = page.businessHours[currentDay];
+                        return String(currentHours) === 'Closed' ? 'Closed' : 'Open';
+                      })()}
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-6">
+                    {Object.entries(page.businessHours).map(([day, hours], index) => {
+                      const now = new Date();
+                      const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                      const isToday = day === currentDay;
+                      const isClosed = String(hours) === 'Closed';
+                      
+                      return (
+                        <div 
+                          key={day} 
+                          className={`group flex justify-between items-center p-6 rounded-2xl transition-all duration-300 ${
+                            isToday 
+                              ? 'shadow-lg transform scale-105'
+                              : 'hover:shadow-md hover:transform hover:scale-102'
+                          }`}
+                          style={{
+                            background: isToday 
+                              ? themeStyles 
+                                ? `linear-gradient(135deg, ${themeStyles.primaryColor}10 0%, ${themeStyles.primaryColor}05 100%)`
+                                : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
+                              : 'rgba(255, 255, 255, 0.5)',
+                            border: isToday 
+                              ? `2px solid ${themeStyles?.primaryColor || '#2563eb'}30`
+                              : '2px solid transparent',
+                            animationDelay: `${index * 100}ms`
+                          }}
+                          data-testid={`business-hours-${day}`}
+                        >
+                          <div className="flex items-center">
+                            {isToday && (
+                              <div 
+                                className="w-3 h-3 rounded-full mr-4 animate-pulse"
+                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                              ></div>
+                            )}
+                            <span 
+                              className={`text-xl font-semibold capitalize ${
+                                isToday ? 'text-foreground' : 'text-foreground/90'
+                              }`}
+                            >
+                              {day}
+                            </span>
+                            {isToday && (
+                              <span 
+                                className="ml-3 px-3 py-1 rounded-lg text-sm font-bold"
+                                style={{
+                                  background: themeStyles?.primaryColor || '#2563eb',
+                                  color: 'white'
+                                }}
+                              >
+                                Today
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center">
+                            {isClosed ? (
+                              <>
+                                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                <span className="text-xl text-muted-foreground font-medium">
+                                  Closed
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                <span className="text-xl font-bold text-foreground">
+                                  {String(hours)}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Additional info */}
+                  <div className="mt-10 p-6 rounded-2xl bg-background/50 border border-border/20">
+                    <div className="flex items-center justify-center text-center">
+                      <div className="flex items-center text-muted-foreground">
+                        <Clock3 className="h-5 w-5 mr-2" />
+                        <span className="font-medium">All times are in your local timezone</span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1350,72 +1478,206 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Contact Information Section */}
+      {/* Enhanced Contact Information Section */}
       {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress) && (
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">Contact Information</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Get in touch with us</p>
+        <section className="py-32 relative overflow-hidden">
+          {/* Sophisticated background */}
+          <div className="absolute inset-0">
+            <div 
+              className="absolute inset-0 opacity-40"
+              style={{
+                background: themeStyles 
+                  ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 50%)`
+                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%)'
+              }}
+            ></div>
+          </div>
+          
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-24">
+              <div 
+                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                }}
+              >
+                <Phone 
+                  className="h-10 w-10" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+              </div>
+              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Get in Touch</h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+                Ready to connect? Choose your preferred method of contact and let's start the conversation.
+              </p>
+              
+              {/* Contact stats or quick info */}
+              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    24h
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Response Time</div>
+                </div>
+                <div className="w-px h-8 bg-border"></div>
+                <div className="text-center">
+                  <div 
+                    className="text-2xl font-bold mb-1"
+                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                  >
+                    {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">Contact Methods</div>
+                </div>
+              </div>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {page.contactPhone && (
-                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-8">
-                      <Phone 
-                        className="h-12 w-12 mx-auto mb-6" 
-                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                      />
-                      <h3 className="text-xl font-semibold text-foreground mb-4">Phone</h3>
+                  <Card className="group text-center border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 bg-card/80 backdrop-blur-md relative overflow-hidden">
+                    {/* Hover gradient overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                      }}
+                    ></div>
+                    
+                    <CardContent className="p-10 relative z-10">
+                      <div 
+                        className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          background: themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                        }}
+                      >
+                        <Phone className="h-10 w-10 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-foreground mb-6">Phone</h3>
                       <a 
                         href={`tel:${page.contactPhone}`}
-                        className="text-lg text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold"
                         data-testid="contact-phone"
                       >
                         {page.contactPhone}
                       </a>
+                      <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Click to call directly
+                      </p>
                     </CardContent>
                   </Card>
                 )}
 
                 {page.contactEmail && (
-                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-8">
-                      <Mail 
-                        className="h-12 w-12 mx-auto mb-6" 
-                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                      />
-                      <h3 className="text-xl font-semibold text-foreground mb-4">Email</h3>
+                  <Card className="group text-center border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 bg-card/80 backdrop-blur-md relative overflow-hidden">
+                    {/* Hover gradient overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                      }}
+                    ></div>
+                    
+                    <CardContent className="p-10 relative z-10">
+                      <div 
+                        className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          background: themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                        }}
+                      >
+                        <Mail className="h-10 w-10 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-foreground mb-6">Email</h3>
                       <a 
                         href={`mailto:${page.contactEmail}`}
-                        className="text-lg text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-xl text-muted-foreground hover:text-foreground transition-colors font-medium group-hover:font-semibold break-all"
                         data-testid="contact-email"
                       >
                         {page.contactEmail}
                       </a>
+                      <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Send us a message
+                      </p>
                     </CardContent>
                   </Card>
                 )}
 
                 {page.businessAddress && (
-                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
-                    <CardContent className="p-8">
-                      <MapPin 
-                        className="h-12 w-12 mx-auto mb-6" 
-                        style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                      />
-                      <h3 className="text-xl font-semibold text-foreground mb-4">Address</h3>
+                  <Card className="group text-center border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 bg-card/80 backdrop-blur-md relative overflow-hidden">
+                    {/* Hover gradient overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+                      }}
+                    ></div>
+                    
+                    <CardContent className="p-10 relative z-10">
+                      <div 
+                        className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          background: themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                        }}
+                      >
+                        <MapPin className="h-10 w-10 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-foreground mb-6">Address</h3>
                       <address 
-                        className="text-lg text-muted-foreground not-italic"
+                        className="text-xl text-muted-foreground not-italic font-medium group-hover:font-semibold transition-all duration-300 leading-relaxed"
                         data-testid="contact-address"
                       >
                         {page.businessAddress}
                       </address>
+                      <p className="text-sm text-muted-foreground mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Visit us in person
+                      </p>
                     </CardContent>
                   </Card>
                 )}
+              </div>
+              
+              {/* Additional contact CTA */}
+              <div className="text-center mt-16">
+                <div className="max-w-2xl mx-auto">
+                  <div className="p-8 rounded-3xl bg-card/60 backdrop-blur-sm border border-border/20 shadow-lg">
+                    <h3 className="text-2xl font-bold text-foreground mb-4">Prefer a Different Method?</h3>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      We're flexible and happy to accommodate your communication preferences. Let us know how you'd like to connect!
+                    </p>
+                    <Button 
+                      onClick={() => setShowBookingModal(true)}
+                      className="px-8 py-4 rounded-2xl text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                          : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                        color: 'white',
+                        border: 'none'
+                      }}
+                      data-testid="button-contact-us-cta"
+                    >
+                      <Calendar className="h-5 w-5 mr-2" />
+                      Schedule a Consultation
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
