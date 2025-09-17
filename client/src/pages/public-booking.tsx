@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -21,6 +21,8 @@ export default function PublicBooking() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showBusinessHours, setShowBusinessHours] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const [reviewFormData, setReviewFormData] = useState({
     customerName: '',
     customerEmail: '',
@@ -453,7 +455,7 @@ export default function PublicBooking() {
                   </div>
                 </Button>
                 
-                {page.calendarLink ? (
+                {page.calendarLink && (
                   <Button
                     variant="outline"
                     className="group px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-md sm:hover:shadow-lg transition-all duration-300"
@@ -467,22 +469,6 @@ export default function PublicBooking() {
                     <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
                       <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                       View Calendar
-                    </a>
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="group px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-md sm:hover:shadow-lg transition-all duration-300"
-                    style={{
-                      borderColor: themeStyles?.primaryColor || '#2563eb',
-                      color: themeStyles?.primaryColor || '#2563eb'
-                    }}
-                    asChild
-                    data-testid="button-call-us"
-                  >
-                    <a href="tel:+1234567890">
-                      <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                      Call Now
                     </a>
                   </Button>
                 )}
@@ -1580,42 +1566,10 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Enhanced Business Hours Section */}
+      {/* Business Hours Dropdown */}
       {page.showBusinessHours === 'true' && page.businessHours && (
-        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
-          {/* Elegant background with theme colors */}
-          <div className="absolute inset-0">
-            <div 
-              className="absolute inset-0 opacity-30"
-              style={{
-                background: themeStyles 
-                  ? `radial-gradient(ellipse at 50% 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 70%)`
-                  : 'radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 70%)'
-              }}
-            ></div>
-          </div>
-          
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-20">
-              <div 
-                className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
-                style={{
-                  background: themeStyles 
-                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
-                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
-                }}
-              >
-                <Clock3 
-                  className="h-8 w-8 sm:h-10 sm:w-10" 
-                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                />
-              </div>
-              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">Business Hours</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Plan your visit during our convenient hours. We're here to serve you when you need us most.
-              </p>
-            </div>
-
+        <section className="py-8 relative overflow-hidden">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
               <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-md relative overflow-hidden">
                 {/* Elegant top accent */}
