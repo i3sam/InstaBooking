@@ -46,6 +46,7 @@ export const services = pgTable("services", {
   description: text("description"),
   durationMinutes: integer("duration_minutes").notNull(),
   price: numeric("price").notNull(),
+  currency: text("currency").default("USD").notNull(),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 

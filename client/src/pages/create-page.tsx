@@ -7,10 +7,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { uploadFile } from '@/lib/supabase';
-import { ArrowLeft, CloudUpload, Plus, X, Palette, Image, FileText, MapPin, Settings, Calendar, HelpCircle, Trash2 } from 'lucide-react';
+import { currencies, formatCurrencyDisplay, searchCurrencies, getCurrencyByCode } from '@/lib/currencies';
+import { ArrowLeft, CloudUpload, Plus, X, Palette, Image, FileText, MapPin, Settings, Calendar, HelpCircle, Trash2, Search } from 'lucide-react';
 
 export default function CreatePage() {
   const [, setLocation] = useLocation();
@@ -44,7 +46,7 @@ export default function CreatePage() {
     cancellationPolicy: '',
     showBusinessHours: 'true',
     showContactInfo: 'true',
-    services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+    services: [{ name: '', description: '', durationMinutes: '', price: '', currency: 'USD' }],
     gallery: {
       banners: [],
       logos: [],
@@ -183,7 +185,7 @@ export default function CreatePage() {
   const addService = () => {
     setFormData(prev => ({
       ...prev,
-      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: '0' }]
+      services: [...prev.services, { name: '', description: '', durationMinutes: '', price: '', currency: 'USD' }]
     }));
   };
 
@@ -365,8 +367,9 @@ export default function CreatePage() {
 
     const servicesWithNumbers = formData.services.map(service => ({
       ...service,
-      price: parseFloat(service.price) || 0,
-      durationMinutes: parseInt(service.durationMinutes.toString()) || 60
+      price: service.price || '0',
+      durationMinutes: parseInt(service.durationMinutes) || 60,
+      currency: service.currency || 'USD'
     }));
 
     // Filter out empty FAQs
@@ -602,7 +605,7 @@ export default function CreatePage() {
                         <Label>Services</Label>
                 <div className="space-y-4">
                   {formData.services.map((service, index) => (
-                    <div key={index} className="grid md:grid-cols-4 gap-4 p-4 border border-border rounded-xl">
+                    <div key={index} className="grid md:grid-cols-5 gap-4 p-4 border border-border rounded-xl">
                       <Input
                         placeholder="Service name"
                         value={service.name}
@@ -611,24 +614,37 @@ export default function CreatePage() {
                       />
                       <Input
                         type="number"
-                        placeholder="Duration (min)"
+                        placeholder="Duration"
                         value={service.durationMinutes}
-                        onChange={(e) => updateService(index, 'durationMinutes', parseInt(e.target.value))}
+                        onChange={(e) => updateService(index, 'durationMinutes', e.target.value)}
                         data-testid={`input-service-duration-${index}`}
                       />
-                      <div className="flex">
-                        <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                          $
-                        </span>
-                        <Input
-                          type="number"
-                          placeholder="Price"
-                          value={service.price}
-                          onChange={(e) => updateService(index, 'price', e.target.value)}
-                          className="rounded-l-none"
-                          data-testid={`input-service-price-${index}`}
-                        />
-                      </div>
+                      <Select
+                        value={service.currency}
+                        onValueChange={(value) => updateService(index, 'currency', value)}
+                      >
+                        <SelectTrigger data-testid={`select-service-currency-${index}`}>
+                          <SelectValue placeholder="Currency" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {currencies.map((currency) => (
+                            <SelectItem key={currency.code} value={currency.code}>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-sm">{currency.symbol}</span>
+                                <span className="font-medium">{currency.code}</span>
+                                <span className="text-muted-foreground text-sm">- {currency.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        type="number"
+                        placeholder="Price"
+                        value={service.price}
+                        onChange={(e) => updateService(index, 'price', e.target.value)}
+                        data-testid={`input-service-price-${index}`}
+                      />
                       {formData.services.length > 1 && (
                         <Button
                           type="button"

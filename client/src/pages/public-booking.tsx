@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { getCurrencyByCode } from '@/lib/currencies';
 import BookingModal from '@/components/modals/booking-modal';
 import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -864,7 +865,7 @@ export default function PublicBooking() {
                                 />
                               </div>
                               <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
-                                ${service.price}
+                                {getCurrencyByCode(service.currency || 'USD')?.symbol || '$'}{service.price}
                               </span>
                             </div>
                             <div className="text-right">
