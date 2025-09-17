@@ -209,7 +209,7 @@ export default function PublicBooking() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="max-w-md mx-4">
-          <CardContent className="p-8 text-center">
+          <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
             <div className="text-4xl text-muted-foreground mb-4">😕</div>
             <h1 className="text-2xl font-bold text-foreground mb-2">Page Not Found</h1>
             <p className="text-muted-foreground mb-6">
@@ -233,45 +233,46 @@ export default function PublicBooking() {
 
   return (
     <div 
-      className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'}`}
+      className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'} scroll-smooth`}
       style={themeStyles?.cssVariables}
     >
-      {/* Header */}
+      {/* Enhanced Responsive Header */}
       <header className="border-b border-border/10 bg-card/60 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-6 py-5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
               <div 
-                className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
                 style={{
                   background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
                 }}
               >
-                <span className="text-xl font-bold text-white">
+                <span className="text-lg sm:text-xl font-bold text-white">
                   {page.title?.charAt(0) || 'B'}
                 </span>
               </div>
-              <div>
-                <span className="text-xl font-bold text-foreground">{page.title}</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-lg sm:text-xl font-bold text-foreground truncate block">{page.title}</span>
                 {page.tagline && (
-                  <p className="text-sm text-muted-foreground mt-0.5">{page.tagline}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate hidden sm:block">{page.tagline}</p>
                 )}
               </div>
             </div>
             <Button 
               variant="ghost"
               onClick={() => window.history.back()}
+              className="flex-shrink-0 h-9 sm:h-10 px-3 sm:px-4"
               data-testid="button-back"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Back</span>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Enhanced Hero Section */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+      {/* Enhanced Hero Section with Better Mobile Spacing */}
+      <section className="relative overflow-hidden min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8">
         {/* Dynamic layered background */}
         <div className="absolute inset-0">
           {/* Primary gradient background */}
@@ -347,12 +348,12 @@ export default function PublicBooking() {
         </div>
         
         {/* Main content */}
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-6xl mx-auto text-center">
             {/* Professional badge */}
-            <div className="mb-12">
+            <div className="mb-8 sm:mb-12 lg:mb-16">
               <div 
-                className="inline-flex items-center px-8 py-4 rounded-full text-sm font-semibold backdrop-blur-md shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300"
+                className="inline-flex items-center px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 rounded-full text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xl border border-white/20 transform hover:scale-105 transition-all duration-300"
                 style={{
                   background: themeStyles 
                     ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.15) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
@@ -370,23 +371,23 @@ export default function PublicBooking() {
             </div>
             
             {/* Main heading with enhanced typography */}
-            <div className="mb-12">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground mb-6 leading-[0.95] tracking-tight">
+            <div className="mb-8 sm:mb-12 lg:mb-16">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-4 sm:mb-6 leading-[0.95] tracking-tight">
                 <span className="block">{page.title}</span>
               </h1>
               {page.tagline && (
-                <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-5xl mx-auto font-medium leading-relaxed opacity-90">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-5xl mx-auto font-medium leading-relaxed opacity-90">
                   {page.tagline}
                 </p>
               )}
             </div>
             
             {/* Enhanced CTA section */}
-            <div className="mb-16">
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+            <div className="mb-12 sm:mb-16 lg:mb-20">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-6 sm:mb-8">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
-                  className="group px-12 py-6 rounded-2xl text-xl h-auto font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden"
+                  className="group px-6 sm:px-10 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg lg:text-xl h-auto font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden"
                   style={{
                     background: themeStyles 
                       ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
@@ -398,7 +399,7 @@ export default function PublicBooking() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   <div className="flex items-center relative z-10">
-                    <Calendar className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
                     Book Appointment
                   </div>
                 </Button>
@@ -415,7 +416,7 @@ export default function PublicBooking() {
                     data-testid="button-visit-calendar"
                   >
                     <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
-                      <Calendar className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                      <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                       View Calendar
                     </a>
                   </Button>
@@ -431,7 +432,7 @@ export default function PublicBooking() {
                     data-testid="button-call-us"
                   >
                     <a href="tel:+1234567890">
-                      <Phone className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                      <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                       Call Now
                     </a>
                   </Button>
@@ -439,7 +440,7 @@ export default function PublicBooking() {
               </div>
               
               {/* Trust indicators */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center">
                   <div 
                     className="w-3 h-3 rounded-full mr-2"
@@ -484,7 +485,7 @@ export default function PublicBooking() {
 
       {/* Enhanced Services Section */}
       {services.length > 0 && (
-        <section className="py-32 relative overflow-hidden">
+        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
           {/* Background enhancements */}
           <div className="absolute inset-0">
             <div 
@@ -497,11 +498,11 @@ export default function PublicBooking() {
             ></div>
           </div>
           
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {/* Enhanced header */}
-            <div className="text-center mb-24">
+            <div className="text-center mb-12 sm:mb-16 lg:mb-24">
               <div 
-                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
                 style={{
                   background: themeStyles 
                     ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -509,17 +510,17 @@ export default function PublicBooking() {
                 }}
               >
                 <Sparkles 
-                  className="h-10 w-10" 
+                  className="h-8 w-8 sm:h-10 sm:w-10" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
               </div>
-              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Our Services</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Our Services</h2>
+              <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8">
                 Discover our expertly crafted services designed to exceed your expectations and deliver exceptional results
               </p>
               
               {/* Services count indicator */}
-              <div className="inline-flex items-center px-6 py-3 rounded-full bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+              <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
                 <div 
                   className="w-2 h-2 rounded-full mr-3"
                   style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
@@ -531,7 +532,7 @@ export default function PublicBooking() {
             </div>
 
             {/* Enhanced services grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
               {services.map((service: any, index: number) => {
                 const IconComponent = getServiceIcon(service.name);
                 
@@ -564,11 +565,11 @@ export default function PublicBooking() {
                       }}
                     ></div>
                     
-                    <CardContent className="p-8 h-full flex flex-col relative z-10">
+                    <CardContent className="p-4 sm:p-6 lg:p-8 h-full flex flex-col relative z-10">
                       {/* Enhanced icon container */}
-                      <div className="relative mb-8">
+                      <div className="relative mb-6 sm:mb-8">
                         <div 
-                          className="w-24 h-24 rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl"
+                          className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl"
                           style={{
                             background: themeStyles 
                               ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -576,7 +577,7 @@ export default function PublicBooking() {
                           }}
                         >
                           <IconComponent 
-                            className="h-12 w-12" 
+                            className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12" 
                             style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                           />
                         </div>
@@ -593,24 +594,24 @@ export default function PublicBooking() {
                       </div>
                       
                       {/* Service title and description */}
-                      <div className="mb-8 flex-grow">
-                        <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300 leading-tight">
+                      <div className="mb-6 sm:mb-8 flex-grow">
+                        <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-foreground mb-3 sm:mb-4 group-hover:text-primary transition-colors duration-300 leading-tight">
                           {service.name}
                         </h3>
                         {service.description && (
-                          <p className="text-muted-foreground leading-relaxed text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                          <p className="text-muted-foreground leading-relaxed text-sm sm:text-base opacity-90 group-hover:opacity-100 transition-opacity duration-300">
                             {service.description}
                           </p>
                         )}
                       </div>
                       
                       {/* Enhanced pricing and duration */}
-                      <div className="space-y-6">
-                        <div className="bg-background/50 backdrop-blur-sm rounded-2xl p-4 border border-border/10">
-                          <div className="flex items-center justify-between mb-3">
+                      <div className="space-y-4 sm:space-y-6">
+                        <div className="bg-background/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-border/10">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3">
                             <div className="flex items-center">
                               <div 
-                                className="w-10 h-10 rounded-xl flex items-center justify-center mr-3 shadow-md"
+                                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center mr-2 sm:mr-3 shadow-md"
                                 style={{
                                   background: themeStyles 
                                     ? `${themeStyles.primaryColor}25`
@@ -618,17 +619,17 @@ export default function PublicBooking() {
                                 }}
                               >
                                 <DollarSign 
-                                  className="h-5 w-5" 
+                                  className="h-4 w-4 sm:h-5 sm:w-5" 
                                   style={{ color: themeStyles?.primaryColor || '#2563eb' }} 
                                 />
                               </div>
-                              <span className="text-3xl lg:text-4xl font-bold text-foreground">
+                              <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
                                 ${service.price}
                               </span>
                             </div>
                             <div className="text-right">
                               <div className="flex items-center text-muted-foreground mb-1">
-                                <Clock className="h-4 w-4 mr-1" />
+                                <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                                 <span className="text-sm font-medium">{service.durationMinutes} min</span>
                               </div>
                               <div className="text-xs text-muted-foreground opacity-75">Duration</div>
@@ -639,7 +640,7 @@ export default function PublicBooking() {
                         {/* Enhanced booking button */}
                         <Button 
                           onClick={() => setShowBookingModal(true)}
-                          className="w-full font-bold rounded-2xl py-5 h-auto hover:shadow-2xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden group text-lg"
+                          className="w-full font-semibold sm:font-bold rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 h-auto hover:shadow-2xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden group text-sm sm:text-base lg:text-lg"
                           style={{
                             background: themeStyles 
                               ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
@@ -651,7 +652,7 @@ export default function PublicBooking() {
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-800"></div>
                           <div className="flex items-center justify-center relative z-10">
-                            <Calendar className="h-6 w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform duration-300" />
                             <span>Book This Service</span>
                           </div>
                         </Button>
@@ -664,10 +665,10 @@ export default function PublicBooking() {
             
             {/* Services summary */}
             <div className="text-center mt-20">
-              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     {services.length}
@@ -677,7 +678,7 @@ export default function PublicBooking() {
                 <div className="w-px h-12 bg-border"></div>
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     {Math.min(...services.map((s: any) => s.durationMinutes))}-{Math.max(...services.map((s: any) => s.durationMinutes))}
@@ -687,7 +688,7 @@ export default function PublicBooking() {
                 <div className="w-px h-12 bg-border"></div>
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     ${Math.min(...services.map((s: any) => parseInt(s.price)))}-{Math.max(...services.map((s: any) => parseInt(s.price)))}
@@ -712,7 +713,7 @@ export default function PublicBooking() {
         if (allImages.length === 0) return null;
         
         return (
-          <section className="py-32 relative overflow-hidden">
+          <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
             {/* Enhanced background */}
             <div className="absolute inset-0">
               <div 
@@ -725,11 +726,11 @@ export default function PublicBooking() {
               ></div>
             </div>
             
-            <div className="container mx-auto px-6 relative z-10">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               {/* Header */}
               <div className="text-center mb-20">
                 <div 
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                  className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
                   style={{
                     background: themeStyles 
                       ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -737,11 +738,11 @@ export default function PublicBooking() {
                   }}
                 >
                   <Image 
-                    className="h-10 w-10" 
+                    className="h-8 w-8 sm:h-10 sm:w-10" 
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   />
                 </div>
-                <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Gallery</h2>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Gallery</h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                   Discover our work through this curated collection showcasing the quality and style that defines our service
                 </p>
@@ -826,7 +827,7 @@ export default function PublicBooking() {
                           {/* Image name/caption */}
                           {image.name && (
                             <div className="mt-6 text-center">
-                              <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
+                              <h4 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
                                 {image.name}
                               </h4>
                             </div>
@@ -900,7 +901,7 @@ export default function PublicBooking() {
       })()}
 
       {/* Enhanced Reviews Section */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
         {/* Elegant background */}
         <div className="absolute inset-0">
           <div 
@@ -913,11 +914,11 @@ export default function PublicBooking() {
           ></div>
         </div>
         
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Enhanced section header */}
-          <div className="text-center mb-24">
+          <div className="text-center mb-12 sm:mb-16 lg:mb-24">
             <div 
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+              className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
               style={{
                 background: themeStyles 
                   ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -925,21 +926,21 @@ export default function PublicBooking() {
               }}
             >
               <MessageSquare 
-                className="h-10 w-10" 
+                className="h-8 w-8 sm:h-10 sm:w-10" 
                 style={{ color: themeStyles?.primaryColor || '#2563eb' }}
               />
             </div>
-            <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Customer Reviews</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Customer Reviews</h2>
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8">
               Discover what our valued customers have to say about their experiences with our professional services
             </p>
             
             {/* Review stats */}
             {reviews.length > 0 && (
-              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     {reviews.length}
@@ -949,7 +950,7 @@ export default function PublicBooking() {
                 <div className="w-px h-8 bg-border"></div>
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     {reviews.length > 0 ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1) : '0.0'}
@@ -975,7 +976,7 @@ export default function PublicBooking() {
 
           {/* Enhanced reviews display */}
           {reviews.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto mb-20">
               {reviews.map((review: any, index: number) => (
                 <Card 
                   key={review.id} 
@@ -995,7 +996,7 @@ export default function PublicBooking() {
                     }}
                   ></div>
                   
-                  <CardContent className="p-8 relative z-10">
+                  <CardContent className="p-4 sm:p-6 lg:p-8 relative z-10">
                     {/* Rating stars with enhanced styling */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex">
@@ -1085,7 +1086,7 @@ export default function PublicBooking() {
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
               </div>
-              <h3 className="text-3xl font-bold text-foreground mb-4">No reviews yet</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">No reviews yet</h3>
               <p className="text-xl text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
                 Be the first to share your experience and help others discover our exceptional service!
               </p>
@@ -1094,7 +1095,7 @@ export default function PublicBooking() {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star 
                       key={star} 
-                      className="h-6 w-6 fill-current opacity-30"
+                      className="h-5 w-5 sm:h-6 sm:w-6 fill-current opacity-30"
                       style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                     />
                   ))}
@@ -1117,7 +1118,7 @@ export default function PublicBooking() {
                 }}
               ></div>
               
-              <CardContent className="p-10">
+              <CardContent className="p-6 sm:p-8 lg:p-10">
                 <div className="text-center mb-10">
                   <div 
                     className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 shadow-lg"
@@ -1132,7 +1133,7 @@ export default function PublicBooking() {
                       style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                     />
                   </div>
-                  <h3 className="text-3xl font-bold text-foreground mb-4">Share Your Experience</h3>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">Share Your Experience</h3>
                   <p className="text-muted-foreground text-lg leading-relaxed">
                     Your feedback helps us improve and helps others make informed decisions
                   </p>
@@ -1255,7 +1256,7 @@ export default function PublicBooking() {
                         </>
                       ) : (
                         <>
-                          <MessageSquare className="h-6 w-6 mr-3" />
+                          <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 mr-3" />
                           Publish Your Review
                         </>
                       )}
@@ -1282,7 +1283,7 @@ export default function PublicBooking() {
                   className="h-12 w-12 mr-4" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
-                <h2 className="text-4xl lg:text-5xl font-bold text-foreground">Frequently Asked Questions</h2>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground">Frequently Asked Questions</h2>
               </div>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Find answers to common questions about our services</p>
             </div>
@@ -1299,7 +1300,7 @@ export default function PublicBooking() {
                       className="text-left py-6 hover:no-underline"
                       data-testid={`faq-question-${index}`}
                     >
-                      <span className="text-lg font-semibold text-foreground">{faq.question}</span>
+                      <span className="text-base sm:text-lg font-semibold text-foreground">{faq.question}</span>
                     </AccordionTrigger>
                     <AccordionContent 
                       className="pb-6 text-muted-foreground leading-relaxed"
@@ -1317,7 +1318,7 @@ export default function PublicBooking() {
 
       {/* Enhanced Business Hours Section */}
       {page.showBusinessHours === 'true' && page.businessHours && (
-        <section className="py-32 relative overflow-hidden">
+        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
           {/* Elegant background with theme colors */}
           <div className="absolute inset-0">
             <div 
@@ -1330,10 +1331,10 @@ export default function PublicBooking() {
             ></div>
           </div>
           
-          <div className="container mx-auto px-6 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center mb-20">
               <div 
-                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
                 style={{
                   background: themeStyles 
                     ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -1341,7 +1342,7 @@ export default function PublicBooking() {
                 }}
               >
                 <Clock3 
-                  className="h-10 w-10" 
+                  className="h-8 w-8 sm:h-10 sm:w-10" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
               </div>
@@ -1363,7 +1364,7 @@ export default function PublicBooking() {
                   }}
                 ></div>
                 
-                <CardContent className="p-10">
+                <CardContent className="p-6 sm:p-8 lg:p-10">
                   {/* Current status indicator */}
                   <div className="text-center mb-8">
                     <div 
@@ -1376,7 +1377,7 @@ export default function PublicBooking() {
                         border: `2px solid ${themeStyles?.primaryColor || '#2563eb'}20`
                       }}
                     >
-                      <Clock3 className="h-5 w-5 mr-2" />
+                      <Clock3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Currently {(() => {
                         const now = new Date();
                         const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -1466,7 +1467,7 @@ export default function PublicBooking() {
                   <div className="mt-10 p-6 rounded-2xl bg-background/50 border border-border/20">
                     <div className="flex items-center justify-center text-center">
                       <div className="flex items-center text-muted-foreground">
-                        <Clock3 className="h-5 w-5 mr-2" />
+                        <Clock3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         <span className="font-medium">All times are in your local timezone</span>
                       </div>
                     </div>
@@ -1480,7 +1481,7 @@ export default function PublicBooking() {
 
       {/* Enhanced Contact Information Section */}
       {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress) && (
-        <section className="py-32 relative overflow-hidden">
+        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
           {/* Sophisticated background */}
           <div className="absolute inset-0">
             <div 
@@ -1493,10 +1494,10 @@ export default function PublicBooking() {
             ></div>
           </div>
           
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="text-center mb-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-12 sm:mb-16 lg:mb-24">
               <div 
-                className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-8 shadow-xl"
+                className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
                 style={{
                   background: themeStyles 
                     ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
@@ -1504,20 +1505,20 @@ export default function PublicBooking() {
                 }}
               >
                 <Phone 
-                  className="h-10 w-10" 
+                  className="h-8 w-8 sm:h-10 sm:w-10" 
                   style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                 />
               </div>
-              <h2 className="text-5xl lg:text-6xl font-bold text-foreground mb-8 tracking-tight">Get in Touch</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Get in Touch</h2>
+              <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8">
                 Ready to connect? Choose your preferred method of contact and let's start the conversation.
               </p>
               
               {/* Contact stats or quick info */}
-              <div className="inline-flex items-center space-x-6 px-8 py-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     24h
@@ -1527,7 +1528,7 @@ export default function PublicBooking() {
                 <div className="w-px h-8 bg-border"></div>
                 <div className="text-center">
                   <div 
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                     style={{ color: themeStyles?.primaryColor || '#2563eb' }}
                   >
                     {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length}
@@ -1538,7 +1539,7 @@ export default function PublicBooking() {
             </div>
 
             <div className="max-w-5xl mx-auto">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {page.contactPhone && (
                   <Card className="group text-center border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 bg-card/80 backdrop-blur-md relative overflow-hidden">
                     {/* Hover gradient overlay */}
@@ -1551,7 +1552,7 @@ export default function PublicBooking() {
                       }}
                     ></div>
                     
-                    <CardContent className="p-10 relative z-10">
+                    <CardContent className="p-6 sm:p-8 lg:p-10 relative z-10">
                       <div 
                         className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1589,7 +1590,7 @@ export default function PublicBooking() {
                       }}
                     ></div>
                     
-                    <CardContent className="p-10 relative z-10">
+                    <CardContent className="p-6 sm:p-8 lg:p-10 relative z-10">
                       <div 
                         className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1627,7 +1628,7 @@ export default function PublicBooking() {
                       }}
                     ></div>
                     
-                    <CardContent className="p-10 relative z-10">
+                    <CardContent className="p-6 sm:p-8 lg:p-10 relative z-10">
                       <div 
                         className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1656,7 +1657,7 @@ export default function PublicBooking() {
               {/* Additional contact CTA */}
               <div className="text-center mt-16">
                 <div className="max-w-2xl mx-auto">
-                  <div className="p-8 rounded-3xl bg-card/60 backdrop-blur-sm border border-border/20 shadow-lg">
+                  <div className="p-4 sm:p-6 lg:p-8 rounded-3xl bg-card/60 backdrop-blur-sm border border-border/20 shadow-lg">
                     <h3 className="text-2xl font-bold text-foreground mb-4">Prefer a Different Method?</h3>
                     <p className="text-muted-foreground mb-6 leading-relaxed">
                       We're flexible and happy to accommodate your communication preferences. Let us know how you'd like to connect!
@@ -1673,7 +1674,7 @@ export default function PublicBooking() {
                       }}
                       data-testid="button-contact-us-cta"
                     >
-                      <Calendar className="h-5 w-5 mr-2" />
+                      <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Schedule a Consultation
                     </Button>
                   </div>
@@ -1718,7 +1719,7 @@ export default function PublicBooking() {
               }}
               data-testid="button-book-appointment-cta"
             >
-              <Calendar className="h-5 w-5 mr-2" />
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Book an Appointment
             </Button>
             {page.calendarLink ? (
@@ -1729,7 +1730,7 @@ export default function PublicBooking() {
                 data-testid="button-visit-calendar-cta"
               >
                 <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
-                  <Calendar className="h-5 w-5 mr-2" />
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   View My Calendar
                 </a>
               </Button>
@@ -1741,7 +1742,7 @@ export default function PublicBooking() {
                 data-testid="button-call-us-cta"
               >
                 <a href="tel:+1234567890">
-                  <Phone className="h-5 w-5 mr-2" />
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Call Us: (123) 456-7890
                 </a>
               </Button>
