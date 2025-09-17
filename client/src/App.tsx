@@ -15,6 +15,11 @@ import Pricing from "@/pages/pricing";
 import Tutorial from "@/pages/tutorial";
 import AuthGuard from "@/components/auth/auth-guard";
 import NotFound from "@/pages/not-found";
+import Legal from "@/pages/legal";
+import Terms from "@/pages/terms";
+import Privacy from "@/pages/privacy";
+import Refunds from "@/pages/refunds";
+import Contact from "@/pages/contact";
 
 function Router() {
   return (
@@ -24,6 +29,11 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/tutorial" component={Tutorial} />
+      <Route path="/legal" component={Legal} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/refunds" component={Refunds} />
+      <Route path="/contact" component={Contact} />
       <Route path="/dashboard">
         <AuthGuard>
           <Dashboard />
