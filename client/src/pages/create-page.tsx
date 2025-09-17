@@ -438,7 +438,7 @@ export default function CreatePage() {
                           <Label htmlFor="slug">URL Slug</Label>
                           <div className="flex">
                             <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                              bookinggen.com/
+                              bookinggen.xyz/
                             </span>
                             <Input
                               id="slug"

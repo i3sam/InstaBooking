@@ -281,7 +281,7 @@ export default function Home() {
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <div className="ml-4 text-xs text-muted-foreground font-mono">yourname.bookinggen.app</div>
+                  <div className="ml-4 text-xs text-muted-foreground font-mono">bookinggen.xyz/yourname</div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
