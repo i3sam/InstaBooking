@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import multer from 'multer';
 import { Resend } from 'resend';
+import { insertReviewSchema } from '@shared/schema';
 
 // Supabase setup
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -501,28 +502,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reviews routes
   app.post("/api/reviews", async (req, res) => {
     try {
-      const { pageId, customerName, customerEmail, rating, reviewText } = req.body;
+      // Validate request body using Zod schema
+      const validationResult = insertReviewSchema.safeParse(req.body);
       
-      // Validate required fields
-      if (!pageId || !customerName || !rating) {
-        return res.status(400).json({ message: "Page ID, customer name, and rating are required" });
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid review data", 
+          errors: validationResult.error.flatten().fieldErrors 
+        });
       }
       
-      // Validate rating range
-      if (rating < 1 || rating > 5) {
+      const reviewData = validationResult.data;
+      
+      // Server-side rating validation (redundant but safe)
+      if (reviewData.rating < 1 || reviewData.rating > 5) {
         return res.status(400).json({ message: "Rating must be between 1 and 5" });
       }
       
       const review = await storage.createReview({
-        pageId,
-        customerName,
-        customerEmail: customerEmail || null,
-        rating,
-        reviewText: reviewText || null,
-        isApproved: 'pending' // Reviews start as pending
+        ...reviewData,
+        isApproved: 'pending' // Reviews start as pending approval
       });
       
-      res.json(review);
+      res.status(201).json(review);
     } catch (error) {
       console.error("Create review error:", error);
       res.status(500).json({ message: "Internal server error" });
