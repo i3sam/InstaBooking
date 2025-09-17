@@ -428,15 +428,40 @@ export default function PublicBooking() {
               </div>
             </div>
             
-            {/* Main heading with enhanced typography */}
-            <div className="mb-8 sm:mb-12 lg:mb-16">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-4 sm:mb-6 leading-[0.95] tracking-tight">
-                <span className="block">{page.title}</span>
-              </h1>
+            {/* Enhanced main heading with better mobile typography */}
+            <div className="mb-6 sm:mb-10 lg:mb-16">
+              {/* Large decorative background text */}
+              <div className="relative">
+                <div 
+                  className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden"
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                >
+                  <span className="text-8xl sm:text-9xl font-black transform rotate-[-5deg] select-none">
+                    {page.title?.charAt(0) || 'B'}
+                  </span>
+                </div>
+                
+                <h1 className="relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-foreground mb-3 sm:mb-6 leading-[0.9] tracking-tight">
+                  <span className="block bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                    {page.title}
+                  </span>
+                  {/* Subtle underline accent */}
+                  <div 
+                    className="w-16 sm:w-20 h-1 sm:h-1.5 rounded-full mx-auto mt-2 sm:mt-4 opacity-80"
+                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                  ></div>
+                </h1>
+              </div>
+              
               {page.tagline && (
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-5xl mx-auto font-medium leading-relaxed opacity-90">
-                  {page.tagline}
-                </p>
+                <div className="relative">
+                  <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto font-medium leading-relaxed opacity-95 px-4">
+                    {page.tagline}
+                  </p>
+                  {/* Decorative quotes */}
+                  <div className="absolute -top-2 -left-2 text-4xl opacity-20 font-bold" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>"</div>
+                  <div className="absolute -bottom-2 -right-2 text-4xl opacity-20 font-bold" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>"</div>
+                </div>
               )}
             </div>
             
@@ -497,17 +522,24 @@ export default function PublicBooking() {
                 )}
               </div>
               
-              {/* Enhanced Trust indicators with stats */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 text-xs sm:text-sm text-muted-foreground mb-8">
+              {/* Enhanced Trust indicators with better mobile design */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto mb-8">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2"
-                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                        ></div>
-                        <span className="font-medium">Instant Confirmation</span>
+                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            <CheckCircle className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                          </div>
+                          <div className="text-center sm:text-left">
+                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Instant Confirmation</span>
+                            <span className="text-xs text-muted-foreground hidden sm:block">Immediate response</span>
+                          </div>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -515,16 +547,23 @@ export default function PublicBooking() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <div className="hidden sm:block w-px h-4 bg-border"></div>
+
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2"
-                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                        ></div>
-                        <span className="font-medium">Professional Service</span>
+                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            <Award className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                          </div>
+                          <div className="text-center sm:text-left">
+                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Professional Service</span>
+                            <span className="text-xs text-muted-foreground hidden sm:block">Expert quality</span>
+                          </div>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -532,16 +571,23 @@ export default function PublicBooking() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <div className="hidden sm:block w-px h-4 bg-border"></div>
+
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center">
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2"
-                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                        ></div>
-                        <span className="font-medium">Secure Booking</span>
+                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            <Shield className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                          </div>
+                          <div className="text-center sm:text-left">
+                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Secure Booking</span>
+                            <span className="text-xs text-muted-foreground hidden sm:block">Safe & protected</span>
+                          </div>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -549,6 +595,114 @@ export default function PublicBooking() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+              </div>
+
+              {/* Enhanced mobile content section to reduce emptiness */}
+              <div className="mt-8 sm:mt-12 px-4 sm:px-6">
+                <div className="max-w-2xl mx-auto">
+                  {/* Service preview card */}
+                  {services.length > 0 && (
+                    <div className="relative group">
+                      {/* Decorative elements */}
+                      <div className="absolute -inset-1 rounded-3xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" 
+                           style={{
+                             background: themeStyles 
+                               ? `linear-gradient(135deg, ${themeStyles.primaryColor}, transparent, ${themeStyles.primaryColor})`
+                               : 'linear-gradient(135deg, #2563eb, transparent, #2563eb)'
+                           }}>
+                      </div>
+                      
+                      <div className="relative bg-card/60 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-border/20 shadow-xl">
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-4">
+                            <div 
+                              className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                              style={{
+                                background: themeStyles 
+                                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}20, ${themeStyles.primaryColor}10)`
+                                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.1))'
+                              }}
+                            >
+                              <Sparkles 
+                                className="w-6 h-6" 
+                                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
+                            Ready to Get Started?
+                          </h3>
+                          
+                          <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">
+                            Choose from {services.length} professional service{services.length > 1 ? 's' : ''} designed to meet your needs
+                          </p>
+                          
+                          {/* Service range info */}
+                          <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="text-center p-3 rounded-xl bg-background/50 backdrop-blur-sm border border-border/10">
+                              <div 
+                                className="text-lg font-bold mb-1"
+                                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                              >
+                                {Math.min(...services.map((s: any) => s.durationMinutes))}
+                                {services.length > 1 && `-${Math.max(...services.map((s: any) => s.durationMinutes))}`} min
+                              </div>
+                              <div className="text-xs text-muted-foreground font-medium">Duration</div>
+                            </div>
+                            <div className="text-center p-3 rounded-xl bg-background/50 backdrop-blur-sm border border-border/10">
+                              <div 
+                                className="text-lg font-bold mb-1"
+                                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                              >
+                                ${Math.min(...services.map((s: any) => parseInt(s.price) || 0))}
+                                {services.length > 1 && services.some((s: any) => parseInt(s.price) !== Math.min(...services.map((s2: any) => parseInt(s2.price) || 0))) && `+`}
+                              </div>
+                              <div className="text-xs text-muted-foreground font-medium">Starting</div>
+                            </div>
+                          </div>
+                          
+                          {/* Quick action */}
+                          <div className="flex items-center justify-center">
+                            <div className="text-xs text-muted-foreground">Scroll down to explore services</div>
+                            <div className="ml-2 animate-bounce">
+                              <div 
+                                className="w-1 h-4 rounded-full"
+                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', opacity: 0.6 }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Decorative accent line */}
+                  <div className="flex items-center justify-center mt-8 sm:mt-12">
+                    <div className="flex items-center space-x-2">
+                      <div 
+                        className="w-2 h-2 rounded-full animate-pulse"
+                        style={{ 
+                          backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                          animationDelay: '0s',
+                          animationDuration: '2s'
+                        }}
+                      ></div>
+                      <div 
+                        className="w-8 h-0.5 rounded-full"
+                        style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', opacity: 0.3 }}
+                      ></div>
+                      <div 
+                        className="w-2 h-2 rounded-full animate-pulse"
+                        style={{ 
+                          backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                          animationDelay: '1s',
+                          animationDuration: '2s'
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>
