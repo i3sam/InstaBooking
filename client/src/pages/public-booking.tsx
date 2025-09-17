@@ -440,12 +440,12 @@ export default function PublicBooking() {
               )}
             </div>
             
-            {/* Enhanced CTA section */}
-            <div className="mb-12 sm:mb-16 lg:mb-20">
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-6 sm:mb-8">
+            {/* Enhanced CTA section with improved mobile layout */}
+            <div className="mb-8 sm:mb-12 lg:mb-20">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mb-4 sm:mb-6 max-w-md sm:max-w-none mx-auto">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
-                  className="group px-6 sm:px-10 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg lg:text-xl h-auto font-bold shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden"
+                  className="group px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 sm:duration-500 relative overflow-hidden"
                   style={{
                     background: themeStyles 
                       ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
@@ -456,8 +456,8 @@ export default function PublicBooking() {
                   data-testid="button-book-appointment"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/25 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                  <div className="flex items-center relative z-10">
-                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                  <div className="flex items-center justify-center relative z-10">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform duration-300" />
                     Book Appointment
                   </div>
                 </Button>
@@ -465,7 +465,7 @@ export default function PublicBooking() {
                 {page.calendarLink ? (
                   <Button
                     variant="outline"
-                    className="group px-8 py-4 rounded-xl text-lg h-auto font-semibold border-2 hover:shadow-lg transition-all duration-300"
+                    className="group px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-md sm:hover:shadow-lg transition-all duration-300"
                     style={{
                       borderColor: themeStyles?.primaryColor || '#2563eb',
                       color: themeStyles?.primaryColor || '#2563eb'
@@ -481,7 +481,7 @@ export default function PublicBooking() {
                 ) : (
                   <Button
                     variant="outline"
-                    className="group px-8 py-4 rounded-xl text-lg h-auto font-semibold border-2 hover:shadow-lg transition-all duration-300"
+                    className="group px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-md sm:hover:shadow-lg transition-all duration-300"
                     style={{
                       borderColor: themeStyles?.primaryColor || '#2563eb',
                       color: themeStyles?.primaryColor || '#2563eb'
@@ -551,120 +551,18 @@ export default function PublicBooking() {
                 </TooltipProvider>
               </div>
 
-              {/* Professional Stats Widgets */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
-                        <div className="flex items-center justify-center mb-2">
-                          <Users 
-                            className="h-5 w-5 mr-2" 
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          />
-                          <span 
-                            className="text-lg sm:text-xl font-bold"
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            500+
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Happy Clients</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Over 500 satisfied customers</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
-                        <div className="flex items-center justify-center mb-2">
-                          <Award 
-                            className="h-5 w-5 mr-2" 
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          />
-                          <span 
-                            className="text-lg sm:text-xl font-bold"
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            5.0
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Rating</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Perfect 5-star average rating</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
-                        <div className="flex items-center justify-center mb-2">
-                          <TrendingUp 
-                            className="h-5 w-5 mr-2" 
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          />
-                          <span 
-                            className="text-lg sm:text-xl font-bold"
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            99%
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Success Rate</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>99% customer satisfaction rate</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-center p-4 rounded-xl bg-card/30 backdrop-blur-sm border border-border/10 hover:bg-card/40 transition-all duration-300">
-                        <div className="flex items-center justify-center mb-2">
-                          <Timer 
-                            className="h-5 w-5 mr-2" 
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          />
-                          <span 
-                            className="text-lg sm:text-xl font-bold"
-                            style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            24h
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">Response</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>24-hour response guarantee</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
             </div>
           </div>
         </div>
         
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        {/* Improved mobile-friendly scroll indicator */}
+        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <div 
-            className="w-6 h-10 border-2 rounded-full flex justify-center"
+            className="w-5 h-8 sm:w-6 sm:h-10 border-2 rounded-full flex justify-center"
             style={{ borderColor: `${themeStyles?.primaryColor || '#2563eb'}40` }}
           >
             <div 
-              className="w-1 h-3 rounded-full mt-2 animate-pulse"
+              className="w-0.5 sm:w-1 h-2 sm:h-3 rounded-full mt-2 animate-pulse"
               style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
             ></div>
           </div>
@@ -719,15 +617,15 @@ export default function PublicBooking() {
               </div>
             </div>
 
-            {/* Enhanced services grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
+            {/* Enhanced services grid with improved mobile layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 max-w-7xl mx-auto">
               {services.map((service: any, index: number) => {
                 const IconComponent = getServiceIcon(service.name);
                 
                 return (
                   <Card 
                     key={service.id} 
-                    className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-4 bg-card/60 backdrop-blur-md relative overflow-hidden"
+                    className="group hover:shadow-lg sm:hover:shadow-2xl transition-all duration-300 sm:duration-500 border-0 shadow-md sm:shadow-lg hover:-translate-y-2 sm:hover:-translate-y-4 bg-card/60 backdrop-blur-md relative overflow-hidden"
                     style={{
                       animationDelay: `${index * 150}ms`
                     }}
@@ -825,10 +723,10 @@ export default function PublicBooking() {
                           </div>
                         </div>
                         
-                        {/* Enhanced booking button */}
+                        {/* Enhanced booking button with improved mobile layout */}
                         <Button 
                           onClick={() => setShowBookingModal(true)}
-                          className="w-full font-semibold sm:font-bold rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 h-auto hover:shadow-2xl transform hover:scale-105 transition-all duration-500 relative overflow-hidden group text-sm sm:text-base lg:text-lg"
+                          className="w-full font-medium sm:font-semibold rounded-lg sm:rounded-xl py-3 sm:py-4 lg:py-5 h-auto hover:shadow-lg sm:hover:shadow-2xl transform hover:scale-105 transition-all duration-300 sm:duration-500 relative overflow-hidden group text-sm sm:text-base lg:text-lg"
                           style={{
                             background: themeStyles 
                               ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
@@ -840,7 +738,7 @@ export default function PublicBooking() {
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-800"></div>
                           <div className="flex items-center justify-center relative z-10">
-                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform duration-300" />
+                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                             <span>Book This Service</span>
                           </div>
                         </Button>
@@ -1831,28 +1729,20 @@ export default function PublicBooking() {
                 Ready to connect? Choose your preferred method of contact and let's start the conversation.
               </p>
               
-              {/* Contact stats or quick info */}
-              <div className="inline-flex items-center space-x-4 sm:space-x-6 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    24h
+              {/* Contact info display */}
+              {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length > 0 && (
+                <div className="inline-flex items-center px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                  <div className="text-center">
+                    <div 
+                      className="text-xl sm:text-2xl font-bold mb-1"
+                      style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                    >
+                      {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length}
+                    </div>
+                    <div className="text-sm text-muted-foreground font-medium">Contact Methods</div>
                   </div>
-                  <div className="text-sm text-muted-foreground font-medium">Response Time</div>
                 </div>
-                <div className="w-px h-8 bg-border"></div>
-                <div className="text-center">
-                  <div 
-                    className="text-xl sm:text-2xl font-bold mb-1"
-                    style={{ color: themeStyles?.primaryColor || '#2563eb' }}
-                  >
-                    {[page.contactPhone, page.contactEmail, page.businessAddress].filter(Boolean).length}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">Contact Methods</div>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="max-w-5xl mx-auto">
