@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,34 @@ import {
 
 export default function Home() {
   const [, setLocation] = useLocation();
+
+  // Handle hash-based scrolling when navigating to homepage with hash
+  useEffect(() => {
+    const scrollToHashSection = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Try to scroll immediately
+    if (!scrollToHashSection()) {
+      // If element not found, retry after a short delay (for DOM to be ready)
+      const timeoutId = setTimeout(() => {
+        if (!scrollToHashSection()) {
+          // Final retry with requestAnimationFrame
+          requestAnimationFrame(scrollToHashSection);
+        }
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, []);
 
   const features = [
     {

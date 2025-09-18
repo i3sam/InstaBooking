@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, Menu, X } from 'lucide-react';
 
 export default function Header() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -18,11 +18,18 @@ export default function Header() {
 
   const scrollToSection = (href: string) => {
     if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      // If we're on the homepage, scroll to the section
+      if (location === '/') {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // If we're on another page, navigate to homepage with the hash
+        setLocation('/' + href);
       }
     } else {
+      // For regular page navigation
       setLocation(href);
     }
     setMobileMenuOpen(false);
