@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,25 +56,32 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardContent className="p-8">
+    <div className="min-h-screen page-gradient relative overflow-hidden">
+      {/* Glass Prism Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
+      <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-overlay"></div>
+      <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
+      <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
+      
+      <div className="relative flex items-center justify-center min-h-screen p-6 content-layer">
+        <div className="w-full max-w-md glass-prism-card rounded-3xl p-8 hover-lift animate-fade-in-up">
           <div className="flex justify-start mb-4">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => setLocation('/')}
-              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 rounded-lg"
               data-testid="button-back-home"
             >
               <Home className="h-4 w-4" />
               <span>Back to Homepage</span>
             </Button>
           </div>
+          
           <div className="text-center mb-8">
             <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <CalendarDays className="h-6 w-6 text-primary-foreground" />
+              <div className="w-10 h-10 glass-prism rounded-lg flex items-center justify-center">
+                <CalendarDays className="h-6 w-6 text-primary" />
               </div>
               <span className="text-xl font-bold text-foreground">BookingGen</span>
             </div>
@@ -85,7 +91,7 @@ export default function Login() {
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -94,12 +100,13 @@ export default function Login() {
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
                 data-testid="input-email"
+                className="glass-input mt-2"
               />
             </div>
             
             <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
+              <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
+              <div className="relative mt-2">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -108,7 +115,7 @@ export default function Login() {
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   required
                   data-testid="input-password"
-                  className="pr-10"
+                  className="glass-input pr-10"
                 />
                 <Button
                   type="button"
@@ -134,9 +141,9 @@ export default function Login() {
                   checked={formData.remember}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, remember: !!checked }))}
                 />
-                <Label htmlFor="remember" className="text-sm">Remember me</Label>
+                <Label htmlFor="remember" className="text-sm text-foreground">Remember me</Label>
               </div>
-              <Button variant="link" className="text-sm p-0">
+              <Button variant="link" className="text-sm p-0 text-primary hover:text-primary/80">
                 Forgot password?
               </Button>
             </div>
@@ -144,8 +151,7 @@ export default function Login() {
             <Button 
               type="submit" 
               size="lg"
-              variant="default"
-              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+              className="w-full h-12 glass-prism-button px-6 py-2 rounded-full font-semibold text-[15px] shadow-md"
               disabled={loading}
               data-testid="button-sign-in"
             >
@@ -154,10 +160,10 @@ export default function Login() {
             
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
+                <div className="w-full border-t border-white/20"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
+                <span className="px-4 bg-white/5 backdrop-blur-sm text-muted-foreground rounded-full">Or continue with</span>
               </div>
             </div>
             
@@ -165,7 +171,7 @@ export default function Login() {
               type="button" 
               variant="outline" 
               size="lg"
-              className="w-full h-12 border-2 hover:bg-muted/50"
+              className="w-full h-12 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 rounded-full"
               onClick={handleGoogleSignIn}
               data-testid="button-google-signin"
             >
@@ -184,7 +190,7 @@ export default function Login() {
               Don't have an account?{' '}
               <Button 
                 variant="link" 
-                className="p-0"
+                className="p-0 text-primary hover:text-primary/80 font-medium"
                 onClick={() => setLocation('/signup')}
                 data-testid="link-signup"
               >
@@ -192,8 +198,8 @@ export default function Login() {
               </Button>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
