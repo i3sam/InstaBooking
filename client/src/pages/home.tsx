@@ -338,15 +338,17 @@ export default function Home() {
       </section>
 
       {/* Booking Page Demo */}
-      <section className="relative py-24 overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
+      <section className="relative py-24 overflow-hidden gojiberry-gradient">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
         
-        <div className="relative container mx-auto px-6">
-          <div className="text-center mb-20">
+        <div className="relative container mx-auto px-6 content-layer">
+          <div className="text-center mb-20 animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
               See what your{' '}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+              <span className="text-blue-gradient">
                 booking pages
               </span>{' '}
               will look like
@@ -358,8 +360,9 @@ export default function Home() {
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Desktop Demo */}
-            <div className="space-y-6">
-              <div className="bg-background border border-border rounded-2xl p-8 shadow-2xl">
+            <div className="space-y-6 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+              <div className="glass-prism-card rounded-3xl p-8 hover-lift relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 <div className="flex items-center space-x-2 mb-6">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
@@ -368,7 +371,7 @@ export default function Home() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Heart className="h-8 w-8 text-primary" />
                     </div>
                     <div>
@@ -377,16 +380,16 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <div className="p-4 bg-muted rounded-lg">
+                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
                       <h4 className="font-semibold text-foreground">Individual Therapy Session</h4>
                       <p className="text-sm text-muted-foreground">50 minutes • $120</p>
                     </div>
-                    <div className="p-4 bg-muted rounded-lg">
+                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
                       <h4 className="font-semibold text-foreground">Couples Counseling</h4>
                       <p className="text-sm text-muted-foreground">60 minutes • $150</p>
                     </div>
                   </div>
-                  <Button className="w-full bg-primary text-primary-foreground">
+                  <Button className="w-full glass-prism-button px-6 py-2 rounded-full font-semibold">
                     Book Appointment
                   </Button>
                 </div>
@@ -398,29 +401,30 @@ export default function Home() {
             </div>
 
             {/* Mobile Demo */}
-            <div className="flex justify-center">
+            <div className="flex justify-center animate-fade-in-up" style={{animationDelay: '0.4s'}}>
               <div className="w-80 space-y-6">
-                <div className="bg-background border border-border rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-muted rounded-b-lg"></div>
+                <div className="glass-prism-card rounded-3xl p-6 relative overflow-hidden hover-lift group">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-white/30 rounded-b-lg"></div>
                   <div className="pt-4 space-y-4">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <div className="w-12 h-12 glass-prism rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
                         <Coffee className="h-6 w-6 text-primary" />
                       </div>
                       <h3 className="text-lg font-bold text-foreground">Mike's Barber Shop</h3>
                       <p className="text-sm text-muted-foreground">Premium cuts & styling</p>
                     </div>
                     <div className="space-y-2">
-                      <div className="p-3 bg-muted rounded-lg">
+                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
                         <h4 className="font-semibold text-sm text-foreground">Classic Cut</h4>
                         <p className="text-xs text-muted-foreground">30 min • $35</p>
                       </div>
-                      <div className="p-3 bg-muted rounded-lg">
+                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
                         <h4 className="font-semibold text-sm text-foreground">Cut & Style</h4>
                         <p className="text-xs text-muted-foreground">45 min • $50</p>
                       </div>
                     </div>
-                    <Button size="sm" className="w-full bg-primary text-primary-foreground">
+                    <Button size="sm" className="w-full glass-prism-button px-4 py-2 rounded-full font-semibold text-sm">
                       Book Now
                     </Button>
                   </div>
@@ -433,11 +437,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="text-center mt-16">
+          <div className="text-center mt-16 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
             <Button 
               size="lg"
               onClick={() => setLocation('/tutorial')}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="glass-prism-button px-8 py-3 rounded-full text-lg font-semibold hover-lift"
               data-testid="button-see-tutorial"
             >
               <Play className="mr-2 h-5 w-5" />
