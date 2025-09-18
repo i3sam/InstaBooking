@@ -58,8 +58,7 @@ export default function Pricing() {
       ],
       buttonText: "Contact Sales",
       buttonAction: () => {
-        // TODO: Open contact sales modal or redirect to contact page
-        window.open('mailto:sales@bookinggen.com?subject=Enterprise Plan Inquiry', '_blank');
+        setLocation('/sales');
       },
       isPrimary: false,
       badge: null
@@ -76,7 +75,7 @@ export default function Pricing() {
       <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-overlay pointer-events-none -z-10" style={{animationDelay: '1.5s'}}></div>
       <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay pointer-events-none -z-10" style={{animationDelay: '3s'}}></div>
       
-      <section className="pt-32 pb-20 relative content-layer">
+      <section className="pt-32 pb-32 relative content-layer">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h1 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
@@ -146,7 +145,7 @@ export default function Pricing() {
                         type="button"
                         size="lg"
                         onClick={plan.buttonAction}
-                        className={`w-full h-12 ${plan.isPrimary ? 'glass-prism-button' : 'bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-foreground'}`}
+                        className={`w-full h-12 ${plan.isPrimary ? 'glass-prism-button' : 'glass-prism-button'}`}
                         variant={plan.isPrimary ? 'default' : 'outline'}
                         data-testid={`button-${plan.name.toLowerCase()}-plan`}
                       >
