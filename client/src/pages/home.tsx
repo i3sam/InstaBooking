@@ -147,41 +147,43 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-blue-50/30 dark:to-blue-950/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/5"></div>
+      <section className="relative overflow-hidden gojiberry-hero-gradient">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80"></div>
+        <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float"></div>
+        <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float" style={{animationDelay: '3s'}}></div>
         
         <div className="relative pt-20 pb-16 lg:pt-28 lg:pb-24">
           <div className="container mx-auto px-6">
             <div className="text-center max-w-5xl mx-auto">
-              <div className="space-y-8">
-                {/* Notification Badge */}
-                <div className="inline-flex items-center px-6 py-3 glass-effect rounded-full text-primary text-sm font-medium animate-pulse-glow-animation">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-3 animate-pulse"></span>
-                  New: The new way to create booking pages
+              <div className="space-y-8 animate-fade-in-up">
+                {/* Notification Badge - Gojiberry Style */}
+                <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
+                  <span className="bg-white text-red-600 text-xs font-bold px-2 py-1 rounded-md mr-3">New</span>
+                  The new way to create booking pages
                 </div>
                 
                 {/* Main Headline */}
-                <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground">
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground animate-slide-in-left">
                   Create{' '}
-                  <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                  <span className="text-blue-gradient">
                     beautiful booking pages
                   </span>{' '}
                   in minutes
                 </h1>
                 
                 {/* Subtitle */}
-                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right">
                   Our AI-powered platform works 24/7 to create professional booking pages that convert visitors into clients effortlessly.
                 </p>
                 
                 {/* CTA Button */}
-                <div className="pt-4">
+                <div className="pt-4 animate-scale-in" style={{animationDelay: '0.3s'}}>
                   <Button 
                     onClick={() => setLocation('/signup')}
                     size="lg"
-                    className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
+                    className="glass-prism-card hover-lift bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl"
                     data-testid="button-get-started"
                   >
                     Get Started for Free
@@ -209,17 +211,17 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Hero Image Section - Moved to Bottom */}
+        {/* Hero Image Section - Moved to Bottom with Glass Prism Effect */}
         <div className="relative pb-20 lg:pb-32">
           <div className="container mx-auto px-6">
-            <div className="relative max-w-6xl mx-auto">
-              <div className="relative">
+            <div className="relative max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '0.6s'}}>
+              <div className="relative glass-prism-card rounded-3xl p-8 hover-lift">
                 <img 
                   src={heroImage} 
                   alt="BookingGen dashboard interface" 
-                  className="w-full h-auto object-contain rounded-2xl shadow-2xl"
+                  className="w-full h-auto object-contain rounded-2xl"
                 />
-                <div className="absolute -inset-8 bg-gradient-to-r from-primary/20 via-blue-500/20 to-primary/20 blur-3xl -z-10 opacity-60"></div>
+                <div className="absolute -inset-12 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-3xl -z-10 opacity-70 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -227,16 +229,16 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="relative py-24 overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/3"></div>
+      <section id="features" className="relative py-24 overflow-hidden gojiberry-gradient">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float" style={{animationDelay: '2s'}}></div>
         
         <div className="relative container mx-auto px-6">
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
               Everything you need to{' '}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+              <span className="text-blue-gradient">
                 accept bookings
               </span>
             </h2>
@@ -247,15 +249,19 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {features.map((feature, index) => (
-              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2">
+              <Card 
+                key={index} 
+                className="group glass-prism-card hover-lift animate-fade-in-up"
+                style={{animationDelay: `${index * 0.1}s`}}
+              >
                 <CardContent className="p-8">
                   <div className="relative mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-16 h-16 glass-prism rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <feature.icon className="h-8 w-8 text-primary group-hover:text-blue-600 transition-colors duration-300" />
                     </div>
-                    <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">{feature.title}</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-blue-gradient transition-colors duration-300">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -266,11 +272,14 @@ export default function Home() {
 
       {/* How It Works */}
       <section id="how-it-works" className="relative py-24 overflow-hidden">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute top-32 left-10 w-80 h-80 glass-prism rounded-full opacity-15 animate-float"></div>
+        
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
               Launch your booking page in{' '}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+              <span className="text-blue-gradient">
                 3 simple steps
               </span>
             </h2>
@@ -278,17 +287,21 @@ export default function Home() {
 
           <div className="grid lg:grid-cols-3 gap-16">
             {steps.map((step, index) => (
-              <div key={index} className="text-center group">
+              <div 
+                key={index} 
+                className="text-center group animate-fade-in-up"
+                style={{animationDelay: `${index * 0.2}s`}}
+              >
                 <div className="relative mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-primary/10 via-blue-500/10 to-primary/20 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <span className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{step.number}</span>
+                  <div className="w-24 h-24 glass-prism rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift">
+                    <span className="text-3xl font-bold text-blue-gradient">{step.number}</span>
                   </div>
-                  <div className="absolute -inset-3 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent -translate-x-1/2"></div>
+                    <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-400/30 to-transparent -translate-x-1/2"></div>
                   )}
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-blue-gradient transition-colors duration-300">{step.title}</h3>
                 <p className="text-muted-foreground text-lg leading-relaxed">{step.description}</p>
               </div>
             ))}
@@ -406,41 +419,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="relative py-24 overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
-        
-        <div className="relative container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
-              Trusted by{' '}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
-                thousands of professionals
-              </span>
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center group" data-testid={`stat-${index}`}>
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary/10 via-blue-500/10 to-primary/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <stat.icon className="h-10 w-10 text-primary group-hover:text-blue-600 transition-colors duration-300" />
-                  </div>
-                  <div className="absolute -inset-3 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                </div>
-                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent mb-3" data-testid={`stat-value-${index}`}>
-                  {stat.value}
-                </div>
-                <div className="text-muted-foreground text-lg font-medium" data-testid={`stat-label-${index}`}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Use Cases Section */}
       <section className="relative py-24 overflow-hidden">
@@ -541,27 +519,27 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-24 overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-background to-blue-50/30 dark:to-blue-950/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/5"></div>
+      <section className="relative py-24 overflow-hidden gojiberry-gradient">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute top-10 right-32 w-72 h-72 glass-prism rounded-full opacity-20 animate-float"></div>
+        <div className="absolute bottom-20 left-20 w-56 h-56 glass-prism rounded-full opacity-15 animate-float" style={{animationDelay: '1s'}}></div>
         
         <div className="relative container mx-auto px-6">
-          <div className="text-center max-w-5xl mx-auto">
+          <div className="text-center max-w-5xl mx-auto animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
               Ready to transform your{' '}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+              <span className="text-blue-gradient">
                 booking process?
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
               Join thousands of professionals who have streamlined their business with BookingGen
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in" style={{animationDelay: '0.3s'}}>
               <Button 
                 size="lg"
                 onClick={() => setLocation('/signup')}
-                className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
+                className="glass-prism-card hover-lift bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl"
                 data-testid="button-cta-signup"
               >
                 Get Started for Free
@@ -571,7 +549,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 onClick={() => setLocation('/tutorial')}
-                className="px-12 py-6 rounded-full text-xl h-auto border-2 border-border hover:border-primary/30 hover:bg-primary/5 text-foreground font-semibold transition-all duration-300"
+                className="glass-prism-card hover-lift px-12 py-6 rounded-full text-xl h-auto border-2 border-border hover:border-primary/30 hover:bg-primary/5 text-foreground font-semibold transition-all duration-300"
                 data-testid="button-cta-tutorial"
               >
                 <Play className="mr-3 h-6 w-6" />
