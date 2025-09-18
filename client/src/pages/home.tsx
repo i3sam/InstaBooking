@@ -140,6 +140,9 @@ export default function Home() {
     <div className="min-h-screen page-gradient">
       <Header />
       
+      {/* Add top padding to account for floating header */}
+      <div className="h-24"></div>
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden gojiberry-hero-gradient">
         {/* Glass Prism Background Elements */}
