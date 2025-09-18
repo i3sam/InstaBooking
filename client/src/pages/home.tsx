@@ -135,12 +135,6 @@ export default function Home() {
     }
   ];
 
-  const stats = [
-    { label: "Active Users", value: "10,000+", icon: Users },
-    { label: "Bookings Processed", value: "50,000+", icon: Calendar },
-    { label: "Average Setup Time", value: "5 Minutes", icon: Clock },
-    { label: "Customer Satisfaction", value: "98%", icon: Star }
-  ];
 
   return (
     <div className="min-h-screen bg-background">
