@@ -315,11 +315,12 @@
 }
 
 .gojiberry-hero-gradient {
-  background: radial-gradient(ellipse at top, 
-    hsl(217.2, 91.2%, 98%) 0%, 
-    hsl(217.2, 91.2%, 96%) 30%,
-    hsl(221.2, 83.2%, 98%) 60%, 
-    hsl(217.2, 91.2%, 97%) 100%);
+  background: linear-gradient(135deg, 
+    hsl(0, 0%, 100%) 0%,
+    hsl(217.2, 91.2%, 95%) 25%,
+    hsl(221.2, 83.2%, 88%) 50%, 
+    hsl(217.2, 91.2%, 75%) 75%, 
+    hsl(221.2, 83.2%, 65%) 100%);
 }
 
 .notification-badge {
@@ -352,6 +353,41 @@
   box-shadow: 
     0 8px 32px hsla(217.2, 91.2%, 20%, 0.1),
     inset 0 1px 0 hsla(0, 0%, 100%, 0.6);
+}
+
+/* Enhanced Glass Prism Button */
+.glass-prism-button {
+  background: linear-gradient(145deg, 
+    hsla(217.2, 91.2%, 75%, 0.9) 0%, 
+    hsla(221.2, 83.2%, 65%, 0.8) 50%,
+    hsla(217.2, 91.2%, 55%, 0.9) 100%) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 2px solid hsla(0, 0%, 100%, 0.3) !important;
+  box-shadow: 
+    0 12px 24px hsla(217.2, 91.2%, 20%, 0.2),
+    inset 0 1px 0 hsla(0, 0%, 100%, 0.5) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+.glass-prism-button:hover {
+  background: linear-gradient(145deg, 
+    hsla(217.2, 91.2%, 65%, 0.95) 0%, 
+    hsla(221.2, 83.2%, 55%, 0.9) 50%,
+    hsla(217.2, 91.2%, 45%, 0.95) 100%) !important;
+  transform: perspective(1000px) rotateX(-2deg) rotateY(2deg) translateY(-8px) scale(1.05) !important;
+  box-shadow: 
+    0 20px 40px hsla(217.2, 91.2%, 20%, 0.3),
+    inset 0 2px 0 hsla(0, 0%, 100%, 0.6) !important;
+  border-color: hsla(0, 0%, 100%, 0.5) !important;
+  color: white !important;
+}
+
+.glass-prism-button:active {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-1deg) translateY(-4px) scale(0.98) !important;
+  transition: all 0.1s ease !important;
 }
 
 /* Scroll Animations */
