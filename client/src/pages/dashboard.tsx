@@ -155,10 +155,10 @@ function AnalyticsSection() {
           <h2 className="text-2xl font-bold text-foreground mb-2">Analytics</h2>
           <p className="text-muted-foreground">Track your booking performance and revenue</p>
         </div>
-        <Card className="border-red-200">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-red-300/20 shadow-2xl">
           <CardContent className="p-6 text-center">
             <div className="text-4xl text-red-500 mb-4">⚠️</div>
-            <p className="text-red-600">Failed to load analytics data</p>
+            <p className="text-red-600 dark:text-red-400">Failed to load analytics data</p>
           </CardContent>
         </Card>
       </div>
@@ -168,21 +168,23 @@ function AnalyticsSection() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Analytics</h2>
-        <p className="text-muted-foreground">Track your booking performance and revenue</p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">Analytics</h2>
+        <p className="text-gray-600 dark:text-gray-300">Track your booking performance and revenue</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
-        <Card>
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Conversion Rate</h3>
-              <div className="w-4 h-4 text-blue-600">📊</div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Conversion Rate</h3>
+              <div className="w-8 h-8 rounded-lg glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/30 flex items-center justify-center">
+                <span className="text-blue-600 dark:text-blue-400">📊</span>
+              </div>
             </div>
-            <div className="text-3xl font-bold text-foreground mb-2">
+            <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
               {statsLoading ? "..." : `${dashboardStats?.conversionRate || 0}%`}
             </div>
-            <p className="text-sm text-blue-600">
+            <p className="text-sm text-blue-600 dark:text-blue-400">
               {statsLoading 
                 ? "Loading..." 
                 : (dashboardStats?.totalAppointments || 0) === 0 
@@ -193,16 +195,18 @@ function AnalyticsSection() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Avg. Booking Value</h3>
-              <div className="w-4 h-4 text-purple-600">📈</div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Booking Value</h3>
+              <div className="w-8 h-8 rounded-lg glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/30 flex items-center justify-center">
+                <span className="text-purple-600 dark:text-purple-400">📈</span>
+              </div>
             </div>
-            <div className="text-3xl font-bold text-foreground mb-2">
+            <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
               {statsLoading ? "..." : formatPrice(dashboardStats?.avgBookingValue || 0)}
             </div>
-            <p className="text-sm text-purple-600">
+            <p className="text-sm text-purple-600 dark:text-purple-400">
               {statsLoading 
                 ? "Loading..." 
                 : (dashboardStats?.totalAppointments || 0) === 0 
@@ -214,40 +218,40 @@ function AnalyticsSection() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-6">Key Metrics</h3>
+          <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Key Metrics</h3>
           {statsLoading ? (
-            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+            <div className="h-64 glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl text-muted-foreground mb-4">⏳</div>
-                <p className="text-muted-foreground">Loading analytics data...</p>
+                <div className="text-4xl text-gray-400 mb-4">⏳</div>
+                <p className="text-gray-600 dark:text-gray-400">Loading analytics data...</p>
               </div>
             </div>
           ) : dashboardStats?.totalAppointments === 0 ? (
-            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+            <div className="h-64 glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl text-muted-foreground mb-4">📊</div>
-                <p className="text-muted-foreground">Analytics will appear here once you have booking data</p>
+                <div className="text-4xl text-gray-400 mb-4">📊</div>
+                <p className="text-gray-600 dark:text-gray-400">Analytics will appear here once you have booking data</p>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <div className="text-2xl font-bold text-primary mb-2">{dashboardStats?.pagesCount || 0}</div>
-                <p className="text-sm text-muted-foreground">Active Pages</p>
+              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/20 rounded-xl">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">{dashboardStats?.pagesCount || 0}</div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Active Pages</p>
               </div>
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 mb-2">{dashboardStats?.totalAppointments || 0}</div>
-                <p className="text-sm text-muted-foreground">Total Bookings</p>
+              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-cyan-500/10 border border-white/20 rounded-xl">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{dashboardStats?.totalAppointments || 0}</div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Total Bookings</p>
               </div>
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
-                <p className="text-sm text-muted-foreground">Pending Approval</p>
+              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-white/20 rounded-xl">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Pending Approval</p>
               </div>
-              <div className="text-center p-4 bg-muted/30 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-white/20 rounded-xl">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
               </div>
             </div>
           )}
@@ -293,15 +297,15 @@ function SettingsSection() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Settings</h2>
-        <p className="text-muted-foreground">Manage your account and preferences</p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">Settings</h2>
+        <p className="text-gray-600 dark:text-gray-300">Manage your account and preferences</p>
       </div>
 
       <div className="max-w-4xl">
         <div className="grid lg:grid-cols-2 gap-8">
-          <Card>
+          <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
             <CardContent className="p-8">
-              <h3 className="text-lg font-semibold text-foreground mb-6">Profile Information</h3>
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Profile Information</h3>
               <form className="space-y-6" onSubmit={(e) => {
                 e.preventDefault();
                 updateProfileMutation.mutate({
@@ -330,7 +334,7 @@ function SettingsSection() {
                     className="h-12 bg-muted/50"
                     data-testid="input-email"
                   />
-                  <p className="text-sm text-muted-foreground">Email cannot be changed</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Email cannot be changed</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Time Zone</Label>
@@ -348,7 +352,7 @@ function SettingsSection() {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md" 
+                  className="w-full h-12 glass-prism-button text-white shadow-lg backdrop-blur-lg" 
                   data-testid="button-save-changes"
                 >
                   Save Changes
@@ -357,28 +361,28 @@ function SettingsSection() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
             <CardContent className="p-8">
-              <h3 className="text-lg font-semibold text-foreground mb-6">Notification Preferences</h3>
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Notification Preferences</h3>
               <div className="space-y-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground mt-1">Receive booking confirmations and updates via email</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-100">Email Notifications</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Receive booking confirmations and updates via email</p>
                   </div>
                   <Checkbox defaultChecked className="mt-1" />
                 </div>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">SMS Reminders</p>
-                    <p className="text-sm text-muted-foreground mt-1">Get text reminders for upcoming appointments</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-100">SMS Reminders</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Get text reminders for upcoming appointments</p>
                   </div>
                   <Checkbox className="mt-1" />
                 </div>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">Marketing Updates</p>
-                    <p className="text-sm text-muted-foreground mt-1">Receive product updates and helpful tips</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-100">Marketing Updates</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Receive product updates and helpful tips</p>
                   </div>
                   <Checkbox defaultChecked className="mt-1" />
                 </div>
@@ -389,17 +393,17 @@ function SettingsSection() {
 
         {/* Current Plan Status - Clean and Simple */}
         {profile?.membershipStatus === 'pro' && (
-          <Card className="mt-8">
+          <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Current Plan</h3>
-                  <p className="text-muted-foreground">Pro Plan - All features unlocked</p>
+                  <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">Current Plan</h3>
+                  <p className="text-gray-600 dark:text-gray-300">Pro Plan - All features unlocked</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-green-600 font-medium mb-1">Active</div>
+                  <div className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">Active</div>
                   {profile?.membershipExpires && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Renews {new Date(profile.membershipExpires).toLocaleDateString()}
                     </p>
                   )}
@@ -410,13 +414,13 @@ function SettingsSection() {
         )}
 
         {/* Extras Section */}
-        <Card className="mt-8">
+        <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
           <CardContent className="p-8">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Extras</h3>
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Extras</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button
                 variant="outline"
-                className="flex items-center justify-center h-12 text-left"
+                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12 text-left"
                 onClick={() => setLocation('/report-bug')}
                 data-testid="button-report-bug"
               >
@@ -425,7 +429,7 @@ function SettingsSection() {
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center justify-center h-12 text-left"
+                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12 text-left"
                 onClick={() => setLocation('/request-feature')}
                 data-testid="button-request-feature"
               >
@@ -437,13 +441,13 @@ function SettingsSection() {
         </Card>
 
         {/* Account Actions */}
-        <Card className="mt-8">
+        <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
           <CardContent className="p-8">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Account Actions</h3>
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Account Actions</h3>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 variant="outline"
-                className="flex items-center justify-center h-12"
+                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12"
                 onClick={() => setLocation('/')}
                 data-testid="button-back-home"
               >
@@ -452,7 +456,7 @@ function SettingsSection() {
               </Button>
               <Button
                 variant="destructive"
-                className="flex items-center justify-center h-12"
+                className="glass-prism backdrop-blur-md bg-red-500/80 dark:bg-red-600/80 border border-red-400/30 hover:bg-red-600/90 dark:hover:bg-red-700/90 text-white transition-all duration-300 flex items-center justify-center h-12"
                 onClick={() => {
                   logout();
                   setLocation('/');

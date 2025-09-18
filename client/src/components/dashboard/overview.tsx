@@ -132,7 +132,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   ];
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       {/* Stats Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {statsError ? (
@@ -146,17 +146,17 @@ export default function Overview({ onSectionChange }: OverviewProps) {
           </div>
         ) : (
           stats.map((stat, index) => (
-            <Card key={index} className="stat-card border-0">
+            <Card key={index} className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-scale-in">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
+                  <div className={`w-12 h-12 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br ${stat.color.includes('primary') ? 'from-blue-500/20 to-purple-500/20' : stat.color.includes('green') ? 'from-green-500/20 to-cyan-500/20' : 'from-orange-500/20 to-yellow-500/20'} border border-white/30 flex items-center justify-center`}>
                     <stat.icon className="h-6 w-6" />
                   </div>
-                  <span className="text-2xl font-bold text-foreground" data-testid={`stat-${stat.title.toLowerCase().replace(' ', '-')}`}>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent" data-testid={`stat-${stat.title.toLowerCase().replace(' ', '-')}`}>
                     {stat.value}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-muted-foreground">{stat.title}</h3>
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">{stat.title}</h3>
               </CardContent>
             </Card>
           ))
@@ -165,37 +165,37 @@ export default function Overview({ onSectionChange }: OverviewProps) {
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
-        <Card className="premium-card border-0">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-slide-in-left">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Recent Activity</h3>
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Recent Activity</h3>
             <div className="space-y-4">
               {activityLoading ? (
                 <div className="text-center py-8">
                   <div className="text-4xl text-muted-foreground mb-4">⏳</div>
-                  <p className="text-muted-foreground">Loading recent activity...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading recent activity...</p>
                 </div>
               ) : activityError ? (
                 <div className="text-center py-8">
                   <div className="text-4xl text-muted-foreground mb-4">⚠️</div>
-                  <p className="text-muted-foreground text-red-600">Failed to load recent activity</p>
+                  <p className="text-red-500 dark:text-red-400">Failed to load recent activity</p>
                 </div>
               ) : activities.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl text-muted-foreground mb-4">📋</div>
-                  <p className="text-muted-foreground">No recent activity</p>
+                  <p className="text-gray-600 dark:text-gray-400">No recent activity</p>
                 </div>
               ) : (
                 activities.map((activity: RecentActivity, index: number) => {
                   const { icon: ActivityIcon, iconBg } = getActivityIcon(activity);
                   return (
                     <div key={index} className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${iconBg}`}>
+                      <div className={`w-10 h-10 rounded-full glass-prism backdrop-blur-md bg-gradient-to-br ${iconBg.includes('orange') ? 'from-orange-500/20 to-yellow-500/20' : iconBg.includes('green') ? 'from-green-500/20 to-cyan-500/20' : iconBg.includes('red') ? 'from-red-500/20 to-pink-500/20' : 'from-blue-500/20 to-purple-500/20'} border border-white/30 flex items-center justify-center`}>
                         <ActivityIcon className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">{activity.title}</p>
-                        <p className="text-xs text-muted-foreground">{activity.description}</p>
-                        <p className="text-xs text-muted-foreground">{formatActivityTime(activity.time)}</p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{activity.title}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{activity.description}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">{formatActivityTime(activity.time)}</p>
                       </div>
                     </div>
                   );
@@ -206,28 +206,28 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="premium-card border-0">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-slide-in-right">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Quick Actions</h3>
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Quick Actions</h3>
             <div className="space-y-4">
               {quickActions.map((action, index) => (
                 <Button
                   key={index}
                   onClick={action.action}
                   variant="ghost"
-                  className="quick-action-button w-full flex items-center justify-between p-4 h-auto"
+                  className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 hover:shadow-lg hover:scale-105 w-full flex items-center justify-between p-4 h-auto rounded-xl"
                   data-testid={`quick-action-${action.title.toLowerCase().replace(' ', '-')}`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${action.iconBg}`}>
+                    <div className={`w-10 h-10 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br ${action.iconBg.includes('primary') ? 'from-blue-500/20 to-purple-500/20' : action.iconBg.includes('green') ? 'from-green-500/20 to-cyan-500/20' : 'from-purple-500/20 to-pink-500/20'} border border-white/30 flex items-center justify-center`}>
                       <action.icon className="h-5 w-5" />
                     </div>
                     <div className="text-left">
-                      <span className="font-medium text-foreground block">{action.title}</span>
-                      <span className="text-sm text-muted-foreground">{action.description}</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-100 block">{action.title}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{action.description}</span>
                     </div>
                   </div>
-                  <div className="text-muted-foreground">→</div>
+                  <div className="text-gray-600 dark:text-gray-400">→</div>
                 </Button>
               ))}
             </div>
