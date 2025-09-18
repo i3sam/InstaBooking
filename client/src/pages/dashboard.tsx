@@ -44,8 +44,15 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
+    <div className="min-h-screen page-gradient animate-fade-in relative overflow-hidden">
+      {/* Glass prism background effects */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-blue-400/10 via-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-40 right-32 w-48 h-48 bg-gradient-to-br from-green-400/10 via-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute bottom-32 left-1/3 w-56 h-56 bg-gradient-to-br from-purple-400/10 via-pink-400/10 to-orange-400/10 rounded-full blur-3xl animate-float-slow"></div>
+      </div>
+      
+      <div className="flex relative z-10">
         {/* Desktop Sidebar - Hidden on mobile */}
         <div className="hidden lg:block">
           <Sidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
@@ -53,14 +60,14 @@ export default function Dashboard() {
         
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="lg:hidden fixed inset-0 z-50 flex animate-fade-in">
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 bg-black/50" 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
               onClick={() => setIsMobileMenuOpen(false)}
             />
             {/* Mobile Sidebar */}
-            <div className="relative w-64 h-full">
+            <div className="relative w-64 h-full animate-slide-in-left">
               <Sidebar activeSection={activeSection} onSectionChange={handleSectionChange} />
             </div>
           </div>
@@ -68,40 +75,40 @@ export default function Dashboard() {
         
         <div className="flex-1 w-full lg:w-auto">
           {/* Header */}
-          <header className="dashboard-header px-4 lg:px-8 py-6">
+          <header className="glass-prism-card mx-4 lg:mx-8 my-6 px-6 py-4 backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl shadow-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
+                  className="lg:hidden p-2 rounded-xl glass-prism backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30 hover:bg-white/30 dark:hover:bg-black/30 transition-all duration-300"
                   data-testid="button-mobile-menu"
                 >
                   {isMobileMenuOpen ? (
-                    <X className="h-6 w-6 text-foreground" />
+                    <X className="h-6 w-6 text-gray-700 dark:text-gray-200" />
                   ) : (
-                    <Menu className="h-6 w-6 text-foreground" />
+                    <Menu className="h-6 w-6 text-gray-700 dark:text-gray-200" />
                   )}
                 </button>
                 
                 <div>
-                  <h1 className="text-xl lg:text-2xl font-bold text-foreground">Dashboard</h1>
-                  <p className="text-muted-foreground text-sm lg:text-base">Manage your booking pages and appointments</p>
+                  <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Dashboard</h1>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm lg:text-base">Manage your booking pages and appointments</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-xs lg:text-sm font-medium text-muted-foreground">
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full glass-prism flex items-center justify-center backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30">
+                    <span className="text-xs lg:text-sm font-medium text-gray-700 dark:text-gray-200">
                       {(user?.fullName || user?.email)?.charAt(0)?.toUpperCase() || 'U'}
                     </span>
                   </div>
                   <div className="hidden sm:block">
-                    <p className="text-sm font-medium text-foreground" data-testid="text-username">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100" data-testid="text-username">
                       {profile?.fullName || user?.email}
                     </p>
-                    <p className="text-xs text-muted-foreground" data-testid="text-membership-status">
+                    <p className="text-xs text-gray-600 dark:text-gray-300" data-testid="text-membership-status">
                       {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Starter Plan'}
                     </p>
                   </div>
@@ -112,7 +119,9 @@ export default function Dashboard() {
 
           {/* Content */}
           <div className="p-4 lg:p-8">
-            {renderContent()}
+            <div className="animate-slide-up">
+              {renderContent()}
+            </div>
           </div>
         </div>
       </div>
