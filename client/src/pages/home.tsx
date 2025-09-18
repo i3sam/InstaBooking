@@ -152,10 +152,10 @@ export default function Home() {
           <div className="container mx-auto px-6">
             <div className="text-center max-w-5xl mx-auto">
               <div className="space-y-8 animate-fade-in-up">
-                {/* Notification Badge - Gojiberry Style */}
+                {/* Notification Badge - Blue Theme */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
-                  <span className="bg-white text-red-600 text-xs font-bold px-2 py-1 rounded-md mr-3">New</span>
-                  The new way to create booking pages
+                  <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">New</span>
+                  New Analytics Feature
                 </div>
                 
                 {/* Main Headline */}

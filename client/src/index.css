@@ -324,10 +324,10 @@
 
 .notification-badge {
   background: linear-gradient(135deg, 
-    hsl(0, 84.2%, 60.2%) 0%, 
-    hsl(0, 84.2%, 65%) 100%);
-  box-shadow: 0 4px 14px hsl(0, 84.2%, 60.2% / 0.3);
-  border: 1px solid hsl(0, 84.2%, 70%);
+    hsl(217.2, 91.2%, 59.8%) 0%, 
+    hsl(221.2, 83.2%, 53.3%) 100%);
+  box-shadow: 0 4px 14px hsl(217.2, 91.2%, 59.8% / 0.3);
+  border: 1px solid hsl(217.2, 91.2%, 70%);
 }
 
 /* Glass Prism Effects */
