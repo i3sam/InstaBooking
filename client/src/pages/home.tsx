@@ -177,7 +177,7 @@ export default function Home() {
                   <Button 
                     onClick={() => setLocation('/signup')}
                     size="lg"
-                    className="glass-prism-card hover-lift bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl"
+                    className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
                     data-testid="button-get-started"
                   >
                     Get Started for Free
