@@ -10,10 +10,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Solution', href: '#solution' },
+    { name: 'Solution', href: '#how-it-works' },
     { name: 'Features', href: '#features' },
     { name: 'Pricing', href: '/pricing' },
-    { name: 'FAQs', href: '#faqs' },
+    { name: 'Testimonials', href: '#testimonials' },
   ];
 
   const scrollToSection = (href: string) => {

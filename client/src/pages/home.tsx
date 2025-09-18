@@ -297,13 +297,20 @@ export default function Home() {
       </section>
 
       {/* Booking Page Demo */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              See what your booking pages will look like
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
+        
+        <div className="relative container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              See what your{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                booking pages
+              </span>{' '}
+              will look like
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Beautiful, professional booking pages that convert visitors into clients
             </p>
           </div>
@@ -436,34 +443,42 @@ export default function Home() {
       </section>
 
       {/* Use Cases Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Perfect for any service-based business
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
+        <div className="relative container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              Perfect for any{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                service-based business
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Join professionals across industries who trust BookingGen to manage their appointments
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {useCases.map((useCase, index) => (
-              <Card key={index} className="premium-card border-0" data-testid={`use-case-${index}`}>
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <useCase.icon className="h-6 w-6 text-primary" />
+              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2" data-testid={`use-case-${index}`}>
+                <CardContent className="p-8">
+                  <div className="relative mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <useCase.icon className="h-8 w-8 text-primary group-hover:text-blue-600 transition-colors duration-300" />
+                    </div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2" data-testid={`use-case-title-${index}`}>
+                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300" data-testid={`use-case-title-${index}`}>
                     {useCase.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4" data-testid={`use-case-description-${index}`}>
+                  <p className="text-muted-foreground mb-6 leading-relaxed" data-testid={`use-case-description-${index}`}>
                     {useCase.description}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {useCase.examples.map((example, exampleIndex) => (
-                      <div key={exampleIndex} className="flex items-center text-xs text-muted-foreground">
-                        <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                      <div key={exampleIndex} className="flex items-center text-sm text-muted-foreground">
+                        <Check className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />
                         {example}
                       </div>
                     ))}
@@ -476,38 +491,44 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20">
+      <section id="testimonials" className="py-24">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              What our users are saying
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              What our{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                users are saying
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               See how BookingGen has transformed businesses just like yours
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="premium-card border-0" data-testid={`testimonial-${index}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
+              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2" data-testid={`testimonial-${index}`}>
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-muted-foreground mb-6 italic" data-testid={`testimonial-content-${index}`}>
+                  <p className="text-muted-foreground mb-8 italic text-lg leading-relaxed" data-testid={`testimonial-content-${index}`}>
                     "{testimonial.content}"
                   </p>
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-sm font-semibold text-primary">{testimonial.avatar}</span>
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                        <span className="text-sm font-bold text-primary">{testimonial.avatar}</span>
+                      </div>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground" data-testid={`testimonial-name-${index}`}>
+                      <div className="font-bold text-foreground text-lg group-hover:text-primary transition-colors duration-300" data-testid={`testimonial-name-${index}`}>
                         {testimonial.name}
                       </div>
-                      <div className="text-sm text-muted-foreground" data-testid={`testimonial-role-${index}`}>
+                      <div className="text-muted-foreground font-medium" data-testid={`testimonial-role-${index}`}>
                         {testimonial.role}
                       </div>
                     </div>
