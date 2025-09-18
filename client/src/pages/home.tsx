@@ -141,7 +141,7 @@ export default function Home() {
       <Header />
       
       {/* Add top padding to account for floating header */}
-      <div className="h-24"></div>
+      <div className="h-28"></div>
       
       {/* Hero Section */}
       <section className="relative overflow-hidden gojiberry-hero-gradient">
