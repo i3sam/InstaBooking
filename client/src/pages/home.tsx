@@ -227,26 +227,36 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Everything you need to accept bookings
+      <section id="features" className="relative py-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/3"></div>
+        
+        <div className="relative container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              Everything you need to{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                accept bookings
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Powerful features designed to help you create professional booking experiences that your clients will love.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {features.map((feature, index) => (
-              <Card key={index} className="premium-card transition-all duration-300 border-0">
+              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2">
                 <CardContent className="p-8">
-                  <div className="feature-icon w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                    <feature.icon className="h-8 w-8 text-primary" />
+                  <div className="relative mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <feature.icon className="h-8 w-8 text-primary group-hover:text-blue-600 transition-colors duration-300" />
+                    </div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-4">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -255,22 +265,31 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20">
+      <section id="how-it-works" className="relative py-24 overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Launch your booking page in 3 simple steps
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              Launch your booking page in{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                3 simple steps
+              </span>
             </h2>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid lg:grid-cols-3 gap-16">
             {steps.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-primary">{step.number}</span>
+              <div key={index} className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary/10 via-blue-500/10 to-primary/20 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <span className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{step.number}</span>
+                  </div>
+                  <div className="absolute -inset-3 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  {index < steps.length - 1 && (
+                    <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-primary/30 to-transparent -translate-x-1/2"></div>
+                  )}
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
+                <p className="text-muted-foreground text-lg leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -381,24 +400,33 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Trusted by thousands of professionals
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
+        
+        <div className="relative container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              Trusted by{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                thousands of professionals
+              </span>
             </h2>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center" data-testid={`stat-${index}`}>
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <stat.icon className="h-8 w-8 text-primary" />
+              <div key={index} className="text-center group" data-testid={`stat-${index}`}>
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/10 via-blue-500/10 to-primary/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <stat.icon className="h-10 w-10 text-primary group-hover:text-blue-600 transition-colors duration-300" />
+                  </div>
+                  <div className="absolute -inset-3 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 </div>
-                <div className="text-3xl font-bold text-foreground mb-2" data-testid={`stat-value-${index}`}>
+                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent mb-3" data-testid={`stat-value-${index}`}>
                   {stat.value}
                 </div>
-                <div className="text-muted-foreground" data-testid={`stat-label-${index}`}>
+                <div className="text-muted-foreground text-lg font-medium" data-testid={`stat-label-${index}`}>
                   {stat.label}
                 </div>
               </div>
@@ -492,45 +520,54 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-              Ready to transform your booking process?
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-background to-blue-50/30 dark:to-blue-950/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/5"></div>
+        
+        <div className="relative container mx-auto px-6">
+          <div className="text-center max-w-5xl mx-auto">
+            <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
+              Ready to transform your{' '}
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                booking process?
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
               Join thousands of professionals who have streamlined their business with BookingGen
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
               <Button 
                 size="lg"
                 onClick={() => setLocation('/signup')}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8"
+                className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
                 data-testid="button-cta-signup"
               >
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
+                Get Started for Free
+                <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
               <Button 
                 size="lg"
                 variant="outline"
                 onClick={() => setLocation('/tutorial')}
+                className="px-12 py-6 rounded-full text-xl h-auto border-2 border-border hover:border-primary/30 hover:bg-primary/5 text-foreground font-semibold transition-all duration-300"
                 data-testid="button-cta-tutorial"
               >
+                <Play className="mr-3 h-6 w-6" />
                 Watch Tutorial
               </Button>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground mt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-12 text-lg text-muted-foreground">
               <div className="flex items-center">
-                <Check className="h-4 w-4 text-green-500 mr-2" />
+                <Check className="h-6 w-6 text-green-500 mr-3" />
                 Professional features
               </div>
               <div className="flex items-center">
-                <Check className="h-4 w-4 text-green-500 mr-2" />
+                <Check className="h-6 w-6 text-green-500 mr-3" />
                 No setup fees
               </div>
               <div className="flex items-center">
-                <Check className="h-4 w-4 text-green-500 mr-2" />
+                <Check className="h-6 w-6 text-green-500 mr-3" />
                 Cancel anytime
               </div>
             </div>
