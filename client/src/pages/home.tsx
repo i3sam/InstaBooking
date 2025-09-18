@@ -147,63 +147,79 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="premium-gradient pt-12 pb-24 lg:pt-16 lg:pb-32">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-10">
-              <div className="space-y-6">
-                <div className="inline-flex items-center px-6 py-3 glass-effect rounded-full text-primary text-sm font-medium">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                  New: Automated appointment notifications
+      <section className="relative overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-blue-50/30 dark:to-blue-950/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/5"></div>
+        
+        <div className="relative pt-20 pb-16 lg:pt-28 lg:pb-24">
+          <div className="container mx-auto px-6">
+            <div className="text-center max-w-5xl mx-auto">
+              <div className="space-y-8">
+                {/* Notification Badge */}
+                <div className="inline-flex items-center px-6 py-3 glass-effect rounded-full text-primary text-sm font-medium animate-pulse-glow-animation">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-3 animate-pulse"></span>
+                  New: The new way to create booking pages
                 </div>
-                <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-foreground">
-                  Create <span className="text-primary">beautiful booking pages</span> in minutes
+                
+                {/* Main Headline */}
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground">
+                  Create{' '}
+                  <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
+                    beautiful booking pages
+                  </span>{' '}
+                  in minutes
                 </h1>
-                <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                  Design, customize, and launch professional booking pages that convert. 
-                  Perfect for freelancers, consultants, and service providers.
+                
+                {/* Subtitle */}
+                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto">
+                  Our AI-powered platform works 24/7 to create professional booking pages that convert visitors into clients effortlessly.
                 </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-6">
-                <Button 
-                  onClick={() => setLocation('/signup')}
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 px-10 py-6 rounded-xl text-xl h-auto text-white font-semibold shadow-lg hover:shadow-xl transition-all"
-                  data-testid="button-get-started"
-                >
-                  Get Started
-                  <ArrowRight className="ml-3 h-6 w-6" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="px-10 py-6 rounded-xl text-xl h-auto border-border hover:bg-muted text-foreground"
-                  onClick={() => setLocation('/tutorial')}
-                  data-testid="button-watch-demo"
-                >
-                  <Play className="mr-3 h-6 w-6" />
-                  See How It Works
-                </Button>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3" />
-                  Quick setup
+                
+                {/* CTA Button */}
+                <div className="pt-4">
+                  <Button 
+                    onClick={() => setLocation('/signup')}
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
+                    data-testid="button-get-started"
+                  >
+                    Get Started for Free
+                    <ArrowRight className="ml-3 h-6 w-6" />
+                  </Button>
                 </div>
-                <div className="flex items-center">
-                  <Check className="h-5 w-5 text-green-500 mr-3" />
-                  Professional features
+                
+                {/* Feature Points */}
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground pt-6">
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-green-500 mr-3" />
+                    Quick setup
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-green-500 mr-3" />
+                    Professional features
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-green-500 mr-3" />
+                    Cancel anytime
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="relative lg:order-last">
-              <div className="relative max-w-full overflow-hidden">
+          </div>
+        </div>
+        
+        {/* Hero Image Section - Moved to Bottom */}
+        <div className="relative pb-20 lg:pb-32">
+          <div className="container mx-auto px-6">
+            <div className="relative max-w-6xl mx-auto">
+              <div className="relative">
                 <img 
                   src={heroImage} 
                   alt="BookingGen dashboard interface" 
-                  className="w-full h-auto object-contain lg:object-cover lg:max-h-[600px] xl:max-h-[700px]"
+                  className="w-full h-auto object-contain rounded-2xl shadow-2xl"
                 />
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-blue-500/20 blur-2xl -z-10"></div>
+                <div className="absolute -inset-8 bg-gradient-to-r from-primary/20 via-blue-500/20 to-primary/20 blur-3xl -z-10 opacity-60"></div>
               </div>
             </div>
           </div>

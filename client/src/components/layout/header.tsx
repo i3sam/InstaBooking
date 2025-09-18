@@ -10,10 +10,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
+    { name: 'Solution', href: '#solution' },
     { name: 'Features', href: '#features' },
-    { name: 'Tutorial', href: '/tutorial' },
     { name: 'Pricing', href: '/pricing' },
-    { name: 'How it Works', href: '#how-it-works' },
+    { name: 'FAQs', href: '#faqs' },
   ];
 
   const scrollToSection = (href: string) => {
@@ -29,8 +29,8 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4">
+    <header className="border-b border-border/50 bg-background/95 backdrop-blur-lg sticky top-0 z-50">
+      <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div 
@@ -45,12 +45,12 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-10">
             {navigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => scrollToSection(item.href)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-all duration-200 font-medium text-[15px]"
                 data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
               >
                 {item.name}
@@ -85,10 +85,10 @@ export default function Header() {
                 </Button>
                 <Button 
                   onClick={() => setLocation('/signup')}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-full font-semibold text-[15px] shadow-lg hover:shadow-xl transition-all duration-200"
                   data-testid="nav-signup"
                 >
-                  Get Started
+                  Start for Free
                 </Button>
               </div>
             )}
@@ -168,10 +168,10 @@ export default function Header() {
                       setLocation('/signup');
                       setMobileMenuOpen(false);
                     }}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 justify-start"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 justify-start rounded-full font-semibold"
                     data-testid="mobile-nav-signup"
                   >
-                    Get Started
+                    Start for Free
                   </Button>
                 </>
               )}
