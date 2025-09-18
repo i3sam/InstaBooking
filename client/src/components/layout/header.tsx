@@ -61,15 +61,15 @@ export default function Header() {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <Button 
-                    variant="ghost"
                     onClick={() => setLocation('/dashboard')}
+                    className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-foreground px-4 py-2 rounded-lg"
                     data-testid="nav-dashboard"
                   >
                     Dashboard
                   </Button>
                   <Button 
-                    variant="ghost"
                     onClick={logout}
+                    className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-foreground px-4 py-2 rounded-lg"
                     data-testid="nav-logout"
                   >
                     Logout
@@ -78,8 +78,8 @@ export default function Header() {
               ) : (
                 <div className="flex items-center space-x-4">
                   <Button 
-                    variant="ghost"
                     onClick={() => setLocation('/login')}
+                    className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-foreground px-4 py-2 rounded-lg"
                     data-testid="nav-login"
                   >
                     Login
@@ -129,23 +129,21 @@ export default function Header() {
                 {user ? (
                   <>
                     <Button 
-                      variant="ghost"
                       onClick={() => {
                         setLocation('/dashboard');
                         setMobileMenuOpen(false);
                       }}
-                      className="justify-start"
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 justify-start text-foreground"
                       data-testid="mobile-nav-dashboard"
                     >
                       Dashboard
                     </Button>
                     <Button 
-                      variant="ghost"
                       onClick={() => {
                         logout();
                         setMobileMenuOpen(false);
                       }}
-                      className="justify-start"
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 justify-start text-foreground"
                       data-testid="mobile-nav-logout"
                     >
                       Logout
@@ -154,12 +152,11 @@ export default function Header() {
                 ) : (
                   <>
                     <Button 
-                      variant="ghost"
                       onClick={() => {
                         setLocation('/login');
                         setMobileMenuOpen(false);
                       }}
-                      className="justify-start"
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 justify-start text-foreground"
                       data-testid="mobile-nav-login"
                     >
                       Login
@@ -169,7 +166,7 @@ export default function Header() {
                         setLocation('/signup');
                         setMobileMenuOpen(false);
                       }}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 justify-start rounded-full font-semibold"
+                      className="glass-prism-button justify-start rounded-full font-semibold px-6 py-2"
                       data-testid="mobile-nav-signup"
                     >
                       Start for Free
