@@ -128,16 +128,16 @@ export default function PagesList() {
   }
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Booking Pages</h2>
-          <p className="text-muted-foreground">Create and manage your booking pages</p>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Booking Pages</h2>
+          <p className="text-gray-600 dark:text-gray-300">Create and manage your booking pages</p>
         </div>
         <Button 
           onClick={handleCreatePage}
           variant="default"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+          className="glass-prism-button text-white shadow-lg backdrop-blur-lg"
           data-testid="button-create-page"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -159,7 +159,7 @@ export default function PagesList() {
               <Button 
                 onClick={handleCreatePage}
                 variant="default"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                className="glass-prism-button text-white shadow-lg backdrop-blur-lg"
                 data-testid="button-get-started"
               >
                 Get Started

@@ -50,18 +50,18 @@ export default function AppointmentsList() {
   }
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Appointments</h2>
-          <p className="text-muted-foreground">Manage your upcoming and past appointments</p>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Appointments</h2>
+          <p className="text-gray-600 dark:text-gray-300">Manage your upcoming and past appointments</p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" data-testid="button-filter">
+          <Button variant="outline" className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300" data-testid="button-filter">
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </Button>
-          <Button variant="outline" data-testid="button-export">
+          <Button variant="outline" className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -69,16 +69,16 @@ export default function AppointmentsList() {
       </div>
 
       {appointments.length === 0 ? (
-        <Card>
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
           <CardContent className="p-12 text-center">
-            <div className="text-6xl text-muted-foreground mb-4">📅</div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">No appointments yet</h3>
-            <p className="text-muted-foreground mb-6">
+            <div className="text-6xl text-gray-400 mb-4">📅</div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">No appointments yet</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Once people start booking appointments through your pages, they'll appear here.
             </p>
             <Button 
               variant="default"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md" 
+              className="glass-prism-button text-white shadow-lg backdrop-blur-lg" 
               data-testid="button-create-page-from-appointments"
             >
               Create Your First Booking Page
@@ -86,16 +86,16 @@ export default function AppointmentsList() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-muted/50">
+              <thead className="glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border-b border-white/10">
                 <tr>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Customer</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Service</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Date & Time</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Customer</th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Service</th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Date & Time</th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Status</th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
