@@ -137,18 +137,18 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen page-gradient">
       <Header />
       
       {/* Hero Section */}
       <section className="relative overflow-hidden gojiberry-hero-gradient">
         {/* Glass Prism Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80"></div>
-        <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float"></div>
-        <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float" style={{animationDelay: '1.5s'}}></div>
-        <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float" style={{animationDelay: '3s'}}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
+        <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-overlay"></div>
+        <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
         
-        <div className="relative pt-20 pb-16 lg:pt-28 lg:pb-24">
+        <div className="relative pt-20 pb-16 lg:pt-28 lg:pb-24 content-layer">
           <div className="container mx-auto px-6">
             <div className="text-center max-w-5xl mx-auto">
               <div className="space-y-8 animate-fade-in-up">
@@ -159,13 +159,15 @@ export default function Home() {
                 </div>
                 
                 {/* Main Headline */}
-                <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground animate-slide-in-left">
-                  Create{' '}
-                  <span className="text-blue-gradient">
-                    beautiful booking pages
-                  </span>{' '}
-                  in minutes
-                </h1>
+                <div className="hero-radial-beam">
+                  <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground animate-slide-in-left">
+                    Create{' '}
+                    <span className="text-blue-gradient">
+                      beautiful booking pages
+                    </span>{' '}
+                    in minutes
+                  </h1>
+                </div>
                 
                 {/* Subtitle */}
                 <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right">
@@ -173,7 +175,7 @@ export default function Home() {
                 </p>
                 
                 {/* CTA Button */}
-                <div className="pt-4 animate-scale-in" style={{animationDelay: '0.3s'}}>
+                <div className="pt-4 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
                   <Button 
                     onClick={() => setLocation('/signup')}
                     size="lg"
@@ -225,10 +227,10 @@ export default function Home() {
       {/* Features Section */}
       <section id="features" className="relative py-24 overflow-hidden gojiberry-gradient">
         {/* Glass Prism Background Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float"></div>
-        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
         
-        <div className="relative container mx-auto px-6">
+        <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center mb-20 animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
               Everything you need to{' '}
@@ -515,10 +517,10 @@ export default function Home() {
       {/* CTA Section */}
       <section className="relative py-24 overflow-hidden gojiberry-gradient">
         {/* Glass Prism Background Elements */}
-        <div className="absolute top-10 right-32 w-72 h-72 glass-prism rounded-full opacity-20 animate-float"></div>
-        <div className="absolute bottom-20 left-20 w-56 h-56 glass-prism rounded-full opacity-15 animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-10 right-32 w-72 h-72 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+        <div className="absolute bottom-20 left-20 w-56 h-56 glass-prism rounded-full opacity-15 animate-float bg-overlay" style={{animationDelay: '1s'}}></div>
         
-        <div className="relative container mx-auto px-6">
+        <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center max-w-5xl mx-auto animate-fade-in-up">
             <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
               Ready to transform your{' '}
@@ -529,11 +531,11 @@ export default function Home() {
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
               Join thousands of professionals who have streamlined their business with BookingGen
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in" style={{animationDelay: '0.3s'}}>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
               <Button 
                 size="lg"
                 onClick={() => setLocation('/signup')}
-                className="glass-prism-card hover-lift bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 px-12 py-6 rounded-full text-xl h-auto text-white font-semibold shadow-2xl"
+                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
                 data-testid="button-cta-signup"
               >
                 Get Started for Free
@@ -543,7 +545,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 onClick={() => setLocation('/tutorial')}
-                className="glass-prism-card hover-lift px-12 py-6 rounded-full text-xl h-auto border-2 border-border hover:border-primary/30 hover:bg-primary/5 text-foreground font-semibold transition-all duration-300"
+                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
                 data-testid="button-cta-tutorial"
               >
                 <Play className="mr-3 h-6 w-6" />

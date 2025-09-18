@@ -29,7 +29,7 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b border-border/50 bg-background/95 backdrop-blur-lg sticky top-0 z-50">
+    <header className="sticky-glass-header sticky top-0 z-50">
       <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -50,7 +50,7 @@ export default function Header() {
               <button
                 key={item.name}
                 onClick={() => scrollToSection(item.href)}
-                className="text-muted-foreground hover:text-foreground transition-all duration-200 font-medium text-[15px]"
+                className="nav-link-animated text-muted-foreground hover:text-foreground font-medium text-[15px]"
                 data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
               >
                 {item.name}
@@ -85,7 +85,7 @@ export default function Header() {
                 </Button>
                 <Button 
                   onClick={() => setLocation('/signup')}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-full font-semibold text-[15px] shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="glass-prism-button px-6 py-2 rounded-full font-semibold text-[15px]"
                   data-testid="nav-signup"
                 >
                   Start for Free
