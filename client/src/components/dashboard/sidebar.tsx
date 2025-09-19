@@ -145,23 +145,23 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               className="w-full glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl p-4 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 shadow-lg hover:shadow-xl group"
               data-testid="button-account-switcher"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10 glass-prism border-2 border-white/30">
+              <div className="flex items-center justify-between min-w-0">
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <Avatar className="h-10 w-10 glass-prism border-2 border-white/30 flex-shrink-0">
                     <AvatarFallback className="glass-prism-button text-white text-sm font-semibold">
                       {profile?.fullName ? getInitials(profile.fullName) : getInitials(user?.email || 'U')}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="text-left flex-1">
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                  <div className="text-left min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate max-w-full" title={profile?.fullName || 'User'}>
                       {profile?.fullName || 'User'}
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-full" title={user?.email}>
                       {user?.email}
                     </p>
                   </div>
                 </div>
-                <ChevronUp className="h-4 w-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors" />
+                <ChevronUp className="h-4 w-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors flex-shrink-0" />
               </div>
             </button>
           </DropdownMenuTrigger>
@@ -171,22 +171,22 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             className="w-64 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl"
           >
             <div className="p-3">
-              <div className="flex items-center space-x-3 mb-3">
-                <Avatar className="h-12 w-12 glass-prism border-2 border-white/30">
+              <div className="flex items-center space-x-3 mb-3 min-w-0">
+                <Avatar className="h-12 w-12 glass-prism border-2 border-white/30 flex-shrink-0">
                   <AvatarFallback className="glass-prism-button text-white font-semibold">
                     {profile?.fullName ? getInitials(profile.fullName) : getInitials(user?.email || 'U')}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800 dark:text-gray-100">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-800 dark:text-gray-100 truncate" title={profile?.fullName || 'User'}>
                     {profile?.fullName || 'User'}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate" title={user?.email}>
                     {user?.email}
                   </p>
                   <div className="flex items-center mt-1">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${profile?.membershipStatus === 'pro' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <div className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${profile?.membershipStatus === 'pro' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
                       {profile?.membershipStatus === 'pro' ? 'Pro Plan' : 'Starter Plan'}
                     </span>
                   </div>
