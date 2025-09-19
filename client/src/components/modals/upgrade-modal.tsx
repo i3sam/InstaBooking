@@ -104,35 +104,35 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/60 to-white/80 dark:from-gray-900/90 dark:via-blue-950/60 dark:to-gray-900/80 border border-blue-200/40 dark:border-blue-800/40 shadow-2xl max-w-2xl mx-auto rounded-3xl overflow-hidden" data-testid="modal-upgrade">
+      <DialogContent className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/60 to-white/80 dark:from-gray-900/90 dark:via-blue-950/60 dark:to-gray-900/80 border border-blue-200/40 dark:border-blue-800/40 shadow-2xl max-w-lg sm:max-w-xl md:max-w-2xl mx-auto rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto" data-testid="modal-upgrade">
         <div className="relative">
           {/* Enhanced Background decoration with better white/blue theme */}
           <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-300/30 via-blue-400/20 to-blue-500/25 rounded-full -translate-y-20 translate-x-20 blur-2xl animate-pulse"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400/25 via-blue-300/30 to-blue-200/20 rounded-full translate-y-16 -translate-x-16 blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
           <div className="absolute top-1/2 left-1/2 w-60 h-20 bg-gradient-to-r from-blue-100/20 via-white/30 to-blue-100/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-60"></div>
           
-          <div className="relative z-10 p-8">
-            <DialogHeader className="text-center mb-8">
+          <div className="relative z-10 p-4 sm:p-6 md:p-8">
+            <DialogHeader className="text-center mb-4 sm:mb-6 md:mb-8">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto group animate-fade-in-up">
                   <Crown className="h-8 w-8 text-yellow-500 group-hover:scale-110 transition-transform duration-300" />
                 </div>
               </div>
-              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 Upgrade to Pro
               </DialogTitle>
               <p className="text-gray-600 dark:text-gray-300 mt-2">Unlock all features and take your booking business to the next level</p>
             </DialogHeader>
         
-            <div className="space-y-8">
+            <div className="space-y-4 sm:space-y-6 md:space-y-8">
               {/* Currency Selector */}
               <div className="flex justify-center">
                 <CurrencySelector variant="compact" />
               </div>
               
               {/* Plan Details */}
-              <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-900/80 dark:via-blue-950/60 dark:to-gray-900/70 border border-blue-300/30 dark:border-blue-700/30 rounded-2xl p-8 relative overflow-hidden shadow-xl">
-                <Badge className="absolute top-6 right-6 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-lg animate-pulse border-0 px-4 py-2 font-semibold">
+              <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-900/80 dark:via-blue-950/60 dark:to-gray-900/70 border border-blue-300/30 dark:border-blue-700/30 rounded-2xl p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xl">
+                <Badge className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-lg animate-pulse border-0 px-3 py-1 sm:px-4 sm:py-2 font-semibold text-xs sm:text-sm">
                   50% OFF!
                 </Badge>
                 <div className="flex items-center mb-6">
@@ -145,11 +145,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   </div>
                 </div>
                 
-                <div className="flex items-baseline mb-8">
-                  <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{formatPrice(14.99)}</span>
-                  <span className="text-gray-500 dark:text-gray-400 ml-3 text-lg">/month</span>
-                  <div className="ml-4 glass-prism backdrop-blur-md bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1">
-                    <span className="text-red-600 dark:text-red-400 text-sm font-semibold line-through">{formatPrice(29.99)}</span>
+                <div className="flex flex-wrap items-baseline mb-6 sm:mb-8 gap-2">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{formatPrice(14.99)}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">/month</span>
+                  <div className="glass-prism backdrop-blur-md bg-red-500/10 border border-red-500/20 rounded-lg px-2 sm:px-3 py-1">
+                    <span className="text-red-600 dark:text-red-400 text-xs sm:text-sm font-semibold line-through">{formatPrice(29.99)}</span>
                   </div>
                 </div>
                 
@@ -175,8 +175,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               </div>
 
               {/* Current Plan Info */}
-              <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 dark:from-gray-900/60 dark:via-blue-950/40 dark:to-gray-900/50 border border-blue-200/20 dark:border-blue-800/20 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between">
+              <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 dark:from-gray-900/60 dark:via-blue-950/40 dark:to-gray-900/50 border border-blue-200/20 dark:border-blue-800/20 rounded-xl p-4 sm:p-6 shadow-lg">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-start sm:items-center sm:justify-between">
                   <div>
                     <p className="font-semibold text-gray-800 dark:text-gray-100 mb-1">
                       Current Plan: {profile?.membershipStatus === 'pro' ? 'Pro' : 'Starter'}
