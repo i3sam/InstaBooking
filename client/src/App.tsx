@@ -8,6 +8,7 @@ import { CurrencyProvider } from "@/hooks/use-currency";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
+import ResetPassword from "@/pages/reset-password";
 import Dashboard from "@/pages/dashboard";
 import CreatePage from "@/pages/create-page";
 import PublicBooking from "@/pages/public-booking";
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/sales" component={Sales} />
       <Route path="/tutorial" component={Tutorial} />

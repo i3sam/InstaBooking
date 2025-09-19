@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Home, Eye, EyeOff } from 'lucide-react';
+import EmailConfirmationModal from '@/components/modals/email-confirmation-modal';
 
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { signup, signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -37,12 +39,21 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      await signup(formData.email, formData.password, formData.fullName);
-      toast({
-        title: "Account created!",
-        description: "Welcome to BookingGen. Let's get you started.",
-      });
-      setLocation('/dashboard');
+      const result = await signup(formData.email, formData.password, formData.fullName);
+      
+      if (result.needsEmailConfirmation) {
+        setShowEmailConfirmation(true);
+        toast({
+          title: "Check your email!",
+          description: "We sent you a confirmation link to complete your signup.",
+        });
+      } else {
+        toast({
+          title: "Account created!",
+          description: "Welcome to BookingGen. Let's get you started.",
+        });
+        setLocation('/dashboard');
+      }
     } catch (error) {
       toast({
         title: "Signup failed",
@@ -243,6 +254,13 @@ export default function Signup() {
           </div>
         </div>
       </div>
+
+      {/* Email Confirmation Modal */}
+      <EmailConfirmationModal
+        isOpen={showEmailConfirmation}
+        onClose={() => setShowEmailConfirmation(false)}
+        email={formData.email}
+      />
     </div>
   );
 }

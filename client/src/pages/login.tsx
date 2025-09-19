@@ -10,9 +10,10 @@ import { CalendarDays, Home, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login, signInWithGoogle } = useAuth();
+  const { login, signInWithGoogle, resetPassword } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -52,6 +53,34 @@ export default function Login() {
         description: "Failed to sign in with Google. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      await resetPassword(formData.email);
+      toast({
+        title: "Reset email sent!",
+        description: "Check your email for password reset instructions.",
+      });
+    } catch (error) {
+      toast({
+        title: "Reset failed",
+        description: "Failed to send reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -144,8 +173,15 @@ export default function Login() {
                 />
                 <Label htmlFor="remember" className="text-sm text-foreground">Remember me</Label>
               </div>
-              <Button variant="link" className="text-sm p-0 text-primary hover:text-primary/80">
-                Forgot password?
+              <Button 
+                type="button"
+                variant="link" 
+                className="text-sm p-0 text-primary hover:text-primary/80"
+                onClick={handleForgotPassword}
+                disabled={resetLoading}
+                data-testid="button-forgot-password"
+              >
+                {resetLoading ? "Sending..." : "Forgot password?"}
               </Button>
             </div>
             

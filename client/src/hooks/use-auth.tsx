@@ -23,8 +23,9 @@ interface AuthContextType {
   profile: Profile | null;
   session: Session | null;
   login: (email: string, password: string, redirectTo?: string) => Promise<void>;
-  signup: (email: string, password: string, fullName: string) => Promise<void>;
+  signup: (email: string, password: string, fullName: string) => Promise<{ needsEmailConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
 }
@@ -72,7 +73,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
           email: session.user.email || '',
           fullName: session.user.user_metadata?.full_name
         });
-        fetchProfile(session.user.id);
+        
+        // Create profile if this is a new signup verification
+        if (event === 'SIGNED_IN' && session.user.email_confirmed_at) {
+          try {
+            await fetchProfile(session.user.id);
+          } catch (error) {
+            // If profile doesn't exist, create it
+            try {
+              await apiRequest('POST', '/api/profile', {
+                userId: session.user.id,
+                fullName: session.user.user_metadata?.full_name || '',
+              });
+              await fetchProfile(session.user.id);
+            } catch (createError) {
+              console.error('Failed to create profile after email verification:', createError);
+            }
+          }
+        } else {
+          fetchProfile(session.user.id);
+        }
         
         // Handle redirect after successful login
         if (redirectAfterLogin && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
@@ -95,12 +115,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   const fetchProfile = async (userId: string) => {
     try {
       const response = await apiRequest('GET', '/api/profile');
+      
+      if (!response.ok) {
+        // If profile doesn't exist (404), throw to trigger creation
+        if (response.status === 404) {
+          throw new Error('Profile not found');
+        }
+        // For other errors, set fallback profile
+        console.error('Failed to fetch profile:', response.status);
+        setProfile({
+          id: userId,
+          fullName: session?.user?.user_metadata?.full_name || '',
+          membershipStatus: 'free',
+          membershipPlan: undefined,
+          membershipExpires: undefined
+        });
+        return;
+      }
+      
       const profileData = await response.json();
       setProfile(profileData);
       console.log('Profile fetched successfully:', profileData);
     } catch (error) {
+      // Re-throw 404 errors to allow profile creation
+      if (error instanceof Error && error.message === 'Profile not found') {
+        throw error;
+      }
+      
       console.error('Failed to fetch profile:', error);
-      // Set a default profile to unblock the UI if server is completely down
+      // Set a default profile for network/server errors
       setProfile({
         id: userId,
         fullName: session?.user?.user_metadata?.full_name || '',
@@ -132,6 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         data: {
           full_name: fullName,
         },
+        emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     });
 
@@ -139,8 +183,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       throw new Error(error.message);
     }
 
-    // Create profile in our database
-    if (data.user) {
+    // Check if email confirmation is needed
+    const needsEmailConfirmation = !data.session && data.user && !data.user.email_confirmed_at;
+
+    // Create profile in our database only if user is immediately confirmed
+    if (data.user && data.session) {
       try {
         await apiRequest('POST', '/api/profile', {
           userId: data.user.id,
@@ -150,6 +197,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         console.error('Failed to create profile:', error);
       }
     }
+
+    return { needsEmailConfirmation: !!needsEmailConfirmation };
   };
 
   const signInWithGoogle = async () => {
@@ -158,6 +207,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
       },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
@@ -180,6 +239,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       login, 
       signup, 
       signInWithGoogle, 
+      resetPassword, 
       logout, 
       loading 
     }}>
