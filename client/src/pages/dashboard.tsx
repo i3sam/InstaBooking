@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -261,6 +261,314 @@ function AnalyticsSection() {
   );
 }
 
+interface BugFixesChangelogSectionProps {
+  onReportBug: () => void;
+}
+
+function BugFixesChangelogSection({ onReportBug }: BugFixesChangelogSectionProps) {
+  const changelogData = [
+    {
+      version: "2.1.0",
+      date: "September 2025",
+      type: "feature",
+      title: "Enhanced Glass Prism UI Design",
+      description: "Redesigned the entire interface with our beautiful glass prism effect, featuring improved transparency, blur effects, and white/blue gradients throughout the app.",
+      icon: Palette,
+      items: [
+        "Updated all components with glass prism styling",
+        "Improved responsive design for mobile devices",
+        "Added subtle animations and hover effects",
+        "Enhanced color consistency across the platform"
+      ]
+    },
+    {
+      version: "2.0.5",
+      date: "September 2025",
+      type: "fix",
+      title: "Payment Processing Improvements",
+      description: "Fixed critical issues with Razorpay integration and improved payment success rates.",
+      icon: CreditCard,
+      items: [
+        "Fixed upgrade modal payment flow",
+        "Improved error handling for failed payments",
+        "Added better loading states during payment processing",
+        "Enhanced subscription management features"
+      ]
+    },
+    {
+      version: "2.0.4",
+      date: "September 2025", 
+      type: "feature",
+      title: "Advanced Booking Page Customization",
+      description: "Added powerful customization options for booking pages with new themes and layout options.",
+      icon: Smartphone,
+      items: [
+        "New booking page themes and color schemes",
+        "Custom logo upload functionality",
+        "Advanced typography options",
+        "Mobile-optimized booking forms",
+        "Real-time preview while editing"
+      ]
+    },
+    {
+      version: "2.0.3",
+      date: "August 2025",
+      type: "fix",
+      title: "Database Performance Optimization",
+      description: "Significantly improved app performance through database optimizations and caching.",
+      icon: Database,
+      items: [
+        "Optimized database queries for faster loading",
+        "Implemented intelligent caching system",
+        "Fixed memory leaks in data fetching",
+        "Improved connection pooling for better stability"
+      ]
+    },
+    {
+      version: "2.0.2",
+      date: "August 2025",
+      type: "feature",
+      title: "Smart Analytics Dashboard",
+      description: "Introduced comprehensive analytics with conversion tracking and revenue insights.",
+      icon: Search,
+      items: [
+        "Real-time booking conversion analytics",
+        "Revenue tracking and forecasting",
+        "Customer behavior insights",
+        "Exportable reports and data",
+        "Custom date range filtering"
+      ]
+    },
+    {
+      version: "2.0.1",
+      date: "August 2025",
+      type: "fix",
+      title: "Authentication & Security Enhancements", 
+      description: "Strengthened security measures and improved user authentication experience.",
+      icon: Shield,
+      items: [
+        "Enhanced JWT token security",
+        "Improved password reset flow",
+        "Added two-factor authentication support",
+        "Fixed session timeout issues",
+        "Strengthened API endpoint security"
+      ]
+    },
+    {
+      version: "2.0.0",
+      date: "July 2025",
+      type: "feature",
+      title: "Multi-Currency Support & Internationalization",
+      description: "Added support for multiple currencies and international payment methods.",
+      icon: Globe,
+      items: [
+        "Support for 50+ currencies worldwide",
+        "Automatic currency conversion",
+        "Region-specific payment methods",
+        "Localized date and time formatting",
+        "International tax calculation support"
+      ]
+    },
+    {
+      version: "1.9.8",
+      date: "July 2025",
+      type: "feature",
+      title: "Email Automation & Notifications",
+      description: "Powerful email automation system for booking confirmations and reminders.",
+      icon: Mail,
+      items: [
+        "Automated booking confirmation emails",
+        "Customizable email templates",
+        "Smart reminder scheduling",
+        "Email deliverability improvements",
+        "Customer communication tracking"
+      ]
+    },
+    {
+      version: "1.9.7",
+      date: "June 2025",
+      type: "fix",
+      title: "Mobile Responsiveness Fixes",
+      description: "Fixed various mobile responsiveness issues and improved touch interactions.",
+      icon: Smartphone,
+      items: [
+        "Fixed mobile navigation menu issues",
+        "Improved touch target sizes",
+        "Fixed form input focus on mobile devices",
+        "Enhanced mobile booking flow",
+        "Optimized loading speeds on slower connections"
+      ]
+    },
+    {
+      version: "1.9.6",
+      date: "June 2025",
+      type: "feature",
+      title: "Advanced Calendar Integration",
+      description: "Seamless integration with popular calendar applications and scheduling tools.",
+      icon: Calendar,
+      items: [
+        "Google Calendar synchronization",
+        "Outlook calendar integration",
+        "iCal export functionality",
+        "Automatic timezone detection",
+        "Conflict detection and prevention",
+        "Bulk calendar operations"
+      ]
+    }
+  ];
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent mb-2">
+              Bug Fixes & Changelogs
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Stay updated with the latest features, improvements, and bug fixes
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            <Button
+              onClick={onReportBug}
+              className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30"
+              data-testid="button-report-bug-header"
+            >
+              <Bug className="h-4 w-4 mr-2" />
+              Report Bug
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 shadow-xl hover-lift">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/40 to-white/50 border border-white/30">
+              <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+              {changelogData.filter(item => item.type === 'feature').length}
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">New Features</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 shadow-xl hover-lift">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/40 to-white/50 border border-white/30">
+              <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+              {changelogData.filter(item => item.type === 'fix').length}
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Bug Fixes</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 shadow-xl hover-lift">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/40 to-white/50 border border-white/30">
+              <RefreshCw className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+              {changelogData.length}
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Total Updates</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Changelog Items */}
+      <div className="space-y-6">
+        {changelogData.map((item, index) => (
+          <Card key={index} className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 shadow-xl hover-lift">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className={`w-12 h-12 glass-prism rounded-xl flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/40 to-white/50 border border-white/30 flex-shrink-0`}>
+                  <item.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <h4 className="text-lg font-semibold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent">
+                        {item.title}
+                      </h4>
+                      <div className={`glass-prism backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-white/30 ${
+                        item.type === 'feature' 
+                          ? 'bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 text-blue-800 dark:text-blue-100'
+                          : 'bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 text-blue-800 dark:text-blue-100'
+                      }`}>
+                        {item.type === 'feature' ? 'New Feature' : 'Bug Fix'}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      v{item.version} • {item.date}
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    {item.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {item.items.map((subItem, subIndex) => (
+                      <div key={subIndex} className="flex items-center space-x-2">
+                        <div className="w-4 h-4 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30 flex-shrink-0">
+                          <CheckCircle className="h-2.5 w-2.5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{subItem}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* CTA Section */}
+      <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 shadow-xl">
+        <CardContent className="p-8 text-center">
+          <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/40 to-white/50 border border-white/30">
+            <Bug className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h4 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent mb-2">
+            Found a Bug or Have Feedback?
+          </h4>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+            Help us improve BookingGen by reporting bugs or suggesting new features. Your feedback is valuable to us!
+          </p>
+          <div className="flex justify-center space-x-4">
+            <Button
+              onClick={onReportBug}
+              className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30"
+              data-testid="button-report-bug-footer"
+            >
+              <Bug className="h-4 w-4 mr-2" />
+              Report a Bug
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.open('mailto:support@bookinggen.com?subject=Feature Request', '_blank')}
+              className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/40 via-blue-50/30 to-white/30 dark:from-gray-800/40 dark:via-blue-950/30 dark:to-gray-800/30 border border-white/30 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 text-blue-700 dark:text-blue-300"
+              data-testid="button-request-feature-footer"
+            >
+              <Lightbulb className="h-4 w-4 mr-2" />
+              Request Feature
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 function SettingsSection() {
   const { user, profile, logout, resetPassword } = useAuth();
   const { toast } = useToast();
@@ -269,6 +577,7 @@ function SettingsSection() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
   const [cancelSubscriptionLoading, setCancelSubscriptionLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('account');
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
     email: user?.email || '',
@@ -341,6 +650,11 @@ function SettingsSection() {
     }
   };
   
+  const settingsTabs = [
+    { id: 'account', label: 'Account', icon: User },
+    { id: 'changelog', label: 'Bug Fixes & Changelogs', icon: Bug },
+  ];
+
   return (
     <div>
       <div className="mb-8">
@@ -348,8 +662,33 @@ function SettingsSection() {
         <p className="text-gray-600 dark:text-gray-300">Manage your account and preferences</p>
       </div>
 
-      <div className="max-w-4xl">
-        <div className="grid lg:grid-cols-2 gap-8">
+      {/* Settings Navigation Tabs */}
+      <div className="mb-8">
+        <div className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl p-2 shadow-xl">
+          <div className="flex space-x-2">
+            {settingsTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex items-center justify-center px-4 py-3 rounded-xl transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md'
+                }`}
+                data-testid={`tab-${tab.id}`}
+              >
+                <tab.icon className="h-5 w-5 mr-2" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'account' ? (
+        <div className="max-w-4xl">
+          <div className="grid lg:grid-cols-2 gap-8">
           <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
             <CardContent className="p-8">
               <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Profile Information</h3>
@@ -631,7 +970,10 @@ function SettingsSection() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      ) : (
+        <BugFixesChangelogSection onReportBug={() => setLocation('/report-bug')} />
+      )}
 
       <UpgradeModal 
         isOpen={showUpgradeModal} 
