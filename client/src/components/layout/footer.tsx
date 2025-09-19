@@ -1,11 +1,12 @@
 import { CalendarDays } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function Footer() {
   const footerLinks = {
     product: [
-      { name: 'Features', href: '#features' },
-      { name: 'Pricing', href: '/pricing' },
-      { name: 'How It Works', href: '#how-it-works' },
+      { name: 'Features', href: '/#features', isSection: true },
+      { name: 'Pricing', href: '/pricing', isSection: false },
+      { name: 'How It Works', href: '/#how-it-works', isSection: true },
     ],
     support: [
       { name: 'Legal & Support', href: '/legal' },
@@ -16,11 +17,6 @@ export default function Footer() {
     ],
   };
 
-  const socialLinks = [
-    { name: 'Twitter', href: '#', icon: '𝕏' },
-    { name: 'LinkedIn', href: '#', icon: 'in' },
-    { name: 'GitHub', href: '#', icon: '⚡' },
-  ];
 
   return (
     <footer className="bg-muted/50 border-t border-border py-16">
@@ -45,13 +41,23 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
-                  <a 
-                    href={link.href} 
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    data-testid={`footer-link-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    {link.name}
-                  </a>
+                  {link.isSection ? (
+                    <a 
+                      href={link.href} 
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      data-testid={`footer-link-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <Link 
+                      href={link.href}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      data-testid={`footer-link-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -75,27 +81,18 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social Links */}
+          {/* Connect Section */}
           <div>
             <h4 className="font-semibold text-foreground mb-4">Connect</h4>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                  data-testid={`social-link-${social.name.toLowerCase()}`}
-                >
-                  <span className="text-sm font-bold">{social.icon}</span>
-                </a>
-              ))}
+            <div className="text-muted-foreground">
+              <span data-testid="connect-coming-soon">Coming Soon</span>
             </div>
           </div>
         </div>
 
         {/* Copyright */}
         <div className="border-t border-border pt-8 text-center text-muted-foreground">
-          <p>&copy; 2024 BookingGen. All rights reserved.</p>
+          <p>&copy; 2025 BookingGen. All rights reserved.</p>
         </div>
       </div>
     </footer>
