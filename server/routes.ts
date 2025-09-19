@@ -776,7 +776,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Server-side canonical pricing - ignore any client-provided amount
       const PLAN_PRICING = {
-        'pro': { amount: 10, currency: 'USD' }
+        'pro': { amount: 14.99, currency: 'USD' }
       };
       
       const planConfig = PLAN_PRICING[plan as keyof typeof PLAN_PRICING];

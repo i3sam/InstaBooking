@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -262,11 +262,13 @@ function AnalyticsSection() {
 }
 
 function SettingsSection() {
-  const { user, profile, logout } = useAuth();
+  const { user, profile, logout, resetPassword } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  const [cancelSubscriptionLoading, setCancelSubscriptionLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
     email: user?.email || '',
@@ -293,6 +295,51 @@ function SettingsSection() {
       });
     },
   });
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+    
+    setResetPasswordLoading(true);
+    try {
+      await resetPassword(user.email);
+      toast({
+        title: "Password reset email sent!",
+        description: "Check your email for instructions to reset your password.",
+      });
+    } catch (error) {
+      toast({
+        title: "Reset failed",
+        description: "Failed to send password reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetPasswordLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    setCancelSubscriptionLoading(true);
+    try {
+      const response = await apiRequest('POST', '/api/payments/cancel-subscription', {});
+      if (response.ok) {
+        queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+        toast({
+          title: "Subscription cancelled",
+          description: "Your subscription will remain active until the end of your billing period.",
+        });
+      } else {
+        throw new Error('Failed to cancel subscription');
+      }
+    } catch (error) {
+      toast({
+        title: "Cancellation failed",
+        description: "Failed to cancel subscription. Please contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setCancelSubscriptionLoading(false);
+    }
+  };
   
   return (
     <div>
@@ -391,27 +438,142 @@ function SettingsSection() {
           </Card>
         </div>
 
-        {/* Current Plan Status - Clean and Simple */}
-        {profile?.membershipStatus === 'pro' && (
-          <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
+        {/* Security Settings */}
+        <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
+          <CardContent className="p-8">
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6 flex items-center">
+              <Shield className="h-5 w-5 mr-2" />
+              Security Settings
+            </h3>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-4 glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl">
                 <div>
-                  <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">Current Plan</h3>
-                  <p className="text-gray-600 dark:text-gray-300">Pro Plan - All features unlocked</p>
+                  <p className="font-medium text-gray-800 dark:text-gray-100">Password</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Reset your account password</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-green-600 dark:text-green-400 font-medium mb-1">Active</div>
-                  {profile?.membershipExpires && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Renews {new Date(profile.membershipExpires).toLocaleDateString()}
-                    </p>
+                <Button
+                  onClick={handlePasswordReset}
+                  disabled={resetPasswordLoading}
+                  className="glass-prism-button text-white shadow-lg backdrop-blur-lg h-10 px-4"
+                  data-testid="button-reset-password"
+                >
+                  {resetPasswordLoading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Reset Password
+                    </>
                   )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Management */}
+        <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
+          <CardContent className="p-8">
+            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6 flex items-center">
+              <CreditCard className="h-5 w-5 mr-2" />
+              Subscription Management
+            </h3>
+            
+            {profile?.membershipStatus === 'pro' ? (
+              <div className="space-y-6">
+                {/* Plan Status */}
+                <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 glass-prism rounded-xl flex items-center justify-center mr-3 backdrop-blur-md bg-green-500/20 border border-green-500/30">
+                        <Crown className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-100">Pro Plan</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">All features unlocked</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-green-600 dark:text-green-400 font-medium mb-1 flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        Active
+                      </div>
+                      {profile?.membershipExpires && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          Renews {new Date(profile.membershipExpires).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Plan Features */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    {['Unlimited pages', 'Custom branding', 'Analytics', 'Priority support'].map((feature) => (
+                      <div key={feature} className="flex items-center">
+                        <div className="w-4 h-4 glass-prism rounded-full flex items-center justify-center mr-2 backdrop-blur-md bg-green-500/20 border border-green-500/30">
+                          <div className="w-1.5 h-1.5 bg-green-600 dark:bg-green-400 rounded-full"></div>
+                        </div>
+                        <span className="text-xs text-gray-700 dark:text-gray-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Subscription Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button
+                    variant="outline"
+                    className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12"
+                    onClick={() => setShowUpgradeModal(true)}
+                    data-testid="button-manage-billing"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Manage Billing
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="glass-prism backdrop-blur-md bg-red-500/20 dark:bg-red-600/20 border border-red-500/30 hover:bg-red-500/30 dark:hover:bg-red-600/30 text-red-700 dark:text-red-400 font-medium transition-all duration-300 flex items-center justify-center h-12"
+                    onClick={handleCancelSubscription}
+                    disabled={cancelSubscriptionLoading}
+                    data-testid="button-cancel-subscription"
+                  >
+                    {cancelSubscriptionLoading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Cancelling...
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        Cancel Subscription
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6 text-center">
+                <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-blue-500/20 border border-blue-500/30">
+                  <Crown className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Starter Plan</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Limited features available</p>
+                <Button
+                  className="glass-prism-button text-white shadow-lg backdrop-blur-lg"
+                  onClick={() => setShowUpgradeModal(true)}
+                  data-testid="button-upgrade-to-pro"
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade to Pro
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Extras Section */}
         <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
