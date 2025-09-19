@@ -1,6 +1,9 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Mail, CheckCircle, ExternalLink } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { Mail, CheckCircle, ExternalLink, RefreshCw, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface EmailConfirmationModalProps {
   isOpen: boolean;
@@ -9,6 +12,23 @@ interface EmailConfirmationModalProps {
 }
 
 export default function EmailConfirmationModal({ isOpen, onClose, email }: EmailConfirmationModalProps) {
+  const { resendConfirmation } = useAuth();
+  const { toast } = useToast();
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [emailsSent, setEmailsSent] = useState(1);
+
+  // Cooldown timer for resend button
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      interval = setInterval(() => {
+        setResendCooldown(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendCooldown]);
+
   const handleOpenEmailClient = () => {
     // Try to open common email clients
     const emailDomain = email.split('@')[1]?.toLowerCase();
@@ -28,6 +48,27 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
     window.open(emailUrl, '_blank');
   };
 
+  const handleResendEmail = async () => {
+    setResendLoading(true);
+    try {
+      await resendConfirmation(email);
+      setEmailsSent(prev => prev + 1);
+      setResendCooldown(60); // 60 second cooldown
+      toast({
+        title: "Email sent!",
+        description: "We've sent another confirmation email to your inbox.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to resend email",
+        description: "Please try again in a few moments.",
+        variant: "destructive",
+      });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl max-w-md mx-auto rounded-3xl overflow-hidden">
@@ -44,11 +85,13 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Check your email
             </DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
-              We sent a confirmation link to{' '}
-              <span className="font-semibold text-blue-600 dark:text-blue-400">
-                {email}
-              </span>
+            <DialogDescription asChild>
+              <div className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
+                {emailsSent === 1 ? 'We sent' : `We've sent ${emailsSent}`} confirmation {emailsSent === 1 ? 'link' : 'emails'} to{' '}
+                <span className="font-semibold text-blue-600 dark:text-blue-400">
+                  {email}
+                </span>
+              </div>
             </DialogDescription>
           </DialogHeader>
 
@@ -87,9 +130,34 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
               </Button>
               
               <Button
+                onClick={handleResendEmail}
+                disabled={resendLoading || resendCooldown > 0}
                 variant="outline"
+                className="w-full h-12 glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-resend-email"
+              >
+                {resendLoading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : resendCooldown > 0 ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2" />
+                    Resend in {resendCooldown}s
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Resend Email
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                variant="ghost"
                 onClick={onClose}
-                className="w-full h-12 glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300"
+                className="w-full h-12 glass-prism backdrop-blur-md bg-transparent border border-transparent hover:bg-white/10 dark:hover:bg-black/10 transition-all duration-300"
                 data-testid="button-close-modal"
               >
                 I'll check later
@@ -97,9 +165,17 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
             </div>
 
             {/* Help Text */}
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Didn't receive the email? Check your spam folder or contact support.
-            </p>
+            <div className="space-y-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Didn't receive the email? Check your spam folder first.
+              </p>
+              {emailsSent > 1 && (
+                <p className="text-xs text-green-600 dark:text-green-400 flex items-center justify-center">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Email resent successfully
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -26,6 +26,7 @@ interface AuthContextType {
   signup: (email: string, password: string, fullName: string) => Promise<{ needsEmailConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  resendConfirmation: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
 }
@@ -33,7 +34,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -95,7 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         }
         
         // Handle redirect after successful login
-        if (redirectAfterLogin && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        // Don't redirect if user is on reset password page (they came from email link)
+        if (redirectAfterLogin && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && location !== '/reset-password') {
           setTimeout(() => {
             setLocation(redirectAfterLogin);
             setRedirectAfterLogin(null);
@@ -110,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     });
 
     return () => subscription.unsubscribe();
-  }, [redirectAfterLogin, setLocation]);
+  }, [redirectAfterLogin, setLocation, location]);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -224,6 +226,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     }
   };
 
+  const resendConfirmation = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -240,6 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
       signup, 
       signInWithGoogle, 
       resetPassword, 
+      resendConfirmation, 
       logout, 
       loading 
     }}>
