@@ -71,8 +71,8 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl max-w-md mx-auto rounded-3xl overflow-hidden">
-        <div className="p-8 text-center">
+      <DialogContent className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/60 to-white/80 dark:from-gray-900/90 dark:via-blue-950/60 dark:to-gray-900/80 border border-blue-200/40 dark:border-blue-800/40 shadow-2xl max-w-lg w-full mx-auto my-8 rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="p-6 sm:p-8 text-center">
           {/* Animated Email Icon */}
           <div className="relative mb-6">
             <div className="w-20 h-20 glass-prism rounded-full flex items-center justify-center mx-auto group animate-fade-in-up">
@@ -97,7 +97,7 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
 
           <div className="mt-8 space-y-6">
             {/* Steps */}
-            <div className="glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl p-6 text-left">
+            <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 dark:from-gray-900/60 dark:via-blue-950/40 dark:to-gray-900/50 border border-blue-200/20 dark:border-blue-800/20 rounded-xl p-4 sm:p-6 text-left shadow-lg">
               <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
                 <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
                 Next steps:
@@ -122,7 +122,7 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
             <div className="space-y-3">
               <Button
                 onClick={handleOpenEmailClient}
-                className="w-full h-12 glass-prism-button text-white shadow-lg backdrop-blur-lg flex items-center justify-center"
+                className="w-full h-12 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 text-white shadow-lg backdrop-blur-lg flex items-center justify-center border-0 font-semibold transition-all duration-300 hover:scale-105"
                 data-testid="button-open-email"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -133,7 +133,7 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
                 onClick={handleResendEmail}
                 disabled={resendLoading || resendCooldown > 0}
                 variant="outline"
-                className="w-full h-12 glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 glass-prism backdrop-blur-md bg-white/20 dark:bg-gray-800/30 border border-blue-200/40 dark:border-blue-700/40 hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-blue-700 dark:text-blue-300 font-medium"
                 data-testid="button-resend-email"
               >
                 {resendLoading ? (
@@ -157,7 +157,7 @@ export default function EmailConfirmationModal({ isOpen, onClose, email }: Email
               <Button
                 variant="ghost"
                 onClick={onClose}
-                className="w-full h-12 glass-prism backdrop-blur-md bg-transparent border border-transparent hover:bg-white/10 dark:hover:bg-black/10 transition-all duration-300"
+                className="w-full h-12 glass-prism backdrop-blur-md bg-transparent border border-transparent hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all duration-300 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                 data-testid="button-close-modal"
               >
                 I'll check later

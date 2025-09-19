@@ -36,7 +36,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   ];
 
   return (
-    <div className="w-64 glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-r border-white/20 h-screen flex flex-col shadow-2xl animate-slide-in-left">
+    <div className="w-64 glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-r border-white/20 h-screen flex flex-col shadow-2xl animate-slide-in-left fixed left-0 top-0 z-40 overflow-y-auto overscroll-contain">
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center space-x-3">

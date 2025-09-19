@@ -104,11 +104,12 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl max-w-2xl mx-auto rounded-3xl overflow-hidden" data-testid="modal-upgrade">
+      <DialogContent className="glass-prism-card backdrop-blur-xl bg-gradient-to-br from-white/90 via-blue-50/60 to-white/80 dark:from-gray-900/90 dark:via-blue-950/60 dark:to-gray-900/80 border border-blue-200/40 dark:border-blue-800/40 shadow-2xl max-w-2xl mx-auto rounded-3xl overflow-hidden" data-testid="modal-upgrade">
         <div className="relative">
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full -translate-y-16 translate-x-16 blur-xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full translate-y-12 -translate-x-12 blur-xl"></div>
+          {/* Enhanced Background decoration with better white/blue theme */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-300/30 via-blue-400/20 to-blue-500/25 rounded-full -translate-y-20 translate-x-20 blur-2xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400/25 via-blue-300/30 to-blue-200/20 rounded-full translate-y-16 -translate-x-16 blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-60 h-20 bg-gradient-to-r from-blue-100/20 via-white/30 to-blue-100/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-60"></div>
           
           <div className="relative z-10 p-8">
             <DialogHeader className="text-center mb-8">
@@ -130,13 +131,13 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               </div>
               
               {/* Plan Details */}
-              <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 border border-white/20 rounded-2xl p-8 relative overflow-hidden">
-                <Badge className="absolute top-6 right-6 glass-prism-button text-white shadow-lg animate-pulse">
+              <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-900/80 dark:via-blue-950/60 dark:to-gray-900/70 border border-blue-300/30 dark:border-blue-700/30 rounded-2xl p-8 relative overflow-hidden shadow-xl">
+                <Badge className="absolute top-6 right-6 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-lg animate-pulse border-0 px-4 py-2 font-semibold">
                   50% OFF!
                 </Badge>
                 <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mr-4 backdrop-blur-md bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-white/30">
-                    <Crown className="h-6 w-6 text-yellow-500" />
+                  <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mr-4 backdrop-blur-md bg-gradient-to-br from-blue-500/20 via-blue-400/25 to-blue-300/20 border border-blue-300/40 dark:border-blue-600/40">
+                    <Crown className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Pro Plan</h3>
@@ -174,7 +175,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               </div>
 
               {/* Current Plan Info */}
-              <div className="glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl p-6">
+              <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 dark:from-gray-900/60 dark:via-blue-950/40 dark:to-gray-900/50 border border-blue-200/20 dark:border-blue-800/20 rounded-xl p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold text-gray-800 dark:text-gray-100 mb-1">
@@ -184,7 +185,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                       {profile?.membershipStatus === 'pro' ? 'All features included' : 'Limited features - upgrade to unlock everything'}
                     </p>
                   </div>
-                  <Badge className={profile?.membershipStatus === 'pro' ? 'glass-prism-button text-white' : 'glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 text-gray-700 dark:text-gray-300'}>
+                  <Badge className={profile?.membershipStatus === 'pro' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-0' : 'bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-600'}>
                     {profile?.membershipStatus === 'pro' ? 'Pro' : 'Starter'}
                   </Badge>
                 </div>
@@ -195,7 +196,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 <Button
                   variant="ghost"
                   onClick={onClose}
-                  className="flex-1 h-12 glass-prism backdrop-blur-md bg-transparent border border-white/20 hover:bg-white/10 dark:hover:bg-black/10 transition-all duration-300 text-gray-700 dark:text-gray-300"
+                  className="flex-1 h-12 glass-prism backdrop-blur-md bg-white/20 dark:bg-gray-800/30 border border-blue-200/40 dark:border-blue-700/40 hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 text-blue-700 dark:text-blue-300 font-medium"
                   data-testid="button-cancel-upgrade"
                 >
                   Maybe Later
@@ -205,7 +206,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   size="lg"
                   onClick={handleUpgrade}
                   disabled={isProcessing}
-                  className="flex-1 h-12 glass-prism-button text-white shadow-lg backdrop-blur-lg hover:scale-105 transition-all duration-300"
+                  className="flex-1 h-12 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 text-white shadow-lg backdrop-blur-lg hover:scale-105 transition-all duration-300 border-0 font-semibold"
                   data-testid="button-confirm-upgrade"
                 >
                   {isProcessing ? (

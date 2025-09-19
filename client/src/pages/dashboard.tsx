@@ -73,7 +73,7 @@ export default function Dashboard() {
           </div>
         )}
         
-        <div className="flex-1 w-full lg:w-auto">
+        <div className="flex-1 w-full lg:w-auto lg:ml-64">
           {/* Header */}
           <header className="glass-prism-card mx-4 lg:mx-8 my-6 px-6 py-4 backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl shadow-2xl">
             <div className="flex items-center justify-between">
