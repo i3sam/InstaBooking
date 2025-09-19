@@ -17,6 +17,7 @@ export default function Signup() {
     fullName: '',
     email: '',
     password: '',
+    remember: false,
     agreeToTerms: false
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -159,22 +160,35 @@ export default function Signup() {
               </div>
             </div>
             
-            <div className="flex items-start space-x-2">
-              <Checkbox 
-                id="terms"
-                checked={formData.agreeToTerms}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, agreeToTerms: !!checked }))}
-              />
-              <Label htmlFor="terms" className="text-sm leading-5 text-foreground">
-                I agree to the{' '}
-                <Button variant="link" className="p-0 h-auto text-primary text-sm hover:text-primary/80 font-medium">
-                  Terms of Service
-                </Button>
-                {' '}and{' '}
-                <Button variant="link" className="p-0 h-auto text-primary text-sm hover:text-primary/80 font-medium">
-                  Privacy Policy
-                </Button>
-              </Label>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="remember"
+                  checked={formData.remember}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, remember: !!checked }))}
+                  data-testid="checkbox-remember"
+                />
+                <Label htmlFor="remember" className="text-sm text-foreground">Remember me</Label>
+              </div>
+              
+              <div className="flex items-start space-x-2">
+                <Checkbox 
+                  id="terms"
+                  checked={formData.agreeToTerms}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, agreeToTerms: !!checked }))}
+                  data-testid="checkbox-terms"
+                />
+                <Label htmlFor="terms" className="text-sm leading-5 text-foreground">
+                  I agree to the{' '}
+                  <Button variant="link" className="p-0 h-auto text-primary text-sm hover:text-primary/80 font-medium">
+                    Terms of Service
+                  </Button>
+                  {' '}and{' '}
+                  <Button variant="link" className="p-0 h-auto text-primary text-sm hover:text-primary/80 font-medium">
+                    Privacy Policy
+                  </Button>
+                </Label>
+              </div>
             </div>
             
             <Button 

@@ -444,10 +444,10 @@ function SettingsSection() {
         <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
           <CardContent className="p-8">
             <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Account Actions</h3>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Button
                 variant="outline"
-                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12"
+                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12 w-full"
                 onClick={() => setLocation('/')}
                 data-testid="button-back-home"
               >
@@ -456,7 +456,7 @@ function SettingsSection() {
               </Button>
               <Button
                 variant="destructive"
-                className="glass-prism backdrop-blur-md bg-red-500/80 dark:bg-red-600/80 border border-red-400/30 hover:bg-red-600/90 dark:hover:bg-red-700/90 text-white transition-all duration-300 flex items-center justify-center h-12"
+                className="glass-prism backdrop-blur-md bg-red-500 dark:bg-red-600 border-2 border-red-400 hover:bg-red-600 dark:hover:bg-red-700 text-white font-semibold transition-all duration-300 flex items-center justify-center h-12 w-full shadow-lg hover:shadow-xl"
                 onClick={() => {
                   logout();
                   setLocation('/');

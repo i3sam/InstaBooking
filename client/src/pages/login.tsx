@@ -140,6 +140,7 @@ export default function Login() {
                   id="remember"
                   checked={formData.remember}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, remember: !!checked }))}
+                  data-testid="checkbox-remember"
                 />
                 <Label htmlFor="remember" className="text-sm text-foreground">Remember me</Label>
               </div>
