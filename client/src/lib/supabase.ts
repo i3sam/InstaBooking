@@ -11,10 +11,21 @@ export const supabase = (() => {
     return {
       auth: {
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-        signInWithPassword: () => Promise.resolve({ data: { user: null }, error: new Error('Supabase not configured') }),
-        signUp: () => Promise.resolve({ data: { user: null }, error: new Error('Supabase not configured') }),
+        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: new Error('Supabase not configured') }),
+        signUp: () => Promise.resolve({ data: { user: null, session: null }, error: new Error('Supabase not configured') }),
+        signInWithOAuth: () => Promise.resolve({ data: { url: null, provider: null }, error: new Error('Supabase not configured') }),
         signOut: () => Promise.resolve({ error: null }),
-        onAuthStateChange: () => ({ data: { subscription: null }, error: null })
+        resetPasswordForEmail: () => Promise.resolve({ data: {}, error: new Error('Supabase not configured') }),
+        resend: () => Promise.resolve({ data: {}, error: new Error('Supabase not configured') }),
+        onAuthStateChange: () => ({ 
+          data: { 
+            subscription: {
+              unsubscribe: () => {}
+            }
+          }, 
+          error: null 
+        })
       },
       storage: {
         from: () => ({

@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { useLocation } from 'wouter';
 import { supabase } from '@/lib/supabase';
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import type { User as SupabaseUser, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { apiRequest } from '@/lib/queryClient';
 
 interface User {
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       setSession(session);
       if (session?.user) {
         // Store Supabase token for API calls
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       setSession(session);
       
       if (session?.user) {
