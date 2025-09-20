@@ -60,17 +60,17 @@ export default function Legal() {
       response: "24-48 hours"
     },
     {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Chat with our support team in real-time",
-      contact: "Available in dashboard",
-      response: "Instant response"
-    },
-    {
       icon: FileText,
       title: "Help Center",
       description: "Browse our comprehensive knowledge base",
       contact: "Self-service articles",
+      response: "Available 24/7"
+    },
+    {
+      icon: HelpCircle,
+      title: "Documentation",
+      description: "Step-by-step guides and tutorials",
+      contact: "Complete user guides",
       response: "Available 24/7"
     }
   ];

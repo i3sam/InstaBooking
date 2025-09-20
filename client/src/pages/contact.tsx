@@ -61,15 +61,15 @@ export default function Contact() {
       action: () => window.open('mailto:team@bookinggen.xyz', '_blank')
     },
     {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Chat with our support team in real-time",
-      contact: "Available in your dashboard",
-      response: "Instant response during business hours",
-      action: () => setLocation('/dashboard')
+      icon: HeadphonesIcon,
+      title: "Help Center",
+      description: "Browse our comprehensive knowledge base",
+      contact: "Self-service articles available 24/7",
+      response: "Instant access to solutions",
+      action: () => setLocation('/help-center')
     },
     {
-      icon: HeadphonesIcon,
+      icon: Users,
       title: "Priority Support",
       description: "Dedicated support for Pro subscribers",
       contact: "Available for Pro users",
