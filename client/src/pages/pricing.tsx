@@ -23,7 +23,6 @@ export default function Pricing() {
         "Unlimited booking pages",
         "Full customization", 
         "Unlimited bookings",
-        "Payment processing",
         "Analytics dashboard",
         "Priority support",
         "Custom branding",
@@ -52,9 +51,7 @@ export default function Pricing() {
         "Advanced analytics",
         "Custom integrations",
         "Dedicated account manager",
-        "24/7 priority support",
-        "SLA guarantees",
-        "Custom contracts"
+        "24/7 priority support"
       ],
       buttonText: "Contact Sales",
       buttonAction: () => {

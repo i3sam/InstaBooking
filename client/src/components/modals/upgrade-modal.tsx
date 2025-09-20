@@ -157,7 +157,6 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   {[
                     "Unlimited booking pages",
                     "Custom branding",
-                    "Payment processing",
                     "Analytics dashboard",
                     "Priority support",
                     "Full customization",
