@@ -50,7 +50,7 @@ export default function Privacy() {
       content: [
         "Personal Information: When you create an account, we collect your name, email address, and contact details you provide.",
         "Business Information: Details about your business, services, and booking preferences to customize your booking pages.",
-        "Payment Information: We collect billing information through secure payment processors. We do not store full credit card details on our servers.",
+        "Billing Information: We collect billing information through secure processors for subscription management. We do not store full credit card details on our servers.",
         "Usage Data: We automatically collect information about how you use our platform, including IP address, browser type, pages visited, and interaction data.",
         "Customer Data: When your clients make bookings, we collect the information they provide, which you control and own."
       ]
@@ -72,7 +72,7 @@ export default function Privacy() {
       icon: UserCheck,
       content: [
         "We do not sell your personal information to third parties under any circumstances.",
-        "Service Providers: We may share data with trusted third-party services that help us operate our platform (hosting, payment processing, email services).",
+        "Service Providers: We may share data with trusted third-party services that help us operate our platform (hosting, billing services, email services).",
         "Legal Requirements: We may disclose information if required by law, court order, or to protect our rights and safety.",
         "Business Transfers: In the event of a merger or acquisition, user data may be transferred as part of the business assets.",
         "Your Clients: Information you collect through your booking pages is shared with you as the business owner.",

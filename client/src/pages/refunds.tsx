@@ -106,7 +106,7 @@ export default function Refunds() {
       title: "Non-Refundable Items",
       content: [
         "Setup fees: One-time setup or customization fees are generally non-refundable after service delivery.",
-        "Third-party costs: Payment processing fees and third-party service costs cannot be refunded.",
+        "Third-party costs: External service integration costs cannot be refunded.",
         "Abuse or violations: Accounts terminated for terms of service violations are not eligible for refunds.",
         "Downgrade difference: When downgrading plans, the difference is typically applied as credit rather than refunded."
       ]

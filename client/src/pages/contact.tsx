@@ -112,7 +112,7 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <SEO 
         title="Contact Us | BookingGen" 
-        description="Get help from BookingGen's support team. Contact us via email, live chat, or our contact form. We respond within 24-48 hours to all inquiries."
+        description="Get help from BookingGen's support team. Contact us via email or our support form. We respond within 24-48 hours to all inquiries."
         ogTitle="Contact BookingGen Support"
         ogDescription="Contact BookingGen's support team for help with your booking platform. Multiple support options available."
       />

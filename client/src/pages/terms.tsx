@@ -22,7 +22,7 @@ export default function Terms() {
       title: "2. Service Description",
       content: [
         "BookingGen provides online booking page creation and management services for businesses and professionals.",
-        "Our services include custom booking page design, appointment scheduling, payment processing, and customer management tools.",
+        "Our services include custom booking page design, appointment scheduling, and customer management tools.",
         "We reserve the right to modify, suspend, or discontinue any part of our services at any time with reasonable notice."
       ]
     },

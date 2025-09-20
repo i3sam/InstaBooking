@@ -86,7 +86,7 @@ export default function Home() {
     {
       icon: BarChart3,
       title: "Analytics Dashboard",
-      description: "Track bookings, revenue, and customer insights with powerful analytics and reporting tools."
+      description: "Track bookings and performance with powerful analytics and customer insights."
     },
     {
       icon: Bell,
@@ -109,7 +109,7 @@ export default function Home() {
     {
       number: "3",
       title: "Accept Bookings",
-      description: "Start receiving bookings instantly. Manage appointments, accept payments, and grow your business effortlessly."
+      description: "Start receiving bookings instantly. Manage appointments and grow your business effortlessly with our streamlined booking system."
     }
   ];
 
