@@ -24,6 +24,7 @@ import Refunds from "@/pages/refunds";
 import Contact from "@/pages/contact";
 import ReportBug from "@/pages/report-bug";
 import RequestFeature from "@/pages/request-feature";
+import HelpCenter from "@/pages/help-center";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/refunds" component={Refunds} />
       <Route path="/contact" component={Contact} />
+      <Route path="/help-center" component={HelpCenter} />
       <Route path="/dashboard">
         <AuthGuard>
           <Dashboard />
