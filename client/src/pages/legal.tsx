@@ -57,21 +57,27 @@ export default function Legal() {
       title: "Email Support",
       description: "Send us an email for detailed assistance",
       contact: "team@bookinggen.xyz",
-      response: "24-48 hours"
+      response: "24-48 hours",
+      action: () => setLocation('/contact'),
+      buttonText: "Contact Us"
     },
     {
       icon: FileText,
       title: "Help Center",
       description: "Browse our comprehensive knowledge base",
       contact: "Self-service articles",
-      response: "Available 24/7"
+      response: "Available 24/7",
+      action: () => setLocation('/help-center'),
+      buttonText: "Browse Help"
     },
     {
       icon: HelpCircle,
       title: "Documentation",
       description: "Step-by-step guides and tutorials",
       contact: "Complete user guides",
-      response: "Available 24/7"
+      response: "Available 24/7",
+      action: () => setLocation('/tutorial'),
+      buttonText: "View Tutorials"
     }
   ];
 
@@ -180,10 +186,10 @@ export default function Legal() {
                   <CardTitle className="text-xl">{option.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-3">
+                  <p className="text-muted-foreground mb-4">
                     {option.description}
                   </p>
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <Users className="h-4 w-4 text-primary" />
                       <span className="font-medium" data-testid={`text-contact-${index}`}>{option.contact}</span>
@@ -193,6 +199,15 @@ export default function Legal() {
                       <span>{option.response}</span>
                     </div>
                   </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={option.action}
+                    className="w-full"
+                    data-testid={`button-${option.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    {option.buttonText}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
