@@ -5,15 +5,6 @@ import { storage } from "./storage";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
-import Stripe from "stripe";
-
-// Initialize Stripe - Referenced from javascript_stripe integration
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn('Missing STRIPE_SECRET_KEY - Payment functionality will be disabled');
-}
-const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-08-27.basil",
-}) : null;
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema } from '@shared/schema';
@@ -764,139 +755,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await createPaypalOrder(req, res);
   });
 
-  app.post("/paypal/order/:orderID/capture", async (req, res) => {
-    await capturePaypalOrder(req, res);
-  });
-
-  // Stripe payment intent creation - Referenced from javascript_stripe integration
-  app.post("/api/create-payment-intent", verifyToken, async (req: any, res) => {
+  app.post("/paypal/order/:orderID/capture", verifyToken, async (req: any, res) => {
     try {
-      if (!stripe) {
-        return res.status(503).json({ message: "Payment service unavailable. Please check configuration." });
-      }
+      const { orderID } = req.params;
+      const { plan, amount } = req.body;
+      
+      // Capture the PayPal order first
+      const collect = {
+        id: orderID,
+        prefer: "return=minimal",
+      };
 
-      const { plan, currency: requestedCurrency } = req.body;
+      const { createPaypalOrder, capturePaypalOrder: captureOrder, loadPaypalDefault } = await import("./paypal");
+      const { Client, Environment, LogLevel, OrdersController } = await import("@paypal/paypal-server-sdk");
+
+      const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+      const client = new Client({
+        clientCredentialsAuthCredentials: {
+          oAuthClientId: PAYPAL_CLIENT_ID!,
+          oAuthClientSecret: PAYPAL_CLIENT_SECRET!,
+        },
+        environment: process.env.NODE_ENV === "production" ? Environment.Production : Environment.Sandbox,
+      });
+      const ordersController = new OrdersController(client);
       
-      // Currency conversion rates relative to USD
-      const CURRENCY_RATES = {
-        'USD': 1,
-        'EUR': 0.85,
-        'GBP': 0.73,
-        'INR': 83.25,
-        'BHD': 0.376,
-        'AED': 3.67,
-        'SAR': 3.75,
-        'CAD': 1.35,
-        'AUD': 1.52
-      };
-      
-      // Server-side canonical pricing - ignore any client-provided amount
-      const PLAN_PRICING = {
-        'pro': { amount: 14.99, currency: 'USD' }
-      };
-      
-      const planConfig = PLAN_PRICING[plan as keyof typeof PLAN_PRICING];
-      if (!planConfig) {
-        return res.status(400).json({ message: "Invalid plan selected" });
-      }
-      
-      // Validate and use requested currency
-      const currency = requestedCurrency && CURRENCY_RATES[requestedCurrency as keyof typeof CURRENCY_RATES] 
-        ? requestedCurrency 
-        : 'USD';
+      const { body, ...httpResponse } = await ordersController.captureOrder(collect);
+      const jsonResponse = JSON.parse(String(body));
+      const httpStatusCode = httpResponse.statusCode;
+
+      // If capture was successful (status 200 or 201), update membership
+      if (httpStatusCode >= 200 && httpStatusCode < 300 && jsonResponse.status === 'COMPLETED') {
         
-      // Convert price to requested currency
-      const usdAmount = planConfig.amount;
-      const conversionRate = CURRENCY_RATES[currency as keyof typeof CURRENCY_RATES];
-      const canonicalAmount = Math.round((usdAmount * conversionRate) * 100) / 100;
-      
-      // Create Stripe payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(canonicalAmount * 100), // Convert to cents
-        currency: currency.toLowerCase(),
-        payment_method_types: ['card', 'paypal'], // Support both cards and PayPal
-        metadata: {
+        // Store payment record
+        await storage.createPayment({
           userId: req.user.userId,
-          plan: plan,
-          originalAmount: canonicalAmount.toString()
-        }
-      });
+          plan: plan || "pro",
+          amount: amount || "14.99",
+          status: "completed",
+          paypalOrderId: orderID,
+          paypalPaymentId: jsonResponse.id || orderID,
+          meta: { 
+            paypal_order_id: orderID,
+            paypal_payment_id: jsonResponse.id || orderID,
+            paypal_response: jsonResponse,
+            completedAt: new Date().toISOString() 
+          }
+        });
 
-      // Store payment record for tracking
-      await storage.createPayment({
-        userId: req.user.userId,
-        plan,
-        amount: canonicalAmount,
-        status: "created",
-        paypalOrderId: paymentIntent.id, // Store Stripe payment intent ID
-        meta: { 
-          currency, 
-          usdAmount, 
-          planConfig,
-          stripePaymentIntentId: paymentIntent.id
-        }
-      });
-
-      res.json({ 
-        clientSecret: paymentIntent.client_secret,
-        plan,
-        amount: canonicalAmount,
-        currency: currency
-      });
+        // Update profile membership
+        await storage.updateProfile(req.user.userId, {
+          membershipStatus: "pro",
+          membershipPlan: "pro",
+          membershipExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        });
+      }
+      
+      res.status(httpStatusCode).json(jsonResponse);
     } catch (error: any) {
-      console.error("Create payment intent error:", error);
-      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+      console.error("PayPal capture and membership update error:", error);
+      res.status(500).json({ error: "Failed to capture order." });
     }
   });
 
-  // Stripe payment verification - Referenced from javascript_stripe integration
-  app.post("/api/payments/verify", verifyToken, async (req: any, res) => {
-    try {
-      if (!stripe) {
-        return res.status(503).json({ message: "Payment service unavailable. Please check configuration." });
-      }
 
-      const { payment_intent_id, plan, amount } = req.body;
-      
-      if (!payment_intent_id) {
-        return res.status(400).json({ message: "Payment intent ID is required" });
-      }
-
-      // Verify payment with Stripe
-      const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);
-      
-      if (paymentIntent.status !== 'succeeded') {
-        return res.status(400).json({ message: "Payment not completed" });
-      }
-
-      // Update payment status
-      await storage.createPayment({
-        userId: req.user.userId,
-        plan: plan || "pro",
-        amount: amount || "14.99",
-        status: "completed",
-        paypalOrderId: payment_intent_id, // Store Stripe payment intent ID
-        paypalPaymentId: paymentIntent.latest_charge || payment_intent_id,
-        meta: { 
-          stripe_payment_intent_id: payment_intent_id, 
-          stripe_charge_id: paymentIntent.latest_charge,
-          completedAt: new Date().toISOString() 
-        }
-      });
-
-      // Update profile membership
-      await storage.updateProfile(req.user.userId, {
-        membershipStatus: "pro",
-        membershipPlan: "pro",
-        membershipExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-      });
-
-      res.json({ success: true });
-    } catch (error: any) {
-      console.error("Verify payment error:", error);
-      res.status(500).json({ message: "Internal server error: " + error.message });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;
