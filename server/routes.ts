@@ -760,22 +760,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { orderID } = req.params;
       const { plan, amount } = req.body;
       
-      // Capture the PayPal order first
+      // Capture the PayPal order using blueprint function
       const collect = {
         id: orderID,
         prefer: "return=minimal",
       };
 
-      const { createPaypalOrder, capturePaypalOrder: captureOrder, loadPaypalDefault } = await import("./paypal");
-      const { Client, Environment, LogLevel, OrdersController } = await import("@paypal/paypal-server-sdk");
-
+      const { Client, Environment, OrdersController } = await import("@paypal/paypal-server-sdk");
       const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+      
       const client = new Client({
         clientCredentialsAuthCredentials: {
           oAuthClientId: PAYPAL_CLIENT_ID!,
           oAuthClientSecret: PAYPAL_CLIENT_SECRET!,
         },
-        environment: process.env.NODE_ENV === "production" ? Environment.Production : Environment.Sandbox,
+        environment: process.env.PAYPAL_USE_PRODUCTION === "true" ? Environment.Production : Environment.Sandbox,
       });
       const ordersController = new OrdersController(client);
       
@@ -783,7 +782,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const jsonResponse = JSON.parse(String(body));
       const httpStatusCode = httpResponse.statusCode;
 
-      // If capture was successful (status 200 or 201), update membership
+      // If capture was successful and PayPal confirms completion, update membership
       if (httpStatusCode >= 200 && httpStatusCode < 300 && jsonResponse.status === 'COMPLETED') {
         
         // Store payment record
