@@ -162,7 +162,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   <div className="flex justify-center py-4">
                     <PayPalButton
                       amount={convertPrice(14.99).toString()}
-                      currency={selectedCurrency.toString()}
+                      currency={selectedCurrency.code}
                       intent="capture"
                       onSuccess={(orderId, paymentId) => {
                         console.log('PayPal payment successful:', { orderId, paymentId });

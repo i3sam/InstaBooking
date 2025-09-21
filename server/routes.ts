@@ -774,7 +774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           oAuthClientId: PAYPAL_CLIENT_ID!,
           oAuthClientSecret: PAYPAL_CLIENT_SECRET!,
         },
-        environment: process.env.PAYPAL_USE_PRODUCTION === "true" ? Environment.Production : Environment.Sandbox,
+        environment: Environment.Production, // Always use production since user has live credentials
       });
       const ordersController = new OrdersController(client);
       

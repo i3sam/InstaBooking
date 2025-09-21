@@ -31,10 +31,7 @@ const client = new Client({
     oAuthClientSecret: PAYPAL_CLIENT_SECRET,
   },
   timeout: 0,
-  environment:
-                process.env.PAYPAL_USE_PRODUCTION === "true"
-                  ? Environment.Production
-                  : Environment.Sandbox,
+  environment: Environment.Production, // Always use production since user has live credentials
   logging: {
     logLevel: LogLevel.Info,
     logRequest: {
@@ -42,6 +39,7 @@ const client = new Client({
     },
     logResponse: {
       logHeaders: true,
+      logBody: true,
     },
   },
 });
@@ -96,9 +94,19 @@ export async function createPaypalOrder(req: Request, res: Response) {
         .json({ error: "Invalid intent. Intent is required." });
     }
 
+    // Normalize and validate intent
+    const normalizedIntent = intent.toUpperCase();
+    if (!["CAPTURE", "AUTHORIZE"].includes(normalizedIntent)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid intent. Must be 'capture' or 'authorize'." });
+    }
+
+    console.log(`Creating PayPal order: ${amount} ${currency} with intent ${normalizedIntent}`);
+
     const collect = {
       body: {
-        intent: intent,
+        intent: normalizedIntent,
         purchaseUnits: [
           {
             amount: {
@@ -117,15 +125,42 @@ export async function createPaypalOrder(req: Request, res: Response) {
     const jsonResponse = JSON.parse(String(body));
     const httpStatusCode = httpResponse.statusCode;
 
-    res.status(httpStatusCode).json(jsonResponse);
-  } catch (error) {
-    console.error("Failed to create PayPal order:", error instanceof Error ? error.message : "Unknown error");
+    console.log(`PayPal order creation response: ${httpStatusCode}`, jsonResponse);
     
-    // Handle specific PayPal authentication errors
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      const statusCode = (error as any).statusCode;
-      if (statusCode === 401) {
-        return res.status(503).json({ error: "PayPal service temporarily unavailable. Please check configuration." });
+    if (httpStatusCode >= 400) {
+      console.error("PayPal order creation failed with error:", jsonResponse);
+    }
+
+    res.status(httpStatusCode).json(jsonResponse);
+  } catch (error: any) {
+    console.error("Failed to create PayPal order:", error instanceof Error ? error.message : "Unknown error");
+    console.error("Full error object:", error);
+    
+    // Handle PayPal API errors
+    if (error && typeof error === 'object') {
+      if ('statusCode' in error) {
+        const statusCode = error.statusCode;
+        
+        // Try to extract PayPal error details
+        let errorDetails = error;
+        if (error.body) {
+          try {
+            errorDetails = JSON.parse(error.body);
+            console.error("PayPal API error details:", errorDetails);
+          } catch (parseError) {
+            console.error("Could not parse PayPal error body:", error.body);
+            errorDetails = { error: error.body };
+          }
+        } else if (error.result) {
+          errorDetails = error.result;
+          console.error("PayPal API error result:", errorDetails);
+        }
+        
+        if (statusCode === 401) {
+          return res.status(503).json({ error: "PayPal service temporarily unavailable. Please check configuration." });
+        }
+        
+        return res.status(statusCode).json(errorDetails);
       }
     }
     
@@ -170,8 +205,7 @@ export async function capturePaypalOrder(req: Request, res: Response) {
 
 export async function loadPaypalDefault(req: Request, res: Response) {
   try {
-    const isProduction = process.env.PAYPAL_USE_PRODUCTION === "true";
-    console.log(`PayPal environment: ${isProduction ? "Production (Live)" : "Sandbox (Test)"}`);
+    console.log(`PayPal environment: Production (Live) - using real credentials for live payments`);
     
     const clientToken = await getClientToken();
     res.json({
