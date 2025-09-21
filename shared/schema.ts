@@ -90,6 +90,20 @@ export const paymentsDemo = pgTable("payments_demo", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const subscriptions = pgTable("subscriptions", {
+  id: text("id").primaryKey(), // PayPal subscription ID
+  userId: uuid("user_id").references(() => profiles.id),
+  planId: text("plan_id").notNull(), // PayPal plan ID
+  planName: text("plan_name").notNull(), // "pro", "premium", etc.
+  status: text("status").notNull(), // APPROVAL_PENDING|ACTIVE|CANCELLED|SUSPENDED|EXPIRED
+  currency: text("currency").default("USD").notNull(),
+  amount: numeric("amount").notNull(),
+  startTime: timestamp("start_time"),
+  nextBillingTime: timestamp("next_billing_time"),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
 // Insert schemas (users are managed by Supabase auth)
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -135,6 +149,11 @@ export const insertPaymentSchema = createInsertSchema(paymentsDemo).omit({
   createdAt: true,
 });
 
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types (User type managed by Supabase auth)
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
@@ -148,3 +167,5 @@ export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Payment = typeof paymentsDemo.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
