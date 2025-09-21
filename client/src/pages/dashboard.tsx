@@ -555,7 +555,7 @@ function BugFixesChangelogSection({ onReportBug }: BugFixesChangelogSectionProps
             </Button>
             <Button
               variant="outline"
-              onClick={() => window.open('mailto:support@bookinggen.com?subject=Feature Request', '_blank')}
+              onClick={() => window.open('mailto:team@bookinggen.xyz?subject=Feature Request', '_blank')}
               className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/40 via-blue-50/30 to-white/30 dark:from-gray-800/40 dark:via-blue-950/30 dark:to-gray-800/30 border border-white/30 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 text-blue-700 dark:text-blue-300"
               data-testid="button-request-feature-footer"
             >

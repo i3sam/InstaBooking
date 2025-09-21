@@ -65,8 +65,8 @@ async function ensureProduct(): Promise<string> {
         description: "Monthly subscription for pro features",
         type: "SERVICE",
         category: "SOFTWARE",
-        image_url: "https://bookinggen.com/logo.png",
-        home_url: "https://bookinggen.com"
+        image_url: "https://bookinggen.xyz/logo.png",
+        home_url: "https://bookinggen.xyz"
       }
     };
 

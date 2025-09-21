@@ -193,7 +193,7 @@ export default function PagesList() {
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">{page.tagline}</p>
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                  <span>bookinggen.com/{page.slug}</span>
+                  <span>bookinggen.xyz/{page.slug}</span>
                   <span>0 bookings</span>
                 </div>
                 <div className="flex space-x-2">

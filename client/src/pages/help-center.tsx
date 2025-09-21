@@ -60,7 +60,7 @@ export default function HelpCenter() {
           type: "step",
           number: 3,
           title: "Choose your page name and URL",
-          content: "Enter a name for your booking page that represents your business or service. This will also determine your unique BookingGen URL (e.g., yourname.bookinggen.com).",
+          content: "Enter a name for your booking page that represents your business or service. This will also determine your unique BookingGen URL (e.g., yourname.bookinggen.xyz).",
           tips: ["Choose a memorable and professional name", "Keep it short and easy to type", "Avoid special characters or spaces"]
         },
         {
