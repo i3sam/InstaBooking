@@ -48,7 +48,7 @@ const SUBSCRIPTION_PLANS = {
 };
 
 let productId: string | null = null;
-let planIds: { [key: string]: string } = {};
+let planIds: { [key: string]: string } = {}; // Clear plan cache to force recreation with correct pricing
 
 // Ensure product exists for our subscriptions
 async function ensureProduct(): Promise<string> {
@@ -65,8 +65,8 @@ async function ensureProduct(): Promise<string> {
         description: "Monthly subscription for pro features",
         type: "SERVICE",
         category: "SOFTWARE",
-        image_url: "https://example.com/product-image.jpg",
-        home_url: "https://yourapp.com"
+        image_url: "https://bookinggen.com/logo.png",
+        home_url: "https://bookinggen.com"
       }
     };
 
