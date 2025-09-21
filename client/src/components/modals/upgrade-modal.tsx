@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { apiRequest } from '@/lib/queryClient';
-import { initializeRazorpay, openRazorpayCheckout } from '@/lib/razorpay';
+import PayPalButton from '@/components/PayPalButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -22,83 +22,65 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const { toast } = useToast();
   const { formatPrice, convertPrice, selectedCurrency } = useCurrency();
 
+  const [paymentOrderData, setPaymentOrderData] = useState<any>(null);
+
   const handleUpgrade = async () => {
     if (!user) return;
     
     setIsProcessing(true);
     try {
-      // Initialize Razorpay
-      const razorpayLoaded = await initializeRazorpay();
-      if (!razorpayLoaded) {
-        toast({
-          title: "Error",
-          description: "Payment service is not available. Please try again later.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Create order
       const response = await apiRequest('POST', '/api/payments/create-order', {
         plan: 'pro',
         amount: 14.99,
         currency: selectedCurrency.code
       });
-      const { orderId, amount, currency } = await response.json();
-
-      // Open Razorpay checkout
-      openRazorpayCheckout({
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || '',
-        amount,
-        currency,
-        name: 'BookingGen',
-        description: 'Pro Plan - Monthly',
-        order_id: orderId,
-        handler: async (paymentResponse: any) => {
-          try {
-            // Verify payment
-            await apiRequest('POST', '/api/payments/verify', {
-              razorpay_payment_id: paymentResponse.razorpay_payment_id,
-              razorpay_order_id: paymentResponse.razorpay_order_id,
-              razorpay_signature: paymentResponse.razorpay_signature,
-            });
-
-            // Invalidate profile query to refresh user data
-            queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
-            
-            toast({
-              title: "Success!",
-              description: "You've successfully upgraded to Pro! Your new features are now available.",
-            });
-            
-            onClose();
-          } catch (error) {
-            console.error('Payment verification failed:', error);
-            toast({
-              title: "Payment verification failed",
-              description: "Your payment was processed but verification failed. Please contact support.",
-              variant: "destructive",
-            });
-          }
-        },
-        prefill: {
-          name: profile?.fullName || user.email,
-          email: user.email,
-        },
-        theme: {
-          color: '#2563eb',
-        },
+      const orderData = await response.json();
+      setPaymentOrderData(orderData);
+      
+      toast({
+        title: "Payment Ready",
+        description: "PayPal payment is ready. Click the PayPal button below to complete your purchase.",
       });
       
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment preparation error:', error);
       toast({
-        title: "Payment failed",
-        description: "Something went wrong while processing your payment. Please try again.",
+        title: "Payment preparation failed",
+        description: "Something went wrong while preparing your payment. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (paypalOrderId: string, paypalPaymentId: string) => {
+    try {
+      // Verify payment
+      await apiRequest('POST', '/api/payments/verify', {
+        paypal_order_id: paypalOrderId,
+        paypal_payment_id: paypalPaymentId,
+        plan: paymentOrderData?.plan || 'pro',
+        amount: paymentOrderData?.amount || '14.99',
+      });
+
+      // Invalidate profile query to refresh user data
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      
+      toast({
+        title: "Success!",
+        description: "You've successfully upgraded to Pro! Your new features are now available.",
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      toast({
+        title: "Payment verification failed",
+        description: "Your payment was processed but verification failed. Please contact support.",
+        variant: "destructive",
+      });
     }
   };
 

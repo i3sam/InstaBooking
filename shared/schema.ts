@@ -84,8 +84,8 @@ export const paymentsDemo = pgTable("payments_demo", {
   plan: text("plan"),
   amount: numeric("amount"),
   status: text("status"),
-  razorpayOrderId: text("razorpay_order_id"),
-  razorpayPaymentId: text("razorpay_payment_id"),
+  paypalOrderId: text("paypal_order_id"),
+  paypalPaymentId: text("paypal_payment_id"),
   meta: jsonb("meta"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });

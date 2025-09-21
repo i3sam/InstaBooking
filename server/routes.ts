@@ -2,9 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 // Removed PostgreSQL schema imports - using Supabase directly
-import Razorpay from "razorpay";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
+import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema } from '@shared/schema';
@@ -29,14 +29,7 @@ if (supabaseUrl && supabaseServiceKey) {
   console.warn("Supabase credentials not found. Application will continue without Supabase authentication");
 }
 
-// Razorpay setup (optional for MVP testing)
-let razorpay: Razorpay | null = null;
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-  razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
-}
+// PayPal setup is handled in ./paypal.ts module
 
 // Resend setup for email notifications
 let resend: Resend | null = null;
@@ -752,13 +745,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Payment routes
+  // PayPal setup routes from blueprint
+  app.get("/paypal/setup", async (req, res) => {
+    await loadPaypalDefault(req, res);
+  });
+
+  app.post("/paypal/order", async (req, res) => {
+    // Request body should contain: { intent, amount, currency }
+    await createPaypalOrder(req, res);
+  });
+
+  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+    await capturePaypalOrder(req, res);
+  });
+
+  // Payment routes for subscription management
   app.post("/api/payments/create-order", verifyToken, async (req: any, res) => {
     try {
-      if (!razorpay) {
-        return res.status(500).json({ message: "Payment processing not configured" });
-      }
-      
       const { plan, currency: requestedCurrency } = req.body;
       
       // Currency conversion rates relative to USD
@@ -794,26 +797,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const conversionRate = CURRENCY_RATES[currency as keyof typeof CURRENCY_RATES];
       const canonicalAmount = Math.round((usdAmount * conversionRate) * 100) / 100;
       
-      const order = await razorpay.orders.create({
-        amount: Math.round(canonicalAmount * 100), // amount in paise
-        currency: currency,
-        receipt: `receipt_${Date.now()}`,
-      });
-
+      // Store payment record for tracking
       await storage.createPayment({
         userId: req.user.userId,
         plan,
-        amount: canonicalAmount, // Store canonical amount
+        amount: canonicalAmount,
         status: "created",
-        razorpayOrderId: order.id,
-        meta: { order, currency, usdAmount }
+        paypalOrderId: `pending_${Date.now()}`, // Will be updated with actual PayPal order ID
+        meta: { currency, usdAmount, planConfig }
       });
 
       res.json({ 
-        orderId: order.id, 
-        amount: order.amount, 
-        currency: order.currency,
-        displayAmount: canonicalAmount
+        plan,
+        amount: canonicalAmount,
+        currency: currency,
+        displayAmount: canonicalAmount,
+        intent: 'CAPTURE'
       });
     } catch (error) {
       console.error("Create order error:", error);
@@ -823,28 +822,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/payments/verify", verifyToken, async (req: any, res) => {
     try {
-      const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+      const { paypal_order_id, paypal_payment_id, plan, amount } = req.body;
       
-      // Verify signature
-      const body = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-        .update(body.toString())
-        .digest("hex");
-
-      if (expectedSignature !== razorpay_signature) {
-        return res.status(400).json({ message: "Invalid signature" });
+      if (!paypal_order_id) {
+        return res.status(400).json({ message: "PayPal order ID is required" });
       }
 
       // Update payment status
       await storage.createPayment({
         userId: req.user.userId,
-        plan: "pro",
-        amount: "10",
+        plan: plan || "pro",
+        amount: amount || "14.99",
         status: "completed",
-        razorpayOrderId: razorpay_order_id,
-        razorpayPaymentId: razorpay_payment_id,
-        meta: { razorpay_signature }
+        paypalOrderId: paypal_order_id,
+        paypalPaymentId: paypal_payment_id,
+        meta: { paypal_order_id, paypal_payment_id, completedAt: new Date().toISOString() }
       });
 
       // Update profile membership
