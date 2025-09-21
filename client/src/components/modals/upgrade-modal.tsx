@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { apiRequest } from '@/lib/queryClient';
-import PayPalButton from '@/components/PayPalButton';
+import SubscriptionButton from '@/components/SubscriptionButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -160,24 +160,25 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   </div>
                   
                   <div className="flex justify-center py-4">
-                    <PayPalButton
-                      amount={convertPrice(14.99).toString()}
-                      currency={selectedCurrency.code}
-                      intent="capture"
-                      onSuccess={(orderId, paymentId) => {
-                        console.log('PayPal payment successful:', { orderId, paymentId });
+                    <SubscriptionButton
+                      planKey="pro"
+                      onSuccess={(subscriptionId) => {
+                        console.log('Subscription successful:', subscriptionId);
                         handlePaymentSuccess();
                       }}
                       onError={handlePaymentError}
-                      onCancel={(data) => {
-                        console.log('PayPal payment cancelled:', data);
+                      onCancel={() => {
+                        console.log('Subscription cancelled');
                         toast({
-                          title: "Payment cancelled",
+                          title: "Subscription cancelled",
                           description: "You can try again anytime.",
                           variant: "default",
                         });
                       }}
-                    />
+                      className="w-full max-w-sm glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 hover:from-blue-200 hover:via-blue-300 hover:to-blue-400 dark:hover:from-blue-700 dark:hover:via-blue-600 dark:hover:to-blue-500 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
+                    >
+                      Subscribe to Pro - $29.99/month
+                    </SubscriptionButton>
                   </div>
                 </div>
               )}

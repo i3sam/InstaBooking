@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+import { createSubscription, getSubscription, cancelSubscription, handleWebhook } from "./paypalSubscriptions";
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema } from '@shared/schema';
@@ -753,6 +754,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/paypal/order", async (req, res) => {
     // Request body should contain: { intent, amount, currency }
     await createPaypalOrder(req, res);
+  });
+
+  // PayPal Subscription Routes
+  app.post("/api/paypal/subscriptions", verifyToken, async (req: any, res) => {
+    // Add user ID from auth token to request body for security
+    req.body.userId = req.user.userId;
+    await createSubscription(req, res);
+  });
+
+  app.get("/api/paypal/subscriptions/:subscriptionId", verifyToken, async (req, res) => {
+    await getSubscription(req, res);
+  });
+
+  app.post("/api/paypal/subscriptions/:subscriptionId/cancel", verifyToken, async (req, res) => {
+    await cancelSubscription(req, res);
+  });
+
+  app.post("/api/paypal/webhook", async (req, res) => {
+    await handleWebhook(req, res);
   });
 
   app.post("/paypal/order/:orderID/capture", verifyToken, async (req: any, res) => {

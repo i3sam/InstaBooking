@@ -25,6 +25,8 @@ import Contact from "@/pages/contact";
 import ReportBug from "@/pages/report-bug";
 import RequestFeature from "@/pages/request-feature";
 import HelpCenter from "@/pages/help-center";
+import SubscriptionSuccess from "@/pages/subscription/success";
+import SubscriptionCancel from "@/pages/subscription/cancel";
 
 function Router() {
   return (
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/refunds" component={Refunds} />
       <Route path="/contact" component={Contact} />
       <Route path="/help-center" component={HelpCenter} />
+      <Route path="/subscription/success" component={SubscriptionSuccess} />
+      <Route path="/subscription/cancel" component={SubscriptionCancel} />
       <Route path="/dashboard">
         <AuthGuard>
           <Dashboard />

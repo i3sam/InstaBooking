@@ -8,7 +8,7 @@ import { eq, desc, sql } from 'drizzle-orm';
 // Enable connection caching for better performance
 neonConfig.fetchConnectionCache = true;
 neonConfig.poolQueryViaFetch = true;
-import { profiles, pages, services, appointments, paymentsDemo, reviews } from '@shared/schema';
+import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions } from '@shared/schema';
 
 // Lazy initialize database connection
 let db: ReturnType<typeof drizzle> | null = null;
@@ -99,6 +99,13 @@ export interface IStorage {
   getReviewsByPageId(pageId: string): Promise<any[]>;
   getApprovedReviewsByPageId(pageId: string): Promise<any[]>;
   updateReview(id: string, updates: any): Promise<any | undefined>;
+  
+  // Subscriptions
+  createSubscription(subscription: any): Promise<any>;
+  getSubscription(id: string): Promise<any | undefined>;
+  getSubscriptionsByUser(userId: string): Promise<any[]>;
+  updateSubscription(id: string, updates: any): Promise<any | undefined>;
+  cancelSubscription(id: string): Promise<boolean>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -363,6 +370,57 @@ export class DrizzleStorage implements IStorage {
     } catch (error) {
       console.error("Update review error:", error);
       throw error;
+    }
+  }
+
+  async createSubscription(subscription: any): Promise<any> {
+    try {
+      const [result] = await getDb().insert(subscriptions).values(subscription).returning();
+      return result;
+    } catch (error) {
+      console.error("Create subscription error:", error);
+      throw error;
+    }
+  }
+
+  async getSubscription(id: string): Promise<any | undefined> {
+    try {
+      const [result] = await getDb().select().from(subscriptions).where(eq(subscriptions.id, id));
+      return result;
+    } catch (error) {
+      console.error("Get subscription error:", error);
+      return undefined;
+    }
+  }
+
+  async getSubscriptionsByUser(userId: string): Promise<any[]> {
+    try {
+      const results = await getDb().select().from(subscriptions).where(eq(subscriptions.userId, userId)).orderBy(desc(subscriptions.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get subscriptions by user error:", error);
+      throw error;
+    }
+  }
+
+  async updateSubscription(id: string, updates: any): Promise<any | undefined> {
+    try {
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await getDb().update(subscriptions).set(updateData).where(eq(subscriptions.id, id)).returning();
+      return result;
+    } catch (error) {
+      console.error("Update subscription error:", error);
+      throw error;
+    }
+  }
+
+  async cancelSubscription(id: string): Promise<boolean> {
+    try {
+      await this.updateSubscription(id, { status: 'CANCELLED' });
+      return true;
+    } catch (error) {
+      console.error("Cancel subscription error:", error);
+      return false;
     }
   }
 }
