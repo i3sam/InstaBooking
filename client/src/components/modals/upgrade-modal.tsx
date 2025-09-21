@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { apiRequest } from '@/lib/queryClient';
-import PayPalButton from '@/components/PayPalButton';
+import StripeCheckout from '@/components/StripeCheckout';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -22,49 +22,15 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const { toast } = useToast();
   const { formatPrice, convertPrice, selectedCurrency } = useCurrency();
 
-  const [paymentOrderData, setPaymentOrderData] = useState<any>(null);
+  const [showPayment, setShowPayment] = useState(false);
 
   const handleUpgrade = async () => {
     if (!user) return;
-    
-    setIsProcessing(true);
-    try {
-      // Create order
-      const response = await apiRequest('POST', '/api/payments/create-order', {
-        plan: 'pro',
-        amount: 14.99,
-        currency: selectedCurrency.code
-      });
-      const orderData = await response.json();
-      setPaymentOrderData(orderData);
-      
-      toast({
-        title: "Payment Ready",
-        description: "PayPal payment is ready. Click the PayPal button below to complete your purchase.",
-      });
-      
-    } catch (error) {
-      console.error('Payment preparation error:', error);
-      toast({
-        title: "Payment preparation failed",
-        description: "Something went wrong while preparing your payment. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    setShowPayment(true);
   };
 
-  const handlePaymentSuccess = async (paypalOrderId: string, paypalPaymentId: string) => {
+  const handlePaymentSuccess = async () => {
     try {
-      // Verify payment
-      await apiRequest('POST', '/api/payments/verify', {
-        paypal_order_id: paypalOrderId,
-        paypal_payment_id: paypalPaymentId,
-        plan: paymentOrderData?.plan || 'pro',
-        amount: paymentOrderData?.amount || '14.99',
-      });
-
       // Invalidate profile query to refresh user data
       queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
       
@@ -75,13 +41,22 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       
       onClose();
     } catch (error) {
-      console.error('Payment verification failed:', error);
+      console.error('Profile refresh failed:', error);
       toast({
-        title: "Payment verification failed",
-        description: "Your payment was processed but verification failed. Please contact support.",
-        variant: "destructive",
+        title: "Upgrade successful",
+        description: "Your payment was processed successfully. Please refresh the page to see your new features.",
       });
+      onClose();
     }
+  };
+
+  const handlePaymentError = (error: any) => {
+    console.error('Payment error:', error);
+    toast({
+      title: "Payment failed",
+      description: "There was an error processing your payment. Please try again.",
+      variant: "destructive",
+    });
   };
 
   return (
@@ -172,40 +147,24 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 </div>
               </div>
 
-              {/* PayPal Payment Section */}
-              {paymentOrderData && (
+              {/* Stripe Payment Section */}
+              {showPayment && (
                 <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent mb-2">
                       Complete Your Payment
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Click the PayPal button below to securely complete your upgrade to Pro
+                      Choose your payment method below - we accept credit/debit cards and PayPal
                     </p>
                   </div>
                   
-                  <div className="flex justify-center">
-                    <PayPalButton
-                      amount={paymentOrderData.amount.toString()}
-                      currency={paymentOrderData.currency}
-                      intent="sale"
-                      onSuccess={handlePaymentSuccess}
-                      onError={(error) => {
-                        console.error('PayPal payment error:', error);
-                        toast({
-                          title: "Payment failed",
-                          description: "There was an error processing your payment. Please try again.",
-                          variant: "destructive",
-                        });
-                      }}
-                      onCancel={() => {
-                        toast({
-                          title: "Payment cancelled",
-                          description: "Your payment has been cancelled. You can try again when ready.",
-                        });
-                      }}
-                    />
-                  </div>
+                  <StripeCheckout
+                    plan="pro"
+                    amount={convertPrice(14.99)}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
                 </div>
               )}
 
@@ -219,7 +178,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 >
                   Maybe Later
                 </Button>
-                {!paymentOrderData && (
+                {!showPayment && (
                   <Button
                     type="button"
                     size="lg"
