@@ -24,13 +24,13 @@ const client = new Client({
   timeout: 0,
   environment: Environment.Production, // Using live credentials
   logging: {
-    logLevel: LogLevel.Info,
+    logLevel: LogLevel.Error, // Reduce sensitive logging in production
     logRequest: {
-      logBody: true,
+      logBody: false,
     },
     logResponse: {
-      logHeaders: true,
-      logBody: true,
+      logHeaders: false,
+      logBody: false,
     },
   },
 });
@@ -41,7 +41,7 @@ const oAuthController = new OAuthAuthorizationController(client);
 const SUBSCRIPTION_PLANS = {
   pro: {
     name: "Pro Membership",
-    amount: "29.99",
+    amount: "14.99",
     currency: "USD",
     description: "Monthly Pro membership with all features"
   }
@@ -367,7 +367,15 @@ export async function cancelSubscription(req: Request, res: Response) {
 // Webhook handler for subscription events
 export async function handleWebhook(req: Request, res: Response) {
   try {
+    // Basic webhook verification - in production, you should implement full PayPal signature verification
+    // For now, just verify the request has the expected structure
     const event = req.body;
+    
+    if (!event || !event.event_type || !event.resource) {
+      console.error("Invalid webhook payload structure");
+      return res.status(400).json({ error: "Invalid webhook payload" });
+    }
+    
     console.log("PayPal webhook received:", event.event_type);
 
     switch (event.event_type) {
