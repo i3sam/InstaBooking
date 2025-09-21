@@ -23,12 +23,18 @@ interface PayPalButtonProps {
   amount: string;
   currency: string;
   intent: string;
+  onSuccess?: (orderId: string, paymentId: string) => void;
+  onError?: (error: any) => void;
+  onCancel?: (data: any) => void;
 }
 
 export default function PayPalButton({
   amount,
   currency,
   intent,
+  onSuccess,
+  onError,
+  onCancel,
 }: PayPalButtonProps) {
   const createOrder = async () => {
     const orderPayload = {
@@ -57,18 +63,34 @@ export default function PayPalButton({
     return data;
   };
 
-  const onApprove = async (data: any) => {
+  const handleApprove = async (data: any) => {
     console.log("onApprove", data);
-    const orderData = await captureOrder(data.orderId);
-    console.log("Capture result", orderData);
+    try {
+      const orderData = await captureOrder(data.orderId);
+      console.log("Capture result", orderData);
+      if (onSuccess && orderData.id) {
+        onSuccess(data.orderId, orderData.id);
+      }
+    } catch (error) {
+      console.error("Payment capture failed:", error);
+      if (onError) {
+        onError(error);
+      }
+    }
   };
 
-  const onCancel = async (data: any) => {
+  const handleCancel = async (data: any) => {
     console.log("onCancel", data);
+    if (onCancel) {
+      onCancel(data);
+    }
   };
 
-  const onError = async (data: any) => {
+  const handleError = async (data: any) => {
     console.log("onError", data);
+    if (onError) {
+      onError(data);
+    }
   };
 
   useEffect(() => {
@@ -94,11 +116,15 @@ export default function PayPalButton({
   }, []);
   const initPayPal = async () => {
     try {
-      const clientToken: string = await fetch("/paypal/setup")
-        .then((res) => res.json())
-        .then((data) => {
-          return data.clientToken;
-        });
+      const response = await fetch("/paypal/setup");
+      if (!response.ok) {
+        throw new Error(`PayPal setup failed: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      const clientToken: string = data.clientToken;
       const sdkInstance = await (window as any).paypal.createInstance({
         clientToken,
         components: ["paypal-payments"],
@@ -106,9 +132,9 @@ export default function PayPalButton({
 
       const paypalCheckout =
             sdkInstance.createPayPalOneTimePaymentSession({
-              onApprove,
-              onCancel,
-              onError,
+              onApprove: handleApprove,
+              onCancel: handleCancel,
+              onError: handleError,
             });
 
       const onClick = async () => {
@@ -135,7 +161,11 @@ export default function PayPalButton({
         }
       };
     } catch (e) {
-      console.error(e);
+      console.error("PayPal initialization error:", e);
+      // Notify parent component of setup error
+      if (onError) {
+        onError(e);
+      }
     }
   };
 

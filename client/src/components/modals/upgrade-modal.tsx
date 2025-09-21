@@ -172,6 +172,43 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 </div>
               </div>
 
+              {/* PayPal Payment Section */}
+              {paymentOrderData && (
+                <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent mb-2">
+                      Complete Your Payment
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                      Click the PayPal button below to securely complete your upgrade to Pro
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <PayPalButton
+                      amount={paymentOrderData.amount.toString()}
+                      currency={paymentOrderData.currency}
+                      intent="sale"
+                      onSuccess={handlePaymentSuccess}
+                      onError={(error) => {
+                        console.error('PayPal payment error:', error);
+                        toast({
+                          title: "Payment failed",
+                          description: "There was an error processing your payment. Please try again.",
+                          variant: "destructive",
+                        });
+                      }}
+                      onCancel={() => {
+                        toast({
+                          title: "Payment cancelled",
+                          description: "Your payment has been cancelled. You can try again when ready.",
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <Button
@@ -182,26 +219,28 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 >
                   Maybe Later
                 </Button>
-                <Button
-                  type="button"
-                  size="lg"
-                  onClick={handleUpgrade}
-                  disabled={isProcessing}
-                  className="flex-1 h-12 glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 hover:from-blue-200 hover:via-blue-300 hover:to-blue-400 dark:hover:from-blue-700 dark:hover:via-blue-600 dark:hover:to-blue-500 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold"
-                  data-testid="button-confirm-upgrade"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Upgrade to Pro
-                    </>
-                  )}
-                </Button>
+                {!paymentOrderData && (
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={handleUpgrade}
+                    disabled={isProcessing}
+                    className="flex-1 h-12 glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 hover:from-blue-200 hover:via-blue-300 hover:to-blue-400 dark:hover:from-blue-700 dark:hover:via-blue-600 dark:hover:to-blue-500 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold"
+                    data-testid="button-confirm-upgrade"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Upgrade to Pro
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

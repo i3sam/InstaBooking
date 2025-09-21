@@ -51,18 +51,23 @@ const oAuthAuthorizationController = new OAuthAuthorizationController(client);
 /* Token generation helpers */
 
 export async function getClientToken() {
-  const auth = Buffer.from(
-    `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`,
-  ).toString("base64");
+  try {
+    const auth = Buffer.from(
+      `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`,
+    ).toString("base64");
 
-  const { result } = await oAuthAuthorizationController.requestToken(
-    {
-      authorization: `Basic ${auth}`,
-    },
-    { intent: "sdk_init", response_type: "client_token" },
-  );
+    const { result } = await oAuthAuthorizationController.requestToken(
+      {
+        authorization: `Basic ${auth}`,
+      },
+      { intent: "sdk_init", response_type: "client_token" },
+    );
 
-  return result.accessToken;
+    return result.accessToken;
+  } catch (error) {
+    console.error("PayPal client token generation failed:", error instanceof Error ? error.message : "Unknown error");
+    throw new Error("PayPal authentication failed");
+  }
 }
 
 /*  Process transactions */
@@ -114,7 +119,16 @@ export async function createPaypalOrder(req: Request, res: Response) {
 
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
-    console.error("Failed to create order:", error);
+    console.error("Failed to create PayPal order:", error instanceof Error ? error.message : "Unknown error");
+    
+    // Handle specific PayPal authentication errors
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      const statusCode = (error as any).statusCode;
+      if (statusCode === 401) {
+        return res.status(503).json({ error: "PayPal service temporarily unavailable. Please check configuration." });
+      }
+    }
+    
     res.status(500).json({ error: "Failed to create order." });
   }
 }
@@ -122,6 +136,11 @@ export async function createPaypalOrder(req: Request, res: Response) {
 export async function capturePaypalOrder(req: Request, res: Response) {
   try {
     const { orderID } = req.params;
+    
+    if (!orderID) {
+      return res.status(400).json({ error: "Order ID is required." });
+    }
+    
     const collect = {
       id: orderID,
       prefer: "return=minimal",
@@ -135,15 +154,31 @@ export async function capturePaypalOrder(req: Request, res: Response) {
 
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
-    console.error("Failed to create order:", error);
+    console.error("Failed to capture PayPal order:", error instanceof Error ? error.message : "Unknown error");
+    
+    // Handle specific PayPal authentication errors
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      const statusCode = (error as any).statusCode;
+      if (statusCode === 401) {
+        return res.status(503).json({ error: "PayPal service temporarily unavailable. Please check configuration." });
+      }
+    }
+    
     res.status(500).json({ error: "Failed to capture order." });
   }
 }
 
 export async function loadPaypalDefault(req: Request, res: Response) {
-  const clientToken = await getClientToken();
-  res.json({
-    clientToken,
-  });
+  try {
+    const clientToken = await getClientToken();
+    res.json({
+      clientToken,
+    });
+  } catch (error) {
+    console.error("Failed to load PayPal setup:", error instanceof Error ? error.message : "Unknown error");
+    res.status(503).json({ 
+      error: "PayPal service temporarily unavailable. Please check configuration." 
+    });
+  }
 }
 // <END_EXACT_CODE>
