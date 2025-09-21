@@ -52,11 +52,17 @@ export default function PayPalButton({
   };
 
   const captureOrder = async (orderId: string) => {
+    const token = localStorage.getItem('token');
     const response = await fetch(`/paypal/order/${orderId}/capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
+      body: JSON.stringify({
+        plan: "pro",
+        amount: amount
+      }),
     });
     const data = await response.json();
 

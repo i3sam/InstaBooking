@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { apiRequest } from '@/lib/queryClient';
-import StripeCheckout from '@/components/StripeCheckout';
+import PayPalButton from '@/components/PayPalButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -147,7 +147,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 </div>
               </div>
 
-              {/* Stripe Payment Section */}
+              {/* PayPal Payment Section */}
               {showPayment && (
                 <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
                   <div className="text-center mb-6">
@@ -155,16 +155,30 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                       Complete Your Payment
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Choose your payment method below - we accept credit/debit cards and PayPal
+                      Pay securely with PayPal - you can use your PayPal account or pay as a guest with any debit/credit card
                     </p>
                   </div>
                   
-                  <StripeCheckout
-                    plan="pro"
-                    amount={convertPrice(14.99)}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
+                  <div className="flex justify-center py-4">
+                    <PayPalButton
+                      amount={convertPrice(14.99).toString()}
+                      currency={selectedCurrency.toString()}
+                      intent="capture"
+                      onSuccess={(orderId, paymentId) => {
+                        console.log('PayPal payment successful:', { orderId, paymentId });
+                        handlePaymentSuccess();
+                      }}
+                      onError={handlePaymentError}
+                      onCancel={(data) => {
+                        console.log('PayPal payment cancelled:', data);
+                        toast({
+                          title: "Payment cancelled",
+                          description: "You can try again anytime.",
+                          variant: "default",
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
               )}
 
