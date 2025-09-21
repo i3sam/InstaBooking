@@ -6,7 +6,7 @@ Create stunning, professional booking pages in minutes. BookingGen is a modern S
 
 - **Custom Booking Pages**: Create beautiful, branded booking pages with your logo, colors, and services
 - **Smart Scheduling**: Intelligent calendar integration with availability management and time zone detection
-- **Secure Payments**: Accept payments instantly with Razorpay integration
+- **Secure Payments**: Accept payments instantly with PayPal integration
 - **Mobile Optimized**: Responsive designs that work perfectly on all devices
 - **Analytics Dashboard**: Track bookings, revenue, and customer insights
 - **Appointment Management**: Accept, decline, and reschedule appointments with ease
@@ -17,7 +17,7 @@ Create stunning, professional booking pages in minutes. BookingGen is a modern S
 - **Backend**: Express.js with serverless API routes
 - **Database**: PostgreSQL with Drizzle ORM
 - **Authentication**: Supabase Auth
-- **Payments**: Razorpay
+- **Payments**: PayPal
 - **Storage**: Supabase Storage
 - **Deployment**: Vercel
 
@@ -25,7 +25,7 @@ Create stunning, professional booking pages in minutes. BookingGen is a modern S
 
 - Node.js 18+ and npm
 - Supabase account and project
-- Razorpay account for payment processing
+- PayPal account for payment processing
 
 ## 🛠️ Local Development Setup
 
