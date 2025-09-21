@@ -22,7 +22,7 @@ const client = new Client({
     oAuthClientSecret: PAYPAL_CLIENT_SECRET,
   },
   timeout: 0,
-  environment: Environment.Production, // Using live credentials
+  environment: process.env.NODE_ENV === "production" ? Environment.Production : Environment.Sandbox, // Use sandbox in development for testing
   logging: {
     logLevel: LogLevel.Error, // Reduce sensitive logging in production
     logRequest: {
@@ -70,7 +70,8 @@ async function ensureProduct(): Promise<string> {
       }
     };
 
-    const response = await fetch("https://api-m.paypal.com/v1/catalogs/products", {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/catalogs/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +154,8 @@ async function ensurePlan(planKey: string): Promise<string> {
 
     console.log("Sending plan data:", JSON.stringify(planData, null, 2));
     
-    const response = await fetch("https://api-m.paypal.com/v1/billing/plans", {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/billing/plans`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -187,7 +189,8 @@ async function getAccessToken(): Promise<string> {
   try {
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
     
-    const response = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/oauth2/token`, {
       method: "POST",
       headers: {
         "Authorization": `Basic ${auth}`,
@@ -241,7 +244,8 @@ export async function createSubscription(req: Request, res: Response) {
       }
     };
 
-    const response = await fetch("https://api-m.paypal.com/v1/billing/subscriptions", {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/billing/subscriptions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -296,7 +300,8 @@ export async function getSubscription(req: Request, res: Response) {
   try {
     const { subscriptionId } = req.params;
     
-    const response = await fetch(`https://api-m.paypal.com/v1/billing/subscriptions/${subscriptionId}`, {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/billing/subscriptions/${subscriptionId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -352,7 +357,8 @@ export async function cancelSubscription(req: Request, res: Response) {
     const { subscriptionId } = req.params;
     const { reason } = req.body;
 
-    const response = await fetch(`https://api-m.paypal.com/v1/billing/subscriptions/${subscriptionId}/cancel`, {
+    const apiBase = process.env.NODE_ENV === "production" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+    const response = await fetch(`${apiBase}/v1/billing/subscriptions/${subscriptionId}/cancel`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
