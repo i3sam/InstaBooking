@@ -7,11 +7,14 @@ import { useAuth } from '@/hooks/use-auth';
 import { Check } from 'lucide-react';
 import { useCurrency } from '@/hooks/use-currency';
 import CurrencySelector from '@/components/ui/currency-selector';
+import UpgradeModal from '@/components/modals/upgrade-modal';
+import { useState } from 'react';
 
 export default function Pricing() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { formatPrice } = useCurrency();
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   const plans = [
     {
@@ -31,8 +34,7 @@ export default function Pricing() {
       buttonText: user ? "Upgrade to Pro" : "Get Started",
       buttonAction: () => {
         if (user) {
-          // TODO: Open payment modal
-          setLocation('/dashboard');
+          setIsUpgradeModalOpen(true);
         } else {
           setLocation('/signup');
         }
@@ -158,6 +160,11 @@ export default function Pricing() {
       </section>
 
       <Footer />
+      
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+      />
     </div>
   );
 }
