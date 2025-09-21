@@ -230,7 +230,7 @@ export async function createSubscription(req: Request, res: Response) {
       plan_id: planId,
       start_time: new Date(Date.now() + 60000).toISOString(), // Start in 1 minute
       application_context: {
-        brand_name: "Your App",
+        brand_name: "Booking Gen",
         user_action: "SUBSCRIBE_NOW",
         payment_method: {
           payer_selected: "PAYPAL",
@@ -320,6 +320,25 @@ export async function getSubscription(req: Request, res: Response) {
       nextBillingTime: subscription.billing_info?.next_billing_time ? new Date(subscription.billing_info.next_billing_time) : null
     });
 
+    // If subscription is active, ensure user has Pro membership
+    if (subscription.status === 'ACTIVE') {
+      const storedSubscription = await storage.getSubscription(subscriptionId);
+      if (storedSubscription && storedSubscription.userId) {
+        // Calculate membership expiry (1 month from start time or now)
+        const membershipExpires = new Date();
+        membershipExpires.setMonth(membershipExpires.getMonth() + 1);
+        
+        // Activate Pro membership for the user
+        await storage.updateProfile(storedSubscription.userId, {
+          membershipStatus: "pro",
+          membershipPlan: "pro", 
+          membershipExpires: membershipExpires
+        });
+        
+        console.log("✅ Pro membership activated for user via getSubscription:", storedSubscription.userId);
+      }
+    }
+
     res.json(subscription);
   } catch (error) {
     console.error("Failed to get subscription:", error);
@@ -380,11 +399,30 @@ export async function handleWebhook(req: Request, res: Response) {
 
     switch (event.event_type) {
       case "BILLING.SUBSCRIPTION.ACTIVATED":
+        // Update subscription status
         await storage.updateSubscription(event.resource.id, {
           status: "ACTIVE",
           startTime: new Date(event.resource.start_time),
           nextBillingTime: event.resource.billing_info?.next_billing_time ? new Date(event.resource.billing_info.next_billing_time) : null
         });
+
+        // Get subscription to find userId
+        const activeSubscription = await storage.getSubscription(event.resource.id);
+        if (activeSubscription && activeSubscription.userId) {
+          // Calculate membership expiry (1 month from activation)
+          const membershipExpires = new Date();
+          membershipExpires.setMonth(membershipExpires.getMonth() + 1);
+          
+          // Activate Pro membership for the user
+          await storage.updateProfile(activeSubscription.userId, {
+            membershipStatus: "pro",
+            membershipPlan: "pro",
+            membershipExpires: membershipExpires
+          });
+          
+          console.log("✅ Pro membership activated for user:", activeSubscription.userId);
+        }
+        
         console.log("✅ Subscription activated:", event.resource.id);
         break;
 
@@ -392,6 +430,19 @@ export async function handleWebhook(req: Request, res: Response) {
         await storage.updateSubscription(event.resource.id, {
           status: "CANCELLED"
         });
+
+        // Get subscription to find userId and remove Pro membership
+        const cancelledSubscription = await storage.getSubscription(event.resource.id);
+        if (cancelledSubscription && cancelledSubscription.userId) {
+          await storage.updateProfile(cancelledSubscription.userId, {
+            membershipStatus: "free",
+            membershipPlan: null,
+            membershipExpires: null
+          });
+          
+          console.log("✅ Pro membership cancelled for user:", cancelledSubscription.userId);
+        }
+        
         console.log("✅ Subscription cancelled:", event.resource.id);
         break;
 
