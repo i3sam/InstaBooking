@@ -32,7 +32,7 @@ const client = new Client({
   },
   timeout: 0,
   environment:
-                process.env.NODE_ENV === "production"
+                process.env.PAYPAL_USE_PRODUCTION === "true"
                   ? Environment.Production
                   : Environment.Sandbox,
   logging: {
@@ -170,6 +170,9 @@ export async function capturePaypalOrder(req: Request, res: Response) {
 
 export async function loadPaypalDefault(req: Request, res: Response) {
   try {
+    const isProduction = process.env.PAYPAL_USE_PRODUCTION === "true";
+    console.log(`PayPal environment: ${isProduction ? "Production (Live)" : "Sandbox (Test)"}`);
+    
     const clientToken = await getClientToken();
     res.json({
       clientToken,
