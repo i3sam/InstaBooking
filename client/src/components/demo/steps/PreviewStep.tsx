@@ -2,10 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Monitor, Smartphone, Save, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award, ArrowLeft } from 'lucide-react';
+import { Monitor, Smartphone, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 
 interface Service {
@@ -39,47 +36,20 @@ interface DemoData {
 
 interface PreviewStepProps {
   data: DemoData;
-  onSaveDemo: (userInfo?: { email: string; fullName?: string }) => void;
   onCreateAccount: () => void;
   onRestart?: () => void;
-  isSaving: boolean;
   isConverting: boolean;
-  demoCreated: boolean;
   user: any;
 }
 
 export default function PreviewStep({
   data,
-  onSaveDemo,
   onCreateAccount,
   onRestart,
-  isSaving,
   isConverting,
-  demoCreated,
   user
 }: PreviewStepProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [showSaveDemoDialog, setShowSaveDemoDialog] = useState(false);
-  const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
-
-  const handleSaveDemoClick = () => {
-    setShowSaveDemoDialog(true);
-  };
-
-  const handleSaveDemoConfirm = () => {
-    console.log('Save Demo clicked with email:', email);
-    if (email.trim()) {
-      try {
-        onSaveDemo({ email: email.trim(), fullName: fullName.trim() || undefined });
-        setShowSaveDemoDialog(false);
-        setEmail('');
-        setFullName('');
-      } catch (error) {
-        console.error('Error saving demo:', error);
-      }
-    }
-  };
 
   const openBusinessHours = Object.entries(data.businessHours)
     .filter(([, hours]) => hours !== 'Closed')
@@ -484,97 +454,26 @@ export default function PreviewStep({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!demoCreated ? (
-            <>
-              {/* Save Demo */}
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="space-y-1">
-                  <h4 className="font-medium">Save Demo</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Save your demo for 7 days. Share the preview link with others.
-                  </p>
-                </div>
-                <Button
-                  onClick={handleSaveDemoClick}
-                  disabled={isSaving || !data.businessName?.trim()}
-                  data-testid="button-save-demo"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {isSaving ? 'Saving...' : 'Save Demo'}
-                </Button>
-              </div>
-
-              {/* Create Account */}
-              <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
-                <div className="space-y-1">
-                  <h4 className="font-medium flex items-center gap-2">
-                    Create Account & Save
-                    <Badge variant="secondary">Recommended</Badge>
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Sign up and convert your demo into a real booking page.
-                  </p>
-                </div>
-                <Button
-                  onClick={onCreateAccount}
-                  disabled={isConverting || !data.businessName?.trim()}
-                  data-testid="button-create-account"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  {isConverting ? 'Converting...' : 'Create Account'}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Demo Created Success */}
-              <div className="p-4 border rounded-lg bg-green-50 border-green-200">
-                <div className="flex items-center gap-2 text-green-800 font-medium mb-2">
-                  ✅ Demo Created Successfully!
-                </div>
-                <p className="text-sm text-green-700">
-                  Your demo booking page has been saved. You can share it with others to get feedback.
-                </p>
-              </div>
-
-              {/* Convert to Real Page */}
-              {user ? (
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Convert to Real Page</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Turn your demo into a live booking page that accepts real appointments.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={onCreateAccount}
-                    disabled={isConverting}
-                    data-testid="button-convert-demo"
-                  >
-                    <Rocket className="w-4 h-4 mr-2" />
-                    {isConverting ? 'Converting...' : 'Convert Now'}
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-blue-50">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Sign Up to Convert</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Create an account to turn your demo into a real booking page.
-                    </p>
-                  </div>
-                  <Button
-                    onClick={onCreateAccount}
-                    disabled={isConverting}
-                    data-testid="button-signup-convert"
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    {isConverting ? 'Redirecting...' : 'Sign Up'}
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+          {/* Preview & Sign Up */}
+          <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
+            <div className="space-y-1">
+              <h4 className="font-medium flex items-center gap-2">
+                Create Account to Build Your Page
+                <Badge variant="secondary">Required</Badge>
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Sign up to convert your preview into a real booking page.
+              </p>
+            </div>
+            <Button
+              onClick={onCreateAccount}
+              disabled={isConverting || !data.businessName?.trim()}
+              data-testid="button-create-account"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              {isConverting ? 'Redirecting...' : 'Sign Up'}
+            </Button>
+          </div>
 
           <Separator />
 
@@ -598,75 +497,9 @@ export default function PreviewStep({
             </div>
           )}
 
-          <Separator />
-
-          {/* Summary */}
-          <div className="text-sm text-muted-foreground space-y-2">
-            <h5 className="font-medium text-foreground">Demo Summary:</h5>
-            <ul className="space-y-1 ml-4">
-              <li>• Business: {data.businessName || 'Not set'}</li>
-              <li>• Theme: {data.theme}</li>
-              <li>• Services: {data.services.filter(s => s.name).length}</li>
-              <li>• Logo: {data.logoBase64 ? 'Uploaded' : 'None'}</li>
-            </ul>
-          </div>
         </CardContent>
       </Card>
 
-      {/* Save Demo Dialog */}
-      <Dialog open={showSaveDemoDialog} onOpenChange={setShowSaveDemoDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Save Your Demo</DialogTitle>
-            <DialogDescription>
-              Enter your email to create a demo account and save your booking page. You'll be able to access it from your dashboard and upgrade later to make it live.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="demo-email">Email Address</Label>
-              <Input
-                id="demo-email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                data-testid="input-demo-email"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="demo-name">Full Name (Optional)</Label>
-              <Input
-                id="demo-name"
-                type="text"
-                placeholder="Your Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                data-testid="input-demo-name"
-              />
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowSaveDemoDialog(false)}
-                className="flex-1"
-                data-testid="button-cancel-save-demo"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveDemoConfirm}
-                disabled={!email.trim() || isSaving}
-                className="flex-1"
-                data-testid="button-confirm-save-demo"
-              >
-                {isSaving ? 'Creating Account...' : 'Save Demo'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
