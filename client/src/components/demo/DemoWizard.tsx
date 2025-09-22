@@ -290,8 +290,13 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
           
           <DialogHeader className="flex-shrink-0 relative z-10 animate-fade-in-up">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-bold text-blue-gradient" data-testid="text-demo-wizard-title">✨ Test before you Launch</DialogTitle>
-              <Button variant="ghost" size="sm" onClick={onClose} className="hover-lift" data-testid="button-close">
+              <DialogTitle className="text-2xl font-bold text-blue-gradient flex items-center gap-3" data-testid="text-demo-wizard-title">
+                <div className="w-10 h-10 rounded-xl glass-prism flex items-center justify-center">
+                  <span className="text-xl">🚀</span>
+                </div>
+                Test before you Launch
+              </DialogTitle>
+              <Button variant="ghost" size="sm" onClick={onClose} className="glass-effect hover-lift rounded-xl" data-testid="button-close">
                 <X className="w-4 h-4" />
               </Button>
             </div>

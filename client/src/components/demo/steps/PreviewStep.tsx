@@ -449,51 +449,68 @@ export default function PreviewStep({
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            🚀 Next Steps
+          <CardTitle className="flex items-center gap-3 text-blue-gradient text-xl font-bold">
+            <div className="w-8 h-8 rounded-lg glass-prism flex items-center justify-center">
+              <span className="text-lg">🚀</span>
+            </div>
+            Next Steps
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Preview & Sign Up */}
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
-            <div className="space-y-1">
-              <h4 className="font-medium flex items-center gap-2">
-                Create Account to Build Your Page
-                <Badge variant="secondary">Required</Badge>
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                Sign up to convert your preview into a real booking page.
-              </p>
+          <div className="glass-prism-card p-6 rounded-2xl border-none shadow-lg hover-lift animate-fade-in-up">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <h4 className="font-semibold flex items-center gap-3 text-lg">
+                  <div className="w-6 h-6 rounded-lg glass-prism flex items-center justify-center">
+                    <span className="text-xs">✨</span>
+                  </div>
+                  Create Account to Build Your Page
+                  <Badge variant="secondary" className="glass-effect">Required</Badge>
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed ml-9">
+                  Sign up to convert your preview into a real booking page.
+                </p>
+              </div>
+              <Button
+                onClick={onCreateAccount}
+                disabled={isConverting || !data.businessName?.trim()}
+                className="glass-prism-button px-6 py-3 h-auto"
+                data-testid="button-create-account"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                {isConverting ? 'Redirecting...' : 'Sign Up'}
+              </Button>
             </div>
-            <Button
-              onClick={onCreateAccount}
-              disabled={isConverting || !data.businessName?.trim()}
-              data-testid="button-create-account"
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              {isConverting ? 'Redirecting...' : 'Sign Up'}
-            </Button>
           </div>
 
           <Separator />
 
           {/* Restart Option */}
           {onRestart && (
-            <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
-              <div className="space-y-1">
-                <h4 className="font-medium">Start Over</h4>
-                <p className="text-sm text-muted-foreground">
-                  Want to create a different booking page? Start the wizard from the beginning.
-                </p>
+            <div className="glass-effect p-6 rounded-2xl border border-border/30 hover-lift animate-slide-in-right" style={{animationDelay: '0.1s'}}>
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-lg glass-prism flex items-center justify-center">
+                      <span className="text-xs">↻</span>
+                    </div>
+                    Start Over
+                  </h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed ml-9">
+                    Want to create a different booking page? Start the wizard from the beginning.
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={onRestart}
+                  className="glass-effect border-border/50 hover:glass-prism-card transition-all duration-300 px-6 py-3 h-auto"
+                  data-testid="button-restart-wizard"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Restart
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                onClick={onRestart}
-                data-testid="button-restart-wizard"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Restart
-              </Button>
             </div>
           )}
 
