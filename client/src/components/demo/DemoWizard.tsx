@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
@@ -257,7 +257,6 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
         return (
           <PreviewStep 
             data={demoData} 
-            onSaveDemo={handleSaveDemo}
             onCreateAccount={handleCreateAccount}
             onRestart={() => {
               // Reset demo data and go to step 1
@@ -267,9 +266,7 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
               setConvertToken(null);
               localStorage.removeItem(DEMO_STORAGE_KEY);
             }}
-            isSaving={createDemoMutation.isPending}
             isConverting={convertDemoMutation.isPending}
-            demoCreated={!!demoId}
             user={user}
           />
         );
@@ -283,23 +280,36 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col" data-testid="dialog-demo-wizard">
-          <DialogHeader className="flex-shrink-0">
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col glass-prism-card border-none shadow-2xl animate-scale-in" data-testid="dialog-demo-wizard">
+          {/* Glass Prism Background Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-10 left-10 w-48 h-48 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+            <div className="absolute top-32 right-20 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
+            <div className="absolute bottom-20 left-1/3 w-32 h-32 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
+          </div>
+          
+          <DialogHeader className="flex-shrink-0 relative z-10 animate-fade-in-up">
             <div className="flex items-center justify-between">
-              <DialogTitle data-testid="text-demo-wizard-title">Test before you Launch</DialogTitle>
-              <Button variant="ghost" size="sm" onClick={onClose} data-testid="button-close">
+              <DialogTitle className="text-2xl font-bold text-blue-gradient" data-testid="text-demo-wizard-title">✨ Test before you Launch</DialogTitle>
+              <Button variant="ghost" size="sm" onClick={onClose} className="hover-lift" data-testid="button-close">
                 <X className="w-4 h-4" />
               </Button>
             </div>
+            <DialogDescription className="sr-only">
+              Create and customize your booking page through our step-by-step wizard. Preview your page before making it live.
+            </DialogDescription>
             
             {/* Progress Bar */}
-            <div className="space-y-2 mt-4">
-              <Progress value={progress} className="w-full" data-testid="progress-wizard" />
+            <div className="space-y-2 mt-6">
+              <Progress value={progress} className="w-full h-2 glass-effect" data-testid="progress-wizard" />
               <div className="flex justify-between text-sm text-muted-foreground">
-                {steps.map((step) => (
+                {steps.map((step, index) => (
                   <div 
                     key={step.id} 
-                    className={`text-center ${currentStep === step.id ? 'text-foreground font-medium' : ''}`}
+                    className={`text-center transition-all duration-300 animate-slide-in-left ${
+                      currentStep === step.id ? 'text-foreground font-semibold scale-105' : ''
+                    }`}
+                    style={{animationDelay: `${index * 0.1}s`}}
                   >
                     <div className="text-xs">{step.title}</div>
                   </div>
@@ -309,28 +319,29 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
           </DialogHeader>
 
           {/* Step Content */}
-          <div className="flex-1 overflow-y-auto p-1">
+          <div className="flex-1 overflow-y-auto p-1 relative z-10 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
             {renderStep()}
           </div>
 
           {/* Navigation */}
           {currentStep < steps.length && (
-            <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t">
+            <div className="flex-shrink-0 flex justify-between items-center pt-6 border-t border-border/20 relative z-10 animate-slide-in-right" style={{animationDelay: '0.3s'}}>
               <Button 
                 variant="outline" 
                 onClick={prevStep} 
                 disabled={currentStep === 1}
+                className="glass-effect hover-lift"
                 data-testid="button-prev-step"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
               </Button>
               
-              <span className="text-sm text-muted-foreground" data-testid="text-step-counter">
+              <span className="text-sm text-muted-foreground font-medium" data-testid="text-step-counter">
                 Step {currentStep} of {steps.length}
               </span>
               
-              <Button onClick={nextStep} data-testid="button-next-step">
+              <Button onClick={nextStep} className="glass-prism-button" data-testid="button-next-step">
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
