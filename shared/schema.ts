@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, uuid, timestamp, jsonb, numeric, integer, date } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, uuid, timestamp, jsonb, numeric, integer, date, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -36,8 +36,16 @@ export const pages = pgTable("pages", {
   showBusinessHours: text("show_business_hours").default("true"),
   showContactInfo: text("show_contact_info").default("true"),
   data: jsonb("data"),
+  published: boolean("published").default(false),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
+export const demoPages = pgTable("demo_pages", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  data: jsonb("data").notNull(), // Contains the demo page configuration
+  createdAt: timestamp("created_at").default(sql`now()`),
+  expiresAt: timestamp("expires_at").default(sql`now() + interval '7 days'`),
 });
 
 export const services = pgTable("services", {
@@ -154,6 +162,12 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
   updatedAt: true,
 });
 
+export const insertDemoPageSchema = createInsertSchema(demoPages).omit({
+  id: true,
+  createdAt: true,
+  expiresAt: true,
+});
+
 // Types (User type managed by Supabase auth)
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
@@ -169,3 +183,5 @@ export type Payment = typeof paymentsDemo.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type DemoPage = typeof demoPages.$inferSelect;
+export type InsertDemoPage = z.infer<typeof insertDemoPageSchema>;
