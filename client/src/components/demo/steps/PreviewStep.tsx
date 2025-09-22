@@ -39,6 +39,7 @@ interface PreviewStepProps {
   onCreateAccount: () => void;
   onRestart?: () => void;
   isConverting: boolean;
+  isSaving?: boolean;
   user: any;
 }
 
@@ -47,6 +48,7 @@ export default function PreviewStep({
   onCreateAccount,
   onRestart,
   isConverting,
+  isSaving = false,
   user
 }: PreviewStepProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -474,12 +476,12 @@ export default function PreviewStep({
               </div>
               <Button
                 onClick={onCreateAccount}
-                disabled={isConverting || !data.businessName?.trim()}
+                disabled={isConverting || isSaving}
                 className="glass-prism-button px-6 py-3 h-auto"
                 data-testid="button-create-account"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
-                {isConverting ? 'Redirecting...' : 'Sign Up'}
+                {isConverting ? 'Redirecting...' : isSaving ? 'Creating...' : 'Sign Up'}
               </Button>
             </div>
           </div>

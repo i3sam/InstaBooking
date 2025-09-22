@@ -228,20 +228,21 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   };
 
   const handleCreateAccount = () => {
-    console.log('Create Account clicked. User:', user);
+    console.log('🔥 CREATE ACCOUNT BUTTON CLICKED! User:', user);
+    console.log('🔥 Demo data:', demoData);
     try {
       if (user) {
         // User is logged in, convert directly
-        console.log('User is logged in, converting demo directly');
+        console.log('✅ User is logged in, converting demo directly');
         convertDemoMutation.mutate();
       } else {
         // For new flow: save demo first, then redirect to signup
-        console.log('User not logged in, saving demo and redirecting to signup');
+        console.log('✅ User not logged in, saving demo and redirecting to signup');
         // Save the demo anonymously first, then redirect to signup
         createDemoMutation.mutate({ data: demoData });
       }
     } catch (error) {
-      console.error('Error in handleCreateAccount:', error);
+      console.error('❌ Error in handleCreateAccount:', error);
     }
   };
 
@@ -267,6 +268,7 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
               localStorage.removeItem(DEMO_STORAGE_KEY);
             }}
             isConverting={convertDemoMutation.isPending}
+            isSaving={createDemoMutation.isPending}
             user={user}
           />
         );
@@ -292,7 +294,11 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
             <div className="flex items-center justify-between">
               <DialogTitle className="text-2xl font-bold text-blue-gradient flex items-center gap-3" data-testid="text-demo-wizard-title">
                 <div className="w-10 h-10 rounded-xl glass-prism flex items-center justify-center">
-                  <span className="text-xl">🚀</span>
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" opacity="0.3"/>
+                    <path d="M21 16L12 21L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M21 12L12 17L3 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
                 Test before you Launch
               </DialogTitle>
