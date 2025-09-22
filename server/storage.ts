@@ -1,10 +1,17 @@
 // Load environment variables first
 import 'dotenv/config';
 
-import { createClient } from '@supabase/supabase-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { eq, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions, demoPages } from '@shared/schema';
 
-// Supabase client for admin operations
+// Lazy initialize database connection using Supabase PostgreSQL
+let db: ReturnType<typeof drizzle> | null = null;
+
+// Supabase client for admin operations (auth, storage)
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -29,23 +36,33 @@ interface CachedProfile {
 const profileCache = new Map<string, CachedProfile>();
 const PROFILE_CACHE_TTL = 15000; // 15 seconds
 
-// Test Supabase connection
-async function testConnection() {
-  try {
-    if (!supabase) {
-      console.log("⚠️  Supabase client not initialized - cannot test connection");
-      return;
+function getDb() {
+  if (!db) {
+    // Use the Supabase PostgreSQL connection string
+    const connectionString = process.env.DATABASE_URL;
+    
+    if (!connectionString) {
+      throw new Error("DATABASE_URL environment variable is required");
     }
     
+    console.log("✅ Server storage initialized with Drizzle + Supabase PostgreSQL");
+    const client = postgres(connectionString);
+    db = drizzle(client);
+    
+    // Test database connection
+    testConnection();
+  }
+  return db;
+}
+
+// Test database connection
+async function testConnection() {
+  try {
     // Simple query to test connection
-    const { data, error } = await supabase.from('profiles').select('id').limit(1);
-    if (error) {
-      console.log("⚠️  Supabase connection test error:", error.message);
-    } else {
-      console.log("✅ Supabase connection successful");
-    }
+    const result = await getDb().select().from(profiles).limit(1);
+    console.log("✅ Drizzle + Supabase PostgreSQL connection successful");
   } catch (error) {
-    console.log("⚠️  Supabase connection test error (may be normal on startup):", error);
+    console.log("⚠️  Database connection test error (may be normal on startup):", error);
   }
 }
 
@@ -104,29 +121,19 @@ export interface IStorage {
   createDemoUser(email: string, fullName?: string): Promise<any>;
 }
 
-export class SupabaseStorage implements IStorage {
-  private ensureSupabase() {
-    if (!supabase) {
-      throw new Error("Supabase client not initialized. Please check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.");
-    }
-    return supabase;
-  }
-
+export class DrizzleStorage implements IStorage {
   async createProfile(profile: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('profiles').insert(profile).select().single();
-      
-      if (error) throw error;
+      const [result] = await getDb().insert(profiles).values(profile).returning();
       
       // Cache the newly created profile
       const now = Date.now();
-      profileCache.set(data.id, {
-        data,
+      profileCache.set(result.id, {
+        data: result,
         expiresAt: now + PROFILE_CACHE_TTL
       });
       
-      return data;
+      return result;
     } catch (error) {
       console.error("Create profile error:", error);
       throw error;
@@ -143,25 +150,17 @@ export class SupabaseStorage implements IStorage {
         return cached.data;
       }
 
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('profiles').select('*').eq('id', userId).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
+      const [result] = await getDb().select().from(profiles).where(eq(profiles.id, userId));
       
       // Cache the result
-      if (data) {
+      if (result) {
         profileCache.set(userId, {
-          data,
+          data: result,
           expiresAt: now + PROFILE_CACHE_TTL
         });
       }
       
-      return data;
+      return result;
     } catch (error) {
       console.error("Get profile error:", error);
       return undefined;
@@ -170,15 +169,12 @@ export class SupabaseStorage implements IStorage {
 
   async updateProfile(userId: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('profiles').update(updates).eq('id', userId).select().single();
-      
-      if (error) throw error;
+      const [result] = await getDb().update(profiles).set(updates).where(eq(profiles.id, userId)).returning();
       
       // Invalidate cache on update
       profileCache.delete(userId);
       
-      return data;
+      return result;
     } catch (error) {
       console.error("Update profile error:", error);
       throw error;
@@ -187,16 +183,9 @@ export class SupabaseStorage implements IStorage {
 
   async createPage(page: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      const pageData = { 
-        ...page, 
-        created_at: new Date().toISOString(), 
-        updated_at: new Date().toISOString() 
-      };
-      const { data, error } = await client.from('pages').insert(pageData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const pageData = { ...page, createdAt: new Date(), updatedAt: new Date() };
+      const [result] = await getDb().insert(pages).values(pageData).returning();
+      return result;
     } catch (error) {
       console.error("Create page error:", error);
       throw error;
@@ -205,17 +194,8 @@ export class SupabaseStorage implements IStorage {
 
   async getPage(id: string): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('pages').select('*').eq('id', id).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
-      
-      return data;
+      const [result] = await getDb().select().from(pages).where(eq(pages.id, id));
+      return result;
     } catch (error) {
       console.error("Get page error:", error);
       return undefined;
@@ -224,17 +204,8 @@ export class SupabaseStorage implements IStorage {
 
   async getPageBySlug(slug: string): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('pages').select('*').eq('slug', slug).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
-      
-      return data;
+      const [result] = await getDb().select().from(pages).where(eq(pages.slug, slug));
+      return result;
     } catch (error) {
       console.error("Get page by slug error:", error);
       return undefined;
@@ -243,11 +214,8 @@ export class SupabaseStorage implements IStorage {
 
   async getPagesByOwner(ownerId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('pages').select('*').eq('owner_id', ownerId);
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(pages).where(eq(pages.ownerId, ownerId));
+      return results || [];
     } catch (error) {
       console.error("Get pages error:", error);
       return [];
@@ -256,12 +224,9 @@ export class SupabaseStorage implements IStorage {
 
   async updatePage(id: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const updateData = { ...updates, updated_at: new Date().toISOString() };
-      const { data, error } = await client.from('pages').update(updateData).eq('id', id).select().single();
-      
-      if (error) throw error;
-      return data;
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await getDb().update(pages).set(updateData).where(eq(pages.id, id)).returning();
+      return result;
     } catch (error) {
       console.error("Update page error:", error);
       throw error;
@@ -270,10 +235,7 @@ export class SupabaseStorage implements IStorage {
 
   async deletePage(id: string): Promise<boolean> {
     try {
-      const client = this.ensureSupabase();
-      const { error } = await client.from('pages').delete().eq('id', id);
-      
-      if (error) throw error;
+      await getDb().delete(pages).where(eq(pages.id, id));
       return true;
     } catch (error) {
       console.error("Delete page error:", error);
@@ -283,12 +245,9 @@ export class SupabaseStorage implements IStorage {
 
   async createService(service: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      const serviceData = { ...service, created_at: new Date().toISOString() };
-      const { data, error } = await client.from('services').insert(serviceData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const serviceData = { ...service, createdAt: new Date() };
+      const [result] = await getDb().insert(services).values(serviceData).returning();
+      return result;
     } catch (error) {
       console.error("Create service error:", error);
       throw error;
@@ -297,11 +256,8 @@ export class SupabaseStorage implements IStorage {
 
   async getServicesByPageId(pageId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('services').select('*').eq('page_id', pageId);
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(services).where(eq(services.pageId, pageId));
+      return results || [];
     } catch (error) {
       console.error("Get services by page ID error:", error);
       return [];
@@ -310,11 +266,8 @@ export class SupabaseStorage implements IStorage {
 
   async updateService(id: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('services').update(updates).eq('id', id).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().update(services).set(updates).where(eq(services.id, id)).returning();
+      return result;
     } catch (error) {
       console.error("Update service error:", error);
       throw error;
@@ -323,10 +276,7 @@ export class SupabaseStorage implements IStorage {
 
   async deleteService(id: string): Promise<boolean> {
     try {
-      const client = this.ensureSupabase();
-      const { error } = await client.from('services').delete().eq('id', id);
-      
-      if (error) throw error;
+      await getDb().delete(services).where(eq(services.id, id));
       return true;
     } catch (error) {
       console.error("Delete service error:", error);
@@ -336,16 +286,13 @@ export class SupabaseStorage implements IStorage {
 
   async createAppointment(appointment: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
       const appointmentData = { 
         ...appointment, 
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      const { data, error } = await client.from('appointments').insert(appointmentData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().insert(appointments).values(appointmentData).returning();
+      return result;
     } catch (error) {
       console.error("Create appointment error:", error);
       throw error;
@@ -354,17 +301,8 @@ export class SupabaseStorage implements IStorage {
 
   async getAppointmentById(id: string): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('appointments').select('*').eq('id', id).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
-      
-      return data;
+      const [result] = await getDb().select().from(appointments).where(eq(appointments.id, id));
+      return result;
     } catch (error) {
       console.error("Get appointment by ID error:", error);
       return undefined;
@@ -373,11 +311,8 @@ export class SupabaseStorage implements IStorage {
 
   async getAppointmentsByOwner(ownerId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('appointments').select('*').eq('owner_id', ownerId).order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(appointments).where(eq(appointments.ownerId, ownerId)).orderBy(desc(appointments.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get appointments by owner error:", error);
       return [];
@@ -386,12 +321,9 @@ export class SupabaseStorage implements IStorage {
 
   async updateAppointment(id: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const updateData = { ...updates, updated_at: new Date().toISOString() };
-      const { data, error } = await client.from('appointments').update(updateData).eq('id', id).select().single();
-      
-      if (error) throw error;
-      return data;
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await getDb().update(appointments).set(updateData).where(eq(appointments.id, id)).returning();
+      return result;
     } catch (error) {
       console.error("Update appointment error:", error);
       throw error;
@@ -400,12 +332,9 @@ export class SupabaseStorage implements IStorage {
 
   async createPayment(payment: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      const paymentData = { ...payment, created_at: new Date().toISOString() };
-      const { data, error } = await client.from('payments_demo').insert(paymentData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const paymentData = { ...payment, createdAt: new Date() };
+      const [result] = await getDb().insert(paymentsDemo).values(paymentData).returning();
+      return result;
     } catch (error) {
       console.error("Create payment error:", error);
       throw error;
@@ -414,11 +343,8 @@ export class SupabaseStorage implements IStorage {
 
   async getPaymentsByUser(userId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('payments_demo').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(paymentsDemo).where(eq(paymentsDemo.userId, userId)).orderBy(desc(paymentsDemo.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get payments by user error:", error);
       return [];
@@ -427,12 +353,9 @@ export class SupabaseStorage implements IStorage {
 
   async createReview(review: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      const reviewData = { ...review, created_at: new Date().toISOString() };
-      const { data, error } = await client.from('reviews').insert(reviewData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const reviewData = { ...review, createdAt: new Date() };
+      const [result] = await getDb().insert(reviews).values(reviewData).returning();
+      return result;
     } catch (error) {
       console.error("Create review error:", error);
       throw error;
@@ -441,11 +364,8 @@ export class SupabaseStorage implements IStorage {
 
   async getReviewsByPageId(pageId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('reviews').select('*').eq('page_id', pageId).order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(reviews).where(eq(reviews.pageId, pageId)).orderBy(desc(reviews.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get reviews by page ID error:", error);
       return [];
@@ -454,11 +374,8 @@ export class SupabaseStorage implements IStorage {
 
   async getApprovedReviewsByPageId(pageId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('reviews').select('*').eq('page_id', pageId).eq('is_approved', 'approved').order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(reviews).where(eq(reviews.pageId, pageId)).where(eq(reviews.isApproved, 'approved')).orderBy(desc(reviews.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get approved reviews by page ID error:", error);
       return [];
@@ -467,11 +384,8 @@ export class SupabaseStorage implements IStorage {
 
   async updateReview(id: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('reviews').update(updates).eq('id', id).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().update(reviews).set(updates).where(eq(reviews.id, id)).returning();
+      return result;
     } catch (error) {
       console.error("Update review error:", error);
       throw error;
@@ -480,16 +394,13 @@ export class SupabaseStorage implements IStorage {
 
   async createSubscription(subscription: any): Promise<any> {
     try {
-      const client = this.ensureSupabase();
       const subscriptionData = { 
         ...subscription, 
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      const { data, error } = await client.from('subscriptions').insert(subscriptionData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().insert(subscriptions).values(subscriptionData).returning();
+      return result;
     } catch (error) {
       console.error("Create subscription error:", error);
       throw error;
@@ -498,17 +409,8 @@ export class SupabaseStorage implements IStorage {
 
   async getSubscription(id: string): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('subscriptions').select('*').eq('id', id).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
-      
-      return data;
+      const [result] = await getDb().select().from(subscriptions).where(eq(subscriptions.id, id));
+      return result;
     } catch (error) {
       console.error("Get subscription error:", error);
       return undefined;
@@ -517,11 +419,8 @@ export class SupabaseStorage implements IStorage {
 
   async getSubscriptionsByUser(userId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('subscriptions').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(subscriptions).where(eq(subscriptions.userId, userId)).orderBy(desc(subscriptions.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get subscriptions by user error:", error);
       return [];
@@ -530,12 +429,9 @@ export class SupabaseStorage implements IStorage {
 
   async updateSubscription(id: string, updates: any): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const updateData = { ...updates, updated_at: new Date().toISOString() };
-      const { data, error } = await client.from('subscriptions').update(updateData).eq('id', id).select().single();
-      
-      if (error) throw error;
-      return data;
+      const updateData = { ...updates, updatedAt: new Date() };
+      const [result] = await getDb().update(subscriptions).set(updateData).where(eq(subscriptions.id, id)).returning();
+      return result;
     } catch (error) {
       console.error("Update subscription error:", error);
       throw error;
@@ -544,10 +440,7 @@ export class SupabaseStorage implements IStorage {
 
   async cancelSubscription(id: string): Promise<boolean> {
     try {
-      const client = this.ensureSupabase();
-      const { error } = await client.from('subscriptions').update({ status: 'CANCELLED', updated_at: new Date().toISOString() }).eq('id', id);
-      
-      if (error) throw error;
+      await getDb().update(subscriptions).set({ status: 'CANCELLED', updatedAt: new Date() }).where(eq(subscriptions.id, id));
       return true;
     } catch (error) {
       console.error("Cancel subscription error:", error);
@@ -557,24 +450,20 @@ export class SupabaseStorage implements IStorage {
 
   async createDemoPage(demoData: any, ownerId?: string): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      
       const convertToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
       
       const demoPageData = {
-        owner_id: ownerId || null,
+        ownerId: ownerId || null,
         data: demoData,
-        convert_token: convertToken,
-        created_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString()
+        convertToken,
+        createdAt: new Date(),
+        expiresAt
       };
       
-      const { data, error } = await client.from('demo_pages').insert(demoPageData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().insert(demoPages).values(demoPageData).returning();
+      return result;
     } catch (error) {
       console.error("Create demo page error:", error);
       throw error;
@@ -583,17 +472,8 @@ export class SupabaseStorage implements IStorage {
 
   async getDemoPage(id: string): Promise<any | undefined> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('demo_pages').select('*').eq('id', id).single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') { // Not found
-          return undefined;
-        }
-        throw error;
-      }
-      
-      return data;
+      const [result] = await getDb().select().from(demoPages).where(eq(demoPages.id, id));
+      return result;
     } catch (error) {
       console.error("Get demo page error:", error);
       return undefined;
@@ -602,11 +482,8 @@ export class SupabaseStorage implements IStorage {
 
   async getDemoPagesByOwner(ownerId: string): Promise<any[]> {
     try {
-      const client = this.ensureSupabase();
-      const { data, error } = await client.from('demo_pages').select('*').eq('owner_id', ownerId).order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
+      const results = await getDb().select().from(demoPages).where(eq(demoPages.ownerId, ownerId)).orderBy(desc(demoPages.createdAt));
+      return results || [];
     } catch (error) {
       console.error("Get demo pages by owner error:", error);
       return [];
@@ -615,10 +492,7 @@ export class SupabaseStorage implements IStorage {
 
   async deleteDemoPage(id: string): Promise<boolean> {
     try {
-      const client = this.ensureSupabase();
-      const { error } = await client.from('demo_pages').delete().eq('id', id);
-      
-      if (error) throw error;
+      await getDb().delete(demoPages).where(eq(demoPages.id, id));
       return true;
     } catch (error) {
       console.error("Delete demo page error:", error);
@@ -628,41 +502,32 @@ export class SupabaseStorage implements IStorage {
 
   async atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null> {
     try {
-      const client = this.ensureSupabase();
-      
       // First check if token is valid and not already used
-      const { data: demoPage, error: fetchError } = await client
-        .from('demo_pages')
-        .select('*')
-        .eq('id', demoId)
-        .eq('convert_token', convertToken)
-        .single();
+      const [demoPage] = await getDb()
+        .select()
+        .from(demoPages)
+        .where(eq(demoPages.id, demoId))
+        .where(eq(demoPages.convertToken, convertToken));
       
-      if (fetchError || !demoPage) {
+      if (!demoPage) {
         return null; // Invalid token or already used
       }
       
       // Check if not expired
       const now = new Date();
-      const expiresAt = new Date(demoPage.expires_at);
-      if (now > expiresAt) {
+      if (demoPage.expiresAt && now > new Date(demoPage.expiresAt)) {
         return null; // Expired
       }
       
       // Mark token as used by setting it to null
-      const { data: updatedDemo, error: updateError } = await client
-        .from('demo_pages')
-        .update({ convert_token: null, updated_at: new Date().toISOString() })
-        .eq('id', demoId)
-        .eq('convert_token', convertToken)
-        .select()
-        .single();
+      const [updatedDemo] = await getDb()
+        .update(demoPages)
+        .set({ convertToken: null, updatedAt: new Date() })
+        .where(eq(demoPages.id, demoId))
+        .where(eq(demoPages.convertToken, convertToken))
+        .returning();
       
-      if (updateError || !updatedDemo) {
-        return null; // Token already used by another request
-      }
-      
-      return updatedDemo;
+      return updatedDemo || null;
     } catch (error) {
       console.error("Atomic convert demo error:", error);
       return null;
@@ -671,13 +536,10 @@ export class SupabaseStorage implements IStorage {
 
   async associateDemoWithUser(demoId: string, userId: string): Promise<boolean> {
     try {
-      const client = this.ensureSupabase();
-      const { error } = await client
-        .from('demo_pages')
-        .update({ owner_id: userId, updated_at: new Date().toISOString() })
-        .eq('id', demoId);
-      
-      if (error) throw error;
+      await getDb()
+        .update(demoPages)
+        .set({ ownerId: userId, updatedAt: new Date() })
+        .where(eq(demoPages.id, demoId));
       return true;
     } catch (error) {
       console.error("Associate demo with user error:", error);
@@ -687,23 +549,19 @@ export class SupabaseStorage implements IStorage {
 
   async createDemoUser(email: string, fullName?: string): Promise<any> {
     try {
-      const client = this.ensureSupabase();
-      
       // Generate a UUID for demo user
       const demoUserId = crypto.randomUUID();
       
       const profileData = {
         id: demoUserId,
         email,
-        full_name: fullName || 'Demo User',
-        membership_status: 'demo',
-        created_at: new Date().toISOString()
+        fullName: fullName || 'Demo User',
+        membershipStatus: 'demo',
+        createdAt: new Date()
       };
       
-      const { data, error } = await client.from('profiles').insert(profileData).select().single();
-      
-      if (error) throw error;
-      return data;
+      const [result] = await getDb().insert(profiles).values(profileData).returning();
+      return result;
     } catch (error) {
       console.error("Create demo user error:", error);
       throw error;
@@ -712,7 +570,4 @@ export class SupabaseStorage implements IStorage {
 }
 
 // Initialize storage instance
-export const storage = new SupabaseStorage();
-
-// Test connection on startup
-testConnection();
+export const storage = new DrizzleStorage();
