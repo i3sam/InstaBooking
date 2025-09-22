@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocation } from 'wouter';
 import heroImage from '@assets/Hero image (1)_1757961964946.png';
+import DemoWizard from '@/components/demo/DemoWizard';
 import { 
   Palette, 
   CalendarCheck, 
@@ -33,6 +34,7 @@ import {
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const [showDemoWizard, setShowDemoWizard] = useState(false);
 
   // Handle hash-based scrolling when navigating to homepage with hash
   useEffect(() => {
@@ -255,6 +257,140 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Test Before You Launch Section */}
+      <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-blue-50/30 dark:to-blue-950/30">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute top-10 left-10 w-64 h-64 glass-prism rounded-full opacity-15 animate-float bg-overlay"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
+        
+        <div className="relative container mx-auto px-6 content-layer">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full text-white text-sm font-semibold shadow-lg mb-8">
+              <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">Try Now</span>
+              No signup required
+            </div>
+            
+            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+              <span className="text-blue-gradient">
+                Test before you Launch
+              </span>
+            </h2>
+            
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-12">
+              Create and preview your booking page instantly. See exactly how it will look before committing to a plan.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Benefits */}
+            <div className="space-y-8 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                    <Zap className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Instant Preview</h3>
+                    <p className="text-muted-foreground">See your booking page come to life in real-time as you customize it. No guesswork involved.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                    <Target className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Perfect Your Design</h3>
+                    <p className="text-muted-foreground">Test different themes, colors, and layouts until you find the perfect match for your brand.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Risk-Free Testing</h3>
+                    <p className="text-muted-foreground">Try all features without any commitment. Only sign up when you're completely satisfied.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                    <Globe className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Share for Feedback</h3>
+                    <p className="text-muted-foreground">Get feedback from colleagues or clients before going live. Share your demo link easily.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Call to Action */}
+            <div className="animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+              <Card className="glass-prism-card p-8 hover-lift relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                <div className="text-center space-y-6">
+                  <div className="w-20 h-20 glass-prism rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                    <Monitor className="h-10 w-10 text-primary" />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-4">Ready to create your demo?</h3>
+                    <p className="text-muted-foreground mb-6">
+                      It takes less than 5 minutes to build and preview your booking page. Start with our guided wizard.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <Button
+                      onClick={() => setShowDemoWizard(true)}
+                      size="lg"
+                      className="w-full glass-prism-button px-8 py-4 rounded-full text-lg h-auto font-semibold"
+                      data-testid="button-start-demo-wizard"
+                    >
+                      <Play className="mr-3 h-5 w-5" />
+                      Start Demo Wizard
+                    </Button>
+                    
+                    <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
+                      <div className="flex items-center">
+                        <Check className="h-4 w-4 text-green-500 mr-2" />
+                        No credit card
+                      </div>
+                      <div className="flex items-center">
+                        <Check className="h-4 w-4 text-green-500 mr-2" />
+                        No signup required
+                      </div>
+                      <div className="flex items-center">
+                        <Check className="h-4 w-4 text-green-500 mr-2" />
+                        5 min setup
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground">
+                      💡 <strong>Pro tip:</strong> Your demo will be saved for 7 days so you can come back and refine it anytime.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Wizard Modal */}
+      {showDemoWizard && (
+        <DemoWizard 
+          open={showDemoWizard}
+          onClose={() => setShowDemoWizard(false)}
+        />
+      )}
 
       {/* Features Section */}
       <section id="features" className="relative py-24 overflow-hidden gojiberry-gradient">
