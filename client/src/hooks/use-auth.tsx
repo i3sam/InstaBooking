@@ -234,6 +234,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
           userId: data.user.id,
           fullName: fullName,
         });
+
+        // Check for pending demo association after signup
+        const pendingDemoInfo = localStorage.getItem('pending_demo_info');
+        if (pendingDemoInfo) {
+          try {
+            const demoInfo = JSON.parse(pendingDemoInfo);
+            if (demoInfo.demoId && demoInfo.convertToken) {
+              // Associate the demo with the new user account
+              const demoResponse = await apiRequest('POST', '/api/demo/associate', {
+                demoId: demoInfo.demoId,
+                convertToken: demoInfo.convertToken
+              });
+              
+              if (demoResponse.ok) {
+                console.log('Demo successfully associated with user account');
+                localStorage.removeItem('pending_demo_info');
+                localStorage.removeItem('bookinggen_demo_v1');
+              }
+            }
+          } catch (demoError) {
+            console.error('Failed to associate demo after signup:', demoError);
+          }
+        }
       } catch (error) {
         console.error('Failed to create profile:', error);
       }

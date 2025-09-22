@@ -126,30 +126,23 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
       setDemoId(response.id);
       setConvertToken(response.convertToken);
       
-      // If demo user was created, we need to update local state/auth
-      if (response.demoUser) {
-        if (response.demoUser.magicLink) {
-          toast({
-            title: 'Demo Account Created!',
-            description: 'Your demo booking page has been saved! Redirecting you to your dashboard...'
-          });
-          // Auto-redirect to magic link after a short delay
-          setTimeout(() => {
-            window.location.href = response.demoUser.magicLink;
-          }, 2000);
-        } else {
-          toast({
-            title: 'Demo Account Created!',
-            description: 'Your demo booking page has been saved! Please check your email for login instructions to access your dashboard.'
-          });
-        }
-        // Demo user is created in Supabase and can log in normally
-      } else {
-        toast({
-          title: 'Demo Created',
-          description: 'Your demo booking page has been created!'
-        });
-      }
+      // For the new flow: always redirect to signup regardless of demo type
+      toast({
+        title: 'Demo Created!',
+        description: 'Your demo booking page has been created! Please sign up to access it in your dashboard.'
+      });
+      
+      // Store demo info for post-signup redirect
+      localStorage.setItem('pending_demo_info', JSON.stringify({
+        demoId: response.id,
+        convertToken: response.convertToken,
+        demoUser: response.demoUser || null
+      }));
+      
+      // Redirect to signup after short delay
+      setTimeout(() => {
+        window.location.href = '/signup?redirect_from=demo';
+      }, 1500);
     },
     onError: (error) => {
       toast({
@@ -242,10 +235,10 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
         console.log('User is logged in, converting demo directly');
         convertDemoMutation.mutate();
       } else {
-        // Redirect to signup
-        console.log('User not logged in, redirecting to signup');
-        localStorage.setItem('redirect_after_signup', 'convert_demo');
-        window.location.href = '/signup';
+        // For new flow: save demo first, then redirect to signup
+        console.log('User not logged in, saving demo and redirecting to signup');
+        // Save the demo anonymously first, then redirect to signup
+        createDemoMutation.mutate({ data: demoData });
       }
     } catch (error) {
       console.error('Error in handleCreateAccount:', error);

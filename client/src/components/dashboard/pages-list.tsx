@@ -250,11 +250,24 @@ export default function PagesList() {
                   )}
                   <span>0 bookings</span>
                 </div>
-                {page.isDemoPage && page.expiresAt && (
-                  <div className="mb-4 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
-                    <p className="text-xs text-orange-600 dark:text-orange-400">
-                      Demo expires on {new Date(page.expiresAt).toLocaleDateString()}
-                    </p>
+                {page.isDemoPage && (
+                  <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                          ⚠️ Demo Page - Not Live
+                        </p>
+                        <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
+                          This is a demo page and is not published live. Upgrade to Pro to publish this page and start accepting real bookings.
+                        </p>
+                        {page.expiresAt && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400">
+                            Demo expires: {new Date(page.expiresAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div className="flex space-x-2">

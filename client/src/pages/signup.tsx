@@ -48,10 +48,21 @@ export default function Signup() {
           description: "We sent you a confirmation link to complete your signup.",
         });
       } else {
-        toast({
-          title: "Account created!",
-          description: "Welcome to BookingGen. Let's get you started.",
-        });
+        // Check if redirected from demo creation
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectFrom = urlParams.get('redirect_from');
+        
+        if (redirectFrom === 'demo') {
+          toast({
+            title: "Account created!",
+            description: "Welcome to BookingGen! Your demo page is now available in your dashboard.",
+          });
+        } else {
+          toast({
+            title: "Account created!",
+            description: "Welcome to BookingGen. Let's get you started.",
+          });
+        }
         setLocation('/dashboard');
       }
     } catch (error) {

@@ -136,6 +136,7 @@ export interface IStorage {
   getDemoPagesByOwner(ownerId: string): Promise<any[]>;
   deleteDemoPage(id: string): Promise<boolean>;
   atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null>;
+  associateDemoWithUser(demoId: string, userId: string): Promise<boolean>;
   
   // Demo Users
   createDemoUser(email: string, fullName?: string): Promise<any>;
@@ -572,6 +573,21 @@ export class DrizzleStorage implements IStorage {
     } catch (error) {
       console.error("Atomic convert demo error:", error);
       return null;
+    }
+  }
+
+  async associateDemoWithUser(demoId: string, userId: string): Promise<boolean> {
+    try {
+      const [result] = await getDb()
+        .update(demoPages)
+        .set({ ownerId: userId })
+        .where(eq(demoPages.id, demoId))
+        .returning();
+      
+      return !!result;
+    } catch (error) {
+      console.error("Associate demo with user error:", error);
+      return false;
     }
   }
 

@@ -1108,7 +1108,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // Associate anonymous demo with user account
+  app.post("/api/demo/associate", verifyToken, async (req: any, res) => {
+    try {
+      const { demoId, convertToken } = req.body;
+      
+      if (!demoId || !convertToken) {
+        return res.status(400).json({ message: "Demo ID and convert token are required" });
+      }
+      
+      // Get the demo to verify it exists and is not expired
+      const demo = await storage.getDemoPage(demoId);
+      
+      if (!demo) {
+        return res.status(404).json({ message: "Demo not found" });
+      }
+      
+      if (demo.convertToken !== convertToken) {
+        return res.status(403).json({ message: "Invalid convert token" });
+      }
+      
+      if (new Date(demo.expiresAt) < new Date()) {
+        return res.status(410).json({ message: "Demo has expired" });
+      }
+      
+      // Associate the demo with the current user
+      const result = await storage.associateDemoWithUser(demoId, req.user.userId);
+      
+      if (result) {
+        res.json({ message: "Demo successfully associated with your account" });
+      } else {
+        res.status(500).json({ message: "Failed to associate demo with account" });
+      }
+    } catch (error) {
+      console.error("Associate demo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
