@@ -198,28 +198,42 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   };
 
   const handleSaveDemo = (userInfo?: { email: string; fullName?: string }) => {
-    if (userInfo) {
-      // Save demo with demo user account
-      createDemoMutation.mutate({
-        data: demoData,
-        createDemoUser: true,
-        email: userInfo.email,
-        fullName: userInfo.fullName
-      });
-    } else {
-      // Save demo without user account (anonymous)
-      createDemoMutation.mutate({ data: demoData });
+    console.log('handleSaveDemo called with userInfo:', userInfo);
+    try {
+      if (userInfo) {
+        // Save demo with demo user account
+        console.log('Saving demo with user account');
+        createDemoMutation.mutate({
+          data: demoData,
+          createDemoUser: true,
+          email: userInfo.email,
+          fullName: userInfo.fullName
+        });
+      } else {
+        // Save demo without user account (anonymous)
+        console.log('Saving demo anonymously');
+        createDemoMutation.mutate({ data: demoData });
+      }
+    } catch (error) {
+      console.error('Error in handleSaveDemo:', error);
     }
   };
 
   const handleCreateAccount = () => {
-    if (user) {
-      // User is logged in, convert directly
-      convertDemoMutation.mutate();
-    } else {
-      // Redirect to signup
-      localStorage.setItem('redirect_after_signup', 'convert_demo');
-      window.location.href = '/signup';
+    console.log('Create Account clicked. User:', user);
+    try {
+      if (user) {
+        // User is logged in, convert directly
+        console.log('User is logged in, converting demo directly');
+        convertDemoMutation.mutate();
+      } else {
+        // Redirect to signup
+        console.log('User not logged in, redirecting to signup');
+        localStorage.setItem('redirect_after_signup', 'convert_demo');
+        window.location.href = '/signup';
+      }
+    } catch (error) {
+      console.error('Error in handleCreateAccount:', error);
     }
   };
 
@@ -237,6 +251,14 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
             data={demoData} 
             onSaveDemo={handleSaveDemo}
             onCreateAccount={handleCreateAccount}
+            onRestart={() => {
+              // Reset demo data and go to step 1
+              setDemoData(initialDemoData);
+              setCurrentStep(1);
+              setDemoId(null);
+              setConvertToken(null);
+              localStorage.removeItem(DEMO_STORAGE_KEY);
+            }}
             isSaving={createDemoMutation.isPending}
             isConverting={convertDemoMutation.isPending}
             demoCreated={!!demoId}

@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Monitor, Smartphone, Save, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award } from 'lucide-react';
+import { Monitor, Smartphone, Save, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 
 interface Service {
@@ -41,6 +41,7 @@ interface PreviewStepProps {
   data: DemoData;
   onSaveDemo: (userInfo?: { email: string; fullName?: string }) => void;
   onCreateAccount: () => void;
+  onRestart?: () => void;
   isSaving: boolean;
   isConverting: boolean;
   demoCreated: boolean;
@@ -51,6 +52,7 @@ export default function PreviewStep({
   data,
   onSaveDemo,
   onCreateAccount,
+  onRestart,
   isSaving,
   isConverting,
   demoCreated,
@@ -66,11 +68,16 @@ export default function PreviewStep({
   };
 
   const handleSaveDemoConfirm = () => {
+    console.log('Save Demo clicked with email:', email);
     if (email.trim()) {
-      onSaveDemo({ email: email.trim(), fullName: fullName.trim() || undefined });
-      setShowSaveDemoDialog(false);
-      setEmail('');
-      setFullName('');
+      try {
+        onSaveDemo({ email: email.trim(), fullName: fullName.trim() || undefined });
+        setShowSaveDemoDialog(false);
+        setEmail('');
+        setFullName('');
+      } catch (error) {
+        console.error('Error saving demo:', error);
+      }
     }
   };
 
@@ -567,6 +574,28 @@ export default function PreviewStep({
                 </div>
               )}
             </>
+          )}
+
+          <Separator />
+
+          {/* Restart Option */}
+          {onRestart && (
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+              <div className="space-y-1">
+                <h4 className="font-medium">Start Over</h4>
+                <p className="text-sm text-muted-foreground">
+                  Want to create a different booking page? Start the wizard from the beginning.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={onRestart}
+                data-testid="button-restart-wizard"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Restart
+              </Button>
+            </div>
           )}
 
           <Separator />
