@@ -1,13 +1,9 @@
 // Load environment variables first
 import 'dotenv/config';
 
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { eq, desc, sql } from 'drizzle-orm';
-
-// Enable connection caching for better performance
-neonConfig.fetchConnectionCache = true;
-neonConfig.poolQueryViaFetch = true;
 import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions } from '@shared/schema';
 
 // Lazy initialize database connection
@@ -24,13 +20,18 @@ const PROFILE_CACHE_TTL = 15000; // 15 seconds
 
 function getDb() {
   if (!db) {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL environment variable is required");
+    // Use Supabase connection string if available, otherwise fall back to DATABASE_URL
+    const connectionString = process.env.VITE_SUPABASE_URL ? 
+      process.env.VITE_SUPABASE_URL.replace('https://', 'postgresql://postgres:').replace('.supabase.co', '.supabase.co:5432/postgres') :
+      process.env.DATABASE_URL;
+    
+    if (!connectionString) {
+      throw new Error("Database connection string is required");
     }
     
-    console.log("Server storage initialized with Drizzle ORM successfully");
-    const sql = neon(process.env.DATABASE_URL);
-    db = drizzle(sql);
+    console.log("Server storage initialized with Supabase PostgreSQL successfully");
+    const client = postgres(connectionString);
+    db = drizzle(client);
     
     // Test database connection
     testConnection();
