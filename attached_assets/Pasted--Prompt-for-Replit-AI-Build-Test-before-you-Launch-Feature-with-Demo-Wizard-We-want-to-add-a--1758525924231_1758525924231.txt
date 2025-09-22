@@ -1,0 +1,169 @@
+🔹 Prompt for Replit AI — Build “Test before you Launch” Feature with Demo Wizard
+
+We want to add a new “Test before you Launch” feature to BookingGen that lets users create a demo booking page without signup. The goal: make it super easy to test the product, then push them to sign up + upgrade when they want to launch.
+
+🌍 Overall Flow
+
+Homepage Section
+
+Immediately after hero section, add a new section titled:
+“Test before you Launch”
+Subtitle: “Create a demo booking page in minutes — no login required.”
+CTA Button: “Start Demo”
+
+Clicking opens a step-by-step wizard (modal or full-screen).
+
+Wizard (4 Steps)
+
+Step 1 — Business Info
+
+Fields: Business name, tagline (optional), phone (optional), logo upload.
+
+Dropdown for business type (Salon, Barber, Coach, etc.).
+
+Step 2 — Appearance
+
+Choose from 5–6 preset color themes.
+
+Font size (Small/Medium/Large).
+
+Toggle logo display, phone display.
+
+Step 3 — Services & Availability
+
+Add up to 3 services (name, duration, price).
+
+Weekly availability (quick selector).
+
+Step 4 — Live Preview
+
+Show real-time preview of the booking page (reuse booking page React components).
+
+Options:
+
+Save Demo (temporary)
+
+Create Account & Save (migrates demo into DB under new user)
+
+Launch (only available for logged-in Pro users)
+
+🛠️ Technical Implementation
+Client (React + Tailwind)
+
+Build a new component DemoWizard in src/components/demo/.
+
+Save demo state in localStorage under key bookinggen_demo_v1.
+
+On preview, render existing booking page component with demo state instead of DB data.
+
+Logo uploads: keep in browser as base64 for demo, only upload to Supabase storage once user signs up.
+
+Backend (Express Server)
+
+Since we have Express, let’s offload some logic:
+
+Demo Drafts API
+
+Endpoint: POST /api/demo
+
+Stores demo JSON in Supabase (in demo_pages table).
+
+Returns demo_id for retrieval.
+
+Endpoint: GET /api/demo/:id
+
+Returns demo JSON for preview.
+
+(Optional — we can skip storing in DB until user signs up, but Express lets us persist if we want a shareable preview link.)
+
+Convert Demo → Real Page
+
+Endpoint: POST /api/demo/convert
+
+Auth required.
+
+Takes demo_id, copies data into booking_pages table under user_id.
+
+Uploads logo if exists.
+
+Generates a slug.
+
+Deletes demo entry (optional).
+
+Launch Flow
+
+Endpoint: POST /api/page/launch
+
+Checks if user has Pro subscription.
+
+If yes → set published = true in booking_pages.
+
+If not → return “Upgrade Required.”
+
+Database Changes (Supabase)
+
+Create 1 new table for demos (if needed):
+
+create table if not exists demo_pages (
+  id uuid primary key default gen_random_uuid(),
+  data jsonb not null,
+  created_at timestamptz default now(),
+  expires_at timestamptz default now() + interval '7 days'
+);
+
+
+For real booking pages (booking_pages), ensure columns:
+
+alter table booking_pages
+  add column if not exists owner_id uuid references auth.users(id),
+  add column if not exists slug text unique,
+  add column if not exists content jsonb,
+  add column if not exists published boolean default false;
+
+🔑 Business Logic
+
+Anonymous Demos: Stored in localStorage or temporary DB row.
+
+Signup Flow:
+
+If user clicks “Create Account & Save,” signup modal opens.
+
+After signup, call POST /api/demo/convert → migrate into real page.
+
+Launch Flow:
+
+Dashboard shows card: “Welcome — Launch your page today.”
+
+Button → POST /api/page/launch.
+
+If not Pro → show modal “Upgrade required.”
+
+🎨 UI Requirements
+
+Stepper UI (Step 1–4) with progress bar.
+
+Buttons: rounded, smooth hover states, animations.
+
+Preview card with desktop/mobile toggle.
+
+Banner on homepage if unfinished demo exists in localStorage: “Continue your demo.”
+
+✅ Deliverables for Dev
+
+New DemoWizard React component.
+
+New Express routes (/api/demo, /api/demo/convert, /api/page/launch).
+
+Supabase migration file for demo_pages table.
+
+Dashboard update with “Launch your page” card.
+
+End-to-end tested:
+
+Demo works w/out login.
+
+Migrates after signup.
+
+Launch restricted to Pro.
+
+⚠️ Important Rule: Keep code modular, reuse existing booking page renderer, and don’t break current auth or payment system.
