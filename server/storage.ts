@@ -20,13 +20,11 @@ const PROFILE_CACHE_TTL = 15000; // 15 seconds
 
 function getDb() {
   if (!db) {
-    // Use Supabase connection string if available, otherwise fall back to DATABASE_URL
-    const connectionString = process.env.VITE_SUPABASE_URL ? 
-      process.env.VITE_SUPABASE_URL.replace('https://', 'postgresql://postgres:').replace('.supabase.co', '.supabase.co:5432/postgres') :
-      process.env.DATABASE_URL;
+    // Use the proper DATABASE_URL which contains the correct PostgreSQL connection string
+    const connectionString = process.env.DATABASE_URL;
     
     if (!connectionString) {
-      throw new Error("Database connection string is required");
+      throw new Error("DATABASE_URL environment variable is required");
     }
     
     console.log("Server storage initialized with Supabase PostgreSQL successfully");
