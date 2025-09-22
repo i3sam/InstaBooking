@@ -374,7 +374,7 @@ export class DrizzleStorage implements IStorage {
 
   async getApprovedReviewsByPageId(pageId: string): Promise<any[]> {
     try {
-      const results = await getDb().select().from(reviews).where(eq(reviews.pageId, pageId)).where(eq(reviews.isApproved, 'approved')).orderBy(desc(reviews.createdAt));
+      const results = await getDb().select().from(reviews).where(sql`${reviews.pageId} = ${pageId} AND ${reviews.isApproved} = 'approved'`).orderBy(desc(reviews.createdAt));
       return results || [];
     } catch (error) {
       console.error("Get approved reviews by page ID error:", error);
@@ -506,8 +506,7 @@ export class DrizzleStorage implements IStorage {
       const [demoPage] = await getDb()
         .select()
         .from(demoPages)
-        .where(eq(demoPages.id, demoId))
-        .where(eq(demoPages.convertToken, convertToken));
+        .where(sql`${demoPages.id} = ${demoId} AND ${demoPages.convertToken} = ${convertToken}`);
       
       if (!demoPage) {
         return null; // Invalid token or already used
@@ -522,9 +521,8 @@ export class DrizzleStorage implements IStorage {
       // Mark token as used by setting it to null
       const [updatedDemo] = await getDb()
         .update(demoPages)
-        .set({ convertToken: null, updatedAt: new Date() })
-        .where(eq(demoPages.id, demoId))
-        .where(eq(demoPages.convertToken, convertToken))
+        .set({ convertToken: null })
+        .where(sql`${demoPages.id} = ${demoId} AND ${demoPages.convertToken} = ${convertToken}`)
         .returning();
       
       return updatedDemo || null;
@@ -538,7 +536,7 @@ export class DrizzleStorage implements IStorage {
     try {
       await getDb()
         .update(demoPages)
-        .set({ ownerId: userId, updatedAt: new Date() })
+        .set({ ownerId: userId })
         .where(eq(demoPages.id, demoId));
       return true;
     } catch (error) {
