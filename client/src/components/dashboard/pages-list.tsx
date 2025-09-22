@@ -220,7 +220,18 @@ export default function PagesList() {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-foreground">{page.title}</h3>
                   <div className="flex items-center gap-2">
-                    {!page.published ? (
+                    {page.isDemoPage ? (
+                      <>
+                        <Badge variant="outline" className="text-xs border-orange-200 text-orange-600 bg-orange-50">
+                          Demo
+                        </Badge>
+                        {page.isExpired && (
+                          <Badge variant="outline" className="text-xs border-red-200 text-red-600 bg-red-50">
+                            Expired
+                          </Badge>
+                        )}
+                      </>
+                    ) : !page.published ? (
                       <Badge variant="secondary" className="text-xs">
                         <AlertTriangle className="w-3 h-3 mr-1" />
                         Draft
@@ -232,99 +243,142 @@ export default function PagesList() {
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">{page.tagline}</p>
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                  <span>bookinggen.xyz/{page.slug}</span>
+                  {page.isDemoPage ? (
+                    <span className="text-orange-600">Demo Preview</span>
+                  ) : (
+                    <span>bookinggen.xyz/{page.slug}</span>
+                  )}
                   <span>0 bookings</span>
                 </div>
+                {page.isDemoPage && page.expiresAt && (
+                  <div className="mb-4 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+                    <p className="text-xs text-orange-600 dark:text-orange-400">
+                      Demo expires on {new Date(page.expiresAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
                 <div className="flex space-x-2">
-                  {/* If page is unpublished (converted from demo), show launch button for Pro users */}
-                  {!page.published ? (
+                  {/* Handle demo pages differently */}
+                  {page.isDemoPage ? (
                     <>
-                      {isProUser ? (
-                        <Button 
-                          size="sm" 
-                          variant="default"
-                          className="flex-1 bg-green-600 text-white hover:bg-green-700 shadow-md"
-                          onClick={() => handleLaunchPage(page.id)}
-                          disabled={launchingPageId === page.id}
-                          data-testid={`button-launch-${page.slug}`}
-                        >
-                          {launchingPageId === page.id ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-1" />
-                              Launching...
-                            </>
-                          ) : (
-                            <>
-                              <Rocket className="h-4 w-4 mr-1" />
-                              Launch
-                            </>
-                          )}
-                        </Button>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
-                          onClick={() => setShowUpgradeModal(true)}
-                          data-testid={`button-upgrade-to-launch-${page.slug}`}
-                        >
-                          <Rocket className="h-4 w-4 mr-1" />
-                          Upgrade to Launch
-                        </Button>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleEditPage(page)}
-                        data-testid={`button-edit-${page.slug}`}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleEditPage(page)}
-                        data-testid={`button-edit-${page.slug}`}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
+                      {/* Demo pages always show upgrade prompts - no edit/delete */}
                       <Button 
                         size="sm" 
-                        variant="default"
-                        className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                        onClick={() => setLocation(`/${page.slug}`)}
-                        data-testid={`button-view-${page.slug}`}
+                        variant="outline"
+                        className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                        onClick={() => setShowUpgradeModal(true)}
+                        disabled={page.isExpired}
+                        data-testid={`button-upgrade-to-launch-${page.slug}`}
                       >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
+                        <Rocket className="h-4 w-4 mr-1" />
+                        {page.isExpired ? 'Demo Expired' : 'Upgrade to Launch'}
                       </Button>
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        onClick={() => handleCopyLink(page)}
-                        aria-label={`Copy link for ${page.title}`}
-                        title="Copy page link to clipboard"
-                        data-testid={`button-copy-link-${page.slug}`}
+                        className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                        onClick={() => setShowUpgradeModal(true)}
+                        disabled={page.isExpired}
+                        title="Upgrade to get shareable links"
+                        data-testid={`button-upgrade-to-share-${page.slug}`}
                       >
                         <Link className="h-4 w-4" />
                       </Button>
                     </>
+                  ) : (
+                    /* Regular page actions */
+                    <>
+                      {/* If page is unpublished (converted from demo), show launch button for Pro users */}
+                      {!page.published ? (
+                        <>
+                          {isProUser ? (
+                            <Button 
+                              size="sm" 
+                              variant="default"
+                              className="flex-1 bg-green-600 text-white hover:bg-green-700 shadow-md"
+                              onClick={() => handleLaunchPage(page.id)}
+                              disabled={launchingPageId === page.id}
+                              data-testid={`button-launch-${page.slug}`}
+                            >
+                              {launchingPageId === page.id ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-1" />
+                                  Launching...
+                                </>
+                              ) : (
+                                <>
+                                  <Rocket className="h-4 w-4 mr-1" />
+                                  Launch
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                              onClick={() => setShowUpgradeModal(true)}
+                              data-testid={`button-upgrade-to-launch-${page.slug}`}
+                            >
+                              <Rocket className="h-4 w-4 mr-1" />
+                              Upgrade to Launch
+                            </Button>
+                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleEditPage(page)}
+                            data-testid={`button-edit-${page.slug}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => handleEditPage(page)}
+                            data-testid={`button-edit-${page.slug}`}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="default"
+                            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                            onClick={() => setLocation(`/${page.slug}`)}
+                            data-testid={`button-view-${page.slug}`}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                            onClick={() => handleCopyLink(page)}
+                            aria-label={`Copy link for ${page.title}`}
+                            title="Copy page link to clipboard"
+                            data-testid={`button-copy-link-${page.slug}`}
+                          >
+                            <Link className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => handleDeletePage(page.id)}
+                        data-testid={`button-delete-${page.slug}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
                   )}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => handleDeletePage(page.id)}
-                    data-testid={`button-delete-${page.slug}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </CardContent>
             </Card>

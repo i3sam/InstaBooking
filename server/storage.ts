@@ -234,8 +234,51 @@ export class DrizzleStorage implements IStorage {
 
   async getPagesByOwner(ownerId: string): Promise<any[]> {
     try {
-      const results = await getDb().select().from(pages).where(eq(pages.ownerId, ownerId)).orderBy(desc(pages.createdAt));
-      return results;
+      // Get regular booking pages
+      const regularPages = await getDb()
+        .select()
+        .from(pages)
+        .where(eq(pages.ownerId, ownerId))
+        .orderBy(desc(pages.createdAt));
+
+      // Get demo pages
+      const demoPageResults = await getDb()
+        .select()
+        .from(demoPages)
+        .where(eq(demoPages.ownerId, ownerId))
+        .orderBy(desc(demoPages.createdAt));
+
+      // Transform demo pages to match the regular pages structure
+      const transformedDemoPages = demoPageResults.map(demoPage => {
+        const demoData = demoPage.data || {};
+        const now = new Date();
+        const isExpired = demoPage.expiresAt && new Date(demoPage.expiresAt) <= now;
+        
+        return {
+          id: demoPage.id,
+          slug: demoPage.id, // Use demo ID as slug for now
+          title: demoData.businessName || 'Demo Page',
+          tagline: demoData.businessDescription || 'Demo booking page',
+          businessName: demoData.businessName,
+          businessDescription: demoData.businessDescription,
+          logoUrl: demoData.logoUrl,
+          primaryColor: demoData.primaryColor,
+          ownerId: demoPage.ownerId,
+          published: false, // Demo pages are never published
+          createdAt: demoPage.createdAt,
+          updatedAt: demoPage.updatedAt,
+          isDemoPage: true, // Flag to identify demo pages
+          isExpired: isExpired, // Flag for expired demos
+          expiresAt: demoPage.expiresAt,
+          convertToken: demoPage.convertToken
+        };
+      });
+
+      // Combine and sort by creation date
+      const allPages = [...regularPages, ...transformedDemoPages];
+      allPages.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return allPages;
     } catch (error) {
       console.error("Get pages error:", error);
       throw error;
