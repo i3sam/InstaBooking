@@ -343,7 +343,7 @@ export default function PreviewStep({
                           background: `linear-gradient(135deg, ${data.primaryColor}20 0%, ${data.primaryColor}10 100%)`
                         }}
                       >
-                        <span className="text-2xl">{getServiceIcon(service.name)}</span>
+                        <Calendar className="w-6 h-6" style={{ color: data.primaryColor }} />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-foreground mb-2">{service.name}</h3>
@@ -431,6 +431,7 @@ export default function PreviewStep({
       )}
     </div>
   );
+  };
 
   return (
     <div className="space-y-6">
