@@ -11,6 +11,7 @@ import BusinessInfoStep from './steps/BusinessInfoStep';
 import AppearanceStep from './steps/AppearanceStep';
 import ServicesStep from './steps/ServicesStep';
 import PreviewStep from './steps/PreviewStep';
+import UpgradeModal from '@/components/modals/upgrade-modal';
 
 const DEMO_STORAGE_KEY = 'bookinggen_demo_v1';
 
@@ -86,6 +87,7 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   const [demoData, setDemoData] = useState<DemoData>(initialDemoData);
   const [demoId, setDemoId] = useState<string | null>(null);
   const [convertToken, setConvertToken] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -173,11 +175,24 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
       onClose();
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to convert demo. Please try again.',
-        variant: 'destructive'
-      });
+      // Check if this is an upgrade required error (403)
+      const isUpgradeError = error.message && (
+        error.message.startsWith('403:') || 
+        error.message.includes('Upgrade Required') || 
+        error.message.includes('You need a Pro subscription')
+      );
+      
+      if (isUpgradeError) {
+        // Show upgrade modal instead of ugly error toast
+        setShowUpgradeModal(true);
+      } else {
+        // Show regular error toast for other errors
+        toast({
+          title: 'Error',
+          description: error.message || 'Failed to convert demo. Please try again.',
+          variant: 'destructive'
+        });
+      }
     }
   });
 
@@ -273,61 +288,69 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   const progress = (currentStep / steps.length) * 100;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col" data-testid="dialog-demo-wizard">
-        <DialogHeader className="flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle data-testid="text-demo-wizard-title">Test before you Launch</DialogTitle>
-            <Button variant="ghost" size="sm" onClick={onClose} data-testid="button-close">
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="space-y-2 mt-4">
-            <Progress value={progress} className="w-full" data-testid="progress-wizard" />
-            <div className="flex justify-between text-sm text-muted-foreground">
-              {steps.map((step) => (
-                <div 
-                  key={step.id} 
-                  className={`text-center ${currentStep === step.id ? 'text-foreground font-medium' : ''}`}
-                >
-                  <div className="text-xs">{step.title}</div>
-                </div>
-              ))}
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col" data-testid="dialog-demo-wizard">
+          <DialogHeader className="flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <DialogTitle data-testid="text-demo-wizard-title">Test before you Launch</DialogTitle>
+              <Button variant="ghost" size="sm" onClick={onClose} data-testid="button-close">
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-          </div>
-        </DialogHeader>
-
-        {/* Step Content */}
-        <div className="flex-1 overflow-y-auto p-1">
-          {renderStep()}
-        </div>
-
-        {/* Navigation */}
-        {currentStep < steps.length && (
-          <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t">
-            <Button 
-              variant="outline" 
-              onClick={prevStep} 
-              disabled={currentStep === 1}
-              data-testid="button-prev-step"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Previous
-            </Button>
             
-            <span className="text-sm text-muted-foreground" data-testid="text-step-counter">
-              Step {currentStep} of {steps.length}
-            </span>
-            
-            <Button onClick={nextStep} data-testid="button-next-step">
-              Next
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            {/* Progress Bar */}
+            <div className="space-y-2 mt-4">
+              <Progress value={progress} className="w-full" data-testid="progress-wizard" />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                {steps.map((step) => (
+                  <div 
+                    key={step.id} 
+                    className={`text-center ${currentStep === step.id ? 'text-foreground font-medium' : ''}`}
+                  >
+                    <div className="text-xs">{step.title}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Step Content */}
+          <div className="flex-1 overflow-y-auto p-1">
+            {renderStep()}
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+
+          {/* Navigation */}
+          {currentStep < steps.length && (
+            <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={prevStep} 
+                disabled={currentStep === 1}
+                data-testid="button-prev-step"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Previous
+              </Button>
+              
+              <span className="text-sm text-muted-foreground" data-testid="text-step-counter">
+                Step {currentStep} of {steps.length}
+              </span>
+              
+              <Button onClick={nextStep} data-testid="button-next-step">
+                Next
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
+    </>
   );
 }
