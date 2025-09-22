@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Monitor, Smartphone, Save, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
@@ -36,7 +39,7 @@ interface DemoData {
 
 interface PreviewStepProps {
   data: DemoData;
-  onSaveDemo: () => void;
+  onSaveDemo: (userInfo?: { email: string; fullName?: string }) => void;
   onCreateAccount: () => void;
   isSaving: boolean;
   isConverting: boolean;
@@ -54,6 +57,22 @@ export default function PreviewStep({
   user
 }: PreviewStepProps) {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [showSaveDemoDialog, setShowSaveDemoDialog] = useState(false);
+  const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+
+  const handleSaveDemoClick = () => {
+    setShowSaveDemoDialog(true);
+  };
+
+  const handleSaveDemoConfirm = () => {
+    if (email.trim()) {
+      onSaveDemo({ email: email.trim(), fullName: fullName.trim() || undefined });
+      setShowSaveDemoDialog(false);
+      setEmail('');
+      setFullName('');
+    }
+  };
 
   const openBusinessHours = Object.entries(data.businessHours)
     .filter(([, hours]) => hours !== 'Closed')
@@ -214,7 +233,7 @@ export default function PreviewStep({
                   </p>
                 </div>
                 <Button
-                  onClick={onSaveDemo}
+                  onClick={handleSaveDemoClick}
                   disabled={isSaving || !data.businessName}
                   data-testid="button-save-demo"
                 >
@@ -309,6 +328,61 @@ export default function PreviewStep({
           </div>
         </CardContent>
       </Card>
+
+      {/* Save Demo Dialog */}
+      <Dialog open={showSaveDemoDialog} onOpenChange={setShowSaveDemoDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Your Demo</DialogTitle>
+            <DialogDescription>
+              Enter your email to create a demo account and save your booking page. You'll be able to access it from your dashboard and upgrade later to make it live.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="demo-email">Email Address</Label>
+              <Input
+                id="demo-email"
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                data-testid="input-demo-email"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="demo-name">Full Name (Optional)</Label>
+              <Input
+                id="demo-name"
+                type="text"
+                placeholder="Your Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                data-testid="input-demo-name"
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowSaveDemoDialog(false)}
+                className="flex-1"
+                data-testid="button-cancel-save-demo"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveDemoConfirm}
+                disabled={!email.trim() || isSaving}
+                className="flex-1"
+                data-testid="button-confirm-save-demo"
+              >
+                {isSaving ? 'Creating Account...' : 'Save Demo'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

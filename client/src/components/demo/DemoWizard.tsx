@@ -116,17 +116,38 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
   }, [demoData, currentStep, demoId, convertToken]);
 
   const createDemoMutation = useMutation({
-    mutationFn: async (data: DemoData) => {
-      const response = await apiRequest('POST', '/api/demo', { data });
+    mutationFn: async (params: { data: DemoData; createDemoUser?: boolean; email?: string; fullName?: string }) => {
+      const response = await apiRequest('POST', '/api/demo', params);
       return response.json();
     },
     onSuccess: (response: any) => {
       setDemoId(response.id);
       setConvertToken(response.convertToken);
-      toast({
-        title: 'Demo Created',
-        description: 'Your demo booking page has been created!'
-      });
+      
+      // If demo user was created, we need to update local state/auth
+      if (response.demoUser) {
+        if (response.demoUser.magicLink) {
+          toast({
+            title: 'Demo Account Created!',
+            description: 'Your demo booking page has been saved! Redirecting you to your dashboard...'
+          });
+          // Auto-redirect to magic link after a short delay
+          setTimeout(() => {
+            window.location.href = response.demoUser.magicLink;
+          }, 2000);
+        } else {
+          toast({
+            title: 'Demo Account Created!',
+            description: 'Your demo booking page has been saved! Please check your email for login instructions to access your dashboard.'
+          });
+        }
+        // Demo user is created in Supabase and can log in normally
+      } else {
+        toast({
+          title: 'Demo Created',
+          description: 'Your demo booking page has been created!'
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -176,8 +197,19 @@ export default function DemoWizard({ open, onClose }: DemoWizardProps) {
     }
   };
 
-  const handleSaveDemo = () => {
-    createDemoMutation.mutate(demoData);
+  const handleSaveDemo = (userInfo?: { email: string; fullName?: string }) => {
+    if (userInfo) {
+      // Save demo with demo user account
+      createDemoMutation.mutate({
+        data: demoData,
+        createDemoUser: true,
+        email: userInfo.email,
+        fullName: userInfo.fullName
+      });
+    } else {
+      // Save demo without user account (anonymous)
+      createDemoMutation.mutate({ data: demoData });
+    }
   };
 
   const handleCreateAccount = () => {

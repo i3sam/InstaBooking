@@ -5,9 +5,10 @@ import { z } from "zod";
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(), // This will be the Supabase auth.users.id
+  email: text("email"), // Store email for demo users
   fullName: text("full_name"),
   createdAt: timestamp("created_at").default(sql`now()`),
-  membershipStatus: text("membership_status").default("free"), // free | pro
+  membershipStatus: text("membership_status").default("free"), // free | demo | pro
   membershipPlan: text("membership_plan"),
   membershipExpires: timestamp("membership_expires"),
 });
@@ -43,6 +44,7 @@ export const pages = pgTable("pages", {
 
 export const demoPages = pgTable("demo_pages", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ownerId: uuid("owner_id").references(() => profiles.id), // Associate demo with user
   data: jsonb("data").notNull(), // Contains the demo page configuration
   convertToken: text("convert_token"), // Secure token for conversion (null when used)
   createdAt: timestamp("created_at").default(sql`now()`),

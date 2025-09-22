@@ -532,7 +532,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/demo", async (req, res) => {
     try {
       // Validate demo data structure
-      const validationResult = insertDemoPageSchema.safeParse(req.body);
+      const { data: demoData, createDemoUser: shouldCreateDemoUser, email, fullName } = req.body;
+      const validationResult = insertDemoPageSchema.safeParse({ data: demoData });
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -541,15 +542,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const demoData = validationResult.data;
-      const demo = await storage.createDemoPage(demoData);
+      let demoUserId = null;
+      let demoUser = null;
       
-      // Return demo with convert token (needed for conversion)
-      res.status(201).json({
+      // Create demo user if requested (for Save Demo functionality)
+      if (shouldCreateDemoUser && email) {
+        try {
+          demoUser = await storage.createDemoUser(email, fullName);
+          demoUserId = demoUser.id;
+        } catch (error) {
+          console.error("Failed to create demo user:", error);
+          return res.status(500).json({ message: "Failed to create demo user account" });
+        }
+      }
+      
+      const demo = await storage.createDemoPage(demoData, demoUserId);
+      
+      // Return demo with convert token and user info if created
+      const response: any = {
         id: demo.id,
         convertToken: demo.convertToken,
         expiresAt: demo.expiresAt
-      });
+      };
+      
+      if (demoUser) {
+        response.demoUser = {
+          id: demoUser.id,
+          email: email,
+          fullName: demoUser.fullName,
+          membershipStatus: demoUser.membershipStatus,
+          magicLink: demoUser.magicLink
+        };
+      }
+      
+      res.status(201).json(response);
     } catch (error) {
       console.error("Create demo error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -703,6 +729,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Convert demo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get demo pages for dashboard
+  app.get("/api/demo-pages", verifyToken, async (req: any, res) => {
+    try {
+      const demoPages = await storage.getDemoPagesByOwner(req.user.userId);
+      res.json(demoPages);
+    } catch (error) {
+      console.error("Get demo pages error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

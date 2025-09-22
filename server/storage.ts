@@ -5,10 +5,25 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions, demoPages } from '@shared/schema';
 
 // Lazy initialize database connection
 let db: ReturnType<typeof drizzle> | null = null;
+
+// Supabase client for admin operations
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let supabase: any = null;
+if (supabaseUrl && supabaseServiceKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("Storage Supabase client initialized successfully");
+  } catch (error) {
+    console.warn("Failed to initialize Supabase client in storage:", error);
+  }
+}
 
 // In-memory profile cache to reduce database queries
 interface CachedProfile {
@@ -44,6 +59,14 @@ async function ensureSchema() {
     // Add location_link column if it doesn't exist
     await getDb().execute(sql`ALTER TABLE "pages" ADD COLUMN IF NOT EXISTS "location_link" text;`);
     console.log("✅ Schema migration: location_link column ensured");
+    
+    // Add email column to profiles if it doesn't exist
+    await getDb().execute(sql`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "email" text;`);
+    console.log("✅ Schema migration: profiles.email column ensured");
+    
+    // Add owner_id column to demo_pages if it doesn't exist
+    await getDb().execute(sql`ALTER TABLE "demo_pages" ADD COLUMN IF NOT EXISTS "owner_id" uuid;`);
+    console.log("✅ Schema migration: demo_pages.owner_id column ensured");
   } catch (error) {
     console.error("⚠️  Schema migration error:", error);
   }
@@ -108,10 +131,14 @@ export interface IStorage {
   cancelSubscription(id: string): Promise<boolean>;
   
   // Demo Pages
-  createDemoPage(demoData: any): Promise<any>;
+  createDemoPage(demoData: any, ownerId?: string): Promise<any>;
   getDemoPage(id: string): Promise<any | undefined>;
+  getDemoPagesByOwner(ownerId: string): Promise<any[]>;
   deleteDemoPage(id: string): Promise<boolean>;
   atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null>;
+  
+  // Demo Users
+  createDemoUser(email: string, fullName?: string): Promise<any>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -430,15 +457,17 @@ export class DrizzleStorage implements IStorage {
     }
   }
 
-  async createDemoPage(demoData: any): Promise<any> {
+  async createDemoPage(demoData: any, ownerId?: string): Promise<any> {
     try {
       // Generate secure convert token
       const convertToken = crypto.randomUUID();
       
-      // Set server-side expiry (24 hours)
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      // Set server-side expiry (7 days for demo users, 24 hours for anonymous)
+      const expiryHours = ownerId ? 7 * 24 : 24; // 7 days for demo users, 24 hours for anonymous
+      const expiresAt = new Date(Date.now() + expiryHours * 60 * 60 * 1000);
       
       const demoPageData = {
+        ownerId: ownerId || null,
         data: demoData,
         convertToken: convertToken,
         createdAt: new Date(),
@@ -473,6 +502,16 @@ export class DrizzleStorage implements IStorage {
     }
   }
 
+  async getDemoPagesByOwner(ownerId: string): Promise<any[]> {
+    try {
+      const results = await getDb().select().from(demoPages).where(eq(demoPages.ownerId, ownerId)).orderBy(desc(demoPages.createdAt));
+      return results;
+    } catch (error) {
+      console.error("Get demo pages by owner error:", error);
+      return [];
+    }
+  }
+
   async atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null> {
     try {
       // Atomically validate and invalidate the demo in a single operation
@@ -490,6 +529,102 @@ export class DrizzleStorage implements IStorage {
     } catch (error) {
       console.error("Atomic convert demo error:", error);
       return null;
+    }
+  }
+
+  async createDemoUser(email: string, fullName?: string): Promise<any> {
+    try {
+      if (!supabase) {
+        throw new Error("Supabase not configured - cannot create demo user");
+      }
+      
+      // Check if user already exists first
+      const { data: existingUsers } = await supabase.auth.admin.listUsers({
+        filter: `email:${email}`
+      });
+      
+      let authUser;
+      let magicLink;
+      
+      if (existingUsers?.users && existingUsers.users.length > 0) {
+        // User already exists, use existing user
+        authUser = existingUsers.users[0];
+        console.log("Demo user already exists, using existing user:", email);
+        
+        // Generate magic link for existing user
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email: email
+        });
+        
+        if (!linkError && linkData) {
+          magicLink = linkData.properties?.action_link;
+        }
+      } else {
+        // Create new Supabase user with admin API
+        const { data: newUserData, error: authError } = await supabase.auth.admin.createUser({
+          email: email,
+          email_confirm: true, // Auto-confirm email for demo users
+          user_metadata: {
+            full_name: fullName || email.split('@')[0]
+          }
+        });
+        
+        if (authError || !newUserData.user) {
+          console.error("Failed to create Supabase user:", authError);
+          throw new Error(authError?.message || "Failed to create demo user");
+        }
+        
+        authUser = newUserData.user;
+        
+        // Generate magic link for new user
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email: email
+        });
+        
+        if (!linkError && linkData) {
+          magicLink = linkData.properties?.action_link;
+        }
+      }
+      
+      // Create or update profile in our database
+      const profileData = {
+        id: authUser.id,
+        email: email,
+        fullName: fullName || authUser.user_metadata?.full_name || email.split('@')[0],
+        membershipStatus: 'demo'
+      };
+      
+      // Use upsert pattern to handle both new and existing users
+      const [result] = await getDb()
+        .insert(profiles)
+        .values(profileData)
+        .onConflictDoUpdate({
+          target: [profiles.id],
+          set: {
+            email: profileData.email,
+            fullName: profileData.fullName,
+            membershipStatus: 'demo'
+          }
+        })
+        .returning();
+      
+      // Cache the profile
+      const now = Date.now();
+      profileCache.set(result.id, {
+        data: result,
+        expiresAt: now + PROFILE_CACHE_TTL
+      });
+      
+      return {
+        ...result,
+        supabaseUser: authUser,
+        magicLink: magicLink
+      };
+    } catch (error) {
+      console.error("Create demo user error:", error);
+      throw error;
     }
   }
 }
