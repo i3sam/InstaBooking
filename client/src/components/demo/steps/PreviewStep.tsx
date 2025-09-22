@@ -496,7 +496,7 @@ export default function PreviewStep({
                 </div>
                 <Button
                   onClick={handleSaveDemoClick}
-                  disabled={isSaving || !data.businessName}
+                  disabled={isSaving || !data.businessName?.trim()}
                   data-testid="button-save-demo"
                 >
                   <Save className="w-4 h-4 mr-2" />
@@ -517,7 +517,7 @@ export default function PreviewStep({
                 </div>
                 <Button
                   onClick={onCreateAccount}
-                  disabled={isConverting || !data.businessName}
+                  disabled={isConverting || !data.businessName?.trim()}
                   data-testid="button-create-account"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />

@@ -123,6 +123,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
                 fullName: session.user.user_metadata?.full_name || '',
               });
               await fetchProfile(session.user.id);
+              
+              // Check for pending demo association after profile creation
+              const pendingDemoInfo = localStorage.getItem('pending_demo_info');
+              if (pendingDemoInfo) {
+                try {
+                  const demoInfo = JSON.parse(pendingDemoInfo);
+                  if (demoInfo.demoId && demoInfo.convertToken) {
+                    // Associate the demo with the new user account
+                    const demoResponse = await apiRequest('POST', '/api/demo/associate', {
+                      demoId: demoInfo.demoId,
+                      convertToken: demoInfo.convertToken
+                    });
+                    
+                    if (demoResponse.ok) {
+                      console.log('Demo successfully associated with user account after email confirmation');
+                      localStorage.removeItem('pending_demo_info');
+                      localStorage.removeItem('bookinggen_demo_v1');
+                    }
+                  }
+                } catch (demoError) {
+                  console.error('Failed to associate demo after email confirmation:', demoError);
+                }
+              }
             } catch (createError) {
               console.error('Failed to create profile after email verification:', createError);
             }
