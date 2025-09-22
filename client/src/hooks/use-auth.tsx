@@ -1,8 +1,8 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { supabase } from '@/lib/supabase';
 import type { User as SupabaseUser, Session, AuthChangeEvent } from '@supabase/supabase-js';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, setAuthHandler } from '@/lib/queryClient';
 
 interface User {
   id: string;
@@ -41,7 +41,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   const [loading, setLoading] = useState(true);
   const [redirectAfterLogin, setRedirectAfterLogin] = useState<string | null>(null);
 
+  // Track auth error handling to prevent duplicate calls
+  const authErrorRef = useRef(false);
+  
+  // Handle global 401 errors by logging out and redirecting to login
+  const handleAuthError = async () => {
+    // Debounce to prevent multiple simultaneous calls
+    if (authErrorRef.current) {
+      return;
+    }
+    authErrorRef.current = true;
+    
+    console.log('Authentication error detected, logging out...');
+    // Clear local state immediately
+    localStorage.removeItem('token');
+    setUser(null);
+    setProfile(null);
+    setSession(null);
+    
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+    
+    // Redirect to login if not already there
+    if (location !== '/login' && location !== '/' && location !== '/signup') {
+      setRedirectAfterLogin(location);
+      setLocation('/login');
+    }
+    
+    // Reset the debounce flag after a short delay
+    setTimeout(() => {
+      authErrorRef.current = false;
+    }, 1000);
+  };
+
   useEffect(() => {
+    // Set up global auth error handler for 401 responses
+    setAuthHandler(handleAuthError);
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       setSession(session);
@@ -157,7 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   };
 
   const login = async (email: string, password: string, redirectTo: string = '/dashboard') => {
-    setRedirectAfterLogin(redirectTo);
+    // Only set redirectAfterLogin if it's not already set (preserve auth handler's redirect)
+    if (!redirectAfterLogin) {
+      setRedirectAfterLogin(redirectTo);
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,

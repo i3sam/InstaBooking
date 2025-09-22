@@ -1,7 +1,20 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Global auth handler for 401 errors
+let authHandler: (() => void) | null = null;
+
+export function setAuthHandler(handler: () => void) {
+  authHandler = handler;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
+    // Handle 401 errors before reading the body to avoid consumption issues
+    if (res.status === 401 && authHandler) {
+      authHandler();
+      throw new Error('Unauthorized');
+    }
+    
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
@@ -54,8 +67,15 @@ export const getQueryFn: <T>(options: {
       credentials: "include",
     });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+    // Handle 401 errors
+    if (res.status === 401) {
+      if (authHandler) {
+        authHandler();
+        return null; // Return null instead of throwing to prevent error display
+      }
+      if (unauthorizedBehavior === "returnNull") {
+        return null;
+      }
     }
 
     await throwIfResNotOk(res);
