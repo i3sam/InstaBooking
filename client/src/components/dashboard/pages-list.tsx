@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import CreatePageModal from '@/components/modals/create-page-modal';
 import UpgradeModal from '@/components/modals/upgrade-modal';
-import { Plus, ExternalLink, Edit, Eye, Trash2, Link } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, ExternalLink, Edit, Eye, Trash2, Link, Rocket, AlertTriangle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +27,7 @@ export default function PagesList() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [deletePageId, setDeletePageId] = useState<string | null>(null);
   const [editingPage, setEditingPage] = useState<any | null>(null);
+  const [launchingPageId, setLaunchingPageId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { profile } = useAuth();
@@ -60,8 +62,36 @@ export default function PagesList() {
     },
   });
 
+  const launchMutation = useMutation({
+    mutationFn: async (pageId: string) => {
+      const response = await apiRequest('POST', `/api/page/launch`, { pageId });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      toast({
+        title: "Page launched!",
+        description: "Your booking page is now live and accepting appointments.",
+      });
+      setLaunchingPageId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Launch failed",
+        description: error.message || "Failed to launch the page. Please try again.",
+        variant: "destructive",
+      });
+      setLaunchingPageId(null);
+    },
+  });
+
   const handleDeletePage = (pageId: string) => {
     setDeletePageId(pageId);
+  };
+
+  const handleLaunchPage = (pageId: string) => {
+    setLaunchingPageId(pageId);
+    launchMutation.mutate(pageId);
   };
 
   const confirmDelete = () => {
@@ -189,7 +219,16 @@ export default function PagesList() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-foreground">{page.title}</h3>
-                  <div className="w-3 h-3 bg-green-500 rounded-full" title="Active"></div>
+                  <div className="flex items-center gap-2">
+                    {!page.published ? (
+                      <Badge variant="secondary" className="text-xs">
+                        <AlertTriangle className="w-3 h-3 mr-1" />
+                        Draft
+                      </Badge>
+                    ) : (
+                      <div className="w-3 h-3 bg-green-500 rounded-full" title="Published"></div>
+                    )}
+                  </div>
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">{page.tagline}</p>
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
@@ -197,37 +236,86 @@ export default function PagesList() {
                   <span>0 bookings</span>
                 </div>
                 <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleEditPage(page)}
-                    data-testid={`button-edit-${page.slug}`}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="default"
-                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                    onClick={() => setLocation(`/${page.slug}`)}
-                    data-testid={`button-view-${page.slug}`}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                    onClick={() => handleCopyLink(page)}
-                    aria-label={`Copy link for ${page.title}`}
-                    title="Copy page link to clipboard"
-                    data-testid={`button-copy-link-${page.slug}`}
-                  >
-                    <Link className="h-4 w-4" />
-                  </Button>
+                  {/* If page is unpublished (converted from demo), show launch button for Pro users */}
+                  {!page.published ? (
+                    <>
+                      {isProUser ? (
+                        <Button 
+                          size="sm" 
+                          variant="default"
+                          className="flex-1 bg-green-600 text-white hover:bg-green-700 shadow-md"
+                          onClick={() => handleLaunchPage(page.id)}
+                          disabled={launchingPageId === page.id}
+                          data-testid={`button-launch-${page.slug}`}
+                        >
+                          {launchingPageId === page.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-1" />
+                              Launching...
+                            </>
+                          ) : (
+                            <>
+                              <Rocket className="h-4 w-4 mr-1" />
+                              Launch
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                          onClick={() => setShowUpgradeModal(true)}
+                          data-testid={`button-upgrade-to-launch-${page.slug}`}
+                        >
+                          <Rocket className="h-4 w-4 mr-1" />
+                          Upgrade to Launch
+                        </Button>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleEditPage(page)}
+                        data-testid={`button-edit-${page.slug}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => handleEditPage(page)}
+                        data-testid={`button-edit-${page.slug}`}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="default"
+                        className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                        onClick={() => setLocation(`/${page.slug}`)}
+                        data-testid={`button-view-${page.slug}`}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => handleCopyLink(page)}
+                        aria-label={`Copy link for ${page.title}`}
+                        title="Copy page link to clipboard"
+                        data-testid={`button-copy-link-${page.slug}`}
+                      >
+                        <Link className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                   <Button 
                     variant="outline" 
                     size="sm" 
