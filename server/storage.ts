@@ -4,7 +4,8 @@ import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, desc, sql } from 'drizzle-orm';
-import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions } from '@shared/schema';
+import crypto from 'crypto';
+import { profiles, pages, services, appointments, paymentsDemo, reviews, subscriptions, demoPages } from '@shared/schema';
 
 // Lazy initialize database connection
 let db: ReturnType<typeof drizzle> | null = null;
@@ -105,6 +106,12 @@ export interface IStorage {
   getSubscriptionsByUser(userId: string): Promise<any[]>;
   updateSubscription(id: string, updates: any): Promise<any | undefined>;
   cancelSubscription(id: string): Promise<boolean>;
+  
+  // Demo Pages
+  createDemoPage(demoData: any): Promise<any>;
+  getDemoPage(id: string): Promise<any | undefined>;
+  deleteDemoPage(id: string): Promise<boolean>;
+  atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -420,6 +427,69 @@ export class DrizzleStorage implements IStorage {
     } catch (error) {
       console.error("Cancel subscription error:", error);
       return false;
+    }
+  }
+
+  async createDemoPage(demoData: any): Promise<any> {
+    try {
+      // Generate secure convert token
+      const convertToken = crypto.randomUUID();
+      
+      // Set server-side expiry (24 hours)
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      
+      const demoPageData = {
+        data: demoData,
+        convertToken: convertToken,
+        createdAt: new Date(),
+        expiresAt: expiresAt
+      };
+      
+      const [result] = await getDb().insert(demoPages).values(demoPageData).returning();
+      return result;
+    } catch (error) {
+      console.error("Create demo page error:", error);
+      throw error;
+    }
+  }
+
+  async getDemoPage(id: string): Promise<any | undefined> {
+    try {
+      const [result] = await getDb().select().from(demoPages).where(eq(demoPages.id, id));
+      return result;
+    } catch (error) {
+      console.error("Get demo page error:", error);
+      return undefined;
+    }
+  }
+
+  async deleteDemoPage(id: string): Promise<boolean> {
+    try {
+      await getDb().delete(demoPages).where(eq(demoPages.id, id));
+      return true;
+    } catch (error) {
+      console.error("Delete demo page error:", error);
+      return false;
+    }
+  }
+
+  async atomicConvertDemo(demoId: string, convertToken: string): Promise<any | null> {
+    try {
+      // Atomically validate and invalidate the demo in a single operation
+      const [result] = await getDb()
+        .update(demoPages)
+        .set({ convertToken: null }) // Invalidate token
+        .where(
+          sql`${demoPages.id} = ${demoId} 
+              AND ${demoPages.convertToken} = ${convertToken} 
+              AND ${demoPages.expiresAt} > NOW()`
+        )
+        .returning();
+      
+      return result || null;
+    } catch (error) {
+      console.error("Atomic convert demo error:", error);
+      return null;
     }
   }
 }

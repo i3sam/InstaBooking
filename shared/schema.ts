@@ -44,6 +44,7 @@ export const pages = pgTable("pages", {
 export const demoPages = pgTable("demo_pages", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   data: jsonb("data").notNull(), // Contains the demo page configuration
+  convertToken: text("convert_token"), // Secure token for conversion (null when used)
   createdAt: timestamp("created_at").default(sql`now()`),
   expiresAt: timestamp("expires_at").default(sql`now() + interval '7 days'`),
 });

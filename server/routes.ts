@@ -8,7 +8,7 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./payp
 import { createSubscription, getSubscription, cancelSubscription, handleWebhook } from "./paypalSubscriptions";
 import multer from 'multer';
 import { Resend } from 'resend';
-import { insertReviewSchema, insertPageSchema } from '@shared/schema';
+import { insertReviewSchema, insertPageSchema, insertDemoPageSchema, insertServiceSchema } from '@shared/schema';
 
 // Supabase setup
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -524,6 +524,241 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete page error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Demo routes
+  app.post("/api/demo", async (req, res) => {
+    try {
+      // Validate demo data structure
+      const validationResult = insertDemoPageSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid demo data", 
+          errors: validationResult.error.flatten().fieldErrors 
+        });
+      }
+      
+      const demoData = validationResult.data;
+      const demo = await storage.createDemoPage(demoData);
+      
+      // Return demo with convert token (needed for conversion)
+      res.status(201).json({
+        id: demo.id,
+        convertToken: demo.convertToken,
+        expiresAt: demo.expiresAt
+      });
+    } catch (error) {
+      console.error("Create demo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/demo/:id", async (req, res) => {
+    try {
+      const demo = await storage.getDemoPage(req.params.id);
+      
+      if (!demo) {
+        return res.status(404).json({ message: "Demo not found" });
+      }
+      
+      // Check if demo has expired
+      if (new Date(demo.expiresAt) < new Date()) {
+        return res.status(410).json({ message: "Demo has expired" });
+      }
+      
+      // Don't expose the convert token in public API
+      const { convertToken, ...publicDemo } = demo;
+      res.json(publicDemo);
+    } catch (error) {
+      console.error("Get demo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/demo/convert", verifyToken, async (req: any, res) => {
+    try {
+      const { demoId, convertToken } = req.body;
+      
+      if (!demoId || !convertToken) {
+        return res.status(400).json({ message: "Demo ID and convert token are required" });
+      }
+      
+      // Check user's membership status first
+      const profile = await storage.getProfile(req.user.userId);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "User profile not found" });
+      }
+      
+      // Check if user has Pro subscription and it hasn't expired
+      if (profile.membershipStatus !== 'pro') {
+        return res.status(403).json({ 
+          message: "Upgrade Required", 
+          details: "You need a Pro subscription to convert demo pages" 
+        });
+      }
+      
+      // Check if Pro membership has expired
+      if (profile.membershipExpires && new Date(profile.membershipExpires) < new Date()) {
+        return res.status(403).json({ 
+          message: "Subscription Expired", 
+          details: "Your Pro subscription has expired. Please renew to convert demo pages" 
+        });
+      }
+      
+      // Atomically validate and invalidate the demo (prevents race conditions)
+      const demoData = await storage.atomicConvertDemo(demoId, convertToken);
+      
+      if (!demoData) {
+        // Could be: demo not found, wrong token, already used, or expired
+        // Check which specific case for better error message
+        const demo = await storage.getDemoPage(demoId);
+        if (!demo) {
+          return res.status(404).json({ message: "Demo not found" });
+        }
+        if (!demo.convertToken) {
+          return res.status(410).json({ message: "Demo has already been converted" });
+        }
+        if (new Date(demo.expiresAt) < new Date()) {
+          return res.status(410).json({ message: "Demo has expired" });
+        }
+        // Must be wrong token
+        return res.status(403).json({ message: "Invalid convert token" });
+      }
+      
+      // Generate a unique slug for the page
+      const baseSlug = demoData.data.title ? demoData.data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : 'booking-page';
+      let slug = baseSlug;
+      let counter = 1;
+      
+      // Check for slug uniqueness using storage abstraction
+      while (true) {
+        const existingPage = await storage.getPageBySlug(slug);
+        if (!existingPage) break;
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      
+      // Create the real page from demo data using storage abstraction
+      const pageData = {
+        ownerId: req.user.userId,
+        title: demoData.data.title || 'My Booking Page',
+        slug: slug,
+        tagline: demoData.data.tagline || null,
+        logoUrl: null, // Logo will be uploaded separately if needed
+        primaryColor: demoData.data.primaryColor || '#2563eb',
+        theme: demoData.data.theme || 'Ocean Blue',
+        backgroundType: demoData.data.backgroundType || 'gradient',
+        backgroundValue: demoData.data.backgroundValue || 'blue',
+        fontFamily: demoData.data.fontFamily || 'inter',
+        contactPhone: demoData.data.contactPhone || null,
+        contactEmail: demoData.data.contactEmail || null,
+        businessAddress: demoData.data.businessAddress || null,
+        businessHours: demoData.data.businessHours || {"monday":"9:00-17:00","tuesday":"9:00-17:00","wednesday":"9:00-17:00","thursday":"9:00-17:00","friday":"9:00-17:00","saturday":"Closed","sunday":"Closed"},
+        data: demoData.data,
+        published: false // Demo conversions start as unpublished
+      };
+      
+      // Validate page data before creation
+      const pageValidation = insertPageSchema.safeParse(pageData);
+      if (!pageValidation.success) {
+        return res.status(400).json({ 
+          message: "Invalid page data from demo", 
+          errors: pageValidation.error.flatten().fieldErrors 
+        });
+      }
+      
+      const newPage = await storage.createPage(pageValidation.data);
+      
+      // Create services if they exist in demo data
+      if (demoData.data.services && Array.isArray(demoData.data.services)) {
+        for (const service of demoData.data.services) {
+          const serviceData = {
+            pageId: newPage.id,
+            name: service.name,
+            description: service.description || null,
+            durationMinutes: parseInt(service.duration) || 60,
+            price: parseFloat(service.price) || 0,
+            currency: 'USD'
+          };
+          
+          // Validate service data
+          const serviceValidation = insertServiceSchema.safeParse(serviceData);
+          if (serviceValidation.success) {
+            await storage.createService(serviceValidation.data);
+          }
+        }
+      }
+      
+      // Demo is already invalidated atomically by atomicConvertDemo method
+      
+      res.json({ 
+        success: true, 
+        pageId: newPage.id,
+        slug: newPage.slug,
+        message: "Demo converted to real page successfully" 
+      });
+    } catch (error) {
+      console.error("Convert demo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/page/launch", verifyToken, async (req: any, res) => {
+    try {
+      const { pageId } = req.body;
+      
+      if (!pageId) {
+        return res.status(400).json({ message: "Page ID is required" });
+      }
+      
+      // Get the page to verify ownership using storage abstraction
+      const page = await storage.getPage(pageId);
+      
+      if (!page || page.ownerId !== req.user.userId) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      
+      // Get user's profile to check membership status using storage abstraction
+      const profile = await storage.getProfile(req.user.userId);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "User profile not found" });
+      }
+      
+      // Check if user has Pro subscription and it hasn't expired
+      if (profile.membershipStatus !== 'pro') {
+        return res.status(403).json({ 
+          message: "Upgrade Required", 
+          details: "You need a Pro subscription to launch your booking page" 
+        });
+      }
+      
+      // Check if Pro membership has expired
+      if (profile.membershipExpires && new Date(profile.membershipExpires) < new Date()) {
+        return res.status(403).json({ 
+          message: "Subscription Expired", 
+          details: "Your Pro subscription has expired. Please renew to launch your page" 
+        });
+      }
+      
+      // Set published to true using storage abstraction
+      const updatedPage = await storage.updatePage(pageId, { published: true });
+      
+      if (!updatedPage) {
+        return res.status(500).json({ message: "Failed to launch page" });
+      }
+      
+      res.json({ 
+        success: true, 
+        message: "Page launched successfully",
+        page: updatedPage
+      });
+    } catch (error) {
+      console.error("Launch page error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
