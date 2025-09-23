@@ -329,11 +329,13 @@ export class SupabaseStorage implements IStorage {
   // Appointments
   async createAppointment(appointment: any): Promise<any> {
     try {
+      console.log("Storage createAppointment received:", JSON.stringify(appointment, null, 2));
       const appointmentData = this.toSnakeCase({ 
         ...appointment, 
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
+      console.log("After toSnakeCase conversion:", JSON.stringify(appointmentData, null, 2));
       
       const { data, error } = await supabase
         .from('appointments')

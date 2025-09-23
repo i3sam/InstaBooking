@@ -875,6 +875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", async (req, res) => {
     try {
       const appointmentData = req.body;
+      console.log("Creating appointment with data:", JSON.stringify(appointmentData, null, 2));
       const appointment = await storage.createAppointment(appointmentData);
       
       // Send email notifications
