@@ -103,11 +103,10 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       id: subscription.id,
       userId: authReq.user.userId,
       planId: planId,
-      planName: plan,  // Keep planName for schema compatibility
-      plan: plan,      // Add plan field for consumer compatibility
+      planName: plan,
       status: subscription.status,
-      razorpaySubscriptionId: subscription.id,
-      razorpayPlanId: planId
+      currency: planConfig.currency,
+      amount: planConfig.amount
     });
 
     console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId}`);
@@ -221,7 +220,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     if (subscription.status === 'active') {
       const profile = await storage.getProfile(authReq.user.userId);
       if (profile && profile.membershipStatus !== 'pro') {
-        const planConfig = PLAN_PRICING[storedSub.plan];
+        const planConfig = PLAN_PRICING[storedSub.planName];
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
 
@@ -238,7 +237,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
       subscriptionId: subscription.id,
       status: subscription.status,
       planId: storedSub.planId,
-      plan: storedSub.plan
+      plan: storedSub.planName
     });
   } catch (error) {
     console.error('Failed to get Razorpay subscription:', error);
@@ -305,13 +304,13 @@ async function handleSubscriptionCharged(subscription: any, payment: any) {
     }
 
     // Update user membership
-    const planConfig = PLAN_PRICING[storedSub.plan];
+    const planConfig = PLAN_PRICING[storedSub.planName];
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
 
     await storage.createPayment({
       userId: storedSub.userId,
-      plan: storedSub.plan,
+      plan: storedSub.planName,
       amount: (payment.amount / 100).toString(), // Convert from smallest unit
       status: "completed",
       paymentId: payment.id,
