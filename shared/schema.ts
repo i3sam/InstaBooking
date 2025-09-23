@@ -95,16 +95,16 @@ export const paymentsDemo = pgTable("payments_demo", {
   plan: text("plan"),
   amount: numeric("amount"),
   status: text("status"),
-  paypalOrderId: text("paypal_order_id"),
-  paypalPaymentId: text("paypal_payment_id"),
+  paypalOrderId: text("paypal_order_id"), // Legacy field - PayPal no longer used
+  paypalPaymentId: text("paypal_payment_id"), // Legacy field - PayPal no longer used
   meta: jsonb("meta"),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
 export const subscriptions = pgTable("subscriptions", {
-  id: text("id").primaryKey(), // PayPal subscription ID
+  id: text("id").primaryKey(), // Legacy PayPal subscription ID - PayPal no longer used
   userId: uuid("user_id").references(() => profiles.id),
-  planId: text("plan_id").notNull(), // PayPal plan ID
+  planId: text("plan_id").notNull(), // Legacy PayPal plan ID - PayPal no longer used
   planName: text("plan_name").notNull(), // "pro", "premium", etc.
   status: text("status").notNull(), // APPROVAL_PENDING|ACTIVE|CANCELLED|SUSPENDED|EXPIRED
   currency: text("currency").default("USD").notNull(),
