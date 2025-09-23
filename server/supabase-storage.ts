@@ -349,6 +349,22 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async getStaffById(id: string): Promise<any | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data ? this.toCamelCase(data) : undefined;
+    } catch (error) {
+      console.error("Get staff by ID error:", error);
+      return undefined;
+    }
+  }
+
   async getStaffByPageId(pageId: string): Promise<any[]> {
     try {
       const { data, error } = await supabase
