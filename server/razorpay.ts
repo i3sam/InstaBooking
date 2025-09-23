@@ -347,10 +347,22 @@ async function handleSubscriptionCancelled(subscription: any) {
   try {
     const storedSub = await storage.getSubscription(subscription.id);
     if (storedSub) {
+      // Update subscription status to cancelled
       await storage.updateSubscription(subscription.id, {
         status: 'cancelled'
       });
-      console.log(`Subscription cancelled: ${subscription.id}`);
+
+      // Downgrade user to free when subscription is actually cancelled
+      const profile = await storage.getProfile(storedSub.userId);
+      if (profile) {
+        await storage.updateProfile(storedSub.userId, {
+          membershipStatus: 'free',
+          membershipPlan: null,
+          membershipExpires: null // Clear expiry since they're now on free plan
+        });
+      }
+      
+      console.log(`✅ Subscription cancelled and user ${storedSub.userId} downgraded to free: ${subscription.id}`);
     }
   } catch (error) {
     console.error('Failed to handle subscription cancellation:', error);
