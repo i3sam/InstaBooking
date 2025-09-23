@@ -12,6 +12,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { uploadFile } from '@/lib/supabase';
 import { currencies, formatCurrencyDisplay, searchCurrencies, getCurrencyByCode } from '@/lib/currencies';
 import { ArrowLeft, ArrowRight, CloudUpload, Plus, X, Palette, FileText, MapPin, Settings, Check, Trash2, Search, Calendar, Phone, Mail, Edit } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 export default function CreatePage() {
   const [, setLocation] = useLocation();
@@ -53,6 +54,7 @@ export default function CreatePage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   
   // Step definitions
   const steps = [
@@ -190,11 +192,22 @@ export default function CreatePage() {
   const handleTitleChange = (title: string) => {
     setFormData(prev => {
       const newData = { ...prev, title };
-      if (title && !prev.slug) {
+      // Only auto-generate slug if user hasn't manually edited it
+      if (title && !slugManuallyEdited) {
         newData.slug = generateSlug(title);
       }
       return newData;
     });
+  };
+
+  const handleSlugChange = (slug: string) => {
+    setSlugManuallyEdited(true);
+    setFormData(prev => ({ ...prev, slug }));
+  };
+
+  // Calculate progress percentage
+  const getProgress = () => {
+    return ((currentStep - 1) / (steps.length - 1)) * 100;
   };
 
   const addService = () => {
@@ -329,352 +342,416 @@ export default function CreatePage() {
       case 1:
         return (
           <div className="space-y-6">
-            <div>
-              <Label htmlFor="title">Business Name *</Label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="Your Business Name"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                data-testid="input-title"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="slug">Web Address (URL) *</Label>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-muted-foreground">bookinggen.xyz/</span>
-                <Input
-                  id="slug"
-                  type="text"
-                  placeholder="your-business-name"
-                  value={formData.slug}
-                  onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                  data-testid="input-slug"
-                />
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                This will be your unique booking page URL
-              </p>
-            </div>
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Edit className="h-5 w-5" />
+                  Basic Information
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-base font-medium">Business Name *</Label>
+                  <Input
+                    id="title"
+                    type="text"
+                    placeholder="Your Business Name"
+                    value={formData.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-title"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="slug" className="text-base font-medium">Web Address (URL) *</Label>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span className="text-sm text-muted-foreground px-3 py-2 glass-effect rounded-lg border border-border/50">bookinggen.xyz/</span>
+                    <Input
+                      id="slug"
+                      type="text"
+                      placeholder="your-business-name"
+                      value={formData.slug}
+                      onChange={(e) => handleSlugChange(e.target.value)}
+                      className="glass-effect border-border/50"
+                      data-testid="input-slug"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    This will be your unique booking page URL
+                  </p>
+                </div>
 
-            <div>
-              <Label htmlFor="tagline">Tagline</Label>
-              <Input
-                id="tagline"
-                type="text"
-                placeholder="Professional services made easy"
-                value={formData.tagline}
-                onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
-                data-testid="input-tagline"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                A short description that appears under your business name
-              </p>
-            </div>
+                <div>
+                  <Label htmlFor="tagline" className="text-base font-medium">Tagline</Label>
+                  <Input
+                    id="tagline"
+                    type="text"
+                    placeholder="Professional services made easy"
+                    value={formData.tagline}
+                    onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-tagline"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    A short description that appears under your business name
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
 
       case 2:
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Your Services</h3>
-              <Button type="button" onClick={addService} variant="outline" size="sm" data-testid="button-add-service">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Service
-              </Button>
-            </div>
-            
-            {formData.services.map((service, index) => (
-              <Card key={index} className="relative border-border">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <h4 className="text-sm font-medium">Service #{index + 1}</h4>
-                  {formData.services.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeService(index)}
-                      data-testid={`button-remove-service-${index}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </CardHeader>
-                <CardContent className="pt-0 space-y-4">
-                  <div>
-                    <Label>Service Name *</Label>
-                    <Input
-                      placeholder="e.g., 60-minute consultation"
-                      value={service.name}
-                      onChange={(e) => updateService(index, 'name', e.target.value)}
-                      data-testid={`input-service-name-${index}`}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label>Description</Label>
-                    <Textarea
-                      placeholder="Describe what's included in this service..."
-                      value={service.description}
-                      onChange={(e) => updateService(index, 'description', e.target.value)}
-                      rows={2}
-                      data-testid={`textarea-service-description-${index}`}
-                    />
-                  </div>
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Your Services
+                  </h3>
+                  <Button type="button" onClick={addService} className="glass-effect hover-lift rounded-xl" size="sm" data-testid="button-add-service">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Service
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.services.map((service, index) => (
+                  <Card key={index} className="glass-effect border-border/50 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <h4 className="text-sm font-medium">Service #{index + 1}</h4>
+                      {formData.services.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeService(index)}
+                          className="hover-lift"
+                          data-testid={`button-remove-service-${index}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      <div>
+                        <Label className="text-base font-medium">Service Name *</Label>
+                        <Input
+                          placeholder="e.g., 60-minute consultation"
+                          value={service.name}
+                          onChange={(e) => updateService(index, 'name', e.target.value)}
+                          className="glass-effect border-border/50 mt-2"
+                          data-testid={`input-service-name-${index}`}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium">Description</Label>
+                        <Textarea
+                          placeholder="Describe what's included in this service..."
+                          value={service.description}
+                          onChange={(e) => updateService(index, 'description', e.target.value)}
+                          rows={2}
+                          className="glass-effect border-border/50 mt-2"
+                          data-testid={`textarea-service-description-${index}`}
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <Label>Duration (minutes)</Label>
-                      <Input
-                        type="number"
-                        placeholder="60"
-                        value={service.durationMinutes}
-                        onChange={(e) => updateService(index, 'durationMinutes', e.target.value)}
-                        data-testid={`input-service-duration-${index}`}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label>Price *</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="99.00"
-                        value={service.price}
-                        onChange={(e) => updateService(index, 'price', e.target.value)}
-                        data-testid={`input-service-price-${index}`}
-                      />
-                    </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-base font-medium">Duration (minutes)</Label>
+                          <Input
+                            type="number"
+                            placeholder="60"
+                            value={service.durationMinutes}
+                            onChange={(e) => updateService(index, 'durationMinutes', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-service-duration-${index}`}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium">Price *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="99.00"
+                            value={service.price}
+                            onChange={(e) => updateService(index, 'price', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-service-price-${index}`}
+                          />
+                        </div>
 
-                    <div>
-                      <Label>Currency</Label>
-                      <Select
-                        value={service.currency}
-                        onValueChange={(value) => updateService(index, 'currency', value)}
-                      >
-                        <SelectTrigger data-testid={`select-service-currency-${index}`}>
-                          <SelectValue placeholder="USD" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {currencies.slice(0, 10).map((currency) => (
-                            <SelectItem key={currency.code} value={currency.code}>
-                              <span className="font-mono text-sm">{currency.symbol}</span>
-                              <span className="font-medium ml-2">{currency.code}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                        <div>
+                          <Label className="text-base font-medium">Currency</Label>
+                          <div className="mt-2">
+                            <Select
+                              value={service.currency}
+                              onValueChange={(value) => updateService(index, 'currency', value)}
+                            >
+                              <SelectTrigger className="glass-effect border-border/50" data-testid={`select-service-currency-${index}`}>
+                                <SelectValue placeholder="USD" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {currencies.slice(0, 10).map((currency) => (
+                                  <SelectItem key={currency.code} value={currency.code}>
+                                    <span className="font-mono text-sm">{currency.symbol}</span>
+                                    <span className="font-medium ml-2">{currency.code}</span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
           </div>
         );
 
       case 3:
         return (
           <div className="space-y-6">
-            <div>
-              <Label className="text-base font-medium mb-4 block">Color Theme</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {colorThemes.map((theme, index) => (
-                  <div key={index} className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, theme: theme.name, primaryColor: theme.primary }))}
-                      className={`w-full p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                        formData.theme === theme.name ? 'border-primary shadow-lg' : 'border-border'
-                      }`}
-                      data-testid={`button-theme-${index}`}
-                    >
-                      <div className={`w-full h-8 rounded mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
-                      <span className="text-sm font-medium">{theme.name}</span>
-                    </button>
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Style & Branding
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Color Theme</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {colorThemes.map((theme, index) => (
+                      <div key={index} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, theme: theme.name, primaryColor: theme.primary }))}
+                          className={`w-full p-3 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect ${
+                            formData.theme === theme.name ? 'border-primary shadow-lg' : 'border-border/50'
+                          }`}
+                          data-testid={`button-theme-${index}`}
+                        >
+                          <div className={`w-full h-8 rounded mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
+                          <span className="text-sm font-medium">{theme.name}</span>
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            <div>
-              <Label className="text-base font-medium mb-4 block">Background Style</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {backgroundOptions.map((bg, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ 
-                      ...prev, 
-                      backgroundType: bg.type, 
-                      backgroundValue: bg.value 
-                    }))}
-                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
-                      formData.backgroundValue === bg.value ? 'border-primary shadow-lg' : 'border-border'
-                    }`}
-                    data-testid={`button-background-${index}`}
-                  >
-                    <div className={`w-full h-12 rounded mb-2 ${bg.class}`}></div>
-                    <span className="text-sm font-medium">{bg.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Background Style</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {backgroundOptions.map((bg, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ 
+                          ...prev, 
+                          backgroundType: bg.type, 
+                          backgroundValue: bg.value 
+                        }))}
+                        className={`p-4 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect ${
+                          formData.backgroundValue === bg.value ? 'border-primary shadow-lg' : 'border-border/50'
+                        }`}
+                        data-testid={`button-background-${index}`}
+                      >
+                        <div className={`w-full h-12 rounded mb-2 ${bg.class}`}></div>
+                        <span className="text-sm font-medium">{bg.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            <div>
-              <Label className="text-base font-medium mb-4 block">Upload Logo (Optional)</Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                {logoPreview ? (
-                  <div className="space-y-4">
-                    <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain mx-auto" />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('logo-upload')?.click()}
-                      disabled={uploadingLogo}
-                      data-testid="button-change-logo"
-                    >
-                      Change Logo
-                    </Button>
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Upload Logo (Optional)</Label>
+                  <div className="border-2 border-dashed border-border/50 rounded-xl p-6 text-center glass-effect">
+                    {logoPreview ? (
+                      <div className="space-y-4">
+                        <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain mx-auto" />
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('logo-upload')?.click()}
+                          disabled={uploadingLogo}
+                          className="glass-effect hover-lift rounded-xl"
+                          data-testid="button-change-logo"
+                        >
+                          Change Logo
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <CloudUpload className="h-12 w-12 text-muted-foreground mx-auto" />
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('logo-upload')?.click()}
+                          disabled={uploadingLogo}
+                          className="glass-effect hover-lift rounded-xl"
+                          data-testid="button-upload-logo"
+                        >
+                          {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                        </Button>
+                        <p className="text-sm text-muted-foreground">PNG, JPG up to 5MB</p>
+                      </div>
+                    )}
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
+                      className="hidden"
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <CloudUpload className="h-12 w-12 text-muted-foreground mx-auto" />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('logo-upload')?.click()}
-                      disabled={uploadingLogo}
-                      data-testid="button-upload-logo"
-                    >
-                      {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
-                    </Button>
-                    <p className="text-sm text-muted-foreground">PNG, JPG up to 5MB</p>
-                  </div>
-                )}
-                <input
-                  id="logo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
-                  className="hidden"
-                />
-              </div>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
 
       case 4:
         return (
           <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="contactPhone">Phone Number</Label>
-                <Input
-                  id="contactPhone"
-                  type="tel"
-                  placeholder="+1 (555) 123-4567"
-                  value={formData.contactPhone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
-                  data-testid="input-contact-phone"
-                />
-              </div>
-              <div>
-                <Label htmlFor="contactEmail">Email Address</Label>
-                <Input
-                  id="contactEmail"
-                  type="email"
-                  placeholder="contact@yourbusiness.com"
-                  value={formData.contactEmail}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
-                  data-testid="input-contact-email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="businessAddress">Business Address</Label>
-              <Textarea
-                id="businessAddress"
-                placeholder="123 Main Street, City, State 12345"
-                value={formData.businessAddress}
-                onChange={(e) => setFormData(prev => ({ ...prev, businessAddress: e.target.value }))}
-                rows={2}
-                data-testid="textarea-business-address"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="locationLink">Google Maps Link</Label>
-              <Input
-                id="locationLink"
-                type="url"
-                placeholder="https://maps.google.com/..."
-                value={formData.locationLink}
-                onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
-                data-testid="input-location-link"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Add your Google Maps link so customers can easily find you
-              </p>
-            </div>
-
-            <div>
-              <Label className="text-base font-medium mb-4 block">Business Hours</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(formData.businessHours).map(([day, hours]) => (
-                  <div key={day} className="flex items-center space-x-2">
-                    <Label className="w-20 capitalize text-sm">{day}:</Label>
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Business Information
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="contactPhone" className="text-base font-medium">Phone Number</Label>
                     <Input
-                      placeholder="9:00-17:00 or Closed"
-                      value={hours}
-                      onChange={(e) => setFormData(prev => ({ 
-                        ...prev, 
-                        businessHours: { ...prev.businessHours, [day]: e.target.value }
-                      }))}
-                      className="flex-1"
-                      data-testid={`input-hours-${day}`}
+                      id="contactPhone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={formData.contactPhone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+                      className="glass-effect border-border/50 mt-2"
+                      data-testid="input-contact-phone"
                     />
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div>
+                    <Label htmlFor="contactEmail" className="text-base font-medium">Email Address</Label>
+                    <Input
+                      id="contactEmail"
+                      type="email"
+                      placeholder="contact@yourbusiness.com"
+                      value={formData.contactEmail}
+                      onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+                      className="glass-effect border-border/50 mt-2"
+                      data-testid="input-contact-email"
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
-              <Textarea
-                id="cancellationPolicy"
-                placeholder="Please provide 24 hours notice for cancellations..."
-                value={formData.cancellationPolicy}
-                onChange={(e) => setFormData(prev => ({ ...prev, cancellationPolicy: e.target.value }))}
-                rows={3}
-                data-testid="textarea-cancellation-policy"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="businessAddress" className="text-base font-medium">Business Address</Label>
+                  <Textarea
+                    id="businessAddress"
+                    placeholder="123 Main Street, City, State 12345"
+                    value={formData.businessAddress}
+                    onChange={(e) => setFormData(prev => ({ ...prev, businessAddress: e.target.value }))}
+                    rows={2}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="textarea-business-address"
+                  />
+                </div>
+
+                <div className="glass-effect rounded-xl p-4 border border-border/50">
+                  <Label htmlFor="locationLink" className="text-base font-medium flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Google Maps Link
+                  </Label>
+                  <Input
+                    id="locationLink"
+                    type="url"
+                    placeholder="https://maps.google.com/..."
+                    value={formData.locationLink}
+                    onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-location-link"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Add your Google Maps link so customers can easily find you
+                  </p>
+                </div>
+
+                <div>
+                  <Label className="text-base font-medium mb-4 block flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Business Hours
+                  </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(formData.businessHours).map(([day, hours]) => (
+                      <div key={day} className="flex items-center space-x-2">
+                        <Label className="w-20 capitalize text-sm">{day}:</Label>
+                        <Input
+                          placeholder="9:00-17:00 or Closed"
+                          value={hours}
+                          onChange={(e) => setFormData(prev => ({ 
+                            ...prev, 
+                            businessHours: { ...prev.businessHours, [day]: e.target.value }
+                          }))}
+                          className="flex-1 glass-effect border-border/50"
+                          data-testid={`input-hours-${day}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="cancellationPolicy" className="text-base font-medium">Cancellation Policy</Label>
+                  <Textarea
+                    id="cancellationPolicy"
+                    placeholder="Please provide 24 hours notice for cancellations..."
+                    value={formData.cancellationPolicy}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cancellationPolicy: e.target.value }))}
+                    rows={3}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="textarea-cancellation-policy"
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
 
       case 5:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-xl font-semibold text-foreground mb-2">Ready to Launch!</h3>
+            <div className="text-center mb-8 glass-prism-card p-6 rounded-2xl border-none shadow-lg animate-fade-in-up">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center">
+                  <span className="text-2xl">🚀</span>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-blue-gradient mb-2">Ready to Launch!</h3>
               <p className="text-muted-foreground">
                 Review your booking page details below and publish when you're ready
               </p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
-              <Card>
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
                 <CardHeader>
-                  <h4 className="font-medium flex items-center">
+                  <h4 className="font-medium flex items-center text-blue-gradient">
                     <Edit className="h-4 w-4 mr-2" />
                     Basic Information
                   </h4>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="glass-effect rounded-lg p-4">
                   <div className="space-y-2 text-sm">
                     <p><strong>Business:</strong> {formData.title || 'Not set'}</p>
                     <p><strong>URL:</strong> bookinggen.xyz/{formData.slug || 'not-set'}</p>
@@ -683,14 +760,14 @@ export default function CreatePage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
                 <CardHeader>
-                  <h4 className="font-medium flex items-center">
+                  <h4 className="font-medium flex items-center text-blue-gradient">
                     <FileText className="h-4 w-4 mr-2" />
                     Services
                   </h4>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="glass-effect rounded-lg p-4">
                   <div className="space-y-2 text-sm">
                     {formData.services.filter(s => s.name.trim()).map((service, index) => (
                       <p key={index}>
@@ -704,29 +781,30 @@ export default function CreatePage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
                 <CardHeader>
-                  <h4 className="font-medium flex items-center">
+                  <h4 className="font-medium flex items-center text-blue-gradient">
                     <Palette className="h-4 w-4 mr-2" />
                     Styling
                   </h4>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="glass-effect rounded-lg p-4">
                   <div className="space-y-2 text-sm">
                     <p><strong>Theme:</strong> {formData.theme}</p>
                     <p><strong>Logo:</strong> {formData.logoUrl ? 'Uploaded' : 'None'}</p>
+                    <p><strong>Location:</strong> {formData.locationLink ? 'Added' : 'None'}</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
                 <CardHeader>
-                  <h4 className="font-medium flex items-center">
+                  <h4 className="font-medium flex items-center text-blue-gradient">
                     <Phone className="h-4 w-4 mr-2" />
                     Contact Info
                   </h4>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="glass-effect rounded-lg p-4">
                   <div className="space-y-2 text-sm">
                     <p><strong>Phone:</strong> {formData.contactPhone || 'Not set'}</p>
                     <p><strong>Email:</strong> {formData.contactEmail || 'Not set'}</p>
@@ -745,13 +823,20 @@ export default function CreatePage() {
 
   return (
     <div className="min-h-screen page-gradient">
+      {/* Glass Prism Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-48 h-48 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+        <div className="absolute top-32 right-20 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-20 left-1/3 w-32 h-32 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
+      </div>
+      
       {/* Header */}
-      <div className="container mx-auto px-6 pt-8">
+      <div className="container mx-auto px-6 pt-8 relative z-10">
         <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"
             onClick={() => setLocation('/dashboard')}
-            className="flex items-center"
+            className="flex items-center glass-effect hover-lift rounded-xl"
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -760,66 +845,87 @@ export default function CreatePage() {
         </div>
       </div>
 
-      {/* Step Progress Indicator */}
-      <div className="container mx-auto px-6 mb-12">
-        <div className="flex items-center justify-center mb-12">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center">
-              <div className="text-center group">
-                <div className={`relative w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 transition-all duration-300 ${
-                  currentStep === step.number 
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-110' 
-                    : currentStep > step.number
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {currentStep > step.number ? (
-                    <Check className="h-6 w-6" />
-                  ) : (
-                    <step.icon className="h-6 w-6" />
-                  )}
-                </div>
-                <p className={`text-sm font-medium ${
-                  currentStep === step.number ? 'text-primary' : 'text-muted-foreground'
-                }`}>
-                  {step.title}
-                </p>
+      {/* Glass Prism Progress Header */}
+      <div className="container mx-auto px-6 mb-12 relative z-10">
+        <div className="glass-prism-card p-8 rounded-2xl border-none shadow-2xl animate-fade-in-up">
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" opacity="0.3"/>
+                  <path d="M21 16L12 21L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 12L12 17L3 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
-              {index < steps.length - 1 && (
-                <div className={`h-0.5 w-20 mx-4 ${
-                  currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
-                }`} />
-              )}
             </div>
-          ))}
+            <h1 className="text-3xl font-bold text-blue-gradient mb-2">Create Your Booking Page</h1>
+            <p className="text-muted-foreground">Build a professional booking page in just a few steps</p>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="space-y-4">
+            <Progress value={getProgress()} className="w-full h-3 glass-effect" data-testid="progress-wizard" />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              {steps.map((step, index) => (
+                <div 
+                  key={step.number} 
+                  className={`flex flex-col items-center transition-all duration-300 ${
+                    currentStep === step.number ? 'text-primary font-medium scale-105' : 
+                    currentStep > step.number ? 'text-green-600' : ''
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
+                    currentStep === step.number 
+                      ? 'glass-prism text-primary shadow-lg' 
+                      : currentStep > step.number
+                      ? 'bg-green-500 text-white'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {currentStep > step.number ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <span className="text-xs font-bold">{step.number}</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-center leading-tight">{step.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="container mx-auto px-6 pb-12">
-        <Card className="max-w-4xl mx-auto">
-          <CardHeader className="text-center pb-6">
+      <div className="container mx-auto px-6 pb-12 relative z-10">
+        <div className="max-w-4xl mx-auto glass-prism-card border-none shadow-2xl animate-fade-in-up rounded-2xl">
+          <CardHeader className="text-center pb-6 relative">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                {currentStep}
+              <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center text-blue-gradient shadow-lg">
+                {steps[currentStep - 1] && (() => {
+                  const StepIcon = steps[currentStep - 1].icon;
+                  return <StepIcon className="h-6 w-6" />;
+                })()}
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-blue-gradient">
               {steps[currentStep - 1]?.title}
             </h2>
             <p className="text-muted-foreground">
               {steps[currentStep - 1]?.description}
             </p>
           </CardHeader>
-          <CardContent>
-            {renderStepContent()}
+          <CardContent className="relative">
+            <div className="glass-effect rounded-xl p-6">
+              {renderStepContent()}
+            </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-6 border-t border-border">
+            <div className="flex justify-between mt-8 pt-6 border-t border-border/20">
               <Button
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 1}
+                className="glass-effect hover-lift rounded-xl"
                 data-testid="button-previous"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -830,6 +936,7 @@ export default function CreatePage() {
                 <Button
                   onClick={nextStep}
                   disabled={!validateStep(currentStep)}
+                  className="glass-prism-button hover-lift rounded-xl"
                   data-testid="button-next"
                 >
                   Next
@@ -839,7 +946,7 @@ export default function CreatePage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={createPageMutation.isPending}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  className="glass-prism-button hover-lift rounded-xl"
                   data-testid="button-publish"
                 >
                   {createPageMutation.isPending ? 'Publishing...' : 'Publish Page'}
@@ -848,7 +955,7 @@ export default function CreatePage() {
               )}
             </div>
           </CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   );
