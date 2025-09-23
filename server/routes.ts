@@ -6,6 +6,7 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { createSubscription, getSubscription, cancelSubscription, handleWebhook } from "./paypalSubscriptions";
+import { createRazorpayOrder, verifyRazorpayPayment } from "./razorpay";
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema, insertDemoPageSchema, insertServiceSchema } from '@shared/schema';
@@ -1107,6 +1108,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to capture order." });
     }
   });
+
+  // Razorpay payment routes (conditionally registered)
+  if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+    app.post("/api/razorpay/order", verifyToken, async (req, res) => {
+      await createRazorpayOrder(req, res);
+    });
+
+    app.post("/api/razorpay/verify", verifyToken, async (req, res) => {
+      await verifyRazorpayPayment(req, res);
+    });
+    console.log("Razorpay payment routes registered successfully");
+  } else {
+    console.warn("Razorpay credentials not found - Razorpay payment routes not registered");
+  }
 
   // Associate anonymous demo with user account
   app.post("/api/demo/associate", verifyToken, async (req: any, res) => {
