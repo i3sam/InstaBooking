@@ -5,8 +5,6 @@ import { storage } from "./storage";
 // Removed PostgreSQL schema imports - using Supabase directly
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
-import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
-import { createSubscription, getSubscription, cancelSubscription, handleWebhook } from "./paypalSubscriptions";
 import { createRazorpayOrder, verifyRazorpayPayment, createRazorpaySubscription, handleRazorpayWebhook, getRazorpaySubscription } from "./razorpay";
 import multer from 'multer';
 import { Resend } from 'resend';
@@ -32,7 +30,6 @@ if (supabaseUrl && supabaseServiceKey) {
   console.warn("Supabase credentials not found. Application will continue without Supabase authentication");
 }
 
-// PayPal setup is handled in ./paypal.ts module
 
 // Resend setup for email notifications
 let resend: Resend | null = null;
@@ -1020,95 +1017,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PayPal setup routes from blueprint
-  app.get("/paypal/setup", async (req, res) => {
-    await loadPaypalDefault(req, res);
-  });
-
-  app.post("/paypal/order", async (req, res) => {
-    // Request body should contain: { intent, amount, currency }
-    await createPaypalOrder(req, res);
-  });
-
-  // PayPal Subscription Routes
-  app.post("/api/paypal/subscriptions", verifyToken, async (req: any, res) => {
-    // Add user ID from auth token to request body for security
-    req.body.userId = req.user.userId;
-    await createSubscription(req, res);
-  });
-
-  app.get("/api/paypal/subscriptions/:subscriptionId", verifyToken, async (req, res) => {
-    await getSubscription(req, res);
-  });
-
-  app.post("/api/paypal/subscriptions/:subscriptionId/cancel", verifyToken, async (req, res) => {
-    await cancelSubscription(req, res);
-  });
-
-  app.post("/api/paypal/webhook", async (req, res) => {
-    await handleWebhook(req, res);
-  });
-
-  app.post("/paypal/order/:orderID/capture", verifyToken, async (req: any, res) => {
-    try {
-      const { orderID } = req.params;
-      const { plan, amount } = req.body;
-      
-      // Capture the PayPal order using blueprint function
-      const collect = {
-        id: orderID,
-        prefer: "return=minimal",
-      };
-
-      const { Client, Environment, OrdersController } = await import("@paypal/paypal-server-sdk");
-      const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
-      
-      const client = new Client({
-        clientCredentialsAuthCredentials: {
-          oAuthClientId: PAYPAL_CLIENT_ID!,
-          oAuthClientSecret: PAYPAL_CLIENT_SECRET!,
-        },
-        environment: Environment.Production, // Always use production since user has live credentials
-      });
-      const ordersController = new OrdersController(client);
-      
-      const { body, ...httpResponse } = await ordersController.captureOrder(collect);
-      const jsonResponse = JSON.parse(String(body));
-      const httpStatusCode = httpResponse.statusCode;
-
-      // If capture was successful and PayPal confirms completion, update membership
-      if (httpStatusCode >= 200 && httpStatusCode < 300 && jsonResponse.status === 'COMPLETED') {
-        
-        // Store payment record
-        await storage.createPayment({
-          userId: req.user.userId,
-          plan: plan || "pro",
-          amount: amount || "14.99",
-          status: "completed",
-          paypalOrderId: orderID,
-          paypalPaymentId: jsonResponse.id || orderID,
-          meta: { 
-            paypal_order_id: orderID,
-            paypal_payment_id: jsonResponse.id || orderID,
-            paypal_response: jsonResponse,
-            completedAt: new Date().toISOString() 
-          }
-        });
-
-        // Update profile membership
-        await storage.updateProfile(req.user.userId, {
-          membershipStatus: "pro",
-          membershipPlan: "pro",
-          membershipExpires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-        });
-      }
-      
-      res.status(httpStatusCode).json(jsonResponse);
-    } catch (error: any) {
-      console.error("PayPal capture and membership update error:", error);
-      res.status(500).json({ error: "Failed to capture order." });
-    }
-  });
 
   // Razorpay payment routes (conditionally registered)
   if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
