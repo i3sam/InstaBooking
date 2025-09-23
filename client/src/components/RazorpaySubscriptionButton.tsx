@@ -27,7 +27,7 @@ export default function RazorpaySubscriptionButton({
   onCancel,
   disabled = false,
   className = "",
-  children = "Subscribe with Card"
+  children = "Pay with Credit / Debit card"
 }: RazorpaySubscriptionButtonProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
