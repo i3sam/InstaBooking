@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2 } from 'lucide-react';
+import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit } from 'lucide-react';
 import { uploadFile } from '@/lib/supabase';
 
 interface CreatePageModalProps {
@@ -60,6 +61,8 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   
   // Gallery state
   const [uploadingGallery, setUploadingGallery] = useState<{[key: string]: boolean}>({});
@@ -368,8 +371,90 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     setFormData(prev => ({
       ...prev,
       title: value,
-      slug: prev.slug === '' ? generateSlug(value) : prev.slug
+      slug: !slugManuallyEdited ? generateSlug(value) : prev.slug
     }));
+  };
+
+  const handleSlugChange = (value: string) => {
+    setSlugManuallyEdited(true);
+    setFormData(prev => ({ ...prev, slug: value }));
+  };
+
+  // Step definitions
+  const steps = [
+    {
+      number: 1,
+      title: "Basic Details",
+      description: "Set up your booking page name, web address, and tagline",
+      icon: Edit,
+      fields: ['title', 'slug', 'tagline']
+    },
+    {
+      number: 2, 
+      title: "Services & Pricing",
+      description: "Add your services, set pricing and duration for each offering",
+      icon: FileText,
+      fields: ['services']
+    },
+    {
+      number: 3,
+      title: "Style & Branding", 
+      description: "Customize colors, themes, and upload your logo",
+      icon: Palette,
+      fields: ['theme', 'primaryColor', 'backgroundType', 'backgroundValue', 'fontFamily', 'logoUrl']
+    },
+    {
+      number: 4,
+      title: "Business Information",
+      description: "Add contact details, business hours, and policies",
+      icon: Settings,
+      fields: ['contactPhone', 'contactEmail', 'businessAddress', 'businessHours', 'calendarLink', 'cancellationPolicy']
+    },
+    {
+      number: 5,
+      title: "Review & Publish",
+      description: "Review your booking page and publish it to the world",
+      icon: Check,
+      fields: []
+    }
+  ];
+
+  // Calculate progress percentage
+  const getProgress = () => {
+    return ((currentStep - 1) / (steps.length - 1)) * 100;
+  };
+
+  const validateStep = (step: number) => {
+    switch (step) {
+      case 1:
+        return formData.title.trim() && formData.slug.trim();
+      case 2:
+        return formData.services.some(service => service.name.trim() && service.price);
+      case 3:
+        return true; // Styling is optional
+      case 4:
+        return true; // Business info is optional  
+      case 5:
+        return true; // Review step
+      default:
+        return false;
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, steps.length));
+    } else {
+      toast({
+        title: "Please complete required fields",
+        description: "Fill in the required information before proceeding to the next step.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
   const addService = () => {
@@ -542,784 +627,534 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     });
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Booking Page' : 'Create Booking Page'}</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Accordion type="multiple" defaultValue={["basic"]} className="space-y-4">
-            
-            {/* Basic Information Section */}
-            <AccordionItem value="basic" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <FileText className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Basic Information</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="title">Page Title</Label>
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Edit className="h-5 w-5" />
+                  Basic Information
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="title" className="text-base font-medium">Page Title *</Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Personal Training"
+                      value={formData.title}
+                      onChange={(e) => handleTitleChange(e.target.value)}
+                      className="glass-effect border-border/50 mt-2"
+                      required
+                      data-testid="input-page-title"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="slug" className="text-base font-medium">URL Slug *</Label>
+                    <div className="flex mt-2">
+                      <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-border/50 glass-effect text-muted-foreground text-sm">
+                        bookinggen.xyz/
+                      </span>
                       <Input
-                        id="title"
-                        placeholder="e.g., Personal Training"
-                        value={formData.title}
-                        onChange={(e) => handleTitleChange(e.target.value)}
+                        id="slug"
+                        placeholder="personal-training"
+                        value={formData.slug}
+                        onChange={(e) => handleSlugChange(e.target.value)}
+                        className="rounded-l-none glass-effect border-border/50"
                         required
-                        data-testid="input-page-title"
+                        data-testid="input-page-slug"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="slug">URL Slug</Label>
-                      <div className="flex">
-                        <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                          bookinggen.xyz/
-                        </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="tagline" className="text-base font-medium">Tagline</Label>
+                  <Input
+                    id="tagline"
+                    placeholder="Transform your fitness journey with personalized training"
+                    value={formData.tagline}
+                    onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-tagline"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    A catchy subtitle that describes what you offer
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Your Services
+                  </h3>
+                  <Button type="button" onClick={addService} className="glass-effect hover-lift rounded-xl" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Service
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.services.map((service, index) => (
+                  <Card key={index} className="glass-effect border-border/50 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <h4 className="text-sm font-medium">Service #{index + 1}</h4>
+                      {formData.services.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeService(index)}
+                          className="hover-lift"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      <div>
+                        <Label className="text-base font-medium">Service Name *</Label>
                         <Input
-                          id="slug"
-                          placeholder="personal-training"
-                          value={formData.slug}
-                          onChange={(e) => setFormData(prev => ({ ...prev, slug: generateSlug(e.target.value) }))}
-                          className="rounded-l-none"
-                          required
-                          data-testid="input-page-slug"
+                          placeholder="e.g., 60-minute consultation"
+                          value={service.name}
+                          onChange={(e) => updateService(index, 'name', e.target.value)}
+                          className="glass-effect border-border/50 mt-2"
                         />
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="tagline">Tagline</Label>
-                    <Input
-                      id="tagline"
-                      placeholder="Transform your fitness journey with personalized training"
-                      value={formData.tagline}
-                      onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
-                      data-testid="input-tagline"
-                    />
-                    <p className="text-sm text-muted-foreground mt-1">
-                      A catchy subtitle that describes what you offer
-                    </p>
-                  </div>
-
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Styling & Appearance Section */}
-            <AccordionItem value="styling" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <Palette className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Styling & Appearance</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-4">
-                  <div>
-                    <Label className="flex items-center space-x-2">
-                      <Palette className="h-4 w-4" />
-                      <span>Color Theme ({colorThemes.length} options)</span>
-                    </Label>
-                    <div className="max-h-64 overflow-y-auto border border-border rounded-xl p-3 mt-2">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {colorThemes.map((theme, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => selectColorTheme(theme)}
-                            className={`p-2 rounded-lg border-2 transition-all ${
-                              formData.primaryColor === theme.primary 
-                                ? 'border-primary ring-2 ring-primary/20' 
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                          >
-                            <div 
-                              className={`h-4 w-full rounded bg-gradient-to-r ${theme.gradient} mb-1`}
-                            />
-                            <p className="text-xs font-medium text-foreground">{theme.name}</p>
-                          </button>
-                        ))}
+                      
+                      <div>
+                        <Label className="text-base font-medium">Description</Label>
+                        <Textarea
+                          placeholder="Describe what's included in this service..."
+                          value={service.description}
+                          onChange={(e) => updateService(index, 'description', e.target.value)}
+                          rows={2}
+                          className="glass-effect border-border/50 mt-2"
+                        />
                       </div>
-                    </div>
-                  </div>
 
-                  <div>
-                    <Label className="flex items-center space-x-2">
-                      <Image className="h-4 w-4" />
-                      <span>Background Style ({backgroundOptions.length} options)</span>
-                    </Label>
-                    <div className="max-h-64 overflow-y-auto border border-border rounded-xl p-3 mt-2">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {backgroundOptions.map((bg, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => setFormData(prev => ({ 
-                              ...prev, 
-                              backgroundType: bg.type, 
-                              backgroundValue: bg.value 
-                            }))}
-                            className={`p-2 rounded-lg border-2 transition-all ${
-                              formData.backgroundValue === bg.value 
-                                ? 'border-primary ring-2 ring-primary/20' 
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                          >
-                            <div className={`h-4 w-full rounded ${bg.class} mb-1 border border-border/20`} />
-                            <p className="text-xs font-medium text-foreground">{bg.name}</p>
-                            <p className="text-xs text-muted-foreground capitalize">{bg.type}</p>
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-base font-medium">Duration (minutes)</Label>
+                          <Input
+                            type="number"
+                            placeholder="60"
+                            value={service.durationMinutes}
+                            onChange={(e) => updateService(index, 'durationMinutes', parseInt(e.target.value) || 60)}
+                            className="glass-effect border-border/50 mt-2"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium">Price *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="99.00"
+                            value={service.price}
+                            onChange={(e) => updateService(index, 'price', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        );
 
-                  <div>
-                    <Label className="flex items-center space-x-2">
-                      <span className="text-sm font-medium">Font Style</span>
-                    </Label>
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                      {fontOptions.map((font, index) => (
+      case 3:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Style & Branding
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Color Theme</Label>
+                  <div className="max-h-64 overflow-y-auto glass-effect rounded-xl p-3 border border-border/50">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {colorThemes.map((theme, index) => (
                         <button
                           key={index}
                           type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, fontFamily: font.value }))}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            formData.fontFamily === font.value 
-                              ? 'border-primary ring-2 ring-primary/20' 
-                              : 'border-border hover:border-primary/50'
+                          onClick={() => selectColorTheme(theme)}
+                          className={`p-3 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect ${
+                            formData.theme === theme.name ? 'border-primary shadow-lg' : 'border-border/50'
                           }`}
                         >
-                          <div className={`text-center ${font.class}`}>
-                            <p className="text-lg font-semibold mb-1">Sample Text</p>
-                            <p className="text-xs text-muted-foreground">{font.name}</p>
-                          </div>
+                          <div className={`w-full h-8 rounded mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
+                          <span className="text-sm font-medium">{theme.name}</span>
                         </button>
                       ))}
                     </div>
                   </div>
-
-                  <div>
-                    <Label htmlFor="primaryColor">Custom Primary Color</Label>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <input
-                        type="color"
-                        value={formData.primaryColor}
-                        onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="w-12 h-12 border border-border rounded-lg cursor-pointer"
-                        data-testid="input-primary-color"
-                      />
-                      <Input
-                        value={formData.primaryColor}
-                        onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="flex-1"
-                        placeholder="#2563eb"
-                        data-testid="input-primary-color-hex"
-                      />
-                    </div>
-                  </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
 
-            {/* Services Section */}
-            <AccordionItem value="services" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <Settings className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Services & Pricing</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
                 <div>
-                  <Label>Services</Label>
-                  <div className="space-y-4 mt-2">
-                    {formData.services.map((service, index) => (
-                      <div key={index} className="grid md:grid-cols-4 gap-4 p-4 border border-border rounded-xl">
-                        <Input
-                          placeholder="Service name"
-                          value={service.name}
-                          onChange={(e) => updateService(index, 'name', e.target.value)}
-                          data-testid={`input-service-name-${index}`}
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Duration (min)"
-                          value={service.durationMinutes}
-                          onChange={(e) => updateService(index, 'durationMinutes', parseInt(e.target.value))}
-                          data-testid={`input-service-duration-${index}`}
-                        />
-                        <div className="flex">
-                          <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-border bg-muted text-muted-foreground text-sm">
-                            $
-                          </span>
-                          <Input
-                            type="number"
-                            placeholder="Price"
-                            value={service.price}
-                            onChange={(e) => updateService(index, 'price', e.target.value)}
-                            className="rounded-l-none"
-                            data-testid={`input-service-price-${index}`}
-                          />
-                        </div>
-                        {formData.services.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeService(index)}
-                            data-testid={`button-remove-service-${index}`}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
+                  <Label className="text-base font-medium mb-4 block">Upload Logo (Optional)</Label>
+                  <div className="border-2 border-dashed border-border/50 rounded-xl p-6 text-center glass-effect">
+                    {logoPreview ? (
+                      <div className="space-y-4">
+                        <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain mx-auto" />
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('logo-upload')?.click()}
+                          disabled={uploadingLogo}
+                          className="glass-effect hover-lift rounded-xl"
+                        >
+                          Change Logo
+                        </Button>
                       </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full border-2 border-dashed"
-                      onClick={addService}
-                      data-testid="button-add-service"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Another Service
-                    </Button>
+                    ) : (
+                      <div className="space-y-4">
+                        <CloudUpload className="h-12 w-12 text-muted-foreground mx-auto" />
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('logo-upload')?.click()}
+                          disabled={uploadingLogo}
+                          className="glass-effect hover-lift rounded-xl"
+                        >
+                          {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                        </Button>
+                        <p className="text-sm text-muted-foreground">PNG, JPG up to 5MB</p>
+                      </div>
+                    )}
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
+                      className="hidden"
+                    />
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+              </CardContent>
+            </Card>
+          </div>
+        );
 
-            {/* Content Management Section */}
-            <AccordionItem value="content" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <HelpCircle className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Content & FAQ Management</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-4">
+      case 4:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Business Information
+                </h3>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Frequently Asked Questions</Label>
-                    <div className="space-y-3 mt-2">
-                      {formData.faqs.map((faq, index) => (
-                        <div key={index} className="grid gap-3 p-4 border border-border rounded-xl">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-foreground">FAQ #{index + 1}</span>
-                            {formData.faqs.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => removeFaq(index)}
-                                data-testid={`button-remove-faq-${index}`}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                          <div>
-                            <Label htmlFor={`faq-question-${index}`}>Question</Label>
-                            <Input
-                              id={`faq-question-${index}`}
-                              placeholder="e.g., What should I bring to my appointment?"
-                              value={faq.question}
-                              onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                              data-testid={`input-faq-question-${index}`}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor={`faq-answer-${index}`}>Answer</Label>
-                            <Textarea
-                              id={`faq-answer-${index}`}
-                              rows={3}
-                              placeholder="Please bring comfortable workout clothes and a water bottle..."
-                              value={faq.answer}
-                              onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                              className="resize-none"
-                              data-testid={`textarea-faq-answer-${index}`}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full border-2 border-dashed"
-                        onClick={addFaq}
-                        data-testid="button-add-faq"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Another FAQ
-                      </Button>
-                    </div>
+                    <Label htmlFor="contactPhone" className="text-base font-medium">Phone Number</Label>
+                    <Input
+                      id="contactPhone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={formData.contactPhone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+                      className="glass-effect border-border/50 mt-2"
+                    />
                   </div>
-
                   <div>
-                    <Label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.acceptReviews === 'true'}
-                        onChange={(e) => setFormData(prev => ({ ...prev, acceptReviews: e.target.checked ? 'true' : 'false' }))}
-                        className="rounded border-border"
-                        data-testid="checkbox-accept-reviews"
-                      />
-                      <span>Accept and display customer reviews on booking page</span>
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      When enabled, customers can leave reviews after appointments that will be displayed on your booking page
-                    </p>
+                    <Label htmlFor="contactEmail" className="text-base font-medium">Email Address</Label>
+                    <Input
+                      id="contactEmail"
+                      type="email"
+                      placeholder="contact@yourbusiness.com"
+                      value={formData.contactEmail}
+                      onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+                      className="glass-effect border-border/50 mt-2"
+                    />
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
 
-            {/* Business Information Section */}
-            <AccordionItem value="business" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Business Information</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-4">
-                  <div>
-                    <Label>Business Information</Label>
-                    <div className="space-y-3 mt-2">
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="contactPhone">Phone Number</Label>
-                          <Input
-                            id="contactPhone"
-                            type="tel"
-                            placeholder="(555) 123-4567"
-                            value={formData.contactPhone}
-                            onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
-                            data-testid="input-contact-phone"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="contactEmail">Email Address</Label>
-                          <Input
-                            id="contactEmail"
-                            type="email"
-                            placeholder="hello@example.com"
-                            value={formData.contactEmail}
-                            onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
-                            data-testid="input-contact-email"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="businessAddress">Business Address</Label>
-                        <Textarea
-                          id="businessAddress"
-                          rows={2}
-                          placeholder="123 Main Street, City, State 12345"
-                          value={formData.businessAddress}
-                          onChange={(e) => setFormData(prev => ({ ...prev, businessAddress: e.target.value }))}
-                          className="resize-none"
-                          data-testid="input-business-address"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
-                        <Textarea
-                          id="cancellationPolicy"
-                          rows={3}
-                          placeholder="Please provide 24 hours notice for cancellations..."
-                          value={formData.cancellationPolicy}
-                          onChange={(e) => setFormData(prev => ({ ...prev, cancellationPolicy: e.target.value }))}
-                          className="resize-none"
-                          data-testid="input-cancellation-policy"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <Label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={formData.showContactInfo === 'true'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, showContactInfo: e.target.checked ? 'true' : 'false' }))}
-                            className="rounded border-border"
-                            data-testid="checkbox-show-contact-info"
-                          />
-                          <span>Display contact information on booking page</span>
-                        </Label>
-                        
-                        <Label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={formData.showBusinessHours === 'true'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, showBusinessHours: e.target.checked ? 'true' : 'false' }))}
-                            className="rounded border-border"
-                            data-testid="checkbox-show-business-hours"
-                          />
-                          <span>Display business hours on booking page</span>
-                        </Label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Business Hours</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                      {Object.entries(formData.businessHours).map(([day, hours]) => (
-                        <div key={day} className="flex items-center space-x-2">
-                          <Label className="w-20 capitalize text-sm">{day}:</Label>
-                          <Input
-                            placeholder="9:00-17:00 or Closed"
-                            value={hours}
-                            onChange={(e) => setFormData(prev => ({ 
-                              ...prev, 
-                              businessHours: { ...prev.businessHours, [day]: e.target.value }
-                            }))}
-                            className="flex-1"
-                            data-testid={`input-hours-${day}`}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Integration Section */}
-            <AccordionItem value="integration" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Calendar Integration</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
                 <div>
-                  <Label htmlFor="calendarLink">Calendar Integration</Label>
+                  <Label htmlFor="businessAddress" className="text-base font-medium">Business Address</Label>
+                  <Textarea
+                    id="businessAddress"
+                    placeholder="123 Main Street, City, State 12345"
+                    value={formData.businessAddress}
+                    onChange={(e) => setFormData(prev => ({ ...prev, businessAddress: e.target.value }))}
+                    rows={2}
+                    className="glass-effect border-border/50 mt-2"
+                  />
+                </div>
+
+                <div className="glass-effect rounded-xl p-4 border border-border/50">
+                  <Label htmlFor="calendarLink" className="text-base font-medium flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Google Maps Link
+                  </Label>
                   <Input
                     id="calendarLink"
                     type="url"
-                    placeholder="Google Calendar, Calendly, or other calendar link"
+                    placeholder="https://maps.google.com/..."
                     value={formData.calendarLink}
                     onChange={(e) => setFormData(prev => ({ ...prev, calendarLink: e.target.value }))}
-                    data-testid="input-calendar-link"
+                    className="glass-effect border-border/50 mt-2"
                   />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Add your booking calendar link (Google Calendar, Calendly, etc.)
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Add your Google Maps link so customers can easily find you
                   </p>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
 
-            {/* Gallery Section */}
-            <AccordionItem value="gallery" className="border border-border rounded-xl">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center space-x-3">
-                  <Image className="h-4 w-4 text-primary" />
-                  <span className="text-base font-semibold">Gallery</span>
+                <div>
+                  <Label className="text-base font-medium mb-4 block flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Business Hours
+                  </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(formData.businessHours).map(([day, hours]) => (
+                      <div key={day} className="flex items-center space-x-2">
+                        <Label className="w-20 capitalize text-sm">{day}:</Label>
+                        <Input
+                          placeholder="9:00-17:00 or Closed"
+                          value={hours}
+                          onChange={(e) => setFormData(prev => ({ 
+                            ...prev, 
+                            businessHours: { ...prev.businessHours, [day]: e.target.value }
+                          }))}
+                          className="flex-1 glass-effect border-border/50"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-4">
-                  
-                  {/* Main Logo Section */}
-                  <div>
-                    <Label className="flex items-center space-x-2 mb-2">
-                      <Image className="h-4 w-4" />
-                      <span>Main Logo</span>
-                    </Label>
-                    <div 
-                      className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                      onClick={() => !uploadingLogo && document.getElementById('main-logo-upload-modal')?.click()}
-                    >
-                      {logoPreview ? (
-                        <div className="space-y-2">
-                          <img 
-                            src={logoPreview} 
-                            alt="Logo preview" 
-                            className="h-12 w-auto mx-auto rounded-lg border border-border"
-                          />
-                          <p className="text-xs text-muted-foreground">{logoFile?.name}</p>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setLogoPreview('');
-                              setLogoFile(null);
-                              setFormData(prev => ({ ...prev, logoUrl: '' }));
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ) : (
-                        <>
-                          <CloudUpload className={`h-6 w-6 mx-auto mb-2 ${uploadingLogo ? 'animate-pulse text-primary' : 'text-muted-foreground'}`} />
-                          <p className="text-sm text-muted-foreground mb-1">
-                            {uploadingLogo ? 'Uploading...' : 'Drop your main logo here, or'} 
-                            {!uploadingLogo && <span className="text-primary cursor-pointer"> browse</span>}
-                          </p>
-                          <p className="text-xs text-muted-foreground">PNG, JPG up to 2MB</p>
-                        </>
-                      )}
-                      <input
-                        id="main-logo-upload-modal"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={uploadingLogo}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            if (file.size > 2 * 1024 * 1024) {
-                              toast({
-                                title: "File too large",
-                                description: "Please select an image under 2MB",
-                                variant: "destructive"
-                              });
-                              return;
-                            }
-                            handleLogoUpload(file);
-                          }
-                        }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Upload your company or service logo (optional)
-                    </p>
-                  </div>
-                  
-                  {/* Banners Section */}
-                  <div>
-                    <Label className="flex items-center space-x-2 mb-2">
-                      <Image className="h-4 w-4" />
-                      <span>Banner Images</span>
-                    </Label>
-                    <div className="space-y-2">
-                      <div 
-                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                        onClick={() => document.getElementById('banner-upload-modal')?.click()}
-                      >
-                        {uploadingGallery.banners ? (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
-                            <p className="text-sm text-muted-foreground">Uploading banners...</p>
-                          </>
-                        ) : (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-1">Drop banner images here, or <span className="text-primary cursor-pointer">browse</span></p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
-                          </>
-                        )}
-                        <input
-                          id="banner-upload-modal"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          disabled={uploadingGallery.banners}
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              handleGalleryUpload(e.target.files, 'banners');
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      {galleryPreviews.banners.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2">
-                          {galleryPreviews.banners.map((banner, index) => (
-                            <div key={index} className="relative group">
-                              <img 
-                                src={banner.url} 
-                                alt={banner.name}
-                                className="w-full h-16 object-cover rounded-lg border border-border"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                                onClick={() => removeGalleryImage('banners', index)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                              <p className="text-xs text-muted-foreground mt-1 truncate">{banner.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Additional Logos Section */}
-                  <div>
-                    <Label className="flex items-center space-x-2 mb-2">
-                      <Image className="h-4 w-4" />
-                      <span>Logo Variations</span>
-                    </Label>
-                    <div className="space-y-2">
-                      <div 
-                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                        onClick={() => document.getElementById('logos-upload-modal')?.click()}
-                      >
-                        {uploadingGallery.logos ? (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
-                            <p className="text-sm text-muted-foreground">Uploading logos...</p>
-                          </>
-                        ) : (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-1">Drop logo variations here, or <span className="text-primary cursor-pointer">browse</span></p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
-                          </>
-                        )}
-                        <input
-                          id="logos-upload-modal"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          disabled={uploadingGallery.logos}
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              handleGalleryUpload(e.target.files, 'logos');
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      {galleryPreviews.logos.length > 0 && (
-                        <div className="grid grid-cols-3 gap-2">
-                          {galleryPreviews.logos.map((logo, index) => (
-                            <div key={index} className="relative group">
-                              <img 
-                                src={logo.url} 
-                                alt={logo.name}
-                                className="w-full h-12 object-contain rounded-lg border border-border bg-white p-1"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 p-0"
-                                onClick={() => removeGalleryImage('logos', index)}
-                              >
-                                <Trash2 className="h-2 w-2" />
-                              </Button>
-                              <p className="text-xs text-muted-foreground mt-1 truncate">{logo.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* General Images Section */}
-                  <div>
-                    <Label className="flex items-center space-x-2 mb-2">
-                      <Image className="h-4 w-4" />
-                      <span>Additional Images</span>
-                    </Label>
-                    <div className="space-y-2">
-                      <div 
-                        className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                        onClick={() => document.getElementById('images-upload-modal')?.click()}
-                      >
-                        {uploadingGallery.images ? (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 animate-pulse text-primary" />
-                            <p className="text-sm text-muted-foreground">Uploading images...</p>
-                          </>
-                        ) : (
-                          <>
-                            <CloudUpload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-sm text-muted-foreground mb-1">Drop additional images here, or <span className="text-primary cursor-pointer">browse</span></p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB each</p>
-                          </>
-                        )}
-                        <input
-                          id="images-upload-modal"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          disabled={uploadingGallery.images}
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              handleGalleryUpload(e.target.files, 'images');
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      {galleryPreviews.images.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2">
-                          {galleryPreviews.images.map((image, index) => (
-                            <div key={index} className="relative group">
-                              <img 
-                                src={image.url} 
-                                alt={image.name}
-                                className="w-full h-16 object-cover rounded-lg border border-border"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                                onClick={() => removeGalleryImage('images', index)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                              <p className="text-xs text-muted-foreground mt-1 truncate">{image.name}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-          </Accordion>
-          
-          <div className="flex space-x-4 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="flex-1"
-              onClick={onClose}
-              data-testid="button-cancel"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              variant="default"
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-              disabled={createPageMutation.isPending}
-              data-testid={isEditing ? "button-update-page" : "button-create-page"}
-            >
-              {createPageMutation.isPending ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Page' : 'Create Page')}
-            </Button>
+              </CardContent>
+            </Card>
           </div>
-        </form>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-8 glass-prism-card p-6 rounded-2xl border-none shadow-lg animate-fade-in-up">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center">
+                  <span className="text-2xl">🚀</span>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-blue-gradient mb-2">Ready to Launch!</h3>
+              <p className="text-muted-foreground">
+                Review your booking page details below and publish when you're ready
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Basic Information
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Title:</strong> {formData.title || 'Not set'}</p>
+                    <p><strong>URL:</strong> bookinggen.xyz/{formData.slug || 'not-set'}</p>
+                    <p><strong>Tagline:</strong> {formData.tagline || 'None'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Services
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    {formData.services.filter(s => s.name.trim()).map((service, index) => (
+                      <p key={index}>
+                        <strong>{service.name}</strong> - ${service.price} ({service.durationMinutes || 60} min)
+                      </p>
+                    ))}
+                    {formData.services.filter(s => s.name.trim()).length === 0 && (
+                      <p className="text-muted-foreground">No services added</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <Palette className="h-4 w-4 mr-2" />
+                    Styling
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Theme:</strong> {formData.theme}</p>
+                    <p><strong>Logo:</strong> {formData.logoUrl ? 'Uploaded' : 'None'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Contact Info
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Phone:</strong> {formData.contactPhone || 'Not set'}</p>
+                    <p><strong>Email:</strong> {formData.contactEmail || 'Not set'}</p>
+                    <p><strong>Address:</strong> {formData.businessAddress || 'Not set'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col glass-prism-card border-none shadow-2xl animate-scale-in">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-32 h-32 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
+          <div className="absolute top-20 right-20 w-40 h-40 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-20 left-1/3 w-24 h-24 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
+        </div>
+        
+        <DialogHeader className="flex-shrink-0 relative z-10 animate-fade-in-up">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-bold text-blue-gradient flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl glass-prism flex items-center justify-center">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" opacity="0.3"/>
+                  <path d="M21 16L12 21L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 12L12 17L3 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              {isEditing ? 'Edit Booking Page' : 'Create Booking Page'}
+            </DialogTitle>
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="space-y-4 mt-6">
+            <Progress value={getProgress()} className="w-full h-3 glass-effect" />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              {steps.map((step, index) => (
+                <div 
+                  key={step.number} 
+                  className={`flex flex-col items-center transition-all duration-300 ${
+                    currentStep === step.number ? 'text-primary font-medium scale-105' : 
+                    currentStep > step.number ? 'text-green-600' : ''
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
+                    currentStep === step.number 
+                      ? 'glass-prism text-primary shadow-lg' 
+                      : currentStep > step.number
+                      ? 'bg-green-500 text-white'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {currentStep > step.number ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <span className="text-xs font-bold">{step.number}</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-center leading-tight">{step.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <div className="flex-1 overflow-y-auto relative z-10">
+          <div className="p-6">
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center text-blue-gradient shadow-lg">
+                  {steps[currentStep - 1] && (() => {
+                    const StepIcon = steps[currentStep - 1].icon;
+                    return <StepIcon className="h-6 w-6" />;
+                  })()}
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-blue-gradient">
+                {steps[currentStep - 1]?.title}
+              </h2>
+              <p className="text-muted-foreground">
+                {steps[currentStep - 1]?.description}
+              </p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="glass-effect rounded-xl p-6">
+                {renderStepContent()}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6 border-t border-border/20">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="glass-effect hover-lift rounded-xl"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Previous
+                </Button>
+
+                {currentStep < steps.length ? (
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    disabled={!validateStep(currentStep)}
+                    className="glass-prism-button hover-lift rounded-xl"
+                  >
+                    Next
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={createPageMutation.isPending}
+                    className="glass-prism-button hover-lift rounded-xl"
+                  >
+                    {createPageMutation.isPending ? 'Publishing...' : isEditing ? 'Update Page' : 'Create Page'}
+                    <Check className="h-4 w-4 ml-2" />
+                  </Button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
