@@ -36,6 +36,7 @@ export const pages = pgTable("pages", {
   cancellationPolicy: text("cancellation_policy"),
   showBusinessHours: text("show_business_hours").default("true"),
   showContactInfo: text("show_contact_info").default("true"),
+  gallery: jsonb("gallery").default(sql`'[]'`), // Array of gallery images
   data: jsonb("data"),
   published: boolean("published").default(false),
   createdAt: timestamp("created_at").default(sql`now()`),
