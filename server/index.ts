@@ -6,6 +6,14 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// CRITICAL: Register webhook route with raw body BEFORE JSON parser
+// This prevents express.json() from consuming the raw body needed for signature verification
+app.post("/api/razorpay/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+  const { handleRazorpayWebhook } = await import("./razorpay");
+  await handleRazorpayWebhook(req, res);
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

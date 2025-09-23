@@ -763,6 +763,140 @@ export class SupabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Orders (for Razorpay payment verification)
+  // Store order data temporarily in memory with database backup for persistence
+  private orderCache = new Map<string, any>();
+
+  async createOrder(order: any): Promise<any> {
+    try {
+      const orderData = {
+        ...order,
+        createdAt: new Date().toISOString()
+      };
+      
+      // Store in memory cache for quick verification
+      this.orderCache.set(order.orderId, orderData);
+      
+      // Also store as backup in payments table for persistence
+      await this.createPayment({
+        userId: order.userId,
+        plan: order.plan,
+        amount: order.amount.toString(),
+        status: "pending_verification",
+        paymentId: order.orderId,
+        paymentMethod: "razorpay_order",
+        meta: {
+          orderId: order.orderId,
+          isOrderVerification: true,
+          used: false,
+          currency: order.currency,
+          createdAt: orderData.createdAt
+        }
+      });
+      
+      return orderData;
+    } catch (error) {
+      console.error("Create order error:", error);
+      throw error;
+    }
+  }
+
+  async getOrder(id: string): Promise<any | undefined> {
+    try {
+      // First try memory cache
+      const cached = this.orderCache.get(id);
+      if (cached) return cached;
+      
+      // Fallback to database backup
+      const { data, error } = await supabase
+        .from('payments_demo')
+        .select('*')
+        .eq('payment_id', id)
+        .eq('status', 'pending_verification')
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data && data.meta && data.meta.isOrderVerification) {
+        const orderData = {
+          orderId: data.payment_id,
+          userId: data.user_id,
+          plan: data.plan,
+          amount: parseFloat(data.amount),
+          currency: data.meta.currency || 'USD',
+          createdAt: data.meta.createdAt,
+          used: data.status === 'used' || data.meta.used || false
+        };
+        
+        // Only cache non-used orders to avoid replay
+        if (!orderData.used) {
+          this.orderCache.set(id, orderData);
+        }
+        return orderData;
+      }
+      
+      return undefined;
+    } catch (error) {
+      console.error("Get order error:", error);
+      return undefined;
+    }
+  }
+
+  async updateOrder(id: string, updates: any): Promise<any | undefined> {
+    try {
+      // Update memory cache
+      const cached = this.orderCache.get(id);
+      if (cached) {
+        const updated = { ...cached, ...updates };
+        this.orderCache.set(id, updated);
+        
+        // CRITICAL: Also persist to database to prevent replay attacks after restart
+        if (updates.used) {
+          // Fetch existing record to merge meta data
+          const { data: existingRecord } = await supabase
+            .from('payments_demo')
+            .select('meta')
+            .eq('payment_id', id)
+            .eq('status', 'pending_verification')
+            .single();
+          
+          // Merge existing meta with used flag
+          const updatedMeta = {
+            ...(existingRecord?.meta || {}),
+            used: true,
+            usedAt: new Date().toISOString()
+          };
+          
+          // Mark order as used in database backup
+          const { data, error, count } = await supabase
+            .from('payments_demo')
+            .update({
+              status: 'used',
+              meta: updatedMeta
+            })
+            .eq('payment_id', id)
+            .eq('status', 'pending_verification')
+            .select('id', { count: 'exact' });
+          
+          if (error || count !== 1) {
+            console.error('Failed to persist order used flag:', error || 'No rows affected');
+            throw new Error('Failed to prevent payment replay - security risk');
+          }
+          
+          // Clean up cache after successful DB update
+          setTimeout(() => this.orderCache.delete(id), 2000);
+        }
+        
+        return updated;
+      }
+      
+      return undefined;
+    } catch (error) {
+      console.error("Update order error:", error);
+      return undefined;
+    }
+  }
 }
 
 console.log("✅ SupabaseStorage class ready");

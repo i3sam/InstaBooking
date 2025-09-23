@@ -21,25 +21,7 @@ if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
   console.warn('Razorpay credentials not found - Razorpay payments will be unavailable');
 }
 
-// In-memory storage (in production, use a database)
-const orderStore = new Map<string, {
-  orderId: string;
-  userId: string;
-  plan: string;
-  amount: number;
-  currency: string;
-  createdAt: Date;
-  used: boolean;
-}>();
-
-const subscriptionStore = new Map<string, {
-  subscriptionId: string;
-  planId: string;
-  userId: string;
-  plan: string;
-  status: string;
-  createdAt: Date;
-}>();
+// Storage now handled by Supabase via storage.ts interface
 
 // Cache for subscription plans
 let subscriptionPlans: Map<string, string> = new Map();
@@ -116,14 +98,16 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       }
     }) as any;
 
-    // Store subscription details
-    subscriptionStore.set(subscription.id, {
-      subscriptionId: subscription.id,
-      planId: planId,
+    // Store subscription details in Supabase
+    await storage.createSubscription({
+      id: subscription.id,
       userId: authReq.user.userId,
-      plan: plan,
+      planId: planId,
+      planName: plan,  // Keep planName for schema compatibility
+      plan: plan,      // Add plan field for consumer compatibility
       status: subscription.status,
-      createdAt: new Date()
+      razorpaySubscriptionId: subscription.id,
+      razorpayPlanId: planId
     });
 
     console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId}`);
@@ -183,14 +167,13 @@ export async function createRazorpayOrder(req: Request, res: Response) {
 
     const order = await razorpay.orders.create(options);
     
-    // Store order details tied to user
-    orderStore.set(order.id, {
+    // Store order details in Supabase storage
+    await storage.createOrder({
       orderId: order.id,
       userId: authReq.user.userId,
       plan: plan,
       amount: planConfig.amount,
       currency: planConfig.currency,
-      createdAt: new Date(),
       used: false
     });
     
@@ -221,7 +204,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     }
 
     // Check if subscription belongs to user
-    const storedSub = subscriptionStore.get(subscriptionId);
+    const storedSub = await storage.getSubscription(subscriptionId);
     if (!storedSub || storedSub.userId !== authReq.user.userId) {
       return res.status(404).json({ error: "Subscription not found" });
     }
@@ -229,9 +212,10 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     // Fetch current status from Razorpay
     const subscription = await razorpay.subscriptions.fetch(subscriptionId);
     
-    // Update local store
-    storedSub.status = subscription.status;
-    subscriptionStore.set(subscriptionId, storedSub);
+    // Update subscription status in database
+    await storage.updateSubscription(subscriptionId, {
+      status: subscription.status
+    });
 
     // If subscription is active and user is not pro, update profile
     if (subscription.status === 'active') {
@@ -273,9 +257,9 @@ export async function handleRazorpayWebhook(req: Request, res: Response) {
       return res.status(400).json({ error: 'Webhook secret not configured' });
     }
 
-    // Verify webhook signature using raw body
+    // Verify webhook signature using raw body (Buffer from express.raw)
     const expectedSignature = crypto.createHmac('sha256', webhookSecret)
-      .update(req.body, 'utf8')
+      .update(req.body)
       .digest('hex');
 
     if (expectedSignature !== webhookSignature) {
@@ -314,9 +298,9 @@ export async function handleRazorpayWebhook(req: Request, res: Response) {
 // Webhook event handlers
 async function handleSubscriptionCharged(subscription: any, payment: any) {
   try {
-    const storedSub = subscriptionStore.get(subscription.id);
+    const storedSub = await storage.getSubscription(subscription.id);
     if (!storedSub) {
-      console.warn(`Subscription ${subscription.id} not found in store`);
+      console.warn(`Subscription ${subscription.id} not found in database`);
       return;
     }
 
@@ -345,6 +329,11 @@ async function handleSubscriptionCharged(subscription: any, payment: any) {
       membershipExpires: expiresAt.toISOString()
     });
 
+    // Update subscription status in database
+    await storage.updateSubscription(subscription.id, {
+      status: subscription.status
+    });
+
     console.log(`✅ Subscription payment processed for user ${storedSub.userId}`);
   } catch (error) {
     console.error('Failed to process subscription charge:', error);
@@ -357,10 +346,11 @@ async function handleSubscriptionCompleted(subscription: any) {
 
 async function handleSubscriptionCancelled(subscription: any) {
   try {
-    const storedSub = subscriptionStore.get(subscription.id);
+    const storedSub = await storage.getSubscription(subscription.id);
     if (storedSub) {
-      storedSub.status = 'cancelled';
-      subscriptionStore.set(subscription.id, storedSub);
+      await storage.updateSubscription(subscription.id, {
+        status: 'cancelled'
+      });
       console.log(`Subscription cancelled: ${subscription.id}`);
     }
   } catch (error) {
@@ -370,10 +360,11 @@ async function handleSubscriptionCancelled(subscription: any) {
 
 async function handleSubscriptionPaused(subscription: any) {
   try {
-    const storedSub = subscriptionStore.get(subscription.id);
+    const storedSub = await storage.getSubscription(subscription.id);
     if (storedSub) {
-      storedSub.status = 'paused';
-      subscriptionStore.set(subscription.id, storedSub);
+      await storage.updateSubscription(subscription.id, {
+        status: 'paused'
+      });
       console.log(`Subscription paused: ${subscription.id}`);
     }
   } catch (error) {
@@ -412,7 +403,7 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
     }
 
     // Check if order exists and belongs to this user
-    const storedOrder = orderStore.get(razorpayOrderId);
+    const storedOrder = await storage.getOrder(razorpayOrderId);
     if (!storedOrder) {
       return res.status(404).json({ error: "Order not found" });
     }
@@ -450,8 +441,7 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
     }
 
     // Mark order as used
-    storedOrder.used = true;
-    orderStore.set(razorpayOrderId, storedOrder);
+    await storage.updateOrder(razorpayOrderId, { used: true });
 
     // Store payment record using trusted values from Razorpay and server config
     await storage.createPayment({

@@ -44,6 +44,11 @@ export interface IStorage {
   updateSubscription(id: string, updates: any): Promise<any | undefined>;
   cancelSubscription(id: string): Promise<boolean>;
   
+  // Orders (for Razorpay payment verification)
+  createOrder(order: any): Promise<any>;
+  getOrder(id: string): Promise<any | undefined>;
+  updateOrder(id: string, updates: any): Promise<any | undefined>;
+  
   // Demo Pages
   createDemoPage(demoData: any, ownerId?: string): Promise<any>;
   getDemoPage(id: string): Promise<any | undefined>;
