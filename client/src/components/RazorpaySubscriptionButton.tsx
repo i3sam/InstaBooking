@@ -9,6 +9,7 @@ interface RazorpaySubscriptionButtonProps {
   onSuccess?: (subscriptionId: string) => void;
   onError?: (error: any) => void;
   onCancel?: () => void;
+  onPaymentStart?: () => void;
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -25,6 +26,7 @@ export default function RazorpaySubscriptionButton({
   onSuccess,
   onError,
   onCancel,
+  onPaymentStart,
   disabled = false,
   className = "",
   children = "Pay with Credit / Debit card"
@@ -141,6 +143,11 @@ export default function RazorpaySubscriptionButton({
       // Open Razorpay subscription checkout
       const razorpayInstance = new window.Razorpay(options);
       razorpayInstance.open();
+
+      // Call onPaymentStart callback to notify parent component that payment popup has opened
+      if (onPaymentStart) {
+        onPaymentStart();
+      }
 
     } catch (error) {
       console.error('Subscription initialization failed:', error);

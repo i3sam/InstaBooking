@@ -187,6 +187,10 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                             variant: "default",
                           });
                         }}
+                        onPaymentStart={() => {
+                          // Close the upgrade modal when RazorPay popup opens
+                          onClose();
+                        }}
                         className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 hover:from-green-200 hover:via-green-300 hover:to-green-400 dark:hover:from-green-700 dark:hover:via-green-600 dark:hover:to-green-500 text-green-800 dark:text-green-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
                       >
                         Pay with Credit / Debit card
