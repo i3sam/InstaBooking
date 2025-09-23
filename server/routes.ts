@@ -343,8 +343,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Validate request body
-      const validation = insertPageSchema.safeParse(req.body);
+      // Extract services from request body before validation
+      const { services, ...pageDataFromRequest } = req.body;
+      
+      // Validate page data (without services)
+      const validation = insertPageSchema.safeParse(pageDataFromRequest);
       if (!validation.success) {
         return res.status(400).json({ 
           message: "Validation failed", 
@@ -353,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const pageData = {
-        ...req.body,
+        ...pageDataFromRequest,
         ownerId: req.user.userId
       };
 
@@ -366,8 +369,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = await storage.createPage(pageData);
       
       // Create services if provided
-      if (req.body.services && Array.isArray(req.body.services)) {
-        for (const service of req.body.services) {
+      if (services && Array.isArray(services)) {
+        for (const service of services) {
           await storage.createService({
             ...service,
             pageId: page.id
