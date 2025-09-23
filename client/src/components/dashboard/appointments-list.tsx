@@ -7,12 +7,17 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { useRealtimeAppointments } from '@/hooks/useRealtimeSubscription';
+import { getUserAppointments } from '@/lib/supabase-queries';
 
 export default function AppointmentsList() {
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  // Use direct Supabase client for user's appointments data
   const { data: appointments = [], isLoading } = useQuery<any[]>({
-    queryKey: ['/api/appointments'],
+    queryKey: [`user-appointments-${user?.id}`],
+    queryFn: getUserAppointments,
+    enabled: !!user?.id,
   });
 
   // Enable real-time subscriptions for live appointment updates
@@ -24,7 +29,7 @@ export default function AppointmentsList() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      queryClient.invalidateQueries({ queryKey: [`user-appointments-${user?.id}`] });
       toast({
         title: "Success",
         description: "Appointment status updated successfully",

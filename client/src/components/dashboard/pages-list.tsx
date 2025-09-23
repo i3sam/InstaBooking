@@ -20,6 +20,8 @@ import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
+import { getUserPages } from '@/lib/supabase-queries';
+import { useRealtimePages } from '@/hooks/useRealtimeSubscription';
 
 export default function PagesList() {
   const [, setLocation] = useLocation();
@@ -30,15 +32,21 @@ export default function PagesList() {
   const [launchingPageId, setLaunchingPageId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+
+  // Enable real-time subscriptions for live page updates
+  const { isConnected: isRealtimeConnected } = useRealtimePages(user?.id);
 
   // Check if user has Pro membership and it hasn't expired
   const now = new Date();
   const membershipExpired = profile?.membershipExpires && new Date(profile.membershipExpires) <= now;
   const isProUser = profile?.membershipStatus === 'pro' && !membershipExpired;
 
+  // Use direct Supabase client for user's pages data
   const { data: pages = [], isLoading } = useQuery<any[]>({
-    queryKey: ['/api/pages'],
+    queryKey: [`user-pages-${user?.id}`],
+    queryFn: getUserPages,
+    enabled: !!user?.id,
   });
 
   const deleteMutation = useMutation({
@@ -46,7 +54,7 @@ export default function PagesList() {
       return apiRequest('DELETE', `/api/pages/${pageId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      queryClient.invalidateQueries({ queryKey: [`user-pages-${user?.id}`] });
       toast({
         title: "Page deleted",
         description: "Your booking page has been successfully deleted.",
@@ -68,7 +76,7 @@ export default function PagesList() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      queryClient.invalidateQueries({ queryKey: [`user-pages-${user?.id}`] });
       toast({
         title: "Page launched!",
         description: "Your booking page is now live and accepting appointments.",

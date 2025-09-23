@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
+import { getPublicPageBySlug, getPublicServicesByPageId, getPublicReviewsByPageId } from '@/lib/supabase-queries';
 import BookingModal from '@/components/modals/booking-modal';
 import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -33,14 +34,23 @@ export default function PublicBooking() {
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Use direct Supabase client for public page data
   const { data: pageData, isLoading, error } = useQuery<any>({
-    queryKey: [`/api/pages/${slug}`],
+    queryKey: [`public-page-${slug}`],
+    queryFn: () => getPublicPageBySlug(slug!),
     enabled: !!slug,
   });
 
-  // Fetch reviews for this page
+  // Fetch services and reviews for this page using direct Supabase client
+  const { data: pageServices = [] } = useQuery<any[]>({
+    queryKey: [`public-services-${pageData?.id}`],
+    queryFn: () => getPublicServicesByPageId(pageData?.id),
+    enabled: !!pageData?.id,
+  });
+
   const { data: reviews = [] } = useQuery<any[]>({
-    queryKey: [`/api/reviews/${pageData?.id}`],
+    queryKey: [`public-reviews-${pageData?.id}`],
+    queryFn: () => getPublicReviewsByPageId(pageData?.id),
     enabled: !!pageData?.id,
   });
 
@@ -61,7 +71,7 @@ export default function PublicBooking() {
         rating: 0,
         reviewText: ''
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/reviews/${pageData?.id}`] });
+      queryClient.invalidateQueries({ queryKey: [`public-reviews-${pageData?.id}`] });
     },
     onError: (error: any) => {
       toast({
@@ -288,7 +298,7 @@ export default function PublicBooking() {
   }
 
   const page = pageData;
-  const services = pageData.services || [];
+  const services = pageServices;
   const faqs = pageData.faqs || [];
   const gallery = pageData.data?.gallery || pageData.gallery || { banners: [], logos: [], images: [] };
   const themeStyles = page ? getThemeStyles(page) : null;

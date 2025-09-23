@@ -1,0 +1,200 @@
+import { supabase } from './supabase';
+
+/**
+ * Direct Supabase client operations for public and user-owned data
+ * These operations bypass the API layer and use RLS policies for security
+ */
+
+// Public page operations for booking pages
+export async function getPublicPageBySlug(slug: string) {
+  if (!slug) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single();
+
+    if (error) {
+      console.error('Error fetching public page:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getPublicPageBySlug:', error);
+    return null;
+  }
+}
+
+// Public services for a published page
+export async function getPublicServicesByPageId(pageId: string) {
+  if (!pageId) return [];
+  
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('page_id', pageId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching public services:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getPublicServicesByPageId:', error);
+    return [];
+  }
+}
+
+// Public approved reviews for a page
+export async function getPublicReviewsByPageId(pageId: string) {
+  if (!pageId) return [];
+  
+  try {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('page_id', pageId)
+      .eq('is_approved', 'approved')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching public reviews:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getPublicReviewsByPageId:', error);
+    return [];
+  }
+}
+
+// User's own profile (RLS enforced)
+export async function getUserProfile() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
+    return null;
+  }
+}
+
+// User's own pages (RLS enforced)
+export async function getUserPages() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('pages')
+      .select('*')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user pages:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getUserPages:', error);
+    return [];
+  }
+}
+
+// User's own appointments (RLS enforced)
+export async function getUserAppointments() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user appointments:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getUserAppointments:', error);
+    return [];
+  }
+}
+
+// Get services for a user's page (for page editing)
+export async function getUserPageServices(pageId: string) {
+  if (!pageId) return [];
+  
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return [];
+    }
+
+    // First verify the user owns this page
+    const { data: page } = await supabase
+      .from('pages')
+      .select('id')
+      .eq('id', pageId)
+      .eq('owner_id', user.id)
+      .single();
+      
+    if (!page) {
+      console.warn('User does not own this page or page not found');
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('page_id', pageId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching page services:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getUserPageServices:', error);
+    return [];
+  }
+}
