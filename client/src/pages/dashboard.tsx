@@ -629,7 +629,7 @@ function SettingsSection() {
   const handleCancelSubscription = async () => {
     setCancelSubscriptionLoading(true);
     try {
-      const response = await apiRequest('POST', '/api/payments/cancel-subscription', {});
+      const response = await apiRequest('POST', '/api/razorpay/cancel-subscription', {});
       if (response.ok) {
         queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
         toast({

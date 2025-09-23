@@ -484,3 +484,56 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
     res.status(500).json({ error: "Payment verification failed." });
   }
 }
+
+// Cancel subscription
+export async function cancelRazorpaySubscription(req: Request, res: Response) {
+  try {
+    if (!razorpay) {
+      return res.status(503).json({ error: "Razorpay service not available" });
+    }
+
+    const authReq = req as any;
+    
+    if (!authReq.user || !authReq.user.userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Get user's active subscriptions
+    const userSubscriptions = await storage.getSubscriptionsByUser(authReq.user.userId);
+    const activeSubscription = userSubscriptions.find(sub => 
+      sub.status === 'active' || sub.status === 'ACTIVE'
+    );
+
+    if (!activeSubscription) {
+      return res.status(404).json({ error: "No active subscription found" });
+    }
+
+    // Check if subscription is already cancelled or scheduled for cancellation
+    if (activeSubscription.status === 'cancelled' || activeSubscription.status === 'CANCELLED') {
+      return res.status(409).json({ 
+        error: "Subscription is already cancelled",
+        message: "Your subscription has already been cancelled."
+      });
+    }
+
+    // Cancel with Razorpay - use 1 instead of true for cancel_at_cycle_end
+    await razorpay.subscriptions.cancel(activeSubscription.id, {
+      cancel_at_cycle_end: 1 // Let subscription run until end of billing period
+    });
+
+    // Do NOT update subscription status or user profile here
+    // Let the webhook handle the final cancellation when the period ends
+    // The subscription should remain 'active' until Razorpay sends the cancellation webhook
+
+    console.log(`✅ Subscription cancelled: ${activeSubscription.id} for user ${authReq.user.userId}`);
+    
+    res.json({
+      success: true,
+      message: "Subscription cancelled successfully. You'll continue to have access until the end of your billing period.",
+      subscriptionId: activeSubscription.id
+    });
+  } catch (error) {
+    console.error("Failed to cancel Razorpay subscription:", error);
+    res.status(500).json({ error: "Failed to cancel subscription." });
+  }
+}

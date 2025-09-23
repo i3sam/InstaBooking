@@ -1240,6 +1240,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await getRazorpaySubscription(req, res);
     });
 
+    app.post("/api/razorpay/cancel-subscription", verifyToken, async (req, res) => {
+      const { cancelRazorpaySubscription } = await import("./razorpay");
+      await cancelRazorpaySubscription(req, res);
+    });
+
     // Webhook route moved to server/index.ts for proper middleware ordering
     // This ensures express.raw() runs BEFORE express.json() for signature verification
 
