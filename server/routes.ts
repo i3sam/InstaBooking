@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from 'express';
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 // Removed PostgreSQL schema imports - using Supabase directly
@@ -6,7 +7,7 @@ import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { createSubscription, getSubscription, cancelSubscription, handleWebhook } from "./paypalSubscriptions";
-import { createRazorpayOrder, verifyRazorpayPayment } from "./razorpay";
+import { createRazorpayOrder, verifyRazorpayPayment, createRazorpaySubscription, handleRazorpayWebhook, getRazorpaySubscription } from "./razorpay";
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema, insertDemoPageSchema, insertServiceSchema } from '@shared/schema';
@@ -1118,9 +1119,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.post("/api/razorpay/verify", verifyToken, async (req, res) => {
       await verifyRazorpayPayment(req, res);
     });
-    console.log("Razorpay payment routes registered successfully");
+
+    app.post("/api/razorpay/subscriptions", verifyToken, async (req, res) => {
+      await createRazorpaySubscription(req, res);
+    });
+
+    app.get("/api/razorpay/subscriptions/:subscriptionId", verifyToken, async (req, res) => {
+      await getRazorpaySubscription(req, res);
+    });
+
+    app.post("/api/razorpay/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+      await handleRazorpayWebhook(req, res);
+    });
+
+    console.log("Razorpay payment and subscription routes registered successfully");
   } else {
-    console.warn("Razorpay credentials not found - Razorpay payment routes not registered");
+    console.warn("Razorpay credentials not found - Razorpay routes not registered");
   }
 
   // Associate anonymous demo with user account

@@ -21,7 +21,7 @@ if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
   console.warn('Razorpay credentials not found - Razorpay payments will be unavailable');
 }
 
-// In-memory order storage (in production, use a database)
+// In-memory storage (in production, use a database)
 const orderStore = new Map<string, {
   orderId: string;
   userId: string;
@@ -31,6 +31,115 @@ const orderStore = new Map<string, {
   createdAt: Date;
   used: boolean;
 }>();
+
+const subscriptionStore = new Map<string, {
+  subscriptionId: string;
+  planId: string;
+  userId: string;
+  plan: string;
+  status: string;
+  createdAt: Date;
+}>();
+
+// Cache for subscription plans
+let subscriptionPlans: Map<string, string> = new Map();
+
+// Create subscription plan if it doesn't exist
+export async function createSubscriptionPlan(planName: string, amount: number, currency: string): Promise<string> {
+  if (!razorpay) {
+    throw new Error('Razorpay not initialized');
+  }
+
+  try {
+    // Check if plan already exists
+    if (subscriptionPlans.has(planName)) {
+      return subscriptionPlans.get(planName)!;
+    }
+
+    const plan = await razorpay.plans.create({
+      period: 'monthly',
+      interval: 1,
+      item: {
+        name: `${planName.charAt(0).toUpperCase() + planName.slice(1)} Plan`,
+        description: `Monthly ${planName} subscription`,
+        amount: Math.round(amount * 100), // Convert to smallest unit
+        currency: currency
+      },
+      notes: {
+        plan: planName,
+        type: 'subscription'
+      }
+    });
+
+    subscriptionPlans.set(planName, plan.id);
+    console.log(`✅ Razorpay subscription plan created: ${plan.id} for ${planName}`);
+    return plan.id;
+  } catch (error) {
+    console.error('Failed to create Razorpay subscription plan:', error);
+    throw error;
+  }
+}
+
+// Create subscription
+export async function createRazorpaySubscription(req: Request, res: Response) {
+  try {
+    if (!razorpay) {
+      return res.status(503).json({ error: "Razorpay service not available" });
+    }
+
+    const { plan = 'pro' } = req.body;
+    const authReq = req as any;
+    
+    if (!authReq.user || !authReq.user.userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Server-side pricing
+    const planConfig = PLAN_PRICING[plan];
+    if (!planConfig) {
+      return res.status(400).json({ error: "Invalid plan" });
+    }
+
+    // Create subscription plan if needed
+    const planId = await createSubscriptionPlan(plan, planConfig.amount, planConfig.currency);
+
+    // Create subscription
+    const subscription = await razorpay.subscriptions.create({
+      plan_id: planId,
+      customer_notify: 1,
+      quantity: 1,
+      total_count: 120, // 120 monthly payments (10 years)
+      notes: {
+        userId: authReq.user.userId,
+        plan: plan,
+        serverAmount: planConfig.amount.toString()
+      }
+    }) as any;
+
+    // Store subscription details
+    subscriptionStore.set(subscription.id, {
+      subscriptionId: subscription.id,
+      planId: planId,
+      userId: authReq.user.userId,
+      plan: plan,
+      status: subscription.status,
+      createdAt: new Date()
+    });
+
+    console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId}`);
+    
+    res.json({
+      subscriptionId: subscription.id,
+      planId: planId,
+      status: subscription.status,
+      short_url: subscription.short_url,
+      key: RAZORPAY_KEY_ID
+    });
+  } catch (error) {
+    console.error("Failed to create Razorpay subscription:", error);
+    res.status(500).json({ error: "Failed to create subscription." });
+  }
+}
 
 export async function createRazorpayOrder(req: Request, res: Response) {
   try {
@@ -54,15 +163,21 @@ export async function createRazorpayOrder(req: Request, res: Response) {
     // Convert amount to smallest currency unit (cents for USD)
     const amountInSmallestUnit = Math.round(planConfig.amount * 100);
 
+    // Generate short receipt (max 40 chars) - use timestamp + short user ID hash
+    const shortUserId = authReq.user.userId.substring(0, 8);
+    const timestamp = Date.now();
+    const receipt = `rcpt_${timestamp}_${shortUserId}`;
+    
     const options = {
       amount: amountInSmallestUnit,
       currency: planConfig.currency,
-      receipt: `receipt_${Date.now()}_${authReq.user.userId}`,
+      receipt: receipt,
       notes: {
         plan: plan,
         userId: authReq.user.userId,
         serverAmount: planConfig.amount.toString(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        subscriptionType: 'monthly'
       }
     };
 
@@ -88,6 +203,181 @@ export async function createRazorpayOrder(req: Request, res: Response) {
   } catch (error) {
     console.error("Failed to create Razorpay order:", error);
     res.status(500).json({ error: "Failed to create order." });
+  }
+}
+
+// Get subscription status
+export async function getRazorpaySubscription(req: Request, res: Response) {
+  try {
+    if (!razorpay) {
+      return res.status(503).json({ error: "Razorpay service not available" });
+    }
+
+    const { subscriptionId } = req.params;
+    const authReq = req as any;
+    
+    if (!authReq.user || !authReq.user.userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Check if subscription belongs to user
+    const storedSub = subscriptionStore.get(subscriptionId);
+    if (!storedSub || storedSub.userId !== authReq.user.userId) {
+      return res.status(404).json({ error: "Subscription not found" });
+    }
+
+    // Fetch current status from Razorpay
+    const subscription = await razorpay.subscriptions.fetch(subscriptionId);
+    
+    // Update local store
+    storedSub.status = subscription.status;
+    subscriptionStore.set(subscriptionId, storedSub);
+
+    // If subscription is active and user is not pro, update profile
+    if (subscription.status === 'active') {
+      const profile = await storage.getProfile(authReq.user.userId);
+      if (profile && profile.membershipStatus !== 'pro') {
+        const planConfig = PLAN_PRICING[storedSub.plan];
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
+
+        await storage.updateProfile(authReq.user.userId, {
+          membershipStatus: 'pro',
+          membershipExpires: expiresAt.toISOString()
+        });
+
+        console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check`);
+      }
+    }
+
+    res.json({
+      subscriptionId: subscription.id,
+      status: subscription.status,
+      planId: storedSub.planId,
+      plan: storedSub.plan
+    });
+  } catch (error) {
+    console.error('Failed to get Razorpay subscription:', error);
+    res.status(500).json({ error: 'Failed to get subscription status' });
+  }
+}
+
+// Handle subscription webhook
+export async function handleRazorpayWebhook(req: Request, res: Response) {
+  try {
+    const webhookSignature = req.headers['x-razorpay-signature'] as string;
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.warn('Razorpay webhook secret not configured');
+      return res.status(400).json({ error: 'Webhook secret not configured' });
+    }
+
+    // Verify webhook signature using raw body
+    const expectedSignature = crypto.createHmac('sha256', webhookSecret)
+      .update(req.body, 'utf8')
+      .digest('hex');
+
+    if (expectedSignature !== webhookSignature) {
+      console.warn('Invalid webhook signature received');
+      return res.status(400).json({ error: 'Invalid webhook signature' });
+    }
+
+    // Parse JSON after signature verification
+    const event = JSON.parse(req.body.toString());
+
+    console.log('Razorpay webhook received:', event.event);
+
+    // Handle subscription events
+    switch (event.event) {
+      case 'subscription.charged':
+        await handleSubscriptionCharged(event.payload.subscription.entity, event.payload.payment.entity);
+        break;
+      case 'subscription.completed':
+        await handleSubscriptionCompleted(event.payload.subscription.entity);
+        break;
+      case 'subscription.cancelled':
+        await handleSubscriptionCancelled(event.payload.subscription.entity);
+        break;
+      case 'subscription.paused':
+        await handleSubscriptionPaused(event.payload.subscription.entity);
+        break;
+    }
+
+    res.json({ status: 'ok' });
+  } catch (error) {
+    console.error('Razorpay webhook error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+}
+
+// Webhook event handlers
+async function handleSubscriptionCharged(subscription: any, payment: any) {
+  try {
+    const storedSub = subscriptionStore.get(subscription.id);
+    if (!storedSub) {
+      console.warn(`Subscription ${subscription.id} not found in store`);
+      return;
+    }
+
+    // Update user membership
+    const planConfig = PLAN_PRICING[storedSub.plan];
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
+
+    await storage.createPayment({
+      userId: storedSub.userId,
+      plan: storedSub.plan,
+      amount: (payment.amount / 100).toString(), // Convert from smallest unit
+      status: "completed",
+      paymentId: payment.id,
+      paymentMethod: "razorpay_subscription",
+      meta: {
+        razorpay_subscription_id: subscription.id,
+        razorpay_payment_id: payment.id,
+        subscription_status: subscription.status,
+        completedAt: new Date().toISOString()
+      }
+    });
+
+    await storage.updateProfile(storedSub.userId, {
+      membershipStatus: 'pro',
+      membershipExpires: expiresAt.toISOString()
+    });
+
+    console.log(`✅ Subscription payment processed for user ${storedSub.userId}`);
+  } catch (error) {
+    console.error('Failed to process subscription charge:', error);
+  }
+}
+
+async function handleSubscriptionCompleted(subscription: any) {
+  console.log(`Subscription completed: ${subscription.id}`);
+}
+
+async function handleSubscriptionCancelled(subscription: any) {
+  try {
+    const storedSub = subscriptionStore.get(subscription.id);
+    if (storedSub) {
+      storedSub.status = 'cancelled';
+      subscriptionStore.set(subscription.id, storedSub);
+      console.log(`Subscription cancelled: ${subscription.id}`);
+    }
+  } catch (error) {
+    console.error('Failed to handle subscription cancellation:', error);
+  }
+}
+
+async function handleSubscriptionPaused(subscription: any) {
+  try {
+    const storedSub = subscriptionStore.get(subscription.id);
+    if (storedSub) {
+      storedSub.status = 'paused';
+      subscriptionStore.set(subscription.id, storedSub);
+      console.log(`Subscription paused: ${subscription.id}`);
+    }
+  } catch (error) {
+    console.error('Failed to handle subscription pause:', error);
   }
 }
 

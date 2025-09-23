@@ -1,0 +1,181 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { CreditCard, Loader2 } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+
+interface RazorpaySubscriptionButtonProps {
+  plan?: string;
+  onSuccess?: (subscriptionId: string) => void;
+  onError?: (error: any) => void;
+  onCancel?: () => void;
+  disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+export default function RazorpaySubscriptionButton({
+  plan = 'pro',
+  onSuccess,
+  onError,
+  onCancel,
+  disabled = false,
+  className = "",
+  children = "Subscribe with Card"
+}: RazorpaySubscriptionButtonProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+
+  // Load Razorpay SDK
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubscription = async () => {
+    try {
+      setIsProcessing(true);
+
+      // Load Razorpay script if not already loaded
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Failed to load Razorpay checkout script');
+      }
+
+      // Create subscription on backend
+      const response = await apiRequest('POST', '/api/razorpay/subscriptions', {
+        plan: plan
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create subscription');
+      }
+
+      const subscriptionData = await response.json();
+
+      // Configure Razorpay subscription options
+      const options = {
+        key: subscriptionData.key,
+        subscription_id: subscriptionData.subscriptionId,
+        name: 'BookingGen Pro',
+        description: 'Monthly Pro Subscription - $14.99/month',
+        handler: async (response: any) => {
+          try {
+            console.log('Razorpay subscription response:', response);
+            
+            // Check subscription status immediately for better UX
+            try {
+              const statusResponse = await apiRequest('GET', `/api/razorpay/subscriptions/${subscriptionData.subscriptionId}`);
+              if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                console.log('Subscription status:', statusData);
+              }
+            } catch (statusError) {
+              console.warn('Failed to check subscription status:', statusError);
+            }
+            
+            toast({
+              title: "Subscription Created!",
+              description: "Your monthly Pro subscription is now active.",
+            });
+
+            if (onSuccess) {
+              onSuccess(subscriptionData.subscriptionId);
+            }
+          } catch (error) {
+            console.error('Subscription handler error:', error);
+            toast({
+              title: "Subscription Setup Failed",
+              description: "There was an issue setting up your subscription. Please contact support.",
+              variant: "destructive",
+            });
+
+            if (onError) {
+              onError(error);
+            }
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        notes: {
+          plan: plan,
+          type: 'subscription'
+        },
+        theme: {
+          color: '#2563eb'
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessing(false);
+            toast({
+              title: "Subscription Cancelled",
+              description: "You can try again anytime.",
+            });
+            
+            if (onCancel) {
+              onCancel();
+            }
+          }
+        }
+      };
+
+      // Open Razorpay subscription checkout
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
+
+    } catch (error) {
+      console.error('Subscription initialization failed:', error);
+      setIsProcessing(false);
+      
+      toast({
+        title: "Subscription Failed",
+        description: error instanceof Error ? error.message : "Failed to initialize subscription. Please try again.",
+        variant: "destructive",
+      });
+
+      if (onError) {
+        onError(error);
+      }
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleSubscription}
+      disabled={disabled || isProcessing}
+      className={className}
+      data-testid="button-razorpay-subscription"
+    >
+      {isProcessing ? (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          Setting up subscription...
+        </>
+      ) : (
+        <>
+          <CreditCard className="h-4 w-4 mr-2" />
+          {children}
+        </>
+      )}
+    </Button>
+  );
+}

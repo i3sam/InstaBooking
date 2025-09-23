@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
 import SubscriptionButton from '@/components/SubscriptionButton';
-import RazorpayButton from '@/components/RazorpayButton';
+import RazorpaySubscriptionButton from '@/components/RazorpaySubscriptionButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -171,27 +171,27 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                           <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">Credit/Debit Card</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">One-time payment of {formatPrice(14.99)}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">30 days Pro access • Razorpay</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Monthly subscription {formatPrice(14.99)}/month</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">Auto-renewing • Cancel anytime • Razorpay</p>
                       </div>
-                      <RazorpayButton
+                      <RazorpaySubscriptionButton
                         plan="pro"
-                        onSuccess={(paymentId, orderId) => {
-                          console.log('Razorpay payment successful:', paymentId, orderId);
+                        onSuccess={(subscriptionId) => {
+                          console.log('Razorpay subscription successful:', subscriptionId);
                           handlePaymentSuccess();
                         }}
                         onError={handlePaymentError}
                         onCancel={() => {
                           toast({
-                            title: "Payment cancelled",
+                            title: "Subscription cancelled",
                             description: "You can try again anytime.",
                             variant: "default",
                           });
                         }}
                         className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 hover:from-green-200 hover:via-green-300 hover:to-green-400 dark:hover:from-green-700 dark:hover:via-green-600 dark:hover:to-green-500 text-green-800 dark:text-green-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
                       >
-                        Pay with Card
-                      </RazorpayButton>
+                        Subscribe with Card
+                      </RazorpaySubscriptionButton>
                     </div>
 
                     {/* PayPal Subscription */}
