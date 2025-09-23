@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,10 +9,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { useRealtimeAppointments } from '@/hooks/useRealtimeSubscription';
 import { getUserAppointments } from '@/lib/supabase-queries';
+import RescheduleModal from './reschedule-modal';
 
 export default function AppointmentsList() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [rescheduleModal, setRescheduleModal] = useState<{
+    open: boolean;
+    appointment: any | null;
+  }>({ open: false, appointment: null });
   
   // Use direct Supabase client for user's appointments data
   const { data: appointments = [], isLoading } = useQuery<any[]>({
@@ -50,6 +56,14 @@ export default function AppointmentsList() {
 
   const handleEmail = (email: string) => {
     window.open(`mailto:${email}`, '_blank');
+  };
+
+  const handleReschedule = (appointment: any) => {
+    setRescheduleModal({ open: true, appointment });
+  };
+
+  const closeRescheduleModal = () => {
+    setRescheduleModal({ open: false, appointment: null });
   };
 
   if (isLoading) {
@@ -199,6 +213,7 @@ export default function AppointmentsList() {
                           variant="ghost" 
                           className="text-blue-600 hover:text-blue-700 p-1"
                           data-testid={`button-reschedule-${appointment.id}`}
+                          onClick={() => handleReschedule(appointment)}
                         >
                           <Calendar className="h-4 w-4" />
                         </Button>
@@ -222,6 +237,12 @@ export default function AppointmentsList() {
           </div>
         </Card>
       )}
+      
+      <RescheduleModal
+        open={rescheduleModal.open}
+        onClose={closeRescheduleModal}
+        appointment={rescheduleModal.appointment}
+      />
     </div>
   );
 }

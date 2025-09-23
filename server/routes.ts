@@ -143,6 +143,52 @@ async function sendCustomerAppointmentConfirmation(customerEmail: string, custom
   }
 }
 
+async function sendAppointmentRescheduleEmail(customerEmail: string, customerName: string, serviceName: string, originalDate: string, originalTime: string, newDate: string, newTime: string, note?: string) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
+      to: customerEmail,
+      subject: 'Appointment Rescheduled',
+      html: `
+        <h2>Hello ${customerName},</h2>
+        <p>Your appointment has been rescheduled. Here are the updated details:</p>
+        
+        <div style="background-color: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px;">
+          <h3 style="color: #333; margin-bottom: 10px;">Previous Appointment:</h3>
+          <p><strong>Service:</strong> ${serviceName}</p>
+          <p><strong>Original Date:</strong> ${originalDate}</p>
+          <p><strong>Original Time:</strong> ${originalTime}</p>
+        </div>
+        
+        <div style="background-color: #e8f5e8; padding: 15px; margin: 15px 0; border-radius: 5px;">
+          <h3 style="color: #333; margin-bottom: 10px;">New Appointment:</h3>
+          <p><strong>Service:</strong> ${serviceName}</p>
+          <p><strong>New Date:</strong> ${newDate}</p>
+          <p><strong>New Time:</strong> ${newTime}</p>
+        </div>
+        
+        ${note ? `
+        <div style="background-color: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 5px;">
+          <h3 style="color: #333; margin-bottom: 10px;">Additional Message:</h3>
+          <p>${note}</p>
+        </div>
+        ` : ''}
+        
+        <p>Please make note of your new appointment time. We look forward to seeing you!</p>
+        <p>If you have any questions or concerns, please contact us.</p>
+      `,
+    });
+    console.log(`Reschedule email sent to ${customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send reschedule email:", error);
+  }
+}
+
 // Middleware to verify Supabase JWT
 async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
@@ -962,6 +1008,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updated);
     } catch (error) {
       console.error("Update appointment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/appointments/:id/reschedule", verifyToken, async (req: any, res) => {
+    try {
+      // First get the appointment to verify ownership
+      const appointment = await storage.getAppointmentById(req.params.id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // Verify the user owns this appointment
+      if (appointment.ownerId !== req.user.userId) {
+        return res.status(403).json({ message: "Unauthorized to reschedule this appointment" });
+      }
+
+      const { newDate, newTime, note, customerName, customerEmail, originalDate, originalTime, serviceName } = req.body;
+
+      // Update the appointment with new date and time
+      const updated = await storage.updateAppointment(req.params.id, {
+        date: newDate,
+        time: newTime,
+        status: 'rescheduled'
+      });
+      
+      // Send email notification to customer about reschedule
+      if (customerEmail) {
+        await sendAppointmentRescheduleEmail(
+          customerEmail,
+          customerName,
+          serviceName,
+          originalDate,
+          originalTime,
+          newDate,
+          newTime,
+          note
+        );
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Reschedule appointment error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
