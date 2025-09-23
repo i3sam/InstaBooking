@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { uploadFile } from '@/lib/supabase';
 import { currencies, formatCurrencyDisplay, searchCurrencies, getCurrencyByCode } from '@/lib/currencies';
-import { ArrowLeft, ArrowRight, CloudUpload, Plus, X, Palette, FileText, MapPin, Settings, Check, Trash2, Search, Calendar, Phone, Mail, Edit } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CloudUpload, Plus, X, Palette, FileText, MapPin, Settings, Check, Trash2, Search, Calendar, Phone, Mail, Edit, Users, User } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export default function CreatePage() {
@@ -49,12 +49,14 @@ export default function CreatePage() {
     showBusinessHours: 'true',
     showContactInfo: 'true',
     services: [{ name: '', description: '', durationMinutes: '', price: '', currency: 'USD' }],
+    staff: [] as Array<{name: string; bio: string; position: string; imageUrl: string; email: string; phone: string}>,
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const [uploadingStaffImage, setUploadingStaffImage] = useState<{[key: number]: boolean}>({});
   
   // Step definitions
   const steps = [
@@ -231,6 +233,58 @@ export default function CreatePage() {
       ...prev,
       services: prev.services.map((service, i) => i === index ? { ...service, [field]: value } : service)
     }));
+  };
+
+  // Staff management functions
+  const addStaff = () => {
+    setFormData(prev => ({
+      ...prev,
+      staff: [...prev.staff, { name: '', bio: '', position: '', imageUrl: '', email: '', phone: '' }]
+    }));
+  };
+
+  const removeStaff = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      staff: prev.staff.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateStaff = (index: number, field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      staff: prev.staff.map((member, i) => i === index ? { ...member, [field]: value } : member)
+    }));
+  };
+
+  const handleStaffImageUpload = async (index: number, file: File) => {
+    try {
+      setUploadingStaffImage(prev => ({ ...prev, [index]: true }));
+      const result = await uploadFile(file, 'staff');
+      
+      if (result.success && result.url) {
+        updateStaff(index, 'imageUrl', result.url);
+        toast({
+          title: "Staff image uploaded",
+          description: "The staff member's profile image has been uploaded successfully.",
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: result.error || "Failed to upload the staff image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading staff image:', error);
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading the staff image.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingStaffImage(prev => ({ ...prev, [index]: false }));
+    }
   };
 
   const addFAQ = () => {
@@ -722,6 +776,153 @@ export default function CreatePage() {
                     className="glass-effect border-border/50 mt-2"
                     data-testid="textarea-cancellation-policy"
                   />
+                </div>
+
+                {/* Staff Management Section (Optional) */}
+                <div className="glass-effect rounded-xl p-4 border border-border/50">
+                  <div className="flex items-center justify-between mb-4">
+                    <Label className="text-base font-medium flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Team Members (Optional)
+                    </Label>
+                    <Button 
+                      type="button" 
+                      onClick={addStaff} 
+                      className="glass-effect hover-lift rounded-xl" 
+                      size="sm"
+                      data-testid="button-add-staff"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Staff
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Add your team members to showcase your staff on the booking page
+                  </p>
+
+                  {formData.staff.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <User className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>No team members added yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {formData.staff.map((member, index) => (
+                        <Card key={index} className="glass-effect border-border/50 shadow-sm">
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <h4 className="text-sm font-medium">Team Member #{index + 1}</h4>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeStaff(index)}
+                              className="hover-lift"
+                              data-testid={`button-remove-staff-${index}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </CardHeader>
+                          <CardContent className="pt-0 space-y-4">
+                            {/* Profile Image Upload */}
+                            <div>
+                              <Label className="text-sm font-medium">Profile Image (Optional)</Label>
+                              <div className="mt-2 flex items-center gap-4">
+                                {member.imageUrl ? (
+                                  <img 
+                                    src={member.imageUrl} 
+                                    alt={member.name || "Staff member"} 
+                                    className="w-16 h-16 rounded-full object-cover border-2 border-border/50"
+                                  />
+                                ) : (
+                                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-2 border-border/50">
+                                    <User className="h-8 w-8 text-muted-foreground" />
+                                  </div>
+                                )}
+                                <Button
+                                  type="button"
+                                  onClick={() => document.getElementById(`staff-image-${index}`)?.click()}
+                                  disabled={uploadingStaffImage[index]}
+                                  className="glass-effect hover-lift rounded-xl"
+                                  size="sm"
+                                  data-testid={`button-upload-staff-image-${index}`}
+                                >
+                                  {uploadingStaffImage[index] ? 'Uploading...' : member.imageUrl ? 'Change Image' : 'Upload Image'}
+                                </Button>
+                                <input
+                                  id={`staff-image-${index}`}
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => e.target.files?.[0] && handleStaffImageUpload(index, e.target.files[0])}
+                                  className="hidden"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Staff Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Name *</Label>
+                                <Input
+                                  placeholder="e.g., Dr. Sarah Johnson"
+                                  value={member.name}
+                                  onChange={(e) => updateStaff(index, 'name', e.target.value)}
+                                  className="glass-effect border-border/50 mt-1"
+                                  data-testid={`input-staff-name-${index}`}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">Position</Label>
+                                <Input
+                                  placeholder="e.g., Senior Consultant"
+                                  value={member.position}
+                                  onChange={(e) => updateStaff(index, 'position', e.target.value)}
+                                  className="glass-effect border-border/50 mt-1"
+                                  data-testid={`input-staff-position-${index}`}
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <Label className="text-sm font-medium">Bio</Label>
+                              <Textarea
+                                placeholder="Brief description about this team member..."
+                                value={member.bio}
+                                onChange={(e) => updateStaff(index, 'bio', e.target.value)}
+                                rows={2}
+                                className="glass-effect border-border/50 mt-1"
+                                data-testid={`textarea-staff-bio-${index}`}
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Email</Label>
+                                <Input
+                                  type="email"
+                                  placeholder="sarah@company.com"
+                                  value={member.email}
+                                  onChange={(e) => updateStaff(index, 'email', e.target.value)}
+                                  className="glass-effect border-border/50 mt-1"
+                                  data-testid={`input-staff-email-${index}`}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">Phone</Label>
+                                <Input
+                                  type="tel"
+                                  placeholder="+1 (555) 123-4567"
+                                  value={member.phone}
+                                  onChange={(e) => updateStaff(index, 'phone', e.target.value)}
+                                  className="glass-effect border-border/50 mt-1"
+                                  data-testid={`input-staff-phone-${index}`}
+                                />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
