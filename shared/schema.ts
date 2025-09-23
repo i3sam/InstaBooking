@@ -63,6 +63,21 @@ export const services = pgTable("services", {
   createdAt: timestamp("created_at").default(sql`now()`),
 });
 
+export const staff = pgTable("staff", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  bio: text("bio"),
+  imageUrl: text("image_url"),
+  position: text("position"),
+  email: text("email"),
+  phone: text("phone"),
+  displayOrder: integer("display_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
@@ -181,6 +196,12 @@ export const insertServiceSchema = createInsertSchema(services).omit({
   createdAt: true,
 });
 
+export const insertStaffSchema = createInsertSchema(staff).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
@@ -215,6 +236,8 @@ export type Page = typeof pages.$inferSelect;
 export type InsertPage = z.infer<typeof insertPageSchema>;
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Staff = typeof staff.$inferSelect;
+export type InsertStaff = z.infer<typeof insertStaffSchema>;
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type Review = typeof reviews.$inferSelect;
