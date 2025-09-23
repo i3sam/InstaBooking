@@ -1245,6 +1245,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await cancelRazorpaySubscription(req, res);
     });
 
+    // Get user's subscriptions
+    app.get("/api/subscriptions", verifyToken, async (req, res) => {
+      try {
+        const authReq = req as any;
+        if (!authReq.user?.userId) {
+          return res.status(401).json({ error: "User not authenticated" });
+        }
+
+        const subscriptions = await storage.getSubscriptionsByUser(authReq.user.userId);
+        res.json(subscriptions);
+      } catch (error) {
+        console.error("Failed to get user subscriptions:", error);
+        res.status(500).json({ error: "Failed to get subscriptions" });
+      }
+    });
+
+    // Get user's payment history
+    app.get("/api/payments", verifyToken, async (req, res) => {
+      try {
+        const authReq = req as any;
+        if (!authReq.user?.userId) {
+          return res.status(401).json({ error: "User not authenticated" });
+        }
+
+        const payments = await storage.getPaymentsByUser(authReq.user.userId);
+        res.json(payments);
+      } catch (error) {
+        console.error("Failed to get user payments:", error);
+        res.status(500).json({ error: "Failed to get payment history" });
+      }
+    });
+
     // Webhook route moved to server/index.ts for proper middleware ordering
     // This ensures express.raw() runs BEFORE express.json() for signature verification
 

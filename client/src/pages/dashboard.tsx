@@ -17,6 +17,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/use-currency';
 import UpgradeModal from '@/components/modals/upgrade-modal';
+import BillingModal from '@/components/modals/billing-modal';
 
 export default function Dashboard() {
   const { user, profile } = useAuth();
@@ -575,6 +576,7 @@ function SettingsSection() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showBillingModal, setShowBillingModal] = useState(false);
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
   const [cancelSubscriptionLoading, setCancelSubscriptionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('account');
@@ -652,10 +654,7 @@ function SettingsSection() {
   };
 
   const handleManageBilling = () => {
-    // Open Razorpay billing portal for subscription management
-    if (typeof window !== 'undefined') {
-      window.open('https://dashboard.razorpay.com/', '_blank');
-    }
+    setShowBillingModal(true);
   };
   
   const settingsTabs = [
@@ -986,6 +985,11 @@ function SettingsSection() {
       <UpgradeModal 
         isOpen={showUpgradeModal} 
         onClose={() => setShowUpgradeModal(false)} 
+      />
+
+      <BillingModal 
+        isOpen={showBillingModal} 
+        onClose={() => setShowBillingModal(false)} 
       />
     </div>
   );
