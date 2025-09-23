@@ -55,10 +55,8 @@ const durationOptions = [
 
 export default function ServicesStep({ data, updateData }: ServicesStepProps) {
   const addService = () => {
-    if (data.services.length < 3) {
-      const newServices = [...data.services, { name: '', duration: 60, price: 0 }];
-      updateData({ services: newServices });
-    }
+    const newServices = [...data.services, { name: '', duration: 60, price: 0 }];
+    updateData({ services: newServices });
   };
 
   const removeService = (index: number) => {
@@ -133,7 +131,7 @@ export default function ServicesStep({ data, updateData }: ServicesStepProps) {
               💼 Services
             </CardTitle>
             <Badge variant="secondary" data-testid="badge-service-count">
-              {data.services.length}/3 Services
+              {data.services.length} Services
             </Badge>
           </div>
         </CardHeader>
@@ -222,17 +220,15 @@ export default function ServicesStep({ data, updateData }: ServicesStepProps) {
             </div>
           ))}
 
-          {data.services.length < 3 && (
-            <Button
-              variant="outline"
-              onClick={addService}
-              className="w-full"
-              data-testid="button-add-service"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Service ({data.services.length}/3)
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            onClick={addService}
+            className="w-full"
+            data-testid="button-add-service"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Service
+          </Button>
         </CardContent>
       </Card>
 
