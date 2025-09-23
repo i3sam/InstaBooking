@@ -869,7 +869,7 @@ export class SupabaseStorage implements IStorage {
           };
           
           // Mark order as used in database backup
-          const { data, error, count } = await supabase
+          const { data, error } = await supabase
             .from('payments_demo')
             .update({
               status: 'used',
@@ -877,9 +877,9 @@ export class SupabaseStorage implements IStorage {
             })
             .eq('payment_id', id)
             .eq('status', 'pending_verification')
-            .select('id', { count: 'exact' });
+            .select('id');
           
-          if (error || count !== 1) {
+          if (error || !data || data.length !== 1) {
             console.error('Failed to persist order used flag:', error || 'No rows affected');
             throw new Error('Failed to prevent payment replay - security risk');
           }
