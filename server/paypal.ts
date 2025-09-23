@@ -6,6 +6,9 @@
 // Retain this comment after all edits.
 //
 // <BEGIN_EXACT_CODE>
+// Load environment variables first
+import 'dotenv/config';
+
 import {
   Client,
   Environment,
