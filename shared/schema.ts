@@ -81,38 +81,74 @@ export const appointments = pgTable("appointments", {
 export const reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
-  customerName: text("customer_name").notNull(),
-  customerEmail: text("customer_email"),
+  reviewerName: text("reviewer_name").notNull(),
+  reviewerEmail: text("reviewer_email"),
   rating: integer("rating").notNull(), // 1-5 stars
   reviewText: text("review_text"),
+  status: text("status").default("pending"), // Keep existing status column
   isApproved: text("is_approved").default("pending"), // pending|approved|rejected
   createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
 });
 
 export const paymentsDemo = pgTable("payments_demo", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid("user_id").references(() => profiles.id),
-  plan: text("plan"),
   amount: numeric("amount"),
+  currency: text("currency"),
   status: text("status"),
+  paymentIntentId: text("payment_intent_id"), // Legacy Stripe field
+  subscriptionId: text("subscription_id"), // Legacy subscription field
+  plan: text("plan"),
   paypalOrderId: text("paypal_order_id"), // Legacy field - PayPal no longer used
   paypalPaymentId: text("paypal_payment_id"), // Legacy field - PayPal no longer used
   meta: jsonb("meta"),
   createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
 });
 
 export const subscriptions = pgTable("subscriptions", {
   id: text("id").primaryKey(), // Legacy PayPal subscription ID - PayPal no longer used
   userId: uuid("user_id").references(() => profiles.id),
-  planId: text("plan_id").notNull(), // Legacy PayPal plan ID - PayPal no longer used
-  planName: text("plan_name").notNull(), // "pro", "premium", etc.
   status: text("status").notNull(), // APPROVAL_PENDING|ACTIVE|CANCELLED|SUSPENDED|EXPIRED
-  currency: text("currency").default("USD").notNull(),
+  planId: text("plan_id").notNull(), // Legacy PayPal plan ID - PayPal no longer used
+  currentPeriodStart: timestamp("current_period_start"), // Keep existing column
+  currentPeriodEnd: timestamp("current_period_end"), // Keep existing column
+  planName: text("plan_name"), // "pro", "premium", etc.
+  currency: text("currency").default("USD"),
   amount: numeric("amount").notNull(),
   startTime: timestamp("start_time"),
   nextBillingTime: timestamp("next_billing_time"),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
+// Legacy tables that exist in the database - keep to prevent data loss
+export const memberships = pgTable("memberships", {
+  userId: uuid("user_id").primaryKey().references(() => profiles.id),
+  active: boolean("active").default(true).notNull(),
+  plan: text("plan"),
+  purchasedAt: timestamp("purchased_at", { withTimezone: true }).default(sql`now()`).notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  transactionId: text("transaction_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).default(sql`now()`),
+});
+
+export const bookingPages = pgTable("booking_pages", {
+  id: text("id").primaryKey(),
+  ownerId: uuid("owner_id").notNull().references(() => profiles.id),
+  slug: text("slug").notNull(),
+  businessName: text("business_name").notNull(),
+  tagline: text("tagline"),
+  logoDataUrl: text("logo_data_url"),
+  theme: jsonb("theme"),
+  services: jsonb("services"),
+  contact: jsonb("contact"),
+  calendarUrl: text("calendar_url"),
+  buttonText: text("button_text"),
+  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).default(sql`now()`),
 });
 
 // Insert schemas (users are managed by Supabase auth)
