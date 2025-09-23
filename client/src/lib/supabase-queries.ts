@@ -141,7 +141,10 @@ export async function getUserAppointments() {
 
     const { data, error } = await supabase
       .from('appointments')
-      .select('*')
+      .select(`
+        *,
+        services(name, price)
+      `)
       .eq('owner_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -150,7 +153,26 @@ export async function getUserAppointments() {
       return [];
     }
 
-    return data || [];
+    // Convert snake_case to camelCase and add serviceName
+    const formattedData = (data || []).map((appointment: any) => ({
+      id: appointment.id,
+      pageId: appointment.page_id,
+      ownerId: appointment.owner_id,
+      serviceId: appointment.service_id,
+      customerName: appointment.customer_name,
+      customerEmail: appointment.customer_email,
+      customerPhone: appointment.customer_phone,
+      date: appointment.date,
+      time: appointment.time,
+      status: appointment.status,
+      notes: appointment.notes,
+      createdAt: appointment.created_at,
+      updatedAt: appointment.updated_at,
+      serviceName: appointment.services?.name || 'Service',
+      servicePrice: appointment.services?.price || 0
+    }));
+
+    return formattedData;
   } catch (error) {
     console.error('Error in getUserAppointments:', error);
     return [];
