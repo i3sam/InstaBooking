@@ -326,6 +326,83 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  // Staff methods
+  async createStaff(staff: any): Promise<any> {
+    try {
+      const staffData = this.toSnakeCase({ 
+        ...staff, 
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+      
+      const { data, error } = await supabase
+        .from('staff')
+        .insert(staffData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return this.toCamelCase(data);
+    } catch (error) {
+      console.error("Create staff error:", error);
+      throw error;
+    }
+  }
+
+  async getStaffByPageId(pageId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('page_id', pageId)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      return (data || []).map(item => this.toCamelCase(item));
+    } catch (error) {
+      console.error("Get staff by page ID error:", error);
+      return [];
+    }
+  }
+
+  async updateStaff(id: string, updates: any): Promise<any | undefined> {
+    try {
+      const updateData = this.toSnakeCase({ 
+        ...updates, 
+        updated_at: new Date().toISOString() 
+      });
+      
+      const { data, error } = await supabase
+        .from('staff')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return this.toCamelCase(data);
+    } catch (error) {
+      console.error("Update staff error:", error);
+      throw error;
+    }
+  }
+
+  async deleteStaff(id: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('staff')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Delete staff error:", error);
+      return false;
+    }
+  }
+
   // Appointments
   async createAppointment(appointment: any): Promise<any> {
     try {

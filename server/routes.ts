@@ -603,6 +603,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Staff routes
+  app.get("/api/pages/:pageId/staff", async (req, res) => {
+    try {
+      const staff = await storage.getStaffByPageId(req.params.pageId);
+      res.json(staff);
+    } catch (error) {
+      console.error("Get staff error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/pages/:pageId/staff", verifyToken, async (req: any, res) => {
+    try {
+      const page = await storage.getPage(req.params.pageId);
+      if (!page || page.ownerId !== req.user.userId) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+
+      const staff = await storage.createStaff({
+        ...req.body,
+        pageId: req.params.pageId
+      });
+      res.status(201).json(staff);
+    } catch (error) {
+      console.error("Create staff error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/staff/:id", verifyToken, async (req: any, res) => {
+    try {
+      // First get the staff member to verify ownership
+      const staff = await storage.getStaffById(req.params.id);
+      if (!staff) {
+        return res.status(404).json({ message: "Staff member not found" });
+      }
+
+      // Verify the user owns the page this staff member belongs to
+      const page = await storage.getPage(staff.pageId);
+      if (!page || page.ownerId !== req.user.userId) {
+        return res.status(403).json({ message: "Not authorized to update this staff member" });
+      }
+
+      const updated = await storage.updateStaff(req.params.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Update staff error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/staff/:id", verifyToken, async (req: any, res) => {
+    try {
+      // First get the staff member to verify ownership
+      const staff = await storage.getStaffById(req.params.id);
+      if (!staff) {
+        return res.status(404).json({ message: "Staff member not found" });
+      }
+
+      // Verify the user owns the page this staff member belongs to
+      const page = await storage.getPage(staff.pageId);
+      if (!page || page.ownerId !== req.user.userId) {
+        return res.status(403).json({ message: "Not authorized to delete this staff member" });
+      }
+
+      await storage.deleteStaff(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete staff error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Demo routes
   app.post("/api/demo", async (req, res) => {
     try {

@@ -97,6 +97,16 @@ export default function CreatePage() {
     }
   ];
 
+  // Font options for typography customization
+  const fontOptions = [
+    { name: 'Inter (Modern)', value: 'inter', class: 'font-inter' },
+    { name: 'Roboto (Clean)', value: 'roboto', class: 'font-roboto' },
+    { name: 'Poppins (Rounded)', value: 'poppins', class: 'font-poppins' },
+    { name: 'Montserrat (Elegant)', value: 'montserrat', class: 'font-montserrat' },
+    { name: 'Lato (Professional)', value: 'lato', class: 'font-lato' },
+    { name: 'Open Sans (Friendly)', value: 'opensans', class: 'font-opensans' }
+  ];
+
   // Beautiful color themes for booking pages
   const colorThemes = [
     { name: 'Ocean Blue', primary: '#2563eb', secondary: '#1e40af', accent: '#3b82f6', gradient: 'from-blue-500 to-blue-600' },
@@ -116,12 +126,6 @@ export default function CreatePage() {
     { type: 'gradient', name: 'Rose Gradient', value: 'rose', class: 'bg-gradient-to-br from-rose-100 to-rose-200' },
     { type: 'solid', name: 'Clean White', value: 'white', class: 'bg-white' },
     { type: 'solid', name: 'Soft Gray', value: 'gray', class: 'bg-gray-50' },
-  ];
-
-  const fontOptions = [
-    { name: 'Inter (Modern)', value: 'inter', class: 'font-inter' },
-    { name: 'Roboto (Clean)', value: 'roboto', class: 'font-roboto' },
-    { name: 'Open Sans (Friendly)', value: 'opensans', class: 'font-opensans' }
   ];
 
   const createPageMutation = useMutation({
@@ -623,6 +627,57 @@ export default function CreatePage() {
                         <span className="text-sm font-medium">{bg.name}</span>
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Font Selection */}
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Typography</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {fontOptions.map((font, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, fontFamily: font.value }))}
+                        className={`p-4 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect text-left ${
+                          formData.fontFamily === font.value ? 'border-primary shadow-lg' : 'border-border/50'
+                        }`}
+                        data-testid={`button-font-${index}`}
+                      >
+                        <div className={`${font.class} text-lg mb-1`}>Aa Bb Cc</div>
+                        <span className="text-sm font-medium">{font.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Color Picker */}
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Custom Primary Color</Label>
+                  <div className="glass-effect rounded-xl p-4 border border-border/50">
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="color"
+                        value={formData.primaryColor}
+                        onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
+                        className="w-16 h-16 rounded-lg border-2 border-border/50 cursor-pointer"
+                        data-testid="input-primary-color"
+                      />
+                      <div>
+                        <Label className="text-sm font-medium">Primary Color</Label>
+                        <Input
+                          type="text"
+                          value={formData.primaryColor}
+                          onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
+                          className="glass-effect border-border/50 mt-1 font-mono"
+                          placeholder="#2563eb"
+                          data-testid="input-primary-color-hex"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Choose a primary color that represents your brand
+                    </p>
                   </div>
                 </div>
 

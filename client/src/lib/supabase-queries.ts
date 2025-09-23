@@ -76,6 +76,30 @@ export async function getPublicReviewsByPageId(pageId: string) {
   }
 }
 
+// Public staff for a published page
+export async function getPublicStaffByPageId(pageId: string) {
+  if (!pageId) return [];
+  
+  try {
+    const { data, error } = await supabase
+      .from('staff')
+      .select('*')
+      .eq('page_id', pageId)
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching public staff:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getPublicStaffByPageId:', error);
+    return [];
+  }
+}
+
 // User's own profile (RLS enforced)
 export async function getUserProfile() {
   try {

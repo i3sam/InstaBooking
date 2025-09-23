@@ -59,6 +59,13 @@ export interface IStorage {
   
   // Demo Users
   createDemoUser(email: string, fullName?: string): Promise<any>;
+  
+  // Staff
+  createStaff(staff: any): Promise<any>;
+  getStaffById(id: string): Promise<any | undefined>;
+  getStaffByPageId(pageId: string): Promise<any[]>;
+  updateStaff(id: string, updates: any): Promise<any | undefined>;
+  deleteStaff(id: string): Promise<boolean>;
 }
 
 // Initialize storage instance with SupabaseStorage

@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
-import { getPublicPageBySlug, getPublicServicesByPageId, getPublicReviewsByPageId } from '@/lib/supabase-queries';
+import { getPublicPageBySlug, getPublicServicesByPageId, getPublicReviewsByPageId, getPublicStaffByPageId } from '@/lib/supabase-queries';
 import BookingModal from '@/components/modals/booking-modal';
 import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -51,6 +51,12 @@ export default function PublicBooking() {
   const { data: reviews = [] } = useQuery<any[]>({
     queryKey: [`public-reviews-${pageData?.id}`],
     queryFn: () => getPublicReviewsByPageId(pageData?.id),
+    enabled: !!pageData?.id,
+  });
+
+  const { data: pageStaff = [] } = useQuery<any[]>({
+    queryKey: [`public-staff-${pageData?.id}`],
+    queryFn: () => getPublicStaffByPageId(pageData?.id),
     enabled: !!pageData?.id,
   });
 
@@ -715,6 +721,124 @@ export default function PublicBooking() {
             </div>
             
             {/* Services summary */}
+          </div>
+        </section>
+      )}
+
+      {/* Staff Section */}
+      {pageStaff.length > 0 && (
+        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div 
+              className="absolute inset-0 opacity-30"
+              style={{
+                background: themeStyles 
+                  ? `radial-gradient(circle at 30% 20%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, transparent 50%)`
+                  : 'radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(37, 99, 235, 0.06) 0%, transparent 50%)'
+              }}
+            ></div>
+          </div>
+          
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-20">
+              <div 
+                className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl mb-6 sm:mb-8 shadow-xl"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                }}
+              >
+                <Users 
+                  className="h-8 w-8 sm:h-10 sm:w-10" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 sm:mb-8 tracking-tight">Meet Our Team</h2>
+              <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8">
+                Get to know the experienced professionals who will be taking care of you
+              </p>
+              
+              <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-card/50 backdrop-blur-sm border border-border/10 shadow-lg">
+                <div 
+                  className="w-2 h-2 rounded-full mr-3"
+                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                ></div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {pageStaff.length} Team Member{pageStaff.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
+              {pageStaff.map((staff: any, index: number) => (
+                <Card 
+                  key={staff.id}
+                  className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-border overflow-hidden"
+                  data-testid={`card-staff-${staff.id}`}
+                >
+                  <CardContent className="p-0">
+                    <div className="aspect-square relative overflow-hidden">
+                      {staff.profileImage ? (
+                        <img
+                          src={staff.profileImage}
+                          alt={staff.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling!.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`w-full h-full ${staff.profileImage ? 'hidden' : 'flex'} items-center justify-center`}
+                        style={{
+                          background: themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor}15 0%, ${themeStyles.primaryColor}08 100%)`
+                            : 'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.08) 100%)'
+                        }}
+                      >
+                        <User 
+                          className="h-16 w-16 sm:h-20 sm:w-20"
+                          style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                        />
+                      </div>
+                      
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-foreground mb-2" data-testid={`text-staff-name-${staff.id}`}>
+                        {staff.name}
+                      </h3>
+                      {staff.role && (
+                        <p className="text-sm font-medium mb-3" style={{ color: themeStyles?.primaryColor || '#2563eb' }}>
+                          {staff.role}
+                        </p>
+                      )}
+                      {staff.bio && (
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                          {staff.bio}
+                        </p>
+                      )}
+                      {staff.specialties && staff.specialties.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {staff.specialties.map((specialty: string, idx: number) => (
+                            <Badge 
+                              key={idx}
+                              variant="secondary" 
+                              className="text-xs bg-card border-border"
+                            >
+                              {specialty}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </section>
       )}
