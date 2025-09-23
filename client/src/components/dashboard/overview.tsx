@@ -1,9 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle } from 'lucide-react';
+import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
+import { useAuth } from '@/hooks/use-auth';
+import { useRealtimeDashboard } from '@/hooks/useRealtimeSubscription';
 
 interface OverviewProps {
   onSectionChange?: (section: string) => void;
@@ -30,6 +32,10 @@ interface RecentActivity {
 export default function Overview({ onSectionChange }: OverviewProps) {
   const [, setLocation] = useLocation();
   const { formatPrice } = useCurrency();
+  const { user } = useAuth();
+
+  // Enable real-time subscriptions for live dashboard updates
+  const { isConnected: isRealtimeConnected } = useRealtimeDashboard(user?.id);
 
   // Fetch dashboard statistics
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({

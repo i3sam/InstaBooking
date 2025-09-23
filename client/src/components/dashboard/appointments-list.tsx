@@ -2,15 +2,21 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, Calendar, Mail, Filter, Download } from 'lucide-react';
+import { Check, X, Calendar, Mail, Filter, Download, Wifi, WifiOff } from 'lucide-react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { useRealtimeAppointments } from '@/hooks/useRealtimeSubscription';
 
 export default function AppointmentsList() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { data: appointments = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/appointments'],
   });
+
+  // Enable real-time subscriptions for live appointment updates
+  const { isConnected: isRealtimeConnected } = useRealtimeAppointments(user?.id);
 
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -57,6 +63,20 @@ export default function AppointmentsList() {
           <p className="text-gray-600 dark:text-gray-300">Manage your upcoming and past appointments</p>
         </div>
         <div className="flex space-x-3">
+          {/* Real-time connection indicator */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-black/10 border border-white/20">
+            {isRealtimeConnected ? (
+              <>
+                <Wifi className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-green-500">Live</span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4 text-gray-400" />
+                <span className="text-sm text-gray-400">Offline</span>
+              </>
+            )}
+          </div>
           <Button variant="outline" className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300" data-testid="button-filter">
             <Filter className="h-4 w-4 mr-2" />
             Filter
