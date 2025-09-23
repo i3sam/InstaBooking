@@ -20,15 +20,16 @@ export default function SubscriptionSuccess() {
       try {
         // Get subscription ID from URL params or session storage
         const urlParams = new URLSearchParams(window.location.search);
-        const subscriptionId = urlParams.get('subscription_id') || 
+        const subscriptionId = urlParams.get('razorpay_subscription_id') || 
+                             urlParams.get('subscription_id') || 
                              sessionStorage.getItem('pendingSubscriptionId');
         
         if (!subscriptionId) {
           throw new Error('No subscription ID found');
         }
 
-        // Get subscription details from PayPal to confirm it's active
-        const response = await apiRequest('GET', `/api/paypal/subscriptions/${subscriptionId}`);
+        // Get subscription details from Razorpay to confirm it's active
+        const response = await apiRequest('GET', `/api/razorpay/subscriptions/${subscriptionId}`);
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -46,8 +47,10 @@ export default function SubscriptionSuccess() {
         await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
 
         toast({
-          title: "Subscription Activated!",
-          description: `Your ${subscription.status === 'ACTIVE' ? 'Pro' : 'subscription'} membership is now active. You have access to all premium features.`,
+          title: subscription.status?.toLowerCase() === 'active' ? "Subscription Activated!" : "Subscription Created!",
+          description: subscription.status?.toLowerCase() === 'active' 
+            ? "Your Pro membership is now active. You have access to all premium features."
+            : "Your subscription has been created successfully. It may take a few minutes to become fully active.",
         });
 
       } catch (error) {
@@ -130,16 +133,19 @@ export default function SubscriptionSuccess() {
             </div>
             <CardTitle className="text-2xl text-green-800 dark:text-green-200 flex items-center justify-center gap-2">
               <Crown className="h-6 w-6" />
-              Subscription Activated!
+              {subscriptionData?.status?.toLowerCase() === 'active' ? 'Subscription Activated!' : 'Subscription Created!'}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-6">
             <div className="space-y-2">
               <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Welcome to Pro!
+                {subscriptionData?.status?.toLowerCase() === 'active' ? 'Welcome to Pro!' : 'Subscription Created!'}
               </p>
               <p className="text-gray-600 dark:text-gray-300">
-                Your subscription is now active and you have access to all premium features.
+                {subscriptionData?.status?.toLowerCase() === 'active' 
+                  ? 'Your subscription is now active and you have access to all premium features.'
+                  : 'Your subscription has been created. It may take a few minutes to become fully active.'
+                }
               </p>
             </div>
 
@@ -147,22 +153,20 @@ export default function SubscriptionSuccess() {
               <div className="bg-white/50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Subscription ID:</span>
-                  <span className="font-mono text-xs">{subscriptionData.id}</span>
+                  <span className="font-mono text-xs">{subscriptionData.subscriptionId}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Status:</span>
                   <span className="font-semibold text-green-600 dark:text-green-400">
-                    {subscriptionData.status}
+                    {subscriptionData.status?.toUpperCase()}
                   </span>
                 </div>
-                {subscriptionData.billing_info?.next_billing_time && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Next Billing:</span>
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {new Date(subscriptionData.billing_info.next_billing_time).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Plan:</span>
+                  <span className="text-gray-900 dark:text-gray-100">
+                    {subscriptionData.plan?.toUpperCase() || 'Pro'}
+                  </span>
+                </div>
               </div>
             )}
 
