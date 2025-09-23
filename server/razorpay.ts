@@ -528,10 +528,10 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
       });
     }
 
-    // Cancel with Razorpay - use 1 instead of true for cancel_at_cycle_end
+    // Cancel with Razorpay - cancel at end of billing cycle
     await razorpay.subscriptions.cancel(activeSubscription.id, {
-      cancel_at_cycle_end: 1 // Let subscription run until end of billing period
-    });
+      cancel_at_cycle_end: true
+    } as any);
 
     // Do NOT update subscription status or user profile here
     // Let the webhook handle the final cancellation when the period ends

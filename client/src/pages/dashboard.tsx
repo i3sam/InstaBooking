@@ -637,16 +637,24 @@ function SettingsSection() {
           description: "Your subscription will remain active until the end of your billing period.",
         });
       } else {
-        throw new Error('Failed to cancel subscription');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to cancel subscription');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Cancellation failed",
-        description: "Failed to cancel subscription. Please contact support.",
+        description: error.message || "Failed to cancel subscription. Please contact support.",
         variant: "destructive",
       });
     } finally {
       setCancelSubscriptionLoading(false);
+    }
+  };
+
+  const handleManageBilling = () => {
+    // Open Razorpay billing portal for subscription management
+    if (typeof window !== 'undefined') {
+      window.open('https://dashboard.razorpay.com/', '_blank');
     }
   };
   
@@ -867,7 +875,7 @@ function SettingsSection() {
                   <Button
                     variant="outline"
                     className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 flex items-center justify-center h-12"
-                    onClick={() => setShowUpgradeModal(true)}
+                    onClick={handleManageBilling}
                     data-testid="button-manage-billing"
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
