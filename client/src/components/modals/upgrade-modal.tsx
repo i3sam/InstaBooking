@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
 import SubscriptionButton from '@/components/SubscriptionButton';
+import RazorpayButton from '@/components/RazorpayButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -78,7 +80,9 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               <DialogTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent">
                 Upgrade to Pro
               </DialogTitle>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">Unlock all features and take your booking business to the next level</p>
+              <DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
+                Unlock all features and take your booking business to the next level
+              </DialogDescription>
             </DialogHeader>
         
             <div className="space-y-4 sm:space-y-6 md:space-y-8">
@@ -147,38 +151,81 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 </div>
               </div>
 
-              {/* PayPal Payment Section */}
+              {/* Payment Options Section */}
               {showPayment && (
                 <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-white/90 via-blue-50/70 to-white/80 dark:from-gray-900/90 dark:via-blue-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 dark:from-blue-100 dark:to-white bg-clip-text text-transparent mb-2">
-                      Complete Your Payment
+                      Choose Your Payment Method
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Pay securely with PayPal - you can use your PayPal account or pay as a guest with any debit/credit card
+                      Select your preferred payment option to upgrade to Pro
                     </p>
                   </div>
                   
-                  <div className="flex justify-center py-4">
-                    <SubscriptionButton
-                      planKey="pro"
-                      onSuccess={(subscriptionId) => {
-                        console.log('Subscription successful:', subscriptionId);
-                        handlePaymentSuccess();
-                      }}
-                      onError={handlePaymentError}
-                      onCancel={() => {
-                        console.log('Subscription cancelled');
-                        toast({
-                          title: "Subscription cancelled",
-                          description: "You can try again anytime.",
-                          variant: "default",
-                        });
-                      }}
-                      className="w-full max-w-sm glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 hover:from-blue-200 hover:via-blue-300 hover:to-blue-400 dark:hover:from-blue-700 dark:hover:via-blue-600 dark:hover:to-blue-500 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
-                    >
-                      Subscribe to Pro - $29.99/month
-                    </SubscriptionButton>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Credit/Debit Card Payment (Razorpay) */}
+                    <div className="glass-prism-card backdrop-blur-sm bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-800/80 dark:via-blue-950/60 dark:to-gray-800/70 border border-white/30 dark:border-white/20 rounded-xl p-4" data-testid="section-razorpay">
+                      <div className="text-center mb-4">
+                        <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mx-auto mb-3 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30">
+                          <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">Credit/Debit Card</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">One-time payment of {formatPrice(14.99)}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">30 days Pro access • Razorpay</p>
+                      </div>
+                      <RazorpayButton
+                        plan="pro"
+                        onSuccess={(paymentId, orderId) => {
+                          console.log('Razorpay payment successful:', paymentId, orderId);
+                          handlePaymentSuccess();
+                        }}
+                        onError={handlePaymentError}
+                        onCancel={() => {
+                          toast({
+                            title: "Payment cancelled",
+                            description: "You can try again anytime.",
+                            variant: "default",
+                          });
+                        }}
+                        className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 hover:from-green-200 hover:via-green-300 hover:to-green-400 dark:hover:from-green-700 dark:hover:via-green-600 dark:hover:to-green-500 text-green-800 dark:text-green-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
+                      >
+                        Pay with Card
+                      </RazorpayButton>
+                    </div>
+
+                    {/* PayPal Subscription */}
+                    <div className="glass-prism-card backdrop-blur-sm bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-800/80 dark:via-blue-950/60 dark:to-gray-800/70 border border-white/30 dark:border-white/20 rounded-xl p-4" data-testid="section-paypal">
+                      <div className="text-center mb-4">
+                        <div className="w-12 h-12 glass-prism rounded-xl flex items-center justify-center mx-auto mb-3 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30">
+                          <svg className="h-6 w-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.076 11.847c-.277-.413-.596-.737-.912-1.059-.32-.317-.63-.625-.891-1.012-.263-.386-.458-.866-.458-1.365 0-.5.195-.98.458-1.366.261-.387.571-.695.891-1.012.316-.322.635-.646.912-1.059.275-.415.458-.887.458-1.374 0-1.104-.896-2-2-2-.346 0-.673.089-.958.243-.286.154-.527.376-.719.651-.194.275-.33.588-.402.924-.071.336-.08.685-.025 1.024.055.34.168.667.332.965.164.298.377.566.632.796.255.23.544.415.854.545.31.13.636.201.965.201.329 0 .655-.071.965-.201.31-.13.599-.315.854-.545.255-.23.468-.498.632-.796.164-.298.277-.625.332-.965.055-.339.046-.688-.025-1.024-.072-.336-.208-.649-.402-.924-.192-.275-.433-.497-.719-.651C14.673.089 14.346 0 14 0c-1.104 0-2 .896-2 2 0 .487.183.959.458 1.374.275.413.594.737.912 1.059.32.317.628.625.891 1.012.263.386.458.866.458 1.365s-.195.979-.458 1.365c-.263.387-.571.695-.891 1.012-.318.322-.637.646-.912 1.059-.275.415-.458.887-.458 1.374 0 1.104.896 2 2 2 .346 0 .673-.089.958-.243.286-.154.527-.376.719-.651.194-.275.33-.588.402-.924.071-.336.08-.685.025-1.024-.055-.34-.168-.667-.332-.965-.164-.298-.377-.566-.632-.796-.255-.23-.544-.415-.854-.545-.31-.13-.636-.201-.965-.201-.329 0-.655.071-.965.201-.31.13-.599.315-.854.545-.255.23-.468.498-.632.796-.164.298-.277.625-.332.965-.055.339-.046.688.025 1.024.072.336.208.649.402.924.192.275.433.497.719.651.285.154.612.243.958.243 1.104 0 2-.896 2-2 0-.487-.183-.959-.458-1.374z"/>
+                          </svg>
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">PayPal</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Monthly subscription {formatPrice(14.99)}/month</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">PayPal account or guest checkout</p>
+                      </div>
+                      <SubscriptionButton
+                        planKey="pro"
+                        onSuccess={(subscriptionId) => {
+                          console.log('PayPal subscription successful:', subscriptionId);
+                          handlePaymentSuccess();
+                        }}
+                        onError={handlePaymentError}
+                        onCancel={() => {
+                          console.log('PayPal subscription cancelled');
+                          toast({
+                            title: "Subscription cancelled",
+                            description: "You can try again anytime.",
+                            variant: "default",
+                          });
+                        }}
+                        className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:from-blue-800 dark:via-blue-700 dark:to-blue-600 hover:from-blue-200 hover:via-blue-300 hover:to-blue-400 dark:hover:from-blue-700 dark:hover:via-blue-600 dark:hover:to-blue-500 text-blue-800 dark:text-blue-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
+                      >
+                        Subscribe with PayPal
+                      </SubscriptionButton>
+                    </div>
                   </div>
                 </div>
               )}
