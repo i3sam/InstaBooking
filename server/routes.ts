@@ -116,6 +116,33 @@ async function sendAppointmentRejectionEmail(customerEmail: string, customerName
   }
 }
 
+async function sendCustomerAppointmentConfirmation(customerEmail: string, customerName: string, date: string, time: string, serviceName: string) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
+      to: customerEmail,
+      subject: 'Appointment Request Received!',
+      html: `
+        <h2>Thank you for your appointment request, ${customerName}!</h2>
+        <p>We have received your appointment request with the following details:</p>
+        <p><strong>Service:</strong> ${serviceName}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Time:</strong> ${time}</p>
+        <p>Your appointment is currently pending approval. You will receive another email once it has been reviewed.</p>
+        <p>Thank you for choosing our services!</p>
+      `,
+    });
+    console.log(`Customer confirmation email sent to ${customerEmail}`);
+  } catch (error) {
+    console.error("Failed to send customer confirmation email:", error);
+  }
+}
+
 // Middleware to verify Supabase JWT
 async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
@@ -850,13 +877,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appointmentData = req.body;
       const appointment = await storage.createAppointment(appointmentData);
       
-      // Send email notification to business owner about new appointment
+      // Send email notifications
       try {
         // Get the page owner's profile and service details for the notification
         const page = await storage.getPage(appointmentData.pageId);
         if (page) {
           const profile = await storage.getProfile(page.ownerId);
           if (profile && profile.email) {
+            // Send notification to business owner
             await sendNewAppointmentNotification(
               profile.email,
               appointmentData.customerName,
@@ -866,8 +894,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             );
           }
         }
+        
+        // Send confirmation email to customer
+        if (appointmentData.customerEmail) {
+          await sendCustomerAppointmentConfirmation(
+            appointmentData.customerEmail,
+            appointmentData.customerName,
+            appointmentData.date,
+            appointmentData.time,
+            appointmentData.serviceName || 'Service'
+          );
+        }
       } catch (emailError) {
-        console.error("Failed to send new appointment notification:", emailError);
+        console.error("Failed to send appointment notification emails:", emailError);
         // Don't fail the appointment creation if email fails
       }
       
