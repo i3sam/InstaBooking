@@ -4,7 +4,7 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import heroImage from '@assets/Hero image (1)_1757961964946.png';
+import heroImage from '@assets/image_1758670396246.png';
 import DemoWizard from '@/components/demo/DemoWizard';
 import { 
   Palette, 
@@ -241,18 +241,15 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Hero Image Section - Moved to Bottom with Glass Prism Effect */}
+        {/* Hero Image Section */}
         <div className="relative pb-20 lg:pb-32">
           <div className="container mx-auto px-6">
             <div className="relative max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-              <div className="relative glass-prism-card rounded-3xl p-8 hover-lift">
-                <img 
-                  src={heroImage} 
-                  alt="BookingGen dashboard interface" 
-                  className="w-full h-auto object-contain rounded-2xl"
-                />
-                <div className="absolute -inset-12 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-3xl -z-10 opacity-70 animate-pulse"></div>
-              </div>
+              <img 
+                src={heroImage} 
+                alt="BookingGen dashboard interface" 
+                className="w-full h-auto object-contain rounded-2xl"
+              />
             </div>
           </div>
         </div>
