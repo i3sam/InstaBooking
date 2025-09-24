@@ -274,52 +274,52 @@ export default function Home() {
               </span>
             </h2>
             
-            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-12">
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-12 break-words">
               Create and preview your booking page instantly. See exactly how it will look before committing to a plan.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center lg:items-start">
             {/* Left: Benefits */}
             <div className="space-y-8 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0 min-touch-target">
                     <Zap className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Instant Preview</h3>
-                    <p className="text-muted-foreground">See your booking page come to life in real-time as you customize it. No guesswork involved.</p>
+                    <p className="text-muted-foreground break-words">See your booking page come to life in real-time as you customize it. No guesswork involved.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0 min-touch-target">
                     <Target className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Perfect Your Design</h3>
-                    <p className="text-muted-foreground">Test different themes, colors, and layouts until you find the perfect match for your brand.</p>
+                    <p className="text-muted-foreground break-words">Test different themes, colors, and layouts until you find the perfect match for your brand.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0 min-touch-target">
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Risk-Free Testing</h3>
-                    <p className="text-muted-foreground">Try all features without any commitment. Only sign up when you're completely satisfied.</p>
+                    <p className="text-muted-foreground break-words">Try all features without any commitment. Only sign up when you're completely satisfied.</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 glass-prism rounded-lg flex items-center justify-center shrink-0 min-touch-target">
                     <Globe className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Share for Feedback</h3>
-                    <p className="text-muted-foreground">Get feedback from colleagues or clients before going live. Share your demo link easily.</p>
+                    <p className="text-muted-foreground break-words">Get feedback from colleagues or clients before going live. Share your demo link easily.</p>
                   </div>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function Home() {
                   
                   <div>
                     <h3 className="text-2xl font-bold text-foreground mb-4">Ready to create your demo?</h3>
-                    <p className="text-muted-foreground mb-6">
+                    <p className="text-muted-foreground mb-6 break-words">
                       It takes less than 5 minutes to build and preview your booking page. Start with our guided wizard.
                     </p>
                   </div>
@@ -353,7 +353,7 @@ export default function Home() {
                       Start Demo Wizard
                     </Button>
                     
-                    <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center">
                         <Check className="h-4 w-4 text-green-500 mr-2" />
                         No credit card
@@ -370,7 +370,7 @@ export default function Home() {
                   </div>
                   
                   <div className="pt-4 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground break-words">
                       💡 <strong>Pro tip:</strong> Your demo will be saved for 7 days so you can come back and refine it anytime.
                     </p>
                   </div>
