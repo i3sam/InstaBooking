@@ -47,7 +47,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen page-gradient animate-fade-in relative overflow-hidden">
       {/* Glass prism background effects */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden mobile-hide">
         <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-blue-400/10 via-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-float"></div>
         <div className="absolute top-40 right-32 w-48 h-48 bg-gradient-to-br from-green-400/10 via-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-float-delayed"></div>
         <div className="absolute bottom-32 left-1/3 w-56 h-56 bg-gradient-to-br from-purple-400/10 via-pink-400/10 to-orange-400/10 rounded-full blur-3xl animate-float-slow"></div>
@@ -76,13 +76,13 @@ export default function Dashboard() {
         
         <div className="flex-1 w-full lg:w-auto lg:ml-64">
           {/* Header */}
-          <header className="glass-prism-card mx-4 lg:mx-8 my-6 px-6 py-4 backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl shadow-2xl">
+          <header className="glass-prism-card mx-3 lg:mx-8 my-4 lg:my-6 px-4 lg:px-6 py-3 lg:py-4 backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl shadow-2xl mobile-no-blur">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 rounded-xl glass-prism backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30 hover:bg-white/30 dark:hover:bg-black/30 transition-all duration-300"
+                  className="lg:hidden p-2 rounded-xl glass-prism backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30 hover:bg-white/30 dark:hover:bg-black/30 transition-all duration-300 min-touch-target"
                   data-testid="button-mobile-menu"
                 >
                   {isMobileMenuOpen ? (
@@ -94,7 +94,7 @@ export default function Dashboard() {
                 
                 <div>
                   <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Dashboard</h1>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm lg:text-base">Manage your booking pages and appointments</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm lg:text-base break-words">Manage your booking pages and appointments</p>
                 </div>
               </div>
               
@@ -106,7 +106,7 @@ export default function Dashboard() {
                     </span>
                   </div>
                   <div className="hidden sm:block">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100" data-testid="text-username">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 break-words" data-testid="text-username">
                       {profile?.fullName || user?.email}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-300" data-testid="text-membership-status">
@@ -119,7 +119,7 @@ export default function Dashboard() {
           </header>
 
           {/* Content */}
-          <div className="p-4 lg:p-8">
+          <div className="p-3 lg:p-8">
             <div className="animate-slide-up">
               {renderContent()}
             </div>
@@ -173,8 +173,8 @@ function AnalyticsSection() {
         <p className="text-gray-600 dark:text-gray-300">Track your booking performance and revenue</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
+      <div className="grid lg:grid-cols-2 gap-3 lg:gap-6 mb-8">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Conversion Rate</h3>
@@ -196,7 +196,7 @@ function AnalyticsSection() {
           </CardContent>
         </Card>
         
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Booking Value</h3>
@@ -219,7 +219,7 @@ function AnalyticsSection() {
         </Card>
       </div>
 
-      <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
+      <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Key Metrics</h3>
           {statsLoading ? (
@@ -237,20 +237,20 @@ function AnalyticsSection() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/20 rounded-xl">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/20 rounded-xl mobile-no-blur">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">{dashboardStats?.pagesCount || 0}</div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Active Pages</p>
               </div>
-              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-cyan-500/10 border border-white/20 rounded-xl">
+              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-cyan-500/10 border border-white/20 rounded-xl mobile-no-blur">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{dashboardStats?.totalAppointments || 0}</div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Bookings</p>
               </div>
-              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-white/20 rounded-xl">
+              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-white/20 rounded-xl mobile-no-blur">
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Pending Approval</p>
               </div>
-              <div className="text-center p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-white/20 rounded-xl">
+              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-white/20 rounded-xl mobile-no-blur">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
               </div>
