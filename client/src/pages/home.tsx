@@ -178,9 +178,9 @@ export default function Home() {
       <section className="relative overflow-hidden gojiberry-hero-gradient">
         {/* Glass Prism Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
-        <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-overlay"></div>
-        <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
-        <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
+        <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-overlay mobile-hide"></div>
+        <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '3s'}}></div>
         
         <div className="relative pt-20 pb-16 lg:pt-28 lg:pb-24 content-layer">
           <div className="container mx-auto px-6">
@@ -194,7 +194,7 @@ export default function Home() {
                 
                 {/* Main Headline */}
                 <div className="hero-radial-beam">
-                  <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold leading-tight text-foreground animate-slide-in-left">
+                  <h1 className="text-clamp-xl font-bold leading-tight text-foreground animate-slide-in-left text-wrap-balance">
                     Create{' '}
                     <span className="text-blue-gradient">
                       beautiful booking pages
@@ -204,7 +204,7 @@ export default function Home() {
                 </div>
                 
                 {/* Subtitle */}
-                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right">
+                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right break-words">
                   Our AI-powered platform works 24/7 to create professional booking pages that convert visitors into clients effortlessly.
                 </p>
                 
@@ -213,7 +213,7 @@ export default function Home() {
                   <Button 
                     onClick={() => setLocation('/signup')}
                     size="lg"
-                    className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
+                    className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
                     data-testid="button-get-started"
                   >
                     Get Started for Free
@@ -258,8 +258,8 @@ export default function Home() {
       {/* Test Before You Launch Section */}
       <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-blue-50/30 dark:to-blue-950/30">
         {/* Glass Prism Background Elements */}
-        <div className="absolute top-10 left-10 w-64 h-64 glass-prism rounded-full opacity-15 animate-float bg-overlay"></div>
-        <div className="absolute bottom-20 right-20 w-48 h-48 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-10 left-10 w-64 h-64 glass-prism rounded-full opacity-15 animate-float bg-overlay mobile-hide"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
         
         <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center mb-16 animate-fade-in-up">
@@ -268,7 +268,7 @@ export default function Home() {
               No signup required
             </div>
             
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               <span className="text-blue-gradient">
                 Test before you Launch
               </span>
@@ -327,8 +327,8 @@ export default function Home() {
 
             {/* Right: Call to Action */}
             <div className="animate-fade-in-up" style={{animationDelay: '0.4s'}}>
-              <Card className="glass-prism-card p-8 hover-lift relative group">
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+              <Card className="glass-prism-card p-8 hover-lift relative group mobile-no-blur">
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-blue-500/30 to-blue-600/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 mobile-hide"></div>
                 
                 <div className="text-center space-y-6">
                   <div className="w-20 h-20 glass-prism rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
@@ -346,7 +346,7 @@ export default function Home() {
                     <Button
                       onClick={() => setShowDemoWizard(true)}
                       size="lg"
-                      className="w-full glass-prism-button px-8 py-4 rounded-full text-lg h-auto font-semibold"
+                      className="w-full glass-prism-button px-8 py-4 rounded-full text-lg h-auto font-semibold min-touch-target"
                       data-testid="button-start-demo-wizard"
                     >
                       <Play className="mr-3 h-5 w-5" />
@@ -392,12 +392,12 @@ export default function Home() {
       {/* Features Section */}
       <section id="features" className="relative py-24 overflow-hidden gojiberry-gradient">
         {/* Glass Prism Background Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
-        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
         
         <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center mb-20 animate-fade-in-up">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               Everything you need to{' '}
               <span className="text-blue-gradient">
                 accept bookings
@@ -434,11 +434,11 @@ export default function Home() {
       {/* How It Works */}
       <section id="how-it-works" className="relative py-24 overflow-hidden">
         {/* Glass Prism Background Elements */}
-        <div className="absolute top-32 left-10 w-80 h-80 glass-prism rounded-full opacity-15 animate-float"></div>
+        <div className="absolute top-32 left-10 w-80 h-80 glass-prism rounded-full opacity-15 animate-float mobile-hide"></div>
         
         <div className="container mx-auto px-6">
           <div className="text-center mb-20 animate-fade-in-up">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               Launch your booking page in{' '}
               <span className="text-blue-gradient">
                 3 simple steps
@@ -474,12 +474,12 @@ export default function Home() {
       <section className="relative py-24 overflow-hidden gojiberry-gradient">
         {/* Glass Prism Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
-        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
-        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
         
         <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center mb-20 animate-fade-in-up">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               See what your{' '}
               <span className="text-blue-gradient">
                 booking pages
@@ -513,16 +513,16 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
+                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300 mobile-no-blur">
                       <h4 className="font-semibold text-foreground">Individual Therapy Session</h4>
                       <p className="text-sm text-muted-foreground">50 minutes • $120</p>
                     </div>
-                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
+                    <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300 mobile-no-blur">
                       <h4 className="font-semibold text-foreground">Couples Counseling</h4>
                       <p className="text-sm text-muted-foreground">60 minutes • $150</p>
                     </div>
                   </div>
-                  <Button className="w-full glass-prism-button px-6 py-2 rounded-full font-semibold">
+                  <Button className="w-full glass-prism-button px-6 py-2 rounded-full font-semibold min-touch-target">
                     Book Appointment
                   </Button>
                 </div>
@@ -548,16 +548,16 @@ export default function Home() {
                       <p className="text-sm text-muted-foreground">Premium cuts & styling</p>
                     </div>
                     <div className="space-y-2">
-                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
+                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300 mobile-no-blur">
                         <h4 className="font-semibold text-sm text-foreground">Classic Cut</h4>
                         <p className="text-xs text-muted-foreground">30 min • $35</p>
                       </div>
-                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300">
+                      <div className="p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all duration-300 mobile-no-blur">
                         <h4 className="font-semibold text-sm text-foreground">Cut & Style</h4>
                         <p className="text-xs text-muted-foreground">45 min • $50</p>
                       </div>
                     </div>
-                    <Button size="sm" className="w-full glass-prism-button px-4 py-2 rounded-full font-semibold text-sm">
+                    <Button size="sm" className="w-full glass-prism-button px-4 py-2 rounded-full font-semibold text-sm min-touch-target">
                       Book Now
                     </Button>
                   </div>
@@ -574,7 +574,7 @@ export default function Home() {
             <Button 
               size="lg"
               onClick={() => setLocation('/tutorial')}
-              className="glass-prism-button px-8 py-3 rounded-full text-lg font-semibold hover-lift"
+              className="glass-prism-button px-8 py-3 rounded-full text-lg font-semibold hover-lift mobile-full-width min-touch-target"
               data-testid="button-see-tutorial"
             >
               <Play className="mr-2 h-5 w-5" />
@@ -591,7 +591,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-background to-blue-50/20 dark:to-blue-950/20"></div>
         <div className="relative container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               Perfect for any{' '}
               <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
                 service-based business
@@ -604,7 +604,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {useCases.map((useCase, index) => (
-              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2" data-testid={`use-case-${index}`}>
+              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 mobile-no-blur" data-testid={`use-case-${index}`}>
                 <CardContent className="p-8">
                   <div className="relative mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -637,7 +637,7 @@ export default function Home() {
       <section id="testimonials" className="py-24">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-8">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               What our{' '}
               <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent">
                 users are saying
@@ -650,7 +650,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2" data-testid={`testimonial-${index}`}>
+              <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 mobile-no-blur" data-testid={`testimonial-${index}`}>
                 <CardContent className="p-8">
                   <div className="flex items-center mb-6">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -704,7 +704,7 @@ export default function Home() {
               <Button 
                 size="lg"
                 onClick={() => setLocation('/signup')}
-                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
+                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
                 data-testid="button-cta-signup"
               >
                 Get Started for Free
@@ -714,7 +714,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 onClick={() => setLocation('/tutorial')}
-                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto"
+                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
                 data-testid="button-cta-tutorial"
               >
                 <Play className="mr-3 h-6 w-6" />
