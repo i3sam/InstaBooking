@@ -64,7 +64,7 @@ export default function Dashboard() {
           <div className="lg:hidden fixed inset-0 z-50 flex animate-fade-in">
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm mobile-no-blur" 
               onClick={() => setIsMobileMenuOpen(false)}
             />
             {/* Mobile Sidebar */}

@@ -36,11 +36,11 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   ];
 
   return (
-    <div className="w-64 glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-r border-white/20 h-screen flex flex-col shadow-2xl animate-slide-in-left fixed left-0 top-0 z-40 overflow-y-auto overscroll-contain">
+    <div className="w-64 glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-r border-white/20 h-screen flex flex-col shadow-2xl animate-slide-in-left fixed left-0 top-0 z-40 overflow-y-auto overscroll-contain mobile-no-blur">
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 glass-prism rounded-xl flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/30">
+          <div className="w-10 h-10 glass-prism rounded-xl flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/30 mobile-no-blur">
             <CalendarDays className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">BookingGen</span>
@@ -55,8 +55,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             onClick={() => onSectionChange('overview')}
             className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 group ${
               activeSection === 'overview'
-                ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg'
-                : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md'
+                ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg mobile-no-blur'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md mobile-no-blur'
             }`}
             data-testid="nav-overview"
           >
@@ -72,8 +72,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               onClick={() => onSectionChange(item.id)}
               className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 group ${
                 activeSection === item.id
-                  ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md'
+                  ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg mobile-no-blur'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md mobile-no-blur'
               }`}
               data-testid={`nav-${item.id}`}
             >
@@ -96,8 +96,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               onClick={() => onSectionChange(item.id)}
               className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 group ${
                 activeSection === item.id
-                  ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md'
+                  ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg mobile-no-blur'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md mobile-no-blur'
               }`}
               data-testid={`nav-${item.id}`}
             >
@@ -111,10 +111,10 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       {/* Enhanced Upgrade Card at Bottom */}
       {profile && profile.membershipStatus !== 'pro' && (
         <div className="p-4">
-          <div className="relative glass-prism-card backdrop-blur-xl bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 border border-white/20 rounded-2xl p-5 overflow-hidden shadow-2xl animate-float">
+          <div className="relative glass-prism-card backdrop-blur-xl bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 border border-white/20 rounded-2xl p-5 overflow-hidden shadow-2xl animate-float sm:animate-float mobile-no-blur">
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full -translate-y-10 translate-x-10 blur-xl"></div>
-            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full translate-y-8 -translate-x-8 blur-xl"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full -translate-y-10 translate-x-10 blur-xl mobile-hide"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full translate-y-8 -translate-x-8 blur-xl mobile-hide"></div>
             
             {/* Content */}
             <div className="relative z-10">
@@ -142,7 +142,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button 
-              className="w-full glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl p-4 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 shadow-lg hover:shadow-xl group"
+              className="w-full glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 rounded-2xl p-4 hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 shadow-lg hover:shadow-xl group mobile-no-blur"
               data-testid="button-account-switcher"
             >
               <div className="flex items-center justify-between min-w-0">
@@ -168,7 +168,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           <DropdownMenuContent 
             align="end" 
             side="top"
-            className="w-64 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl"
+            className="w-64 glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur"
           >
             <div className="p-3">
               <div className="flex items-center space-x-3 mb-3 min-w-0">
