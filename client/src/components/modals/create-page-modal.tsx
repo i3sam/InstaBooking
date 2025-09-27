@@ -57,7 +57,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       parking: true,
       wheelchairAccessible: true,
       professionalAtmosphere: true,
-      customInfo: []
+      customInfo: [] as string[]
     },
     gallery: {
       banners: [],
@@ -244,7 +244,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         parking: true,
         wheelchairAccessible: true,
         professionalAtmosphere: true,
-        customInfo: []
+        customInfo: [] as string[]
       },
       gallery: {
         banners: [],
@@ -308,7 +308,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           parking: true,
           wheelchairAccessible: true,
           professionalAtmosphere: true,
-          customInfo: []
+          customInfo: [] as string[]
         },
         gallery: editingPageData.data?.gallery || editingPageData.gallery || {
           banners: [],
