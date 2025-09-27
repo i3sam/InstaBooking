@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit } from 'lucide-react';
+import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit, Users } from 'lucide-react';
 import { uploadFile } from '@/lib/supabase';
 
 interface CreatePageModalProps {
@@ -26,6 +26,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     title: '',
     slug: '',
     tagline: '',
+    description: '',
     primaryColor: '#2563eb',
     calendarLink: '',
     logoUrl: '',
@@ -51,6 +52,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     showBusinessHours: 'true',
     showContactInfo: 'true',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+    staff: [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+    visitInfo: {
+      parking: true,
+      wheelchairAccessible: true,
+      professionalAtmosphere: true,
+      customInfo: []
+    },
     gallery: {
       banners: [],
       logos: [],
@@ -205,6 +213,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       title: '',
       slug: '',
       tagline: '',
+      description: '',
       primaryColor: '#2563eb',
       calendarLink: '',
       logoUrl: '',
@@ -230,6 +239,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       showBusinessHours: 'true',
       showContactInfo: 'true',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+      staff: [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+      visitInfo: {
+        parking: true,
+        wheelchairAccessible: true,
+        professionalAtmosphere: true,
+        customInfo: []
+      },
       gallery: {
         banners: [],
         logos: [],
@@ -261,6 +277,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         title: editingPageData.title || '',
         slug: editingPageData.slug || '',
         tagline: editingPageData.tagline || '',
+        description: editingPageData.data?.description || editingPageData.description || '',
         primaryColor: editingPageData.primaryColor || '#2563eb',
         calendarLink: editingPageData.calendarLink || '',
         logoUrl: editingPageData.logoUrl || '',
@@ -286,6 +303,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         showBusinessHours: editingPageData.showBusinessHours || 'true',
         showContactInfo: editingPageData.showContactInfo || 'true',
         services: formattedServices,
+        staff: editingPageData.data?.staff || [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+        visitInfo: editingPageData.data?.visitInfo || {
+          parking: true,
+          wheelchairAccessible: true,
+          professionalAtmosphere: true,
+          customInfo: []
+        },
         gallery: editingPageData.data?.gallery || editingPageData.gallery || {
           banners: [],
           logos: [],
@@ -385,33 +409,40 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     {
       number: 1,
       title: "Basic Details",
-      description: "Set up your booking page name, web address, and tagline",
+      description: "Set up your booking page name, web address, tagline and description",
       icon: Edit,
-      fields: ['title', 'slug', 'tagline']
+      fields: ['title', 'slug', 'tagline', 'description']
     },
     {
-      number: 2, 
+      number: 2,
+      title: "Team & Staff",
+      description: "Add your team members and their information",
+      icon: Users,
+      fields: ['staff']
+    },
+    {
+      number: 3, 
       title: "Services & Pricing",
       description: "Add your services, set pricing and duration for each offering",
       icon: FileText,
       fields: ['services']
     },
     {
-      number: 3,
+      number: 4,
       title: "Style & Branding", 
       description: "Customize colors, themes, and upload your logo",
       icon: Palette,
       fields: ['theme', 'primaryColor', 'backgroundType', 'backgroundValue', 'fontFamily', 'logoUrl']
     },
     {
-      number: 4,
+      number: 5,
       title: "Business Information",
-      description: "Add contact details, business hours, and policies",
+      description: "Add contact details, business hours, location and visit information",
       icon: Settings,
-      fields: ['contactPhone', 'contactEmail', 'businessAddress', 'businessHours', 'calendarLink', 'cancellationPolicy']
+      fields: ['contactPhone', 'contactEmail', 'businessAddress', 'businessHours', 'calendarLink', 'cancellationPolicy', 'visitInfo']
     },
     {
-      number: 5,
+      number: 6,
       title: "Review & Publish",
       description: "Review your booking page and publish it to the world",
       icon: Check,
@@ -427,14 +458,16 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   const validateStep = (step: number) => {
     switch (step) {
       case 1:
-        return formData.title.trim() && formData.slug.trim();
+        return formData.title.trim() && formData.slug.trim() && formData.description.trim();
       case 2:
-        return formData.services.some(service => service.name.trim() && service.price);
+        return true; // Staff is optional
       case 3:
-        return true; // Styling is optional
+        return formData.services.some(service => service.name.trim() && service.price);
       case 4:
-        return true; // Business info is optional  
+        return true; // Styling is optional
       case 5:
+        return true; // Business info is optional  
+      case 6:
         return true; // Review step
       default:
         return false;
@@ -471,6 +504,63 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         services: prev.services.filter((_, i) => i !== index)
       }));
     }
+  };
+
+  const addStaffMember = () => {
+    setFormData(prev => ({
+      ...prev,
+      staff: [...prev.staff, { name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }]
+    }));
+  };
+
+  const removeStaffMember = (index: number) => {
+    if (formData.staff.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        staff: prev.staff.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateStaffMember = (index: number, field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      staff: prev.staff.map((member, i) => 
+        i === index ? { ...member, [field]: value } : member
+      )
+    }));
+  };
+
+  const addCustomVisitInfo = () => {
+    setFormData(prev => ({
+      ...prev,
+      visitInfo: {
+        ...prev.visitInfo,
+        customInfo: [...prev.visitInfo.customInfo, '']
+      }
+    }));
+  };
+
+  const removeCustomVisitInfo = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      visitInfo: {
+        ...prev.visitInfo,
+        customInfo: prev.visitInfo.customInfo.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const updateCustomVisitInfo = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      visitInfo: {
+        ...prev.visitInfo,
+        customInfo: prev.visitInfo.customInfo.map((info, i) => 
+          i === index ? value : info
+        )
+      }
+    }));
   };
 
   const updateService = (index: number, field: string, value: any) => {
@@ -622,6 +712,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       showBusinessHours: formData.showBusinessHours,
       showContactInfo: formData.showContactInfo,
       data: {
+        description: formData.description,
+        staff: formData.staff,
+        visitInfo: formData.visitInfo,
         gallery: formData.gallery
       }
     });
@@ -686,12 +779,136 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     A catchy subtitle that describes what you offer
                   </p>
                 </div>
+
+                <div>
+                  <Label htmlFor="description" className="text-base font-medium">Business Description *</Label>
+                  <textarea
+                    id="description"
+                    placeholder="Describe your business, services, and what makes you unique. This will appear in the About section of your booking page..."
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full min-h-[120px] px-3 py-2 glass-effect border-border/50 mt-2 rounded-xl resize-vertical"
+                    required
+                    data-testid="textarea-description"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Tell potential clients about your expertise, experience, and approach
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
         );
 
       case 2:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Team & Staff
+                  </h3>
+                  <Button type="button" onClick={addStaffMember} className="glass-effect hover-lift rounded-xl" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Staff Member
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.staff.map((member, index) => (
+                  <Card key={index} className="glass-effect border-border/50 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <h4 className="text-sm font-medium">Staff Member #{index + 1}</h4>
+                      {formData.staff.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeStaffMember(index)}
+                          className="hover-lift"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-base font-medium">Name</Label>
+                          <Input
+                            placeholder="e.g., John Smith"
+                            value={member.name}
+                            onChange={(e) => updateStaffMember(index, 'name', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-staff-name-${index}`}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium">Position/Title</Label>
+                          <Input
+                            placeholder="e.g., Senior Trainer, Massage Therapist"
+                            value={member.position}
+                            onChange={(e) => updateStaffMember(index, 'position', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-staff-position-${index}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-base font-medium">Bio</Label>
+                        <textarea
+                          placeholder="Brief description of experience, specialties, and qualifications..."
+                          value={member.bio}
+                          onChange={(e) => updateStaffMember(index, 'bio', e.target.value)}
+                          rows={3}
+                          className="w-full px-3 py-2 glass-effect border-border/50 mt-2 rounded-xl resize-vertical"
+                          data-testid={`textarea-staff-bio-${index}`}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-base font-medium">Email</Label>
+                          <Input
+                            type="email"
+                            placeholder="john@example.com"
+                            value={member.email}
+                            onChange={(e) => updateStaffMember(index, 'email', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-staff-email-${index}`}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium">Phone</Label>
+                          <Input
+                            type="tel"
+                            placeholder="(555) 123-4567"
+                            value={member.phone}
+                            onChange={(e) => updateStaffMember(index, 'phone', e.target.value)}
+                            className="glass-effect border-border/50 mt-2"
+                            data-testid={`input-staff-phone-${index}`}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground">
+                    Add your team members to build trust with potential clients. Staff information will appear in the Staff section of your booking page.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 3:
         return (
           <div className="space-y-6">
             <Card className="glass-prism-card border-none shadow-lg">
@@ -737,12 +954,12 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                       
                       <div>
                         <Label className="text-base font-medium">Description</Label>
-                        <Textarea
+                        <textarea
                           placeholder="Describe what's included in this service..."
                           value={service.description}
                           onChange={(e) => updateService(index, 'description', e.target.value)}
                           rows={2}
-                          className="glass-effect border-border/50 mt-2"
+                          className="w-full px-3 py-2 glass-effect border-border/50 mt-2 rounded-xl resize-vertical"
                         />
                       </div>
 
@@ -778,7 +995,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           </div>
         );
 
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <Card className="glass-prism-card border-none shadow-lg">
@@ -853,7 +1070,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           </div>
         );
 
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <Card className="glass-prism-card border-none shadow-lg">
@@ -941,12 +1158,106 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     ))}
                   </div>
                 </div>
+
+                <Card className="glass-prism-card border-none shadow-lg">
+                  <CardHeader>
+                    <h4 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Visit Information
+                    </h4>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="parking"
+                          checked={formData.visitInfo.parking}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            visitInfo: { ...prev.visitInfo, parking: e.target.checked }
+                          }))}
+                          className="rounded border-border/50"
+                          data-testid="checkbox-parking"
+                        />
+                        <Label htmlFor="parking" className="text-base">Easy parking available</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="wheelchair"
+                          checked={formData.visitInfo.wheelchairAccessible}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            visitInfo: { ...prev.visitInfo, wheelchairAccessible: e.target.checked }
+                          }))}
+                          className="rounded border-border/50"
+                          data-testid="checkbox-wheelchair"
+                        />
+                        <Label htmlFor="wheelchair" className="text-base">Wheelchair accessible</Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="professional"
+                          checked={formData.visitInfo.professionalAtmosphere}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            visitInfo: { ...prev.visitInfo, professionalAtmosphere: e.target.checked }
+                          }))}
+                          className="rounded border-border/50"
+                          data-testid="checkbox-professional"
+                        />
+                        <Label htmlFor="professional" className="text-base">Professional atmosphere</Label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-base font-medium">Custom Visit Information</Label>
+                        <Button type="button" onClick={addCustomVisitInfo} size="sm" className="glass-effect hover-lift rounded-xl">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Info
+                        </Button>
+                      </div>
+                      
+                      {formData.visitInfo.customInfo.map((info, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <Input
+                            placeholder="e.g., Free Wi-Fi, Complimentary beverages"
+                            value={info}
+                            onChange={(e) => updateCustomVisitInfo(index, e.target.value)}
+                            className="flex-1 glass-effect border-border/50"
+                            data-testid={`input-custom-visit-${index}`}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeCustomVisitInfo(index)}
+                            className="hover-lift"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      {formData.visitInfo.customInfo.length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-2">
+                          Add custom information about visiting your business
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </div>
         );
 
-      case 5:
+      case 6:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8 glass-prism-card p-6 rounded-2xl border-none shadow-lg animate-fade-in-up">
@@ -974,6 +1285,28 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     <p><strong>Title:</strong> {formData.title || 'Not set'}</p>
                     <p><strong>URL:</strong> bookinggen.xyz/{formData.slug || 'not-set'}</p>
                     <p><strong>Tagline:</strong> {formData.tagline || 'None'}</p>
+                    <p><strong>Description:</strong> {formData.description ? formData.description.substring(0, 100) + (formData.description.length > 100 ? '...' : '') : 'Not set'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <Users className="h-4 w-4 mr-2" />
+                    Staff Members
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    {formData.staff.filter(s => s.name.trim()).map((member, index) => (
+                      <p key={index}>
+                        <strong>{member.name}</strong> - {member.position || 'No position set'}
+                      </p>
+                    ))}
+                    {formData.staff.filter(s => s.name.trim()).length === 0 && (
+                      <p className="text-muted-foreground">No staff members added</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1010,6 +1343,29 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <div className="space-y-2 text-sm">
                     <p><strong>Theme:</strong> {formData.theme}</p>
                     <p><strong>Logo:</strong> {formData.logoUrl ? 'Uploaded' : 'None'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-prism-card border-none shadow-lg hover-lift">
+                <CardHeader>
+                  <h4 className="font-medium flex items-center text-blue-gradient">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Visit Information
+                  </h4>
+                </CardHeader>
+                <CardContent className="glass-effect rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    {formData.visitInfo.parking && <p>✓ Easy parking available</p>}
+                    {formData.visitInfo.wheelchairAccessible && <p>✓ Wheelchair accessible</p>}
+                    {formData.visitInfo.professionalAtmosphere && <p>✓ Professional atmosphere</p>}
+                    {formData.visitInfo.customInfo.filter(info => info.trim()).map((info, index) => (
+                      <p key={index}>✓ {info}</p>
+                    ))}
+                    {!formData.visitInfo.parking && !formData.visitInfo.wheelchairAccessible && 
+                     !formData.visitInfo.professionalAtmosphere && formData.visitInfo.customInfo.length === 0 && (
+                      <p className="text-muted-foreground">No visit information added</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
