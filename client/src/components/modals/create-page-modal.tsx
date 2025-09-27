@@ -1074,7 +1074,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                           type="button"
                           onClick={() => selectColorTheme(theme)}
                           className={`p-3 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect ${
-                            formData.theme === theme.name ? 'border-primary shadow-lg' : 'border-border/50'
+                            formData.theme === theme.name 
+                              ? 'border-blue-500 shadow-lg ring-2 ring-blue-200 bg-blue-50/50' 
+                              : 'border-border/50 hover:border-border'
                           }`}
                         >
                           <div className={`w-full h-8 rounded mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
@@ -1090,15 +1092,32 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <div className="border-2 border-dashed border-border/50 rounded-xl p-6 text-center glass-effect">
                     {logoPreview ? (
                       <div className="space-y-4">
-                        <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain mx-auto" />
-                        <Button
-                          type="button"
-                          onClick={() => document.getElementById('logo-upload')?.click()}
-                          disabled={uploadingLogo}
-                          className="glass-effect hover-lift rounded-xl"
-                        >
-                          Change Logo
-                        </Button>
+                        <img src={logoPreview} alt="Logo preview" className="w-20 h-20 object-contain mx-auto rounded-lg border border-border/20" />
+                        <div className="flex gap-2 justify-center">
+                          <Button
+                            type="button"
+                            onClick={() => document.getElementById('logo-upload')?.click()}
+                            disabled={uploadingLogo}
+                            variant="outline"
+                            className="glass-effect hover-lift rounded-xl"
+                            data-testid="button-change-logo"
+                          >
+                            Change Logo
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setLogoPreview('');
+                              setLogoFile(null);
+                              setFormData(prev => ({ ...prev, logoUrl: '' }));
+                            }}
+                            variant="destructive"
+                            className="hover-lift rounded-xl"
+                            data-testid="button-remove-logo"
+                          >
+                            Remove Logo
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -1107,7 +1126,8 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                           type="button"
                           onClick={() => document.getElementById('logo-upload')?.click()}
                           disabled={uploadingLogo}
-                          className="glass-effect hover-lift rounded-xl"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
+                          data-testid="button-upload-logo"
                         >
                           {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
                         </Button>
