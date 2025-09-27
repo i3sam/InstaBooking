@@ -52,7 +52,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     showBusinessHours: 'true',
     showContactInfo: 'true',
     services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
-    staff: [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+    staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
     visitInfo: {
       parking: true,
       wheelchairAccessible: true,
@@ -239,7 +239,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       showBusinessHours: 'true',
       showContactInfo: 'true',
       services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
-      staff: [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+      staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
       visitInfo: {
         parking: true,
         wheelchairAccessible: true,
@@ -303,7 +303,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         showBusinessHours: editingPageData.showBusinessHours || 'true',
         showContactInfo: editingPageData.showContactInfo || 'true',
         services: formattedServices,
-        staff: editingPageData.data?.staff || [{ name: '', position: '', bio: '', email: '', phone: '', imageUrl: '' }],
+        staff: editingPageData.data?.staff || [],
         visitInfo: editingPageData.data?.visitInfo || {
           parking: true,
           wheelchairAccessible: true,
@@ -817,92 +817,106 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {formData.staff.map((member, index) => (
-                  <Card key={index} className="glass-effect border-border/50 shadow-sm">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                      <h4 className="text-sm font-medium">Staff Member #{index + 1}</h4>
-                      {formData.staff.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeStaffMember(index)}
-                          className="hover-lift"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-base font-medium">Name</Label>
-                          <Input
-                            placeholder="e.g., John Smith"
-                            value={member.name}
-                            onChange={(e) => updateStaffMember(index, 'name', e.target.value)}
-                            className="glass-effect border-border/50 mt-2"
-                            data-testid={`input-staff-name-${index}`}
-                          />
+                {formData.staff.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h4 className="text-lg font-medium mb-2">No Staff Members Added</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Add your team members to build trust with potential clients. Staff information will appear in the Staff section of your booking page.
+                    </p>
+                  </div>
+                ) : (
+                  formData.staff.map((member, index) => (
+                    <Card key={index} className="glass-effect border-border/50 shadow-sm">
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                        <h4 className="text-sm font-medium">Staff Member #{index + 1}</h4>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            onClick={addStaffMember}
+                            size="sm"
+                            className="glass-effect hover-lift rounded-xl"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Another
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStaffMember(index)}
+                            className="hover-lift"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                        
-                        <div>
-                          <Label className="text-base font-medium">Position/Title</Label>
-                          <Input
-                            placeholder="e.g., Senior Trainer, Massage Therapist"
-                            value={member.position}
-                            onChange={(e) => updateStaffMember(index, 'position', e.target.value)}
-                            className="glass-effect border-border/50 mt-2"
-                            data-testid={`input-staff-position-${index}`}
-                          />
+                      </CardHeader>
+                      <CardContent className="pt-0 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-base font-medium">Name</Label>
+                            <Input
+                              placeholder="e.g., John Smith"
+                              value={member.name}
+                              onChange={(e) => updateStaffMember(index, 'name', e.target.value)}
+                              className="glass-effect border-border/50 mt-2"
+                              data-testid={`input-staff-name-${index}`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label className="text-base font-medium">Position/Title</Label>
+                            <Input
+                              placeholder="e.g., Senior Trainer, Massage Therapist"
+                              value={member.position}
+                              onChange={(e) => updateStaffMember(index, 'position', e.target.value)}
+                              className="glass-effect border-border/50 mt-2"
+                              data-testid={`input-staff-position-${index}`}
+                            />
+                          </div>
                         </div>
-                      </div>
 
-                      <div>
-                        <Label className="text-base font-medium">Bio</Label>
-                        <textarea
-                          placeholder="Brief description of experience, specialties, and qualifications..."
-                          value={member.bio}
-                          onChange={(e) => updateStaffMember(index, 'bio', e.target.value)}
-                          rows={3}
-                          className="w-full px-3 py-2 glass-effect border-border/50 mt-2 rounded-xl resize-vertical"
-                          data-testid={`textarea-staff-bio-${index}`}
-                        />
-                      </div>
+                        <div>
+                          <Label className="text-base font-medium">Bio</Label>
+                          <textarea
+                            placeholder="Brief description of experience, specialties, and qualifications..."
+                            value={member.bio}
+                            onChange={(e) => updateStaffMember(index, 'bio', e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 glass-effect border-border/50 mt-2 rounded-xl resize-vertical"
+                            data-testid={`textarea-staff-bio-${index}`}
+                          />
+                        </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-base font-medium">Email</Label>
-                          <Input
-                            type="email"
-                            placeholder="john@example.com"
-                            value={member.email}
-                            onChange={(e) => updateStaffMember(index, 'email', e.target.value)}
-                            className="glass-effect border-border/50 mt-2"
-                            data-testid={`input-staff-email-${index}`}
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-base font-medium">Email</Label>
+                            <Input
+                              type="email"
+                              placeholder="john@example.com"
+                              value={member.email}
+                              onChange={(e) => updateStaffMember(index, 'email', e.target.value)}
+                              className="glass-effect border-border/50 mt-2"
+                              data-testid={`input-staff-email-${index}`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label className="text-base font-medium">Phone</Label>
+                            <Input
+                              type="tel"
+                              placeholder="(555) 123-4567"
+                              value={member.phone}
+                              onChange={(e) => updateStaffMember(index, 'phone', e.target.value)}
+                              className="glass-effect border-border/50 mt-2"
+                              data-testid={`input-staff-phone-${index}`}
+                            />
+                          </div>
                         </div>
-                        
-                        <div>
-                          <Label className="text-base font-medium">Phone</Label>
-                          <Input
-                            type="tel"
-                            placeholder="(555) 123-4567"
-                            value={member.phone}
-                            onChange={(e) => updateStaffMember(index, 'phone', e.target.value)}
-                            className="glass-effect border-border/50 mt-2"
-                            data-testid={`input-staff-phone-${index}`}
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground">
-                    Add your team members to build trust with potential clients. Staff information will appear in the Staff section of your booking page.
-                  </p>
-                </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </CardContent>
             </Card>
           </div>
