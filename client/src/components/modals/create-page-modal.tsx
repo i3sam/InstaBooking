@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit, Users } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { uploadFile } from '@/lib/supabase';
 
 interface CreatePageModalProps {
@@ -51,7 +52,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     cancellationPolicy: '',
     showBusinessHours: 'true',
     showContactInfo: 'true',
-    services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+    services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }],
     staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
     visitInfo: {
       parking: true,
@@ -167,6 +168,29 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     { name: 'Open Sans (Friendly)', value: 'opensans', class: 'font-opensans' }
   ];
 
+  const currencyOptions = [
+    { code: 'USD', symbol: '$', name: 'US Dollar' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'British Pound' },
+    { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+    { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+    { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+    { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
+    { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+    { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+    { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
+    { code: 'SEK', symbol: 'kr', name: 'Swedish Krona' },
+    { code: 'NOK', symbol: 'kr', name: 'Norwegian Krone' },
+    { code: 'DKK', symbol: 'kr', name: 'Danish Krone' },
+    { code: 'PLN', symbol: 'zł', name: 'Polish Złoty' },
+    { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+    { code: 'MXN', symbol: '$', name: 'Mexican Peso' },
+    { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+    { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Dollar' },
+    { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' },
+    { code: 'ZAR', symbol: 'R', name: 'South African Rand' }
+  ];
+
   const createPageMutation = useMutation({
     mutationFn: async (data: any) => {
       if (isEditing) {
@@ -238,7 +262,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       cancellationPolicy: '',
       showBusinessHours: 'true',
       showContactInfo: 'true',
-      services: [{ name: '', description: '', durationMinutes: 60, price: '0' }],
+      services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }],
       staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
       visitInfo: {
         parking: true,
@@ -269,9 +293,10 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
             name: service.name || '',
             description: service.description || '',
             durationMinutes: service.durationMinutes || 60,
-            price: service.price?.toString() || '0'
+            price: service.price?.toString() || '0',
+            currency: service.currency || 'USD'
           }))
-        : [{ name: '', description: '', durationMinutes: 60, price: '0' }];
+        : [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }];
 
       setFormData({
         title: editingPageData.title || '',
@@ -493,7 +518,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   const addService = () => {
     setFormData(prev => ({
       ...prev,
-      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: '0' }]
+      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }]
     }));
   };
 
@@ -991,14 +1016,33 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                         
                         <div>
                           <Label className="text-base font-medium">Price *</Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="99.00"
-                            value={service.price}
-                            onChange={(e) => updateService(index, 'price', e.target.value)}
-                            className="glass-effect border-border/50 mt-2"
-                          />
+                          <div className="flex gap-2 mt-2">
+                            <Select
+                              value={service.currency || 'USD'}
+                              onValueChange={(value) => updateService(index, 'currency', value)}
+                            >
+                              <SelectTrigger className="w-24 glass-effect border-border/50">
+                                <SelectValue>
+                                  {currencyOptions.find(c => c.code === (service.currency || 'USD'))?.symbol || '$'}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {currencyOptions.map((currency) => (
+                                  <SelectItem key={currency.code} value={currency.code}>
+                                    {currency.symbol} {currency.code}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="99.00"
+                              value={service.price}
+                              onChange={(e) => updateService(index, 'price', e.target.value)}
+                              className="flex-1 glass-effect border-border/50"
+                            />
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -1334,11 +1378,14 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                 </CardHeader>
                 <CardContent className="glass-effect rounded-lg p-4">
                   <div className="space-y-2 text-sm">
-                    {formData.services.filter(s => s.name.trim()).map((service, index) => (
-                      <p key={index}>
-                        <strong>{service.name}</strong> - ${service.price} ({service.durationMinutes || 60} min)
-                      </p>
-                    ))}
+                    {formData.services.filter(s => s.name.trim()).map((service, index) => {
+                      const currency = currencyOptions.find(c => c.code === (service.currency || 'USD'));
+                      return (
+                        <p key={index}>
+                          <strong>{service.name}</strong> - {currency?.symbol || '$'}{service.price} {service.currency || 'USD'} ({service.durationMinutes || 60} min)
+                        </p>
+                      );
+                    })}
                     {formData.services.filter(s => s.name.trim()).length === 0 && (
                       <p className="text-muted-foreground">No services added</p>
                     )}
