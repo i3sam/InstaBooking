@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +14,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
 import { getPublicPageBySlug, getPublicServicesByPageId, getPublicReviewsByPageId, getPublicStaffByPageId } from '@/lib/supabase-queries';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2 } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2, Info, Calendar as CalendarIcon } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -33,6 +33,18 @@ export default function PublicBooking() {
   });
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  
+  // New state for mobile-first navigation
+  const [activeSection, setActiveSection] = useState('hero');
+  const [showStickyNav, setShowStickyNav] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const staffRef = useRef<HTMLElement>(null);
+  const reviewsRef = useRef<HTMLElement>(null);
+  const timingsRef = useRef<HTMLElement>(null);
+  const galleryRef = useRef<HTMLElement>(null);
+  const calendarRef = useRef<HTMLElement>(null);
 
   // Use direct Supabase client for public page data
   const { data: pageData, isLoading, error } = useQuery<any>({
@@ -87,6 +99,75 @@ export default function PublicBooking() {
       });
     },
   });
+
+  // Scroll detection and navigation logic
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const heroHeight = heroRef.current?.offsetHeight || 800;
+      
+      // Show sticky nav after hero section
+      setShowStickyNav(scrollY > heroHeight * 0.8);
+      
+      // Update active section based on scroll position
+      const sections = [
+        { ref: aboutRef, id: 'about' },
+        { ref: servicesRef, id: 'services' },
+        { ref: staffRef, id: 'staff' },
+        { ref: reviewsRef, id: 'reviews' },
+        { ref: timingsRef, id: 'timings' },
+        { ref: galleryRef, id: 'gallery' },
+        { ref: calendarRef, id: 'calendar' },
+      ];
+      
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section.ref.current) {
+          const rect = section.ref.current.getBoundingClientRect();
+          if (rect.top <= 150) {
+            setActiveSection(section.id);
+            break;
+          }
+        }
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // Smooth scroll to section
+  const scrollToSection = (sectionId: string) => {
+    const refs: { [key: string]: React.RefObject<HTMLElement> } = {
+      about: aboutRef,
+      services: servicesRef,
+      staff: staffRef,
+      reviews: reviewsRef,
+      timings: timingsRef,
+      gallery: galleryRef,
+      calendar: calendarRef,
+    };
+    
+    const targetRef = refs[sectionId];
+    if (targetRef.current) {
+      const offsetTop = targetRef.current.offsetTop - 100; // Account for sticky nav
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Navigation items for mobile-first design
+  const navItems = [
+    { id: 'about', label: 'About', icon: Info },
+    { id: 'services', label: 'Services', icon: Sparkles },
+    { id: 'staff', label: 'Staff', icon: Users },
+    { id: 'reviews', label: 'Reviews', icon: Star },
+    { id: 'timings', label: 'Hours', icon: Clock },
+    { id: 'gallery', label: 'Gallery', icon: Image },
+    { id: 'calendar', label: 'Book', icon: CalendarIcon },
+  ];
 
   // Create dynamic styles based on page theme data
   const getThemeStyles = (page: any) => {
@@ -349,8 +430,11 @@ export default function PublicBooking() {
         </div>
       </header>
 
-      {/* Enhanced Hero Section with Better Mobile Spacing */}
-      <section className="relative overflow-hidden min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8">
+      {/* Mobile-First Hero Section with Glass Prism Effects */}
+      <section 
+        ref={heroRef}
+        className="relative overflow-hidden min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8"
+      >
         {/* Dynamic layered background */}
         <div className="absolute inset-0">
           {/* Primary gradient background */}
@@ -540,9 +624,167 @@ export default function PublicBooking() {
         </div>
       </section>
 
-      {/* Enhanced Services Section */}
+      {/* Mobile-First Sticky Navigation Bar */}
+      {showStickyNav && (
+        <nav className="fixed top-0 left-0 right-0 z-40 glass-prism-card backdrop-blur-xl border-b border-white/10 shadow-lg">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between py-3">
+              {/* Business Logo/Title */}
+              <div className="flex items-center space-x-2 min-w-0">
+                <div 
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
+                  style={{
+                    background: themeStyles 
+                      ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                      : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                  }}
+                >
+                  {page.title?.charAt(0) || 'B'}
+                </div>
+                <span className="font-semibold text-foreground text-sm truncate">
+                  {page.title}
+                </span>
+              </div>
+
+              {/* Mobile-First Navigation Items */}
+              <div className="flex items-center space-x-1 overflow-x-auto scrollbar-hide">
+                {navItems.map((item) => {
+                  const IconComponent = item.icon;
+                  const isActive = activeSection === item.id;
+                  
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`flex flex-col items-center px-2 py-1.5 rounded-lg transition-all duration-300 min-w-[60px] ${
+                        isActive 
+                          ? 'glass-prism-button text-white scale-105' 
+                          : 'hover:bg-white/10 text-muted-foreground hover:text-foreground'
+                      }`}
+                      style={isActive ? {
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, ${themeStyles.primaryColor}90 0%, ${themeStyles.primaryColor}70 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(37, 99, 235, 0.7) 100%)'
+                      } : {}}
+                      data-testid={`nav-${item.id}`}
+                    >
+                      <IconComponent className="h-4 w-4 mb-0.5" />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </nav>
+      )}
+
+      {/* About Section */}
+      <section 
+        ref={aboutRef}
+        className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+        style={{
+          background: themeStyles 
+            ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+            : 'linear-gradient(145deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+        }}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 glass-prism-card"
+              style={{
+                background: themeStyles 
+                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+              }}
+            >
+              <Info 
+                className="h-8 w-8" 
+                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+              />
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">About {page.title}</h2>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Business Info */}
+              <div className="glass-prism-card rounded-2xl p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Our Story</h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  {page.tagline || "We are dedicated to providing exceptional service and creating memorable experiences for every client. Our team combines expertise with passion to deliver results that exceed expectations."}
+                </p>
+                
+                {/* Key Features */}
+                <div className="space-y-3">
+                  {services.length > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span className="text-sm text-foreground">{services.length} Professional Services</span>
+                    </div>
+                  )}
+                  {reviews.length > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <span className="text-sm text-foreground">{reviews.length} Customer Reviews</span>
+                    </div>
+                  )}
+                  {pageStaff.length > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <Users className="h-5 w-5 text-blue-500" />
+                      <span className="text-sm text-foreground">{pageStaff.length} Team Members</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Contact Info */}
+              {(page.contactPhone || page.contactEmail || page.businessAddress) && (
+                <div className="glass-prism-card rounded-2xl p-6 sm:p-8">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Get In Touch</h3>
+                  <div className="space-y-4">
+                    {page.contactPhone && (
+                      <div className="flex items-center space-x-3">
+                        <Phone className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        <a href={`tel:${page.contactPhone}`} className="text-foreground hover:underline">
+                          {page.contactPhone}
+                        </a>
+                      </div>
+                    )}
+                    {page.contactEmail && (
+                      <div className="flex items-center space-x-3">
+                        <Mail className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        <a href={`mailto:${page.contactEmail}`} className="text-foreground hover:underline">
+                          {page.contactEmail}
+                        </a>
+                      </div>
+                    )}
+                    {page.businessAddress && (
+                      <div className="flex items-start space-x-3">
+                        <MapPin className="h-5 w-5 mt-0.5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        <div className="text-foreground">
+                          {page.businessAddress.split('\n').map((line: string, index: number) => (
+                            <div key={index}>{line}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section with Enhanced Mobile Design */}
       {services.length > 0 && (
-        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden" data-services-section>
+        <section 
+          ref={servicesRef}
+          className="py-16 sm:py-24 lg:py-32 relative overflow-hidden"
+          data-services-section
+        >
           {/* Background enhancements */}
           <div className="absolute inset-0">
             <div 
@@ -725,9 +967,17 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Staff Section */}
+      {/* Staff Section with Glass Prism Effects */}
       {pageStaff.length > 0 && (
-        <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
+        <section 
+          ref={staffRef}
+          className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+          style={{
+            background: themeStyles 
+              ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.01) 100%)`
+              : 'linear-gradient(145deg, rgba(37, 99, 235, 0.03) 0%, rgba(37, 99, 235, 0.01) 100%)'
+          }}
+        >
           <div className="absolute inset-0">
             <div 
               className="absolute inset-0 opacity-30"
@@ -774,7 +1024,7 @@ export default function PublicBooking() {
               {pageStaff.map((staff: any, index: number) => (
                 <Card 
                   key={staff.id}
-                  className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-card/80 backdrop-blur-sm border-border/50 hover:border-border overflow-hidden"
+                  className="group glass-prism-card hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-border/50 hover:border-border overflow-hidden"
                   data-testid={`card-staff-${staff.id}`}
                 >
                   <CardContent className="p-0">
@@ -786,7 +1036,10 @@ export default function PublicBooking() {
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling!.style.display = 'flex';
+                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (nextElement) {
+                              nextElement.style.display = 'flex';
+                            }
                           }}
                         />
                       ) : null}
@@ -843,7 +1096,7 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Gallery Section - Modern Slideshow */}
+      {/* Gallery Section with Glass Prism Effects */}
       {(() => {
         // Combine all gallery images into one array for the slideshow
         const allImages = [
@@ -855,7 +1108,15 @@ export default function PublicBooking() {
         if (allImages.length === 0) return null;
         
         return (
-          <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
+          <section 
+            ref={galleryRef}
+            className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+            style={{
+              background: themeStyles 
+                ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.06) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 100%)`
+                : 'linear-gradient(145deg, rgba(37, 99, 235, 0.06) 0%, rgba(37, 99, 235, 0.03) 100%)'
+            }}
+          >
             {/* Enhanced background */}
             <div className="absolute inset-0">
               <div 
@@ -1042,46 +1303,57 @@ export default function PublicBooking() {
         );
       })()}
 
-      {/* Reviews Dropdown */}
-      <section className="py-8 relative overflow-hidden">
+      {/* Reviews Section with Glass Prism Effects */}
+      <section 
+        ref={reviewsRef}
+        className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+        style={{
+          background: themeStyles 
+            ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.04) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+            : 'linear-gradient(145deg, rgba(37, 99, 235, 0.04) 0%, rgba(37, 99, 235, 0.02) 100%)'
+        }}
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-md">
-              <Collapsible>
-                <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors duration-200" data-testid="button-reviews">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <MessageSquare className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                      <div>
-                        <h3 className="text-lg font-semibold">Customer Reviews</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {reviews.length > 0 ? (
-                            <>
-                              {reviews.length} reviews • {(reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)} avg rating
-                              <span className="inline-flex ml-1">
-                                {[1, 2, 3, 4, 5].map((star) => {
-                                  const avgRating = reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length;
-                                  return (
-                                    <Star 
-                                      key={star} 
-                                      className={`h-3 w-3 ${star <= avgRating ? 'fill-current' : 'fill-muted/20'}`}
-                                      style={{ color: star <= avgRating ? (themeStyles?.primaryColor || '#2563eb') : undefined }}
-                                    />
-                                  );
-                                })}
-                              </span>
-                            </>
-                          ) : (
-                            'No reviews yet • Be the first to leave a review'
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown className="h-4 w-4 transform transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="px-6 pb-6">
+          {/* Reviews Header */}
+          <div className="text-center mb-12">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 glass-prism-card"
+              style={{
+                background: themeStyles 
+                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+              }}
+            >
+              <Star 
+                className="h-8 w-8" 
+                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+              />
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">Customer Reviews</h2>
+            {reviews.length > 0 ? (
+              <div className="flex items-center justify-center space-x-4 mb-6">
+                <div className="flex items-center space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const avgRating = reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length;
+                    return (
+                      <Star 
+                        key={star} 
+                        className={`h-6 w-6 ${star <= avgRating ? 'fill-current' : 'fill-muted/20'}`}
+                        style={{ color: star <= avgRating ? (themeStyles?.primaryColor || '#2563eb') : undefined }}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="text-lg font-semibold text-foreground">
+                  {(reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)} out of 5
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-lg">No reviews yet • Be the first to leave a review</p>
+            )}
           </div>
 
           {/* Enhanced reviews display */}
@@ -1460,10 +1732,6 @@ export default function PublicBooking() {
                 </form>
               </CardContent>
             </Card>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </Card>
           </div>
         </div>
       </section>
@@ -1531,44 +1799,58 @@ export default function PublicBooking() {
         </section>
       )}
 
-      {/* Business Hours Dropdown */}
+      {/* Business Hours Section with Glass Prism Effects */}
       {page.showBusinessHours === 'true' && page.businessHours && (
-        <section className="py-8 relative overflow-hidden">
+        <section 
+          ref={timingsRef}
+          className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+          style={{
+            background: themeStyles 
+              ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
+              : 'linear-gradient(145deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
+          }}
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto">
-              <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-md">
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors duration-200" data-testid="button-business-hours">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Timer className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        <div>
-                          <h3 className="text-lg font-semibold">Business Hours</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Currently {(() => {
-                              const now = new Date();
-                              const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                              const currentHours = page.businessHours[currentDay];
-                              const isOpen = String(currentHours) !== 'Closed';
-                              return (
-                                <span className="flex items-center">
-                                  {isOpen ? 'Open' : 'Closed'}
-                                  <div 
-                                    className={`w-2 h-2 rounded-full ml-1 ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}
-                                  ></div>
-                                </span>
-                              );
-                            })()}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronDown className="h-4 w-4 transform transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            {/* Timings Header */}
+            <div className="text-center mb-12">
+              <div 
+                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 glass-prism-card"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                }}
+              >
+                <Clock 
+                  className="h-8 w-8" 
+                  style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+                />
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">Business Hours</h2>
+              <div className="flex items-center justify-center space-x-3 mb-6">
+                <span className="text-lg text-muted-foreground">Currently</span>
+                {(() => {
+                  const now = new Date();
+                  const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                  const currentHours = page.businessHours[currentDay];
+                  const isOpen = String(currentHours) !== 'Closed';
+                  return (
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-lg font-semibold ${isOpen ? 'text-green-600' : 'text-red-600'}`}>
+                        {isOpen ? 'Open' : 'Closed'}
+                      </span>
+                      <div 
+                        className={`w-3 h-3 rounded-full animate-pulse ${isOpen ? 'bg-green-500' : 'bg-red-500'}`}
+                      ></div>
                     </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="px-6 pb-6">
-                  
-                  <div className="grid gap-6">
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Business Hours Grid */}
+            <div className="max-w-4xl mx-auto">
+              <div className="grid gap-4 sm:gap-6">
                     {Object.entries(page.businessHours).map(([day, hours], index) => {
                       const now = new Date();
                       const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -1653,14 +1935,160 @@ export default function PublicBooking() {
                       </div>
                     </div>
                   </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </Card>
             </div>
           </div>
         </section>
       )}
+
+      {/* Calendar/Booking Section with Glass Prism Effects */}
+      <section 
+        ref={calendarRef}
+        className="py-16 sm:py-24 lg:py-32 relative overflow-hidden glass-prism"
+        style={{
+          background: themeStyles 
+            ? `linear-gradient(145deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.04) 100%)`
+            : 'linear-gradient(145deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%)'
+        }}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Calendar Header */}
+          <div className="text-center mb-12">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 glass-prism-card"
+              style={{
+                background: themeStyles 
+                  ? `linear-gradient(135deg, ${themeStyles.primaryColor}30 0%, ${themeStyles.primaryColor}15 100%)`
+                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.3) 0%, rgba(37, 99, 235, 0.15) 100%)'
+              }}
+            >
+              <CalendarIcon 
+                className="h-8 w-8" 
+                style={{ color: themeStyles?.primaryColor || '#2563eb' }}
+              />
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">Book Your Appointment</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+              Ready to experience our exceptional service? Schedule your appointment now and let us take care of you.
+            </p>
+          </div>
+
+          {/* Booking Options */}
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              {/* Quick Booking */}
+              <div className="glass-prism-card rounded-2xl p-6 sm:p-8 text-center">
+                <div className="mb-6">
+                  <div 
+                    className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4"
+                    style={{
+                      background: themeStyles 
+                        ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                        : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                    }}
+                  >
+                    <Zap className="h-6 w-6" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Quick Booking</h3>
+                  <p className="text-muted-foreground">
+                    Book instantly with our simple booking form
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setShowBookingModal(true)}
+                  className="w-full glass-prism-button py-3 text-lg font-semibold"
+                  data-testid="button-quick-booking"
+                >
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Book Now
+                </Button>
+              </div>
+
+              {/* Calendar Integration */}
+              {page.calendarLink && (
+                <div className="glass-prism-card rounded-2xl p-6 sm:p-8 text-center">
+                  <div className="mb-6">
+                    <div 
+                      className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4"
+                      style={{
+                        background: themeStyles 
+                          ? `linear-gradient(135deg, ${themeStyles.primaryColor}20 0%, ${themeStyles.primaryColor}10 100%)`
+                          : 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%)'
+                      }}
+                    >
+                      <ExternalLink className="h-6 w-6" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">View Full Calendar</h3>
+                    <p className="text-muted-foreground">
+                      See all available times and book directly
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    className="w-full py-3 text-lg font-semibold border-2 hover:bg-background/10"
+                    style={{
+                      borderColor: themeStyles?.primaryColor || '#2563eb',
+                      color: themeStyles?.primaryColor || '#2563eb'
+                    }}
+                    asChild
+                    data-testid="button-view-calendar"
+                  >
+                    <a href={page.calendarLink} target="_blank" rel="noopener noreferrer">
+                      <CalendarIcon className="h-5 w-5 mr-2" />
+                      Open Calendar
+                    </a>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Contact Prompt */}
+            <div className="text-center">
+              <div className="glass-prism-card rounded-2xl p-6 sm:p-8">
+                <h3 className="text-xl font-bold text-foreground mb-4">Have Questions?</h3>
+                <p className="text-muted-foreground mb-6">
+                  Need help choosing the right service or have special requirements? We're here to help.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {page.contactPhone && (
+                    <Button 
+                      variant="outline"
+                      className="flex items-center justify-center px-6 py-3 border-2 hover:bg-background/10"
+                      style={{
+                        borderColor: themeStyles?.primaryColor || '#2563eb',
+                        color: themeStyles?.primaryColor || '#2563eb'
+                      }}
+                      asChild
+                      data-testid="button-call"
+                    >
+                      <a href={`tel:${page.contactPhone}`}>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call Us
+                      </a>
+                    </Button>
+                  )}
+                  {page.contactEmail && (
+                    <Button 
+                      variant="outline"
+                      className="flex items-center justify-center px-6 py-3 border-2 hover:bg-background/10"
+                      style={{
+                        borderColor: themeStyles?.primaryColor || '#2563eb',
+                        color: themeStyles?.primaryColor || '#2563eb'
+                      }}
+                      asChild
+                      data-testid="button-email"
+                    >
+                      <a href={`mailto:${page.contactEmail}`}>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Email Us
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Enhanced Contact Information Section */}
       {page.showContactInfo === 'true' && (page.contactPhone || page.contactEmail || page.businessAddress || page.locationLink) && (
