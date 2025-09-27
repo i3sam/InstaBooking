@@ -693,7 +693,7 @@ export default function PublicBooking() {
                         <MapPin className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
                         Contact Information
                       </h4>
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {page.contactPhone && (
                           <div className="flex items-center space-x-3">
                             <div 
@@ -799,6 +799,9 @@ export default function PublicBooking() {
                               src={image.url || image} 
                               alt={`${page.title} - Gallery ${index + 1}`}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              loading="lazy"
+                              width="200"
+                              height="200"
                             />
                             <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-300" />
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -938,7 +941,7 @@ export default function PublicBooking() {
                       {page.acceptReviews === "true" && (
                         <Collapsible open={showReviews} onOpenChange={setShowReviews}>
                           <CollapsibleContent className="space-y-4 mt-6">
-                            <div className="bg-background/50 rounded-lg p-6 border border-border/20">
+                            <div className="bg-background/50 rounded-lg p-4 sm:p-6 border border-border/20 max-w-2xl w-full">
                               <h5 className="text-lg font-semibold text-foreground mb-6 flex items-center">
                                 <MessageSquare className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
                                 Share Your Experience
@@ -955,7 +958,7 @@ export default function PublicBooking() {
                                       type="text"
                                       value={reviewFormData.customerName}
                                       onChange={(e) => handleInputChange('customerName', e.target.value)}
-                                      className={`mt-1 ${validationErrors.customerName ? 'border-red-500' : ''}`}
+                                      className={`mt-1 w-full ${validationErrors.customerName ? 'border-red-500' : ''}`}
                                       placeholder="Enter your full name"
                                       data-testid="input-review-name"
                                     />
@@ -973,7 +976,7 @@ export default function PublicBooking() {
                                       type="email"
                                       value={reviewFormData.customerEmail}
                                       onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                                      className={`mt-1 ${validationErrors.customerEmail ? 'border-red-500' : ''}`}
+                                      className={`mt-1 w-full ${validationErrors.customerEmail ? 'border-red-500' : ''}`}
                                       placeholder="your.email@example.com"
                                       data-testid="input-review-email"
                                     />
@@ -997,7 +1000,7 @@ export default function PublicBooking() {
                                         data-testid={`button-rating-${star}`}
                                       >
                                         <Star 
-                                          className={`h-8 w-8 transition-colors ${
+                                          className={`h-6 w-6 sm:h-8 sm:w-8 transition-colors ${
                                             star <= reviewFormData.rating 
                                               ? 'text-yellow-400 fill-current' 
                                               : 'text-gray-300 hover:text-yellow-200'
@@ -1022,7 +1025,7 @@ export default function PublicBooking() {
                                     id="reviewText"
                                     value={reviewFormData.reviewText}
                                     onChange={(e) => handleInputChange('reviewText', e.target.value)}
-                                    className={`mt-1 min-h-[120px] ${validationErrors.reviewText ? 'border-red-500' : ''}`}
+                                    className={`mt-1 min-h-[120px] w-full ${validationErrors.reviewText ? 'border-red-500' : ''}`}
                                     placeholder="Tell us about your experience..."
                                     maxLength={500}
                                     data-testid="textarea-review-text"
