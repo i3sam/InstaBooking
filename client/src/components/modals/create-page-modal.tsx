@@ -724,18 +724,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     // Filter out empty FAQs
     const validFaqs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
 
+    // Destructure to exclude fields that should go in data
+    const { description, staff, visitInfo, gallery, services, faqs, ...pageFields } = formData;
+    
     createPageMutation.mutate({
-      ...formData,
+      ...pageFields,
       services: servicesWithNumbers,
       faqs: validFaqs,
-      acceptReviews: formData.acceptReviews,
-      businessHours: formData.businessHours,
-      contactPhone: formData.contactPhone,
-      contactEmail: formData.contactEmail,
-      businessAddress: formData.businessAddress,
-      cancellationPolicy: formData.cancellationPolicy,
-      showBusinessHours: formData.showBusinessHours,
-      showContactInfo: formData.showContactInfo,
       data: {
         description: formData.description,
         staff: formData.staff,
@@ -835,7 +830,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     <Users className="h-5 w-5" />
                     Team & Staff
                   </h3>
-                  <Button type="button" onClick={addStaffMember} className="glass-effect hover-lift rounded-xl" size="sm">
+                  <Button 
+                    type="button" 
+                    onClick={addStaffMember} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg" 
+                    size="sm"
+                    data-testid="button-add-staff"
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Staff Member
                   </Button>
@@ -957,7 +958,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     <FileText className="h-5 w-5" />
                     Your Services
                   </h3>
-                  <Button type="button" onClick={addService} className="glass-effect hover-lift rounded-xl" size="sm">
+                  <Button 
+                    type="button" 
+                    onClick={addService} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg" 
+                    size="sm"
+                    data-testid="button-add-service"
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Service
                   </Button>
@@ -1295,7 +1302,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="text-base font-medium">Custom Visit Information</Label>
-                        <Button type="button" onClick={addCustomVisitInfo} size="sm" className="glass-effect hover-lift rounded-xl">
+                        <Button 
+                          type="button" 
+                          onClick={addCustomVisitInfo} 
+                          size="sm" 
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded-lg transition-all duration-200 hover:scale-105 shadow-md"
+                          data-testid="button-add-visit-info"
+                        >
                           <Plus className="h-4 w-4 mr-2" />
                           Add Info
                         </Button>
