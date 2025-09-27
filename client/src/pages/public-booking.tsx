@@ -98,10 +98,6 @@ export default function PublicBooking() {
     { id: 'about', label: 'About', icon: Info },
     { id: 'services', label: 'Services', icon: Sparkles },
     { id: 'staff', label: 'Staff', icon: Users },
-    { id: 'reviews', label: 'Reviews', icon: Star },
-    { id: 'hours', label: 'Hours', icon: Clock },
-    { id: 'gallery', label: 'Gallery', icon: Image },
-    { id: 'book', label: 'Book', icon: CalendarIcon },
   ];
 
   // Create dynamic styles based on page theme data
@@ -564,7 +560,7 @@ export default function PublicBooking() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList 
-              className="grid w-full grid-cols-7 glass-prism-card backdrop-blur-md border border-border/20 shadow-xl mb-8"
+              className="grid w-full grid-cols-3 glass-prism-card backdrop-blur-md border border-border/20 shadow-xl mb-8"
               style={{
                 background: themeStyles 
                   ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
@@ -745,6 +741,340 @@ export default function PublicBooking() {
                           </div>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Business Hours Section */}
+                  {page.showBusinessHours === "true" && page.businessHours && (
+                    <div className="mt-8 pt-8 border-t border-border/20">
+                      <h4 className="text-xl font-semibold text-foreground mb-6 flex items-center">
+                        <Clock className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        Business Hours
+                      </h4>
+                      <div className="bg-background/50 rounded-lg p-6 border border-border/20">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {Object.entries(page.businessHours).map(([day, hours]: [string, any]) => {
+                            const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                            const displayHours = hours === "Closed" ? "Closed" : String(hours);
+                            
+                            return (
+                              <div 
+                                key={day} 
+                                className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
+                                  isToday 
+                                    ? 'bg-primary/10 border border-primary/20' 
+                                    : 'bg-background/30 hover:bg-background/50'
+                                }`}
+                                data-testid={`hours-${day.toLowerCase()}`}
+                              >
+                                <span className={`font-medium capitalize ${isToday ? 'text-primary' : 'text-foreground'}`}>
+                                  {day}{isToday && ' (Today)'}
+                                </span>
+                                <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
+                                  {displayHours}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gallery Section */}
+                  {gallery.images && gallery.images.length > 0 && (
+                    <div className="mt-8 pt-8 border-t border-border/20">
+                      <h4 className="text-xl font-semibold text-foreground mb-6 flex items-center">
+                        <Image className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        Gallery
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {gallery.images.slice(0, 8).map((image: any, index: number) => (
+                          <div 
+                            key={index} 
+                            className="relative aspect-square rounded-lg overflow-hidden bg-background/50 border border-border/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group cursor-pointer"
+                            data-testid={`gallery-thumb-${index}`}
+                          >
+                            <img 
+                              src={image.url || image} 
+                              alt={`${page.title} - Gallery ${index + 1}`}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div 
+                                className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                              >
+                                <Image className="h-4 w-4 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {gallery.images.length > 8 && (
+                          <div className="relative aspect-square rounded-lg overflow-hidden bg-background/80 border border-border/20 flex items-center justify-center text-center p-4">
+                            <div>
+                              <div 
+                                className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center"
+                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                              >
+                                <Image className="h-4 w-4 text-white" />
+                              </div>
+                              <p className="text-xs font-medium text-foreground">
+                                +{gallery.images.length - 8} more
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reviews Section */}
+                  {reviews.filter((review: any) => review.isApproved === 'approved').length > 0 && (
+                    <div className="mt-8 pt-8 border-t border-border/20">
+                      <h4 className="text-xl font-semibold text-foreground mb-6 flex items-center">
+                        <Star className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        Customer Reviews
+                      </h4>
+                      
+                      {/* Reviews Summary */}
+                      <div className="mb-6">
+                        <div className="bg-background/50 rounded-lg p-6 border border-border/20">
+                          <div className="flex flex-col sm:flex-row items-center justify-between">
+                            <div className="text-center sm:text-left mb-4 sm:mb-0">
+                              <div className="flex items-center justify-center sm:justify-start mb-2">
+                                <div className="text-3xl font-bold text-foreground mr-2">
+                                  {(reviews.filter((review: any) => review.isApproved === 'approved').reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.filter((review: any) => review.isApproved === 'approved').length).toFixed(1)}
+                                </div>
+                                <div className="flex space-x-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                      key={star} 
+                                      className={`h-5 w-5 ${
+                                        star <= Math.round(reviews.filter((review: any) => review.isApproved === 'approved').reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.filter((review: any) => review.isApproved === 'approved').length)
+                                          ? 'text-yellow-400 fill-current' 
+                                          : 'text-gray-300'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-muted-foreground">
+                                Based on {reviews.filter((review: any) => review.isApproved === 'approved').length} review{reviews.filter((review: any) => review.isApproved === 'approved').length !== 1 ? 's' : ''}
+                              </p>
+                            </div>
+                            {page.acceptReviews === "true" && (
+                              <Button 
+                                onClick={() => setShowReviews(!showReviews)}
+                                className="px-6 py-2"
+                                style={{
+                                  backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                                  color: 'white'
+                                }}
+                                data-testid="button-write-review"
+                              >
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                Write a Review
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Recent Reviews Grid */}
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {reviews
+                          .filter((review: any) => review.isApproved === 'approved')
+                          .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                          .slice(0, 4)
+                          .map((review: any) => (
+                            <div key={review.id} className="bg-background/50 rounded-lg p-4 border border-border/20" data-testid={`card-review-${review.id}`}>
+                              <div className="flex items-start space-x-3">
+                                <div 
+                                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                >
+                                  <User className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h5 className="font-semibold text-foreground text-sm truncate">
+                                      {review.reviewerName}
+                                    </h5>
+                                    <div className="flex space-x-1">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star 
+                                          key={star} 
+                                          className={`h-3 w-3 ${
+                                            star <= review.rating 
+                                              ? 'text-yellow-400 fill-current' 
+                                              : 'text-gray-300'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
+                                  {review.reviewText && (
+                                    <p className="text-muted-foreground text-xs leading-relaxed mb-1">
+                                      {review.reviewText.length > 100 ? `${review.reviewText.slice(0, 100)}...` : review.reviewText}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-muted-foreground">
+                                    {new Date(review.createdAt).toLocaleDateString('en-US', { 
+                                      year: 'numeric', 
+                                      month: 'short', 
+                                      day: 'numeric' 
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Review Submission Form */}
+                      {page.acceptReviews === "true" && (
+                        <Collapsible open={showReviews} onOpenChange={setShowReviews}>
+                          <CollapsibleContent className="space-y-4 mt-6">
+                            <div className="bg-background/50 rounded-lg p-6 border border-border/20">
+                              <h5 className="text-lg font-semibold text-foreground mb-6 flex items-center">
+                                <MessageSquare className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                Share Your Experience
+                              </h5>
+                              
+                              <form onSubmit={handleReviewSubmit} className="space-y-6">
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <Label htmlFor="customerName" className="text-sm font-medium text-foreground">
+                                      Your Name *
+                                    </Label>
+                                    <Input
+                                      id="customerName"
+                                      type="text"
+                                      value={reviewFormData.customerName}
+                                      onChange={(e) => handleInputChange('customerName', e.target.value)}
+                                      className={`mt-1 ${validationErrors.customerName ? 'border-red-500' : ''}`}
+                                      placeholder="Enter your full name"
+                                      data-testid="input-review-name"
+                                    />
+                                    {validationErrors.customerName && (
+                                      <p className="text-red-500 text-xs mt-1">{validationErrors.customerName}</p>
+                                    )}
+                                  </div>
+                                  
+                                  <div>
+                                    <Label htmlFor="customerEmail" className="text-sm font-medium text-foreground">
+                                      Email (Optional)
+                                    </Label>
+                                    <Input
+                                      id="customerEmail"
+                                      type="email"
+                                      value={reviewFormData.customerEmail}
+                                      onChange={(e) => handleInputChange('customerEmail', e.target.value)}
+                                      className={`mt-1 ${validationErrors.customerEmail ? 'border-red-500' : ''}`}
+                                      placeholder="your.email@example.com"
+                                      data-testid="input-review-email"
+                                    />
+                                    {validationErrors.customerEmail && (
+                                      <p className="text-red-500 text-xs mt-1">{validationErrors.customerEmail}</p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <Label className="text-sm font-medium text-foreground">
+                                    Rating *
+                                  </Label>
+                                  <div className="flex items-center space-x-2 mt-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <button
+                                        key={star}
+                                        type="button"
+                                        onClick={() => handleInputChange('rating', star)}
+                                        className="focus:outline-none"
+                                        data-testid={`button-rating-${star}`}
+                                      >
+                                        <Star 
+                                          className={`h-8 w-8 transition-colors ${
+                                            star <= reviewFormData.rating 
+                                              ? 'text-yellow-400 fill-current' 
+                                              : 'text-gray-300 hover:text-yellow-200'
+                                          }`}
+                                        />
+                                      </button>
+                                    ))}
+                                    <span className="text-muted-foreground text-sm ml-2">
+                                      {reviewFormData.rating > 0 && `${reviewFormData.rating} star${reviewFormData.rating !== 1 ? 's' : ''}`}
+                                    </span>
+                                  </div>
+                                  {validationErrors.rating && (
+                                    <p className="text-red-500 text-xs mt-1">{validationErrors.rating}</p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <Label htmlFor="reviewText" className="text-sm font-medium text-foreground">
+                                    Your Review (Optional)
+                                  </Label>
+                                  <Textarea
+                                    id="reviewText"
+                                    value={reviewFormData.reviewText}
+                                    onChange={(e) => handleInputChange('reviewText', e.target.value)}
+                                    className={`mt-1 min-h-[120px] ${validationErrors.reviewText ? 'border-red-500' : ''}`}
+                                    placeholder="Tell us about your experience..."
+                                    maxLength={500}
+                                    data-testid="textarea-review-text"
+                                  />
+                                  <div className="flex justify-between items-center mt-1">
+                                    {validationErrors.reviewText && (
+                                      <p className="text-red-500 text-xs">{validationErrors.reviewText}</p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground ml-auto">
+                                      {reviewFormData.reviewText.length}/500 characters
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/20">
+                                  <Button 
+                                    type="submit"
+                                    disabled={submitReviewMutation.isPending}
+                                    className="flex-1 sm:flex-none px-6 py-2"
+                                    style={{
+                                      backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                                      color: 'white'
+                                    }}
+                                    data-testid="button-submit-review"
+                                  >
+                                    {submitReviewMutation.isPending ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Submitting...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <MessageSquare className="h-4 w-4 mr-2" />
+                                        Submit Review
+                                      </>
+                                    )}
+                                  </Button>
+                                  <Button 
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowReviews(false)}
+                                    className="flex-1 sm:flex-none px-6 py-2"
+                                    data-testid="button-cancel-review"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </form>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )}
                     </div>
                   )}
                 </div>
