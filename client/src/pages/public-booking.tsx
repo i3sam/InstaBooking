@@ -687,17 +687,17 @@ export default function PublicBooking() {
                   </div>
 
                   {/* Combined Location and Hours Section */}
-                  {(page.businessAddress || (page.showBusinessHours === "true" && page.businessHours) || (page.showContactInfo === "true" && (page.contactPhone || page.contactEmail))) && (
+                  {(page.business_address || (page.show_business_hours === "true" && page.business_hours) || (page.show_contact_info === "true" && (page.contact_phone || page.contact_email))) && (
                     <div className="mt-8 pt-8 border-t border-border/20">
                       <div className="bg-background/50 rounded-lg border border-border/20 overflow-hidden">
                         <div className="grid lg:grid-cols-2 gap-0">
                           {/* Left Side - Map and Address */}
-                          {page.businessAddress && (
+                          {page.business_address && (
                             <div className="relative">
                               {/* Google Maps */}
                               <div className="relative aspect-[4/3] lg:aspect-[3/2]">
                                 <iframe
-                                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dO0A3jPjpb1Cv0&q=${encodeURIComponent(page.businessAddress)}`}
+                                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dO0A3jPjpb1Cv0&q=${encodeURIComponent(page.business_address)}`}
                                   width="100%"
                                   height="100%"
                                   style={{ border: 0 }}
@@ -720,7 +720,7 @@ export default function PublicBooking() {
                                     <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
                                     <p className="text-muted-foreground text-sm">Map not available</p>
                                     <a 
-                                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.businessAddress)}`}
+                                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.business_address)}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-primary hover:underline text-sm mt-1 inline-block"
@@ -741,16 +741,16 @@ export default function PublicBooking() {
                                     <MapPin className="h-3 w-3 text-white" />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-foreground text-sm text-blue-600">{page.businessAddress}</p>
+                                    <p className="font-medium text-foreground text-sm text-blue-600">{page.business_address}</p>
                                   </div>
                                 </div>
                                 
                                 {/* Action Buttons */}
-                                {(page.contactPhone || page.contactEmail) && (
+                                {(page.contact_phone || page.contact_email) && (
                                   <div className="flex space-x-3 mt-4">
-                                    {page.contactPhone && (
+                                    {page.contact_phone && (
                                       <a
-                                        href={`tel:${page.contactPhone}`}
+                                        href={`tel:${page.contact_phone}`}
                                         className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                         data-testid="button-call"
                                       >
@@ -758,9 +758,9 @@ export default function PublicBooking() {
                                         <span>Call</span>
                                       </a>
                                     )}
-                                    {page.contactEmail && (
+                                    {page.contact_email && (
                                       <a
-                                        href={`mailto:${page.contactEmail}`}
+                                        href={`mailto:${page.contact_email}`}
                                         className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                         data-testid="button-message"
                                       >
@@ -775,11 +775,11 @@ export default function PublicBooking() {
                           )}
                           
                           {/* Right Side - Business Hours */}
-                          {page.showBusinessHours === "true" && page.businessHours && (
-                            <div className={`p-6 ${page.businessAddress ? 'border-l border-border/20' : ''}`}>
+                          {page.show_business_hours === "true" && page.business_hours && (
+                            <div className={`p-6 ${page.business_address ? 'border-l border-border/20' : ''}`}>
                               <h4 className="text-lg font-semibold text-foreground mb-4">Business Hours</h4>
                               <div className="space-y-2">
-                                {Object.entries(page.businessHours).map(([day, hours]: [string, any]) => {
+                                {page.business_hours && Object.entries(page.business_hours).map(([day, hours]: [string, any]) => {
                                   const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
                                   const displayHours = hours === "Closed" ? "Closed" : String(hours);
                                   
@@ -804,11 +804,11 @@ export default function PublicBooking() {
                         </div>
                         
                         {/* Fallback for when only contact info exists */}
-                        {!page.businessAddress && !(page.showBusinessHours === "true" && page.businessHours) && page.showContactInfo === "true" && (page.contactPhone || page.contactEmail) && (
+                        {!page.business_address && !(page.show_business_hours === "true" && page.business_hours) && page.show_contact_info === "true" && (page.contact_phone || page.contact_email) && (
                           <div className="p-6">
                             <h4 className="text-lg font-semibold text-foreground mb-4">Contact Information</h4>
                             <div className="space-y-3">
-                              {page.contactPhone && (
+                              {page.contact_phone && (
                                 <div className="flex items-center space-x-3">
                                   <div 
                                     className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -818,13 +818,13 @@ export default function PublicBooking() {
                                   </div>
                                   <div>
                                     <p className="text-sm text-muted-foreground">Phone</p>
-                                    <a href={`tel:${page.contactPhone}`} className="font-medium text-foreground hover:underline">
-                                      {page.contactPhone}
+                                    <a href={`tel:${page.contact_phone}`} className="font-medium text-foreground hover:underline">
+                                      {page.contact_phone}
                                     </a>
                                   </div>
                                 </div>
                               )}
-                              {page.contactEmail && (
+                              {page.contact_email && (
                                 <div className="flex items-center space-x-3">
                                   <div 
                                     className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -834,8 +834,8 @@ export default function PublicBooking() {
                                   </div>
                                   <div>
                                     <p className="text-sm text-muted-foreground">Email</p>
-                                    <a href={`mailto:${page.contactEmail}`} className="font-medium text-foreground hover:underline">
-                                      {page.contactEmail}
+                                    <a href={`mailto:${page.contact_email}`} className="font-medium text-foreground hover:underline">
+                                      {page.contact_email}
                                     </a>
                                   </div>
                                 </div>
