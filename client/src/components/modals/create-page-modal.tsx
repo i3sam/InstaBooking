@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit, Users } from 'lucide-react';
+import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit, Users, Info as InfoIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { uploadFile } from '@/lib/supabase';
 
@@ -64,6 +64,15 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       banners: [],
       logos: [],
       images: []
+    },
+    businessInfo: {
+      businessType: '',
+      walkInsAccepted: '',
+      parking: '',
+      amenities: '',
+      spokenLanguages: '',
+      kidFriendly: '',
+      appointmentCancellationPolicy: ''
     }
   });
   
@@ -274,6 +283,15 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         banners: [],
         logos: [],
         images: []
+      },
+      businessInfo: {
+        businessType: '',
+        walkInsAccepted: '',
+        parking: '',
+        amenities: '',
+        spokenLanguages: '',
+        kidFriendly: '',
+        appointmentCancellationPolicy: ''
       }
     };
     setFormData(defaultFormData);
@@ -339,6 +357,15 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           banners: [],
           logos: [],
           images: []
+        },
+        businessInfo: editingPageData.data?.businessInfo || {
+          businessType: '',
+          walkInsAccepted: '',
+          parking: '',
+          amenities: '',
+          spokenLanguages: '',
+          kidFriendly: '',
+          appointmentCancellationPolicy: ''
         }
       });
       
@@ -468,6 +495,13 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     },
     {
       number: 6,
+      title: "Information",
+      description: "Add business details like type, parking, amenities and policies",
+      icon: InfoIcon,
+      fields: ['businessInfo']
+    },
+    {
+      number: 7,
       title: "Review & Publish",
       description: "Review your booking page and publish it to the world",
       icon: Check,
@@ -493,6 +527,8 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       case 5:
         return true; // Business info is optional  
       case 6:
+        return formData.contactPhone.trim(); // Phone is mandatory for Information step
+      case 7:
         return true; // Review step
       default:
         return false;
@@ -725,7 +761,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     const validFaqs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
 
     // Destructure to exclude fields that should go in data
-    const { description, staff, visitInfo, gallery, services, faqs, ...pageFields } = formData;
+    const { description, staff, visitInfo, gallery, businessInfo, services, faqs, ...pageFields } = formData;
     
     createPageMutation.mutate({
       ...pageFields,
@@ -735,7 +771,8 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         description: formData.description,
         staff: formData.staff,
         visitInfo: formData.visitInfo,
-        gallery: formData.gallery
+        gallery: formData.gallery,
+        businessInfo: formData.businessInfo
       }
     });
   };
@@ -1349,6 +1386,168 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         );
 
       case 6:
+        return (
+          <div className="space-y-6">
+            <Card className="glass-prism-card border-none shadow-lg">
+              <CardHeader>
+                <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
+                  <InfoIcon className="h-5 w-5" />
+                  Business Information
+                </h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Add detailed information about your business. Phone number is required, all other fields are optional.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <InfoIcon className="h-5 w-5 text-yellow-400" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700">
+                        <strong>Phone number is required</strong> for the Information section to appear on your booking page.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="businessType" className="text-base font-medium">Business Type</Label>
+                    <Input
+                      id="businessType"
+                      placeholder="e.g., Hair Salon, Personal Training, Consulting"
+                      value={formData.businessInfo.businessType}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        businessInfo: { ...prev.businessInfo, businessType: e.target.value }
+                      }))}
+                      className="glass-effect border-border/50 mt-2"
+                      data-testid="input-business-type"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="walkInsAccepted" className="text-base font-medium">Walk-ins</Label>
+                    <Select
+                      value={formData.businessInfo.walkInsAccepted}
+                      onValueChange={(value) => setFormData(prev => ({ 
+                        ...prev, 
+                        businessInfo: { ...prev.businessInfo, walkInsAccepted: value }
+                      }))}
+                    >
+                      <SelectTrigger className="glass-effect border-border/50 mt-2" data-testid="select-walk-ins">
+                        <SelectValue placeholder="Select walk-in policy" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Not specified</SelectItem>
+                        <SelectItem value="accepted">Walk-ins accepted</SelectItem>
+                        <SelectItem value="declined">Walk-ins declined</SelectItem>
+                        <SelectItem value="by-appointment-preferred">By appointment preferred</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="parking" className="text-base font-medium">Parking</Label>
+                    <Input
+                      id="parking"
+                      placeholder="e.g., Metered parking, Free parking, Parking garage"
+                      value={formData.businessInfo.parking}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        businessInfo: { ...prev.businessInfo, parking: e.target.value }
+                      }))}
+                      className="glass-effect border-border/50 mt-2"
+                      data-testid="input-parking"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="kidFriendly" className="text-base font-medium">Kid Friendly</Label>
+                    <Select
+                      value={formData.businessInfo.kidFriendly}
+                      onValueChange={(value) => setFormData(prev => ({ 
+                        ...prev, 
+                        businessInfo: { ...prev.businessInfo, kidFriendly: value }
+                      }))}
+                    >
+                      <SelectTrigger className="glass-effect border-border/50 mt-2" data-testid="select-kid-friendly">
+                        <SelectValue placeholder="Select kid-friendly policy" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Not specified</SelectItem>
+                        <SelectItem value="yes">Yes</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="family-focused">Family-focused business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="amenities" className="text-base font-medium">Amenities</Label>
+                  <Input
+                    id="amenities"
+                    placeholder="e.g., WiFi, Snack bar, TV, Disabled Access"
+                    value={formData.businessInfo.amenities}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      businessInfo: { ...prev.businessInfo, amenities: e.target.value }
+                    }))}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-amenities"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    List amenities separated by commas
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="spokenLanguages" className="text-base font-medium">Spoken Languages</Label>
+                  <Input
+                    id="spokenLanguages"
+                    placeholder="e.g., English, Spanish, Chinese, French, Arabic"
+                    value={formData.businessInfo.spokenLanguages}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      businessInfo: { ...prev.businessInfo, spokenLanguages: e.target.value }
+                    }))}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="input-spoken-languages"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    List languages separated by commas
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="appointmentCancellationPolicy" className="text-base font-medium">Appointment Cancellation Policy</Label>
+                  <Textarea
+                    id="appointmentCancellationPolicy"
+                    placeholder="Please understand that when you forget or cancel your appointment without giving enough notice, we miss the opportunity to fill that appointment time..."
+                    value={formData.businessInfo.appointmentCancellationPolicy}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      businessInfo: { ...prev.businessInfo, appointmentCancellationPolicy: e.target.value }
+                    }))}
+                    rows={4}
+                    className="glass-effect border-border/50 mt-2"
+                    data-testid="textarea-cancellation-policy"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Explain your cancellation policy and any fees that may apply
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 7:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8 glass-prism-card p-6 rounded-2xl border-none shadow-lg animate-fade-in-up">
