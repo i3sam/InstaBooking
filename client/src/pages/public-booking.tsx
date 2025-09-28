@@ -694,41 +694,32 @@ export default function PublicBooking() {
                           {/* Left Side - Map and Address */}
                           {page.business_address && (
                             <div className="relative">
-                              {/* Google Maps */}
-                              <div className="relative aspect-[4/3] lg:aspect-[3/2]">
-                                <iframe
-                                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dO0A3jPjpb1Cv0&q=${encodeURIComponent(page.business_address)}`}
-                                  width="100%"
-                                  height="100%"
-                                  style={{ border: 0 }}
-                                  allowFullScreen={true}
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer-when-downgrade"
-                                  title="Business Location"
-                                  className="w-full h-full"
-                                  onError={(e) => {
-                                    // Fallback if maps fails to load
-                                    e.currentTarget.style.display = 'none';
-                                    const fallback = e.currentTarget.parentElement?.querySelector('.map-fallback');
-                                    if (fallback) {
-                                      (fallback as HTMLElement).style.display = 'flex';
-                                    }
-                                  }}
-                                />
-                                <div className="map-fallback absolute inset-0 bg-background/50 flex items-center justify-center hidden">
-                                  <div className="text-center">
-                                    <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
-                                    <p className="text-muted-foreground text-sm">Map not available</p>
-                                    <a 
-                                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.business_address)}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-primary hover:underline text-sm mt-1 inline-block"
+                              {/* Location Button - Redirects to Google Maps */}
+                              <div className="relative aspect-[4/3] lg:aspect-[3/2] bg-background/30 rounded-lg flex items-center justify-center border border-border/20">
+                                <Button
+                                  asChild
+                                  className="flex-col h-auto p-8 bg-background/50 hover:bg-background/70 border border-border/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                                  variant="outline"
+                                  data-testid="button-google-maps-location"
+                                >
+                                  <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.business_address)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <div 
+                                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                                      style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
                                     >
-                                      View on Google Maps
-                                    </a>
-                                  </div>
-                                </div>
+                                      <MapPin className="h-8 w-8 text-white" />
+                                    </div>
+                                    <div className="text-center">
+                                      <p className="text-lg font-semibold text-foreground mb-2">View Location</p>
+                                      <p className="text-sm text-muted-foreground">Open in Google Maps</p>
+                                    </div>
+                                    <ExternalLink className="h-4 w-4 mt-2 text-muted-foreground" />
+                                  </a>
+                                </Button>
                               </div>
                               
                               {/* Address Information */}
@@ -1702,19 +1693,31 @@ export default function PublicBooking() {
                               </h4>
                               <p className="text-muted-foreground text-sm">{page.businessAddress}</p>
                             </div>
-                            <div className="relative">
-                              <iframe
-                                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBokTpGg0vmljYf0_rdR_zx_LT-SjXj2FU&q=${encodeURIComponent(page.businessAddress)}`}
-                                width="100%"
-                                height="300"
-                                style={{ border: 0 }}
-                                allowFullScreen
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                className="w-full"
-                                data-testid="map-iframe"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
+                            <div className="relative bg-background/30 h-64 rounded-lg flex items-center justify-center border border-border/20">
+                              <Button
+                                asChild
+                                className="flex-col h-auto p-6 bg-background/50 hover:bg-background/70 border border-border/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                                variant="outline"
+                                data-testid="button-secondary-maps-location"
+                              >
+                                <a
+                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.businessAddress)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <div 
+                                    className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <MapPin className="h-6 w-6 text-white" />
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-base font-semibold text-foreground mb-1">Open Location</p>
+                                    <p className="text-xs text-muted-foreground">View in Google Maps</p>
+                                  </div>
+                                  <ExternalLink className="h-3 w-3 mt-1 text-muted-foreground" />
+                                </a>
+                              </Button>
                             </div>
                             <div className="p-4 bg-background/30">
                               <div className="flex flex-col sm:flex-row gap-2">
