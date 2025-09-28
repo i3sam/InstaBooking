@@ -1431,7 +1431,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <div>
                     <Label htmlFor="walkInsAccepted" className="text-base font-medium">Walk-ins</Label>
                     <Select
-                      value={formData.businessInfo.walkInsAccepted}
+                      value={formData.businessInfo.walkInsAccepted || undefined}
                       onValueChange={(value) => setFormData(prev => ({ 
                         ...prev, 
                         businessInfo: { ...prev.businessInfo, walkInsAccepted: value }
@@ -1441,7 +1441,6 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                         <SelectValue placeholder="Select walk-in policy" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Not specified</SelectItem>
                         <SelectItem value="accepted">Walk-ins accepted</SelectItem>
                         <SelectItem value="declined">Walk-ins declined</SelectItem>
                         <SelectItem value="by-appointment-preferred">By appointment preferred</SelectItem>
@@ -1469,7 +1468,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <div>
                     <Label htmlFor="kidFriendly" className="text-base font-medium">Kid Friendly</Label>
                     <Select
-                      value={formData.businessInfo.kidFriendly}
+                      value={formData.businessInfo.kidFriendly || undefined}
                       onValueChange={(value) => setFormData(prev => ({ 
                         ...prev, 
                         businessInfo: { ...prev.businessInfo, kidFriendly: value }
@@ -1479,7 +1478,6 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                         <SelectValue placeholder="Select kid-friendly policy" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Not specified</SelectItem>
                         <SelectItem value="yes">Yes</SelectItem>
                         <SelectItem value="no">No</SelectItem>
                         <SelectItem value="family-focused">Family-focused business</SelectItem>
