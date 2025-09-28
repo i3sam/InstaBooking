@@ -686,192 +686,163 @@ export default function PublicBooking() {
                     </div>
                   </div>
 
-                  {/* Contact Information Bar */}
-                  {page.showContactInfo === "true" && (page.contactPhone || page.contactEmail || page.businessAddress) && (
-                    <div className="bg-background/50 rounded-lg p-6 border border-border/20">
-                      <h4 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                        <MapPin className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        Contact Information
-                      </h4>
-                      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {page.contactPhone && (
-                          <div className="flex items-center space-x-3">
-                            <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                            >
-                              <Phone className="h-4 w-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Phone</p>
-                              <a href={`tel:${page.contactPhone}`} className="font-medium text-foreground hover:underline">
-                                {page.contactPhone}
-                              </a>
-                            </div>
-                          </div>
-                        )}
-                        {page.contactEmail && (
-                          <div className="flex items-center space-x-3">
-                            <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                            >
-                              <Mail className="h-4 w-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Email</p>
-                              <a href={`mailto:${page.contactEmail}`} className="font-medium text-foreground hover:underline">
-                                {page.contactEmail}
-                              </a>
-                            </div>
-                          </div>
-                        )}
-                        {page.businessAddress && (
-                          <div className="flex items-center space-x-3">
-                            <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                            >
-                              <MapPin className="h-4 w-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">Address</p>
-                              <p className="font-medium text-foreground">{page.businessAddress}</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Location Section */}
-                  {page.businessAddress && (
+                  {/* Combined Location and Hours Section */}
+                  {(page.businessAddress || (page.showBusinessHours === "true" && page.businessHours) || (page.showContactInfo === "true" && (page.contactPhone || page.contactEmail))) && (
                     <div className="mt-8 pt-8 border-t border-border/20">
-                      <h4 className="text-xl font-semibold text-foreground mb-6 flex items-center">
-                        <MapPin className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        Location
-                      </h4>
-                      <div className="bg-background/50 rounded-lg p-6 border border-border/20">
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <div className="flex items-start space-x-3 mb-4">
-                              <div 
-                                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                              >
-                                <MapPin className="h-4 w-4 text-white" />
+                      <div className="bg-background/50 rounded-lg border border-border/20 overflow-hidden">
+                        <div className="grid lg:grid-cols-2 gap-0">
+                          {/* Left Side - Map and Address */}
+                          {page.businessAddress && (
+                            <div className="relative">
+                              {/* Google Maps */}
+                              <div className="relative aspect-[4/3] lg:aspect-[3/2]">
+                                <iframe
+                                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dO0A3jPjpb1Cv0&q=${encodeURIComponent(page.businessAddress)}`}
+                                  width="100%"
+                                  height="100%"
+                                  style={{ border: 0 }}
+                                  allowFullScreen={true}
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer-when-downgrade"
+                                  title="Business Location"
+                                  className="w-full h-full"
+                                  onError={(e) => {
+                                    // Fallback if maps fails to load
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.parentElement?.querySelector('.map-fallback');
+                                    if (fallback) {
+                                      (fallback as HTMLElement).style.display = 'flex';
+                                    }
+                                  }}
+                                />
+                                <div className="map-fallback absolute inset-0 bg-background/50 flex items-center justify-center hidden">
+                                  <div className="text-center">
+                                    <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
+                                    <p className="text-muted-foreground text-sm">Map not available</p>
+                                    <a 
+                                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.businessAddress)}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline text-sm mt-1 inline-block"
+                                    >
+                                      View on Google Maps
+                                    </a>
+                                  </div>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm text-muted-foreground">Address</p>
-                                <p className="font-medium text-foreground">{page.businessAddress}</p>
+                              
+                              {/* Address Information */}
+                              <div className="p-6 border-t border-border/20">
+                                <div className="flex items-start space-x-3 mb-4">
+                                  <div 
+                                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <MapPin className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-foreground text-sm text-blue-600">{page.businessAddress}</p>
+                                  </div>
+                                </div>
+                                
+                                {/* Action Buttons */}
+                                {(page.contactPhone || page.contactEmail) && (
+                                  <div className="flex space-x-3 mt-4">
+                                    {page.contactPhone && (
+                                      <a
+                                        href={`tel:${page.contactPhone}`}
+                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        data-testid="button-call"
+                                      >
+                                        <Phone className="h-4 w-4" />
+                                        <span>Call</span>
+                                      </a>
+                                    )}
+                                    {page.contactEmail && (
+                                      <a
+                                        href={`mailto:${page.contactEmail}`}
+                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        data-testid="button-message"
+                                      >
+                                        <Mail className="h-4 w-4" />
+                                        <span>Message</span>
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            {page.contactPhone && (
-                              <div className="flex items-start space-x-3 mb-4">
-                                <div 
-                                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                >
-                                  <Phone className="h-4 w-4 text-white" />
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Phone</p>
-                                  <a href={`tel:${page.contactPhone}`} className="font-medium text-foreground hover:underline">
-                                    {page.contactPhone}
-                                  </a>
-                                </div>
-                              </div>
-                            )}
-                            {page.contactEmail && (
-                              <div className="flex items-start space-x-3">
-                                <div 
-                                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                >
-                                  <Mail className="h-4 w-4 text-white" />
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Email</p>
-                                  <a href={`mailto:${page.contactEmail}`} className="font-medium text-foreground hover:underline">
-                                    {page.contactEmail}
-                                  </a>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="relative aspect-video rounded-lg overflow-hidden bg-background/30 border border-border/20">
-                            <iframe
-                              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dO0A3jPjpb1Cv0&q=${encodeURIComponent(page.businessAddress)}`}
-                              width="100%"
-                              height="100%"
-                              style={{ border: 0 }}
-                              allowFullScreen={true}
-                              loading="lazy"
-                              referrerPolicy="no-referrer-when-downgrade"
-                              title="Business Location"
-                              className="w-full h-full"
-                              onError={(e) => {
-                                // Fallback if maps fails to load
-                                e.currentTarget.style.display = 'none';
-                                const fallback = e.currentTarget.parentElement?.querySelector('.map-fallback');
-                                if (fallback) {
-                                  (fallback as HTMLElement).style.display = 'flex';
-                                }
-                              }}
-                            />
-                            <div className="map-fallback absolute inset-0 bg-background/50 flex items-center justify-center hidden">
-                              <div className="text-center">
-                                <MapPin className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
-                                <p className="text-muted-foreground text-sm">Map not available</p>
-                                <a 
-                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.businessAddress)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:underline text-sm mt-1 inline-block"
-                                >
-                                  View on Google Maps
-                                </a>
+                          )}
+                          
+                          {/* Right Side - Business Hours */}
+                          {page.showBusinessHours === "true" && page.businessHours && (
+                            <div className={`p-6 ${page.businessAddress ? 'border-l border-border/20' : ''}`}>
+                              <h4 className="text-lg font-semibold text-foreground mb-4">Business Hours</h4>
+                              <div className="space-y-2">
+                                {Object.entries(page.businessHours).map(([day, hours]: [string, any]) => {
+                                  const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                                  const displayHours = hours === "Closed" ? "Closed" : String(hours);
+                                  
+                                  return (
+                                    <div 
+                                      key={day} 
+                                      className="flex justify-between items-center py-1"
+                                      data-testid={`hours-${day.toLowerCase()}`}
+                                    >
+                                      <span className={`font-medium capitalize text-sm ${isToday ? 'text-primary' : 'text-foreground'}`}>
+                                        {day}
+                                      </span>
+                                      <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
+                                        {displayHours}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
+                          )}
+                        </div>
+                        
+                        {/* Fallback for when only contact info exists */}
+                        {!page.businessAddress && !(page.showBusinessHours === "true" && page.businessHours) && page.showContactInfo === "true" && (page.contactPhone || page.contactEmail) && (
+                          <div className="p-6">
+                            <h4 className="text-lg font-semibold text-foreground mb-4">Contact Information</h4>
+                            <div className="space-y-3">
+                              {page.contactPhone && (
+                                <div className="flex items-center space-x-3">
+                                  <div 
+                                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Phone className="h-4 w-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Phone</p>
+                                    <a href={`tel:${page.contactPhone}`} className="font-medium text-foreground hover:underline">
+                                      {page.contactPhone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                              {page.contactEmail && (
+                                <div className="flex items-center space-x-3">
+                                  <div 
+                                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Mail className="h-4 w-4 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Email</p>
+                                    <a href={`mailto:${page.contactEmail}`} className="font-medium text-foreground hover:underline">
+                                      {page.contactEmail}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Business Hours Section */}
-                  {page.showBusinessHours === "true" && page.businessHours && (
-                    <div className="mt-8 pt-8 border-t border-border/20">
-                      <h4 className="text-xl font-semibold text-foreground mb-6 flex items-center">
-                        <Clock className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        Business Hours
-                      </h4>
-                      <div className="bg-background/50 rounded-lg p-6 border border-border/20">
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {Object.entries(page.businessHours).map(([day, hours]: [string, any]) => {
-                            const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                            const displayHours = hours === "Closed" ? "Closed" : String(hours);
-                            
-                            return (
-                              <div 
-                                key={day} 
-                                className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
-                                  isToday 
-                                    ? 'bg-primary/10 border border-primary/20' 
-                                    : 'bg-background/30 hover:bg-background/50'
-                                }`}
-                                data-testid={`hours-${day.toLowerCase()}`}
-                              >
-                                <span className={`font-medium capitalize ${isToday ? 'text-primary' : 'text-foreground'}`}>
-                                  {day}{isToday && ' (Today)'}
-                                </span>
-                                <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
-                                  {displayHours}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        )}
                       </div>
                     </div>
                   )}
