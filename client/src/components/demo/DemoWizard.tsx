@@ -28,6 +28,14 @@ interface DemoData {
   logoBase64: string;
   businessType: string;
   
+  // Step 1: Additional Business Info
+  walkInsAccepted: string;
+  parking: string;
+  amenities: string;
+  spokenLanguages: string;
+  kidFriendly: string;
+  appointmentCancellationPolicy: string;
+  
   // Step 2: Appearance
   theme: string;
   primaryColor: string;
@@ -58,6 +66,12 @@ const initialDemoData: DemoData = {
   contactPhone: '',
   logoBase64: '',
   businessType: 'salon',
+  walkInsAccepted: 'accepted',
+  parking: '',
+  amenities: '',
+  spokenLanguages: 'English',
+  kidFriendly: 'yes',
+  appointmentCancellationPolicy: '',
   theme: 'Ocean Blue',
   primaryColor: '#2563eb',
   fontSize: 'medium',

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Upload } from 'lucide-react';
 
 interface DemoData {
@@ -12,6 +13,12 @@ interface DemoData {
   contactPhone: string;
   logoBase64: string;
   businessType: string;
+  walkInsAccepted: string;
+  parking: string;
+  amenities: string;
+  spokenLanguages: string;
+  kidFriendly: string;
+  appointmentCancellationPolicy: string;
 }
 
 interface BusinessInfoStepProps {
@@ -139,6 +146,116 @@ export default function BusinessInfoStep({ data, updateData }: BusinessInfoStepP
                 ))}
               </SelectContent>
             </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Additional Business Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            ℹ️ Additional Business Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Walk-ins */}
+          <div className="space-y-2">
+            <Label htmlFor="walk-ins" data-testid="label-walk-ins">
+              Walk-ins
+            </Label>
+            <Select
+              value={data.walkInsAccepted}
+              onValueChange={(value) => updateData({ walkInsAccepted: value })}
+            >
+              <SelectTrigger data-testid="select-walk-ins">
+                <SelectValue placeholder="Select walk-in policy" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="accepted" data-testid="option-walk-ins-accepted">Walk-ins accepted</SelectItem>
+                <SelectItem value="declined" data-testid="option-walk-ins-declined">Walk-ins declined</SelectItem>
+                <SelectItem value="by-appointment-preferred" data-testid="option-walk-ins-by-appointment">By appointment preferred</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Parking */}
+          <div className="space-y-2">
+            <Label htmlFor="parking" data-testid="label-parking">
+              Parking (Optional)
+            </Label>
+            <Input
+              id="parking"
+              data-testid="input-parking"
+              value={data.parking}
+              onChange={(e) => updateData({ parking: e.target.value })}
+              placeholder="e.g., Free parking available, Street parking only"
+              className="w-full"
+            />
+          </div>
+
+          {/* Amenities */}
+          <div className="space-y-2">
+            <Label htmlFor="amenities" data-testid="label-amenities">
+              Amenities (Optional)
+            </Label>
+            <Input
+              id="amenities"
+              data-testid="input-amenities"
+              value={data.amenities}
+              onChange={(e) => updateData({ amenities: e.target.value })}
+              placeholder="e.g., Free WiFi, Refreshments, Waiting area"
+              className="w-full"
+            />
+          </div>
+
+          {/* Spoken Languages */}
+          <div className="space-y-2">
+            <Label htmlFor="spoken-languages" data-testid="label-spoken-languages">
+              Spoken Languages (Optional)
+            </Label>
+            <Input
+              id="spoken-languages"
+              data-testid="input-spoken-languages"
+              value={data.spokenLanguages}
+              onChange={(e) => updateData({ spokenLanguages: e.target.value })}
+              placeholder="e.g., English, Spanish, French"
+              className="w-full"
+            />
+          </div>
+
+          {/* Kid Friendly */}
+          <div className="space-y-2">
+            <Label htmlFor="kid-friendly" data-testid="label-kid-friendly">
+              Kid Friendly
+            </Label>
+            <Select
+              value={data.kidFriendly}
+              onValueChange={(value) => updateData({ kidFriendly: value })}
+            >
+              <SelectTrigger data-testid="select-kid-friendly">
+                <SelectValue placeholder="Select kid-friendly policy" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes" data-testid="option-kid-friendly-yes">Yes</SelectItem>
+                <SelectItem value="no" data-testid="option-kid-friendly-no">No</SelectItem>
+                <SelectItem value="family-focused" data-testid="option-kid-friendly-family">Family-focused business</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Appointment Cancellation Policy */}
+          <div className="space-y-2">
+            <Label htmlFor="cancellation-policy" data-testid="label-cancellation-policy">
+              Appointment Cancellation Policy (Optional)
+            </Label>
+            <Textarea
+              id="cancellation-policy"
+              data-testid="textarea-cancellation-policy"
+              value={data.appointmentCancellationPolicy}
+              onChange={(e) => updateData({ appointmentCancellationPolicy: e.target.value })}
+              placeholder="e.g., 24-hour notice required for cancellations. Fees may apply for last-minute cancellations."
+              className="w-full min-h-[80px]"
+            />
           </div>
         </CardContent>
       </Card>

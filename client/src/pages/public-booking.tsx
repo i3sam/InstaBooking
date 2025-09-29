@@ -735,7 +735,122 @@ export default function PublicBooking() {
                                 </div>
                               )}
 
+                              {/* Walk-ins */}
+                              {page.data?.walkInsAccepted && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Clock className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Walk-ins</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-walk-ins">
+                                      {page.data.walkInsAccepted === 'accepted' ? 'Walk-ins accepted' :
+                                       page.data.walkInsAccepted === 'declined' ? 'Walk-ins declined' :
+                                       page.data.walkInsAccepted === 'by-appointment-preferred' ? 'By appointment preferred' :
+                                       page.data.walkInsAccepted}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Parking */}
+                              {page.data?.parking && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <MapPin className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Parking</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-parking">
+                                      {page.data.parking}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Amenities */}
+                              {page.data?.amenities && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Sparkles className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Amenities</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-amenities">
+                                      {page.data.amenities}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Spoken Languages */}
+                              {page.data?.spokenLanguages && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <MessageSquare className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Spoken Languages</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-spoken-languages">
+                                      {page.data.spokenLanguages}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Kid Friendly */}
+                              {page.data?.kidFriendly && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Heart className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Kid Friendly</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-kid-friendly">
+                                      {page.data.kidFriendly === 'yes' ? 'Yes' :
+                                       page.data.kidFriendly === 'no' ? 'No' :
+                                       page.data.kidFriendly === 'family-focused' ? 'Family-focused business' :
+                                       page.data.kidFriendly}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
+
+                            {/* Appointment Cancellation Policy - Full width if exists */}
+                            {page.data?.appointmentCancellationPolicy && (
+                              <div className="mt-6 pt-6 border-t border-border/20">
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <FileText className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium text-foreground mb-2">Appointment Cancellation Policy</p>
+                                    <p className="text-sm text-muted-foreground leading-relaxed" data-testid="text-cancellation-policy">
+                                      {page.data.appointmentCancellationPolicy}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
