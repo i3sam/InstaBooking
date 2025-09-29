@@ -668,12 +668,8 @@ export default function PublicBooking() {
                         </div>
                       </div>
 
-                      {/* Information Section - Only show if phone exists and businessInfo has data */}
-                      {page.contactPhone && page.data?.businessInfo && (
-                        Object.values(page.data.businessInfo).some((value: any) => value && value.trim && value.trim() !== '') ||
-                        Object.values(page.data.businessInfo).some((value: any) => typeof value === 'boolean' && value) ||
-                        Object.values(page.data.businessInfo).some((value: any) => typeof value === 'string' && value !== '')
-                      ) && (
+                      {/* Information Section - Show if we have contact phone or business data */}
+                      {(page.contactPhone || page.data?.businessType || page.data?.businessName) && (
                         <div>
                           <h4 className="text-xl font-semibold text-foreground mb-4 flex items-center">
                             <Info className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
@@ -681,28 +677,48 @@ export default function PublicBooking() {
                           </h4>
                           <div className="bg-background/50 rounded-lg p-6 border border-border/20">
                             <div className="grid gap-4 sm:grid-cols-2">
-                              {/* Phone */}
-                              <div className="flex items-start space-x-3">
-                                <div 
-                                  className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                >
-                                  <Phone className="h-3 w-3 text-white" />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-foreground">Phone</p>
-                                  <a 
-                                    href={`tel:${page.contactPhone}`} 
-                                    className="text-sm text-muted-foreground hover:underline"
-                                    data-testid="link-phone-info"
+                              {/* Business Name */}
+                              {page.data?.businessName && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
                                   >
-                                    {page.contactPhone}
-                                  </a>
+                                    <Briefcase className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Business Name</p>
+                                    <p className="text-sm text-muted-foreground" data-testid="text-business-name">
+                                      {page.data.businessName}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
+                              )}
+
+                              {/* Phone */}
+                              {page.contactPhone && (
+                                <div className="flex items-start space-x-3">
+                                  <div 
+                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  >
+                                    <Phone className="h-3 w-3 text-white" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-foreground">Phone</p>
+                                    <a 
+                                      href={`tel:${page.contactPhone}`} 
+                                      className="text-sm text-muted-foreground hover:underline"
+                                      data-testid="link-phone-info"
+                                    >
+                                      {page.contactPhone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
 
                               {/* Business Type */}
-                              {page.data?.businessInfo?.businessType && (
+                              {page.data?.businessType && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -713,128 +729,13 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Business Type</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-business-type">
-                                      {page.data.businessInfo.businessType}
+                                      {page.data.businessType.charAt(0).toUpperCase() + page.data.businessType.slice(1)}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
-                              {/* Walk-ins */}
-                              {page.data?.businessInfo?.walkInsAccepted && (
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <Clock className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-foreground">Walk-ins</p>
-                                    <p className="text-sm text-muted-foreground" data-testid="text-walk-ins">
-                                      {page.data.businessInfo.walkInsAccepted === 'accepted' ? 'Walk-ins accepted' :
-                                       page.data.businessInfo.walkInsAccepted === 'declined' ? 'Walk-ins declined' :
-                                       page.data.businessInfo.walkInsAccepted === 'by-appointment-preferred' ? 'By appointment preferred' :
-                                       page.data.businessInfo.walkInsAccepted}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Parking */}
-                              {page.data?.businessInfo?.parking && (
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <MapPin className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-foreground">Parking</p>
-                                    <p className="text-sm text-muted-foreground" data-testid="text-parking">
-                                      {page.data.businessInfo.parking}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Amenities */}
-                              {page.data?.businessInfo?.amenities && (
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <Sparkles className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-foreground">Amenities</p>
-                                    <p className="text-sm text-muted-foreground" data-testid="text-amenities">
-                                      {page.data.businessInfo.amenities}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Spoken Languages */}
-                              {page.data?.businessInfo?.spokenLanguages && (
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <MessageSquare className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-foreground">Spoken Languages</p>
-                                    <p className="text-sm text-muted-foreground" data-testid="text-spoken-languages">
-                                      {page.data.businessInfo.spokenLanguages}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Kid Friendly */}
-                              {page.data?.businessInfo?.kidFriendly && (
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <Heart className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-foreground">Kid Friendly</p>
-                                    <p className="text-sm text-muted-foreground" data-testid="text-kid-friendly">
-                                      {page.data.businessInfo.kidFriendly === 'yes' ? 'Yes' :
-                                       page.data.businessInfo.kidFriendly === 'no' ? 'No' :
-                                       page.data.businessInfo.kidFriendly === 'family-focused' ? 'Family-focused business' :
-                                       page.data.businessInfo.kidFriendly}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
                             </div>
-
-                            {/* Appointment Cancellation Policy - Full width if exists */}
-                            {page.data?.businessInfo?.appointmentCancellationPolicy && (
-                              <div className="mt-6 pt-6 border-t border-border/20">
-                                <div className="flex items-start space-x-3">
-                                  <div 
-                                    className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <FileText className="h-3 w-3 text-white" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="text-sm font-medium text-foreground mb-2">Appointment Cancellation Policy</p>
-                                    <p className="text-sm text-muted-foreground leading-relaxed" data-testid="text-cancellation-policy">
-                                      {page.data.businessInfo.appointmentCancellationPolicy}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </div>
                       )}
