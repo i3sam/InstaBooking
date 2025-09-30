@@ -339,6 +339,30 @@ export default function PublicBooking() {
   const gallery = pageData.data?.gallery || pageData.gallery || { banners: [], logos: [], images: [] };
   const themeStyles = page ? getThemeStyles(page) : null;
 
+  // Helper function to get business data from either new format (top-level) or old format (nested under businessInfo)
+  const getBusinessData = (key: string) => {
+    // Try new format first (top-level in data)
+    if (page.data?.[key]) return page.data[key];
+    // Try old format (nested under businessInfo - after camelCase conversion)
+    if (page.data?.businessInfo?.[key]) return page.data.businessInfo[key];
+    // Try old format with snake_case (in case conversion didn't happen)
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    if (page.data?.business_info?.[snakeKey]) return page.data.business_info[snakeKey];
+    return null;
+  };
+
+  // Extract business data once to avoid repeated lookups
+  const businessData = {
+    businessName: getBusinessData('businessName'),
+    businessType: getBusinessData('businessType'),
+    walkInsAccepted: getBusinessData('walkInsAccepted'),
+    parking: getBusinessData('parking'),
+    amenities: getBusinessData('amenities'),
+    spokenLanguages: getBusinessData('spokenLanguages'),
+    kidFriendly: getBusinessData('kidFriendly'),
+    appointmentCancellationPolicy: getBusinessData('appointmentCancellationPolicy'),
+  };
+
   return (
     <div 
       className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'} scroll-smooth`}
@@ -669,7 +693,7 @@ export default function PublicBooking() {
                       </div>
 
                       {/* Information Section - Show if we have contact phone or business data */}
-                      {(page.contactPhone || page.data?.businessType || page.data?.businessName) && (
+                      {(page.contactPhone || businessData.businessType || businessData.businessName) && (
                         <div>
                           <h4 className="text-xl font-semibold text-foreground mb-4 flex items-center">
                             <Info className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
@@ -678,7 +702,7 @@ export default function PublicBooking() {
                           <div className="bg-background/50 rounded-lg p-6 border border-border/20">
                             <div className="grid gap-4 sm:grid-cols-2">
                               {/* Business Name */}
-                              {page.data?.businessName && (
+                              {businessData.businessName && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -689,7 +713,7 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Business Name</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-business-name">
-                                      {page.data.businessName}
+                                      {businessData.businessName}
                                     </p>
                                   </div>
                                 </div>
@@ -718,7 +742,7 @@ export default function PublicBooking() {
                               )}
 
                               {/* Business Type */}
-                              {page.data?.businessType && (
+                              {businessData.businessType && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -729,14 +753,14 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Business Type</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-business-type">
-                                      {page.data.businessType.charAt(0).toUpperCase() + page.data.businessType.slice(1)}
+                                      {businessData.businessType.charAt(0).toUpperCase() + businessData.businessType.slice(1)}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
                               {/* Walk-ins */}
-                              {page.data?.walkInsAccepted && (
+                              {businessData.walkInsAccepted && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -747,17 +771,17 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Walk-ins</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-walk-ins">
-                                      {page.data.walkInsAccepted === 'accepted' ? 'Walk-ins accepted' :
-                                       page.data.walkInsAccepted === 'declined' ? 'Walk-ins declined' :
-                                       page.data.walkInsAccepted === 'by-appointment-preferred' ? 'By appointment preferred' :
-                                       page.data.walkInsAccepted}
+                                      {businessData.walkInsAccepted === 'accepted' ? 'Walk-ins accepted' :
+                                       businessData.walkInsAccepted === 'declined' ? 'Walk-ins declined' :
+                                       businessData.walkInsAccepted === 'by-appointment-preferred' ? 'By appointment preferred' :
+                                       businessData.walkInsAccepted}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
                               {/* Parking */}
-                              {page.data?.parking && (
+                              {businessData.parking && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -768,14 +792,14 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Parking</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-parking">
-                                      {page.data.parking}
+                                      {businessData.parking}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
                               {/* Amenities */}
-                              {page.data?.amenities && (
+                              {businessData.amenities && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -786,14 +810,14 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Amenities</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-amenities">
-                                      {page.data.amenities}
+                                      {businessData.amenities}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
                               {/* Spoken Languages */}
-                              {page.data?.spokenLanguages && (
+                              {businessData.spokenLanguages && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -804,14 +828,14 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Spoken Languages</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-spoken-languages">
-                                      {page.data.spokenLanguages}
+                                      {businessData.spokenLanguages}
                                     </p>
                                   </div>
                                 </div>
                               )}
 
                               {/* Kid Friendly */}
-                              {page.data?.kidFriendly && (
+                              {businessData.kidFriendly && (
                                 <div className="flex items-start space-x-3">
                                   <div 
                                     className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
@@ -822,10 +846,10 @@ export default function PublicBooking() {
                                   <div>
                                     <p className="text-sm font-medium text-foreground">Kid Friendly</p>
                                     <p className="text-sm text-muted-foreground" data-testid="text-kid-friendly">
-                                      {page.data.kidFriendly === 'yes' ? 'Yes' :
-                                       page.data.kidFriendly === 'no' ? 'No' :
-                                       page.data.kidFriendly === 'family-focused' ? 'Family-focused business' :
-                                       page.data.kidFriendly}
+                                      {businessData.kidFriendly === 'yes' ? 'Yes' :
+                                       businessData.kidFriendly === 'no' ? 'No' :
+                                       businessData.kidFriendly === 'family-focused' ? 'Family-focused business' :
+                                       businessData.kidFriendly}
                                     </p>
                                   </div>
                                 </div>
@@ -833,7 +857,7 @@ export default function PublicBooking() {
                             </div>
 
                             {/* Appointment Cancellation Policy - Full width if exists */}
-                            {page.data?.appointmentCancellationPolicy && (
+                            {businessData.appointmentCancellationPolicy && (
                               <div className="mt-6 pt-6 border-t border-border/20">
                                 <div className="flex items-start space-x-3">
                                   <div 
@@ -845,7 +869,7 @@ export default function PublicBooking() {
                                   <div className="flex-1">
                                     <p className="text-sm font-medium text-foreground mb-2">Appointment Cancellation Policy</p>
                                     <p className="text-sm text-muted-foreground leading-relaxed" data-testid="text-cancellation-policy">
-                                      {page.data.appointmentCancellationPolicy}
+                                      {businessData.appointmentCancellationPolicy}
                                     </p>
                                   </div>
                                 </div>
