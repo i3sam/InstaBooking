@@ -57,6 +57,7 @@ export default function CreatePage() {
     spokenLanguages: 'English',
     kidFriendly: 'yes',
     appointmentCancellationPolicy: '',
+    gallery: [] as string[],
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -64,6 +65,7 @@ export default function CreatePage() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [uploadingStaffImage, setUploadingStaffImage] = useState<{[key: number]: boolean}>({});
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   
   // Step definitions
   const steps = [
@@ -303,6 +305,55 @@ export default function CreatePage() {
     } finally {
       setUploadingStaffImage(prev => ({ ...prev, [index]: false }));
     }
+  };
+
+  const handleGalleryUpload = async (files: FileList) => {
+    if (files.length === 0) return;
+    
+    setUploadingGallery(true);
+    try {
+      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery'));
+      const results = await Promise.all(uploadPromises);
+      
+      const successfulUploads = results.filter(r => r.success && r.url).map(r => r.url as string);
+      
+      if (successfulUploads.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          gallery: [...prev.gallery, ...successfulUploads]
+        }));
+        toast({
+          title: "Images uploaded!",
+          description: `Successfully uploaded ${successfulUploads.length} image${successfulUploads.length > 1 ? 's' : ''}.`,
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload images. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading gallery images:', error);
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading images.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
+    toast({
+      title: "Image removed",
+      description: "The image has been removed from your gallery.",
+    });
   };
 
   const addFAQ = () => {
@@ -743,6 +794,70 @@ export default function CreatePage() {
                       onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
                       className="hidden"
                     />
+                  </div>
+                </div>
+
+                {/* Gallery Upload */}
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Photo Gallery (Optional)</Label>
+                  <div className="border-2 border-dashed border-border/50 rounded-xl p-6 glass-effect">
+                    <div className="text-center space-y-4 mb-4">
+                      <CloudUpload className="h-12 w-12 text-muted-foreground mx-auto" />
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('gallery-upload')?.click()}
+                          disabled={uploadingGallery}
+                          className="glass-effect hover-lift rounded-xl"
+                          data-testid="button-upload-gallery"
+                        >
+                          {uploadingGallery ? 'Uploading...' : 'Upload Images'}
+                        </Button>
+                        <input
+                          id="gallery-upload"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => e.target.files && handleGalleryUpload(e.target.files)}
+                          className="hidden"
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Upload multiple images to showcase your business. PNG, JPG up to 5MB each
+                      </p>
+                    </div>
+
+                    {/* Gallery Preview */}
+                    {formData.gallery.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border/30">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {formData.gallery.map((imageUrl, index) => (
+                            <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-border/30">
+                              <img 
+                                src={imageUrl} 
+                                alt={`Gallery ${index + 1}`} 
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => removeGalleryImage(index)}
+                                  className="rounded-full"
+                                  data-testid={`button-remove-gallery-${index}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-3">
+                          {formData.gallery.length} image{formData.gallery.length > 1 ? 's' : ''} uploaded
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

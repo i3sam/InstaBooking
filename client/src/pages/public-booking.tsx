@@ -19,6 +19,92 @@ import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+// Image Gallery Slideshow Component
+function ImageGallerySlideshow({ images, primaryColor }: { images: string[], primaryColor: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl border border-border/20 bg-background/50 backdrop-blur-md">
+      {/* Main Image Display */}
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full bg-background/30">
+        <img 
+          src={images[currentIndex]} 
+          alt={`Gallery image ${currentIndex + 1}`}
+          className="w-full h-full object-cover"
+          data-testid={`gallery-image-${currentIndex}`}
+        />
+        
+        {/* Image Counter */}
+        <div 
+          className="absolute bottom-4 right-4 px-4 py-2 rounded-full backdrop-blur-md text-white text-sm font-semibold shadow-lg"
+          style={{ backgroundColor: `${primaryColor}cc` }}
+        >
+          {currentIndex + 1} / {images.length}
+        </div>
+      </div>
+
+      {/* Navigation Arrows - Only show if more than 1 image */}
+      {images.length > 1 && (
+        <>
+          {/* Previous Button */}
+          <button
+            onClick={goToPrevious}
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-xl border border-white/20"
+            style={{ backgroundColor: `${primaryColor}ee` }}
+            data-testid="button-gallery-prev"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+          </button>
+
+          {/* Next Button */}
+          <button
+            onClick={goToNext}
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-xl border border-white/20"
+            style={{ backgroundColor: `${primaryColor}ee` }}
+            data-testid="button-gallery-next"
+            aria-label="Next image"
+          >
+            <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+          </button>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`transition-all duration-300 rounded-full ${
+                  index === currentIndex 
+                    ? 'w-8 h-2' 
+                    : 'w-2 h-2 hover:scale-125'
+                }`}
+                style={{ 
+                  backgroundColor: index === currentIndex 
+                    ? 'white' 
+                    : `${primaryColor}88` 
+                }}
+                data-testid={`gallery-dot-${index}`}
+                aria-label={`Go to image ${index + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function PublicBooking() {
   const { slug } = useParams();
   const { toast } = useToast();
@@ -676,6 +762,16 @@ export default function PublicBooking() {
                       <p className="text-lg text-muted-foreground mb-6">{page.tagline}</p>
                     )}
                   </div>
+
+                  {/* Image Gallery Slideshow */}
+                  {page.gallery && page.gallery.length > 0 && (
+                    <div className="mb-8">
+                      <ImageGallerySlideshow 
+                        images={page.gallery} 
+                        primaryColor={themeStyles?.primaryColor || '#2563eb'} 
+                      />
+                    </div>
+                  )}
 
                   <div className="grid md:grid-cols-2 gap-8 mb-8">
                     {/* Business Description */}
