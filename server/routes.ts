@@ -804,7 +804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Generate a unique slug for the page
-      const baseSlug = demoData.data.title ? demoData.data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : 'booking-page';
+      const baseSlug = demoData.data.businessName ? demoData.data.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : 'booking-page';
       let slug = baseSlug;
       let counter = 1;
       
@@ -819,7 +819,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create the real page from demo data using storage abstraction
       const pageData = {
         ownerId: req.user.userId,
-        title: demoData.data.title || 'My Booking Page',
+        title: demoData.data.businessName || 'My Booking Page',
         slug: slug,
         tagline: demoData.data.tagline || null,
         logoUrl: null, // Logo will be uploaded separately if needed
