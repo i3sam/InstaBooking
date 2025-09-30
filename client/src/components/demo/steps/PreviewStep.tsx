@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Monitor, Smartphone, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award, ArrowLeft } from 'lucide-react';
+import { Monitor, Smartphone, UserPlus, Rocket, Clock, DollarSign, Phone, Calendar, Scissors, Coffee, Heart, User, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Leaf, Award, ArrowLeft, MapPin, Sparkles, MessageSquare, Info, FileText } from 'lucide-react';
 import { useState } from 'react';
 
 interface Service {
@@ -17,6 +17,12 @@ interface DemoData {
   contactPhone: string;
   logoBase64: string;
   businessType: string;
+  walkInsAccepted: string;
+  parking: string;
+  amenities: string;
+  spokenLanguages: string;
+  kidFriendly: string;
+  appointmentCancellationPolicy: string;
   theme: string;
   primaryColor: string;
   fontSize: 'small' | 'medium' | 'large';
@@ -380,6 +386,167 @@ export default function PreviewStep({
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Additional Business Information Section */}
+      {(data.businessType || data.walkInsAccepted || data.parking || data.amenities || data.spokenLanguages || data.kidFriendly || data.appointmentCancellationPolicy) && (
+        <section className="py-8 px-4">
+          <div className="container mx-auto">
+            <div className="max-w-3xl mx-auto">
+              <div className="border-0 shadow-lg bg-card/80 backdrop-blur-md rounded-2xl p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                    style={{
+                      background: `linear-gradient(135deg, ${data.primaryColor}20 0%, ${data.primaryColor}10 100%)`
+                    }}
+                  >
+                    <Info className="h-5 w-5" style={{ color: data.primaryColor }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">Additional Information</h3>
+                    <p className="text-sm text-muted-foreground">More details about our business</p>
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Business Type */}
+                  {data.businessType && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <Briefcase className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Business Type</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.businessType.charAt(0).toUpperCase() + data.businessType.slice(1)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Walk-ins */}
+                  {data.walkInsAccepted && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <Clock className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Walk-ins</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.walkInsAccepted === 'accepted' ? 'Walk-ins accepted' :
+                           data.walkInsAccepted === 'declined' ? 'Walk-ins declined' :
+                           data.walkInsAccepted === 'by-appointment-preferred' ? 'By appointment preferred' :
+                           data.walkInsAccepted}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Parking */}
+                  {data.parking && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <MapPin className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Parking</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.parking}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Amenities */}
+                  {data.amenities && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <Sparkles className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Amenities</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.amenities}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Spoken Languages */}
+                  {data.spokenLanguages && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <MessageSquare className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Spoken Languages</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.spokenLanguages}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Kid Friendly */}
+                  {data.kidFriendly && (
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <Heart className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Kid Friendly</p>
+                        <p className="text-sm text-muted-foreground">
+                          {data.kidFriendly === 'yes' ? 'Yes' :
+                           data.kidFriendly === 'no' ? 'No' :
+                           data.kidFriendly === 'family-focused' ? 'Family-focused business' :
+                           data.kidFriendly}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Appointment Cancellation Policy - Full width if exists */}
+                {data.appointmentCancellationPolicy && (
+                  <div className="mt-6 pt-6 border-t border-border/20">
+                    <div className="flex items-start space-x-3">
+                      <div 
+                        className="w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+                        style={{ backgroundColor: data.primaryColor }}
+                      >
+                        <FileText className="h-3 w-3 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground mb-2">Appointment Cancellation Policy</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {data.appointmentCancellationPolicy}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
