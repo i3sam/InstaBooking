@@ -368,23 +368,24 @@ export default function PublicBooking() {
       className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'} scroll-smooth`}
       style={themeStyles?.cssVariables}
     >
-      {/* Enhanced Responsive Header */}
-      <header className="border-b border-border/10 bg-card/60 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+      {/* Enhanced Responsive Header - Improved Mobile Design */}
+      <header className="border-b border-border/20 bg-card/80 backdrop-blur-2xl sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
+                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105"
                 style={{
-                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                  boxShadow: `0 4px 14px -2px ${themeStyles?.primaryColor || '#2563eb'}40`
                 }}
               >
-                <span className="text-lg sm:text-xl font-bold text-white">
+                <span className="text-lg sm:text-2xl font-black text-white">
                   {page.title?.charAt(0) || 'B'}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-lg sm:text-xl font-bold text-foreground truncate block">{page.title}</span>
+                <span className="text-base sm:text-xl lg:text-2xl font-black text-foreground truncate block">{page.title}</span>
                 {page.tagline && (
                   <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate hidden sm:block">{page.tagline}</p>
                 )}
@@ -393,11 +394,11 @@ export default function PublicBooking() {
             <Button 
               variant="ghost"
               onClick={() => window.history.back()}
-              className="flex-shrink-0 h-9 sm:h-10 px-3 sm:px-4"
+              className="flex-shrink-0 h-9 sm:h-10 px-2 sm:px-4 hover:bg-background/50 transition-colors"
               data-testid="button-back"
             >
-              <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Back</span>
+              <ArrowLeft className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline font-semibold">Back</span>
             </Button>
           </div>
         </div>
@@ -508,7 +509,7 @@ export default function PublicBooking() {
             </div>
             
             {/* Enhanced CTA section with improved mobile layout */}
-            <div className="mb-8 sm:mb-12 lg:mb-20">
+            <div className="mb-6 sm:mb-10 lg:mb-16">
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mb-4 sm:mb-6 max-w-md sm:max-w-none mx-auto">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
@@ -597,44 +598,77 @@ export default function PublicBooking() {
         </div>
       </section>
 
-      {/* Tabbed Interface Section */}
+      {/* Tabbed Interface Section - Enhanced Modern Design */}
       <section className="py-8 sm:py-12 lg:py-16 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList 
-              className="grid w-full grid-cols-3 glass-prism-card backdrop-blur-md border border-border/20 shadow-xl mb-8"
-              style={{
-                background: themeStyles 
-                  ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.05) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.02) 100%)`
-                  : 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.02) 100%)'
-              }}
-            >
-              {tabItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <TabsTrigger 
-                    key={item.id} 
-                    value={item.id}
-                    className="flex flex-col items-center px-3 py-4 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 data-[state=active]:shadow-lg"
-                    style={{
-                      color: activeTab === item.id ? 'white' : undefined,
-                      background: activeTab === item.id 
-                        ? themeStyles 
-                          ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
-                          : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
-                        : undefined
-                    }}
-                    data-testid={`tab-${item.id}`}
-                  >
-                    <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 mb-1" />
-                    <span>{item.label}</span>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+            {/* Modern Tab Navigation with improved mobile design */}
+            <div className="flex justify-center mb-8 sm:mb-12">
+              <TabsList 
+                className="inline-flex items-center gap-2 sm:gap-3 p-2 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 shadow-2xl hover:shadow-3xl transition-all duration-300"
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 100%), rgba(255, 255, 255, 0.6)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%), rgba(255, 255, 255, 0.6)'
+                }}
+              >
+                {tabItems.map((item, index) => {
+                  const IconComponent = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <TabsTrigger 
+                      key={item.id} 
+                      value={item.id}
+                      className="group relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+                      style={{
+                        color: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb',
+                        background: isActive 
+                          ? themeStyles 
+                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                          : 'transparent',
+                        boxShadow: isActive ? `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}40` : 'none'
+                      }}
+                      data-testid={`tab-${item.id}`}
+                    >
+                      {/* Icon with animated background */}
+                      <div className={`relative flex items-center justify-center transition-all duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                        <div 
+                          className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 ${isActive ? 'opacity-50' : 'opacity-0 group-hover:opacity-30'}`}
+                          style={{ 
+                            backgroundColor: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb'
+                          }}
+                        ></div>
+                        <IconComponent className={`relative h-5 w-5 sm:h-6 sm:w-6 transition-all duration-300 ${isActive ? 'drop-shadow-lg' : ''}`} />
+                      </div>
+                      
+                      {/* Label - hidden on very small screens for Services/Staff */}
+                      <span className={`relative font-bold tracking-wide transition-all duration-300 ${index > 0 ? 'hidden sm:inline-block' : ''}`}>
+                        {item.label}
+                      </span>
+
+                      {/* Active indicator line */}
+                      {isActive && (
+                        <div 
+                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-12 sm:w-16 rounded-full transition-all duration-300"
+                          style={{ backgroundColor: 'white' }}
+                        ></div>
+                      )}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
 
             <TabsContent value="about">
-              <div className="py-8 rounded-2xl glass-prism-card">
+              <div className="py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 rounded-3xl shadow-2xl border border-border/10 transition-all duration-500 hover:shadow-3xl" 
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.5)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(37, 99, 235, 0.01) 100%), rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(20px)'
+                }}
+              >
                 <div className="max-w-6xl mx-auto">
                   <div className="text-center mb-8">
                     <h3 className="text-3xl font-bold text-foreground mb-4">About {page.title}</h3>
@@ -1539,7 +1573,14 @@ export default function PublicBooking() {
             </TabsContent>
 
             <TabsContent value="services">
-              <div className="py-8 rounded-2xl glass-prism-card">
+              <div className="py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 rounded-3xl shadow-2xl border border-border/10 transition-all duration-500 hover:shadow-3xl" 
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.5)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(37, 99, 235, 0.01) 100%), rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(20px)'
+                }}
+              >
                 <div className="max-w-6xl mx-auto">
                   <div className="text-center mb-8">
                     <h3 className="text-3xl font-bold text-foreground mb-4">Our Services</h3>
@@ -1555,18 +1596,21 @@ export default function PublicBooking() {
                         const currency = getCurrencyByCode(service.currency || 'USD');
                         
                         return (
-                          <Card key={service.id} className="group hover:shadow-lg transition-all duration-300 border-border/20 bg-background/50 backdrop-blur-sm" data-testid={`card-service-${service.id}`}>
-                            <CardContent className="p-6">
-                              <div className="flex items-start space-x-4">
+                          <Card key={service.id} className="group hover:shadow-2xl hover:border-border/40 transition-all duration-500 border-border/15 bg-background/60 backdrop-blur-md overflow-hidden hover:-translate-y-1" data-testid={`card-service-${service.id}`}>
+                            <CardContent className="p-5 sm:p-6 lg:p-7">
+                              <div className="flex flex-col sm:flex-row items-start gap-4 sm:space-x-4">
                                 <div 
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
-                                  style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 flex-shrink-0 shadow-lg"
+                                  style={{ 
+                                    backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                                    boxShadow: `0 8px 20px -4px ${themeStyles?.primaryColor || '#2563eb'}40`
+                                  }}
                                 >
-                                  <ServiceIcon className="h-6 w-6 text-white" />
+                                  <ServiceIcon className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between mb-3">
-                                    <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                                <div className="flex-1 min-w-0 w-full">
+                                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
+                                    <h4 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
                                       {service.name}
                                     </h4>
                                   </div>
@@ -1682,7 +1726,14 @@ export default function PublicBooking() {
             </TabsContent>
 
             <TabsContent value="staff">
-              <div className="py-8 rounded-2xl glass-prism-card">
+              <div className="py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 rounded-3xl shadow-2xl border border-border/10 transition-all duration-500 hover:shadow-3xl" 
+                style={{
+                  background: themeStyles 
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.5)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(37, 99, 235, 0.01) 100%), rgba(255, 255, 255, 0.5)',
+                  backdropFilter: 'blur(20px)'
+                }}
+              >
                 <div className="max-w-6xl mx-auto">
                   <div className="text-center mb-8">
                     <h3 className="text-3xl font-bold text-foreground mb-4">Meet Our Team</h3>
@@ -1697,29 +1748,35 @@ export default function PublicBooking() {
                         .filter((staff: any) => staff.isActive !== false)
                         .sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0))
                         .map((staff: any) => (
-                          <Card key={staff.id} className="group hover:shadow-lg transition-all duration-300 border-border/20 bg-background/50 backdrop-blur-sm overflow-hidden" data-testid={`card-staff-${staff.id}`}>
-                            <CardContent className="p-6 text-center">
-                              <div className="relative mb-4">
+                          <Card key={staff.id} className="group hover:shadow-2xl hover:border-border/40 transition-all duration-500 border-border/15 bg-background/60 backdrop-blur-md overflow-hidden hover:-translate-y-1" data-testid={`card-staff-${staff.id}`}>
+                            <CardContent className="p-6 sm:p-7 lg:p-8 text-center">
+                              <div className="relative mb-6">
                                 {staff.imageUrl ? (
-                                  <div className="relative w-24 h-24 mx-auto mb-4">
+                                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-4">
                                     <img 
                                       src={staff.imageUrl} 
                                       alt={staff.name}
-                                      className="w-full h-full rounded-full object-cover border-4 border-background shadow-lg group-hover:scale-105 transition-transform duration-300"
+                                      className="w-full h-full rounded-full object-cover border-4 border-background shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500"
+                                      style={{
+                                        boxShadow: `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}30`
+                                      }}
                                     />
                                   </div>
                                 ) : (
                                   <div 
-                                    className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                                    className="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500"
+                                    style={{ 
+                                      backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                                      boxShadow: `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}40`
+                                    }}
                                   >
-                                    <User className="h-12 w-12 text-white" />
+                                    <User className="h-14 w-14 sm:h-16 sm:w-16 text-white" />
                                   </div>
                                 )}
                               </div>
 
                               <div className="space-y-2 mb-4">
-                                <h4 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                                <h4 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                                   {staff.name}
                                 </h4>
                                 {staff.position && (
