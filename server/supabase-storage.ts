@@ -57,10 +57,19 @@ export class SupabaseStorage implements IStorage {
       return obj.map(item => this.toSnakeCase(item));
     }
 
+    // JSONB fields that should preserve their nested structure without key conversion
+    const jsonbFields = ['data', 'faqs', 'businessHours', 'gallery', 'theme', 'services', 'contact', 'meta'];
+
     const snakeObj: any = {};
     for (const [key, value] of Object.entries(obj)) {
       const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      snakeObj[snakeKey] = this.toSnakeCase(value);
+      
+      // If this is a JSONB field, preserve its value as-is without recursive conversion
+      if (jsonbFields.includes(key)) {
+        snakeObj[snakeKey] = value;
+      } else {
+        snakeObj[snakeKey] = this.toSnakeCase(value);
+      }
     }
     return snakeObj;
   }
