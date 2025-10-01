@@ -280,7 +280,7 @@ export default function CreatePage() {
   const handleStaffImageUpload = async (index: number, file: File) => {
     try {
       setUploadingStaffImage(prev => ({ ...prev, [index]: true }));
-      const result = await uploadFile(file, 'staff');
+      const result = await uploadFile(file, 'logos');
       
       if (result.success && result.url) {
         updateStaff(index, 'imageUrl', result.url);
@@ -312,7 +312,7 @@ export default function CreatePage() {
     
     setUploadingGallery(true);
     try {
-      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery'));
+      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery-images'));
       const results = await Promise.all(uploadPromises);
       
       const successfulUploads = results.filter(r => r.success && r.url).map(r => r.url as string);

@@ -660,7 +660,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     
     setUploadingGallery(true);
     try {
-      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery'));
+      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery-images'));
       const results = await Promise.all(uploadPromises);
       
       const successfulUploads = results.filter(r => r.success && r.url).map(r => r.url as string);
