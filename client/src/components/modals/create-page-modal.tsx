@@ -53,7 +53,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     cancellationPolicy: '',
     showBusinessHours: 'true',
     showContactInfo: 'true',
-    services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }],
+    services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD', imageUrl: '' }],
     staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
     visitInfo: {
       parking: true,
@@ -81,6 +81,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   
   // Gallery state
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  
+  // Service image upload state
+  const [uploadingServiceIndex, setUploadingServiceIndex] = useState<number | null>(null);
 
   // Fetch page data for editing
   const { data: editingPageData } = useQuery({
@@ -268,7 +271,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       cancellationPolicy: '',
       showBusinessHours: 'true',
       showContactInfo: 'true',
-      services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }],
+      services: [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD', imageUrl: '' }],
       staff: [] as Array<{ name: string; position: string; bio: string; email: string; phone: string; imageUrl: string }>,
       visitInfo: {
         parking: true,
@@ -304,9 +307,10 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
             description: service.description || '',
             durationMinutes: service.durationMinutes || 60,
             price: service.price?.toString() || '0',
-            currency: service.currency || 'USD'
+            currency: service.currency || 'USD',
+            imageUrl: service.imageUrl || ''
           }))
-        : [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }];
+        : [{ name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD', imageUrl: '' }];
 
       setFormData({
         title: editingPageData.title || '',
@@ -433,6 +437,56 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     }
   };
 
+  const handleServiceImageUpload = async (serviceIndex: number, file: File) => {
+    setUploadingServiceIndex(serviceIndex);
+    try {
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Image must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Upload to Supabase
+      const result = await uploadFile(file, 'service-images');
+      
+      if (result.success && result.url) {
+        updateService(serviceIndex, 'imageUrl', result.url);
+        toast({
+          title: "Image uploaded!",
+          description: "Service image has been uploaded successfully.",
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: result.error || "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading the image.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingServiceIndex(null);
+    }
+  };
+
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -553,7 +607,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   const addService = () => {
     setFormData(prev => ({
       ...prev,
-      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD' }]
+      services: [...prev.services, { name: '', description: '', durationMinutes: 60, price: '0', currency: 'USD', imageUrl: '' }]
     }));
   };
 
@@ -1067,6 +1121,69 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                               onChange={(e) => updateService(index, 'price', e.target.value)}
                               className="flex-1 glass-effect border-border/50"
                             />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Service Image Upload */}
+                      <div className="pt-4 border-t border-border/30">
+                        <Label className="text-base font-medium flex items-center gap-2 mb-3">
+                          <Image className="h-4 w-4" />
+                          Service Image (Optional)
+                        </Label>
+                        <div className="flex items-center gap-4">
+                          {service.imageUrl && (
+                            <div className="w-20 h-20 rounded-lg border border-border/50 overflow-hidden flex-shrink-0 glass-effect">
+                              <img
+                                src={service.imageUrl}
+                                alt={`${service.name} preview`}
+                                className="w-full h-full object-cover"
+                                data-testid={`img-service-preview-${index}`}
+                              />
+                            </div>
+                          )}
+                          
+                          <div className="flex-1">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleServiceImageUpload(index, file);
+                              }}
+                              className="hidden"
+                              id={`service-image-upload-${index}`}
+                              data-testid={`input-service-image-${index}`}
+                            />
+                            <div className="flex gap-2 flex-wrap">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => document.getElementById(`service-image-upload-${index}`)?.click()}
+                                disabled={uploadingServiceIndex === index}
+                                data-testid={`button-upload-service-image-${index}`}
+                                className="glass-effect border-border/50"
+                              >
+                                <CloudUpload className="w-4 h-4 mr-2" />
+                                {uploadingServiceIndex === index ? 'Uploading...' : service.imageUrl ? 'Change Image' : 'Upload Image'}
+                              </Button>
+                              {service.imageUrl && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => updateService(index, 'imageUrl', '')}
+                                  data-testid={`button-remove-service-image-${index}`}
+                                >
+                                  <X className="w-4 h-4 mr-1" />
+                                  Remove
+                                </Button>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Recommended: 16:9 or square image, max 5MB
+                            </p>
                           </div>
                         </div>
                       </div>
