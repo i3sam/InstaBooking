@@ -1493,26 +1493,26 @@ export default function PublicBooking() {
                   {/* Combined Location and Hours Section */}
                   {(page.business_address || (normalizedBooleans.showBusinessHours && page.business_hours) || (normalizedBooleans.showContactInfo && (page.contact_phone || page.contact_email))) && (
                     <div className="mt-8 pt-8 border-t border-border/20">
-                      <div className="bg-background/50 rounded-lg border border-border/20 overflow-hidden">
+                      <div className="bg-background/50 rounded-xl border border-border/20 overflow-hidden shadow-lg">
                         <div className="grid lg:grid-cols-2 gap-0">
                           {/* Left Side - Map and Address */}
                           {page.business_address && (
                             <div className="relative">
                               {/* Location Button - Redirects to Google Maps */}
-                              <div className="relative aspect-[4/3] lg:aspect-[3/2] bg-background/30 rounded-lg flex items-center justify-center border border-border/20">
+                              <div className="relative aspect-[4/3] lg:aspect-[3/2] bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5 flex items-center justify-center">
                                 <Button
                                   asChild
-                                  className="flex-col h-auto p-8 bg-background/50 hover:bg-background/70 border border-border/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                                  className="flex-col h-auto p-8 bg-background/80 hover:bg-background border-border/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                                   variant="outline"
                                   data-testid="button-google-maps-location"
                                 >
                                   <a
-                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.business_address)}`}
+                                    href={page.location_link || page.locationLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.business_address)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
                                     <div 
-                                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg"
                                       style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
                                     >
                                       <MapPin className="h-8 w-8 text-white" />
@@ -1527,41 +1527,48 @@ export default function PublicBooking() {
                               </div>
                               
                               {/* Address Information */}
-                              <div className="p-6 border-t border-border/20">
+                              <div className="p-6 border-t border-border/20 bg-background/30">
                                 <div className="flex items-start space-x-3 mb-4">
                                   <div 
-                                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
                                     style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
                                   >
-                                    <MapPin className="h-3 w-3 text-white" />
+                                    <MapPin className="h-4 w-4 text-white" />
                                   </div>
-                                  <div>
-                                    <p className="font-medium text-foreground text-sm text-blue-600">{page.business_address}</p>
+                                  <div className="flex-1">
+                                    <p className="text-xs text-muted-foreground mb-1">Address</p>
+                                    <p className="font-medium text-foreground text-sm">{page.business_address}</p>
                                   </div>
                                 </div>
                                 
                                 {/* Action Buttons */}
-                                {(page.contact_phone || page.contact_email) && (
-                                  <div className="flex space-x-3 mt-4">
+                                {normalizedBooleans.showContactInfo && (page.contact_phone || page.contact_email) && (
+                                  <div className="flex gap-2 mt-4">
                                     {page.contact_phone && (
-                                      <a
-                                        href={`tel:${page.contact_phone}`}
-                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                      <Button
+                                        asChild
+                                        variant="outline"
+                                        className="flex-1 h-auto py-3 border-border/40 hover:border-primary/50 transition-all"
                                         data-testid="button-call"
                                       >
-                                        <Phone className="h-4 w-4" />
-                                        <span>Call</span>
-                                      </a>
+                                        <a href={`tel:${page.contact_phone}`} className="flex flex-col items-center gap-1">
+                                          <Phone className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                          <span className="text-xs font-medium">Call</span>
+                                        </a>
+                                      </Button>
                                     )}
                                     {page.contact_email && (
-                                      <a
-                                        href={`mailto:${page.contact_email}`}
-                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                      <Button
+                                        asChild
+                                        variant="outline"
+                                        className="flex-1 h-auto py-3 border-border/40 hover:border-primary/50 transition-all"
                                         data-testid="button-message"
                                       >
-                                        <Mail className="h-4 w-4" />
-                                        <span>Message</span>
-                                      </a>
+                                        <a href={`mailto:${page.contact_email}`} className="flex flex-col items-center gap-1">
+                                          <Mail className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                          <span className="text-xs font-medium">Message</span>
+                                        </a>
+                                      </Button>
                                     )}
                                   </div>
                                 )}
@@ -1571,23 +1578,33 @@ export default function PublicBooking() {
                           
                           {/* Right Side - Business Hours */}
                           {normalizedBooleans.showBusinessHours && page.business_hours && (
-                            <div className={`p-6 ${page.business_address ? 'border-l border-border/20' : ''}`}>
-                              <h4 className="text-lg font-semibold text-foreground mb-4">Business Hours</h4>
-                              <div className="space-y-2">
+                            <div className={`p-6 ${page.business_address ? 'lg:border-l border-t lg:border-t-0 border-border/20' : ''} bg-background/30`}>
+                              <h4 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
+                                <Clock className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                Business Hours
+                              </h4>
+                              <div className="space-y-3">
                                 {page.business_hours && Object.entries(page.business_hours).map(([day, hours]: [string, any]) => {
                                   const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
                                   const displayHours = hours === "Closed" ? "Closed" : String(hours);
+                                  const isClosed = hours === "Closed";
                                   
                                   return (
                                     <div 
                                       key={day} 
-                                      className="flex justify-between items-center py-1"
+                                      className={`flex justify-between items-center py-2 px-3 rounded-lg transition-colors ${
+                                        isToday ? 'bg-primary/10 border border-primary/20' : 'hover:bg-background/50'
+                                      }`}
                                       data-testid={`hours-${day.toLowerCase()}`}
                                     >
-                                      <span className={`font-medium capitalize text-sm ${isToday ? 'text-primary' : 'text-foreground'}`}>
+                                      <span className={`font-medium capitalize text-sm ${
+                                        isToday ? 'font-semibold' : ''
+                                      }`} style={isToday ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
                                         {day}
                                       </span>
-                                      <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
+                                      <span className={`text-sm font-medium ${
+                                        isClosed ? 'text-muted-foreground' : isToday ? 'font-semibold' : 'text-foreground'
+                                      }`} style={isToday && !isClosed ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
                                         {displayHours}
                                       </span>
                                     </div>
