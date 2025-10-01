@@ -36,11 +36,11 @@ function ImageGallerySlideshow({ images, primaryColor }: { images: string[], pri
   return (
     <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl border border-border/20 bg-background/50 backdrop-blur-md">
       {/* Main Image Display */}
-      <div className="relative aspect-[4/3] sm:aspect-video w-full bg-background/30">
+      <div className="relative aspect-video w-full bg-background/30">
         <img 
           src={images[currentIndex]} 
           alt={`Gallery image ${currentIndex + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           data-testid={`gallery-image-${currentIndex}`}
         />
         
