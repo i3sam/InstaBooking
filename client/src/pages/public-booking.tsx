@@ -18,6 +18,7 @@ import BookingModal from '@/components/modals/booking-modal';
 import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2, Info, Calendar as CalendarIcon } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // Image Gallery Slideshow Component
 function ImageGallerySlideshow({ images, primaryColor }: { images: string[], primaryColor: string }) {
@@ -120,6 +121,10 @@ export default function PublicBooking() {
   });
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  
+  // State for image viewer modal
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   
   // State for tabbed interface
   const [activeTab, setActiveTab] = useState('about');
@@ -1650,6 +1655,10 @@ export default function PublicBooking() {
                             key={index} 
                             className="relative aspect-square rounded-lg overflow-hidden bg-background/50 border border-border/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group cursor-pointer"
                             data-testid={`gallery-thumb-${index}`}
+                            onClick={() => {
+                              setSelectedImage(image.url || image);
+                              setIsImageModalOpen(true);
+                            }}
                           >
                             <img 
                               src={image.url || image} 
@@ -2596,6 +2605,23 @@ export default function PublicBooking() {
         page={page}
         services={services}
       />
+
+      {/* Image Viewer Modal */}
+      <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+        <DialogContent className="max-w-7xl w-full p-0 overflow-hidden bg-background/95 backdrop-blur-lg border-border/50">
+          <DialogTitle className="sr-only">Gallery Image</DialogTitle>
+          <div className="relative w-full max-h-[90vh] flex items-center justify-center p-4">
+            {selectedImage && (
+              <img 
+                src={selectedImage} 
+                alt="Gallery image full size" 
+                className="max-w-full max-h-[85vh] object-contain rounded-lg"
+                data-testid="image-viewer-full"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
