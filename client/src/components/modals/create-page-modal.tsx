@@ -60,11 +60,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       professionalAtmosphere: true,
       customInfo: [] as string[]
     },
-    gallery: {
-      banners: [],
-      logos: [],
-      images: []
-    },
+    gallery: [] as string[],
     businessInfo: {
       businessType: '',
       walkInsAccepted: '',
@@ -83,8 +79,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   
   // Gallery state
-  const [uploadingGallery, setUploadingGallery] = useState<{[key: string]: boolean}>({});
-  const [galleryPreviews, setGalleryPreviews] = useState<{[key: string]: any[]}>({ banners: [], logos: [], images: [] });
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   // Fetch page data for editing
   const { data: editingPageData } = useQuery({
@@ -279,11 +274,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         professionalAtmosphere: true,
         customInfo: [] as string[]
       },
-      gallery: {
-        banners: [],
-        logos: [],
-        images: []
-      },
+      gallery: [] as string[],
       businessInfo: {
         businessType: '',
         walkInsAccepted: '',
@@ -297,8 +288,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     setFormData(defaultFormData);
     setLogoFile(null);
     setLogoPreview('');
-    setGalleryPreviews({ banners: [], logos: [], images: [] });
-    setUploadingGallery({});
+    setUploadingGallery(false);
   };
 
   // Pre-populate form when editing
@@ -353,11 +343,27 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           professionalAtmosphere: true,
           customInfo: [] as string[]
         },
-        gallery: editingPageData.data?.gallery || editingPageData.gallery || {
-          banners: [],
-          logos: [],
-          images: []
-        },
+        gallery: (() => {
+          const rawGallery = editingPageData.data?.gallery || editingPageData.gallery || [];
+          // Normalize legacy gallery object structure to simple array
+          if (Array.isArray(rawGallery)) {
+            return rawGallery;
+          }
+          // Handle legacy {banners, logos, images} structure
+          if (typeof rawGallery === 'object' && rawGallery !== null) {
+            const legacy = rawGallery as any;
+            const allImages = [
+              ...(legacy.banners || []),
+              ...(legacy.logos || []),
+              ...(legacy.images || [])
+            ];
+            // Extract URLs from objects or use strings directly
+            return allImages.map((item: any) => 
+              typeof item === 'string' ? item : item?.url || ''
+            ).filter((url: string) => url.length > 0);
+          }
+          return [];
+        })(),
         businessInfo: editingPageData.data?.businessInfo || {
           businessType: '',
           walkInsAccepted: '',
@@ -372,16 +378,6 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       // Set logo preview if there's a logoUrl
       if (editingPageData.logoUrl) {
         setLogoPreview(editingPageData.logoUrl);
-      }
-      
-      // Set gallery previews if there's gallery data
-      const galleryData = editingPageData.data?.gallery || editingPageData.gallery;
-      if (galleryData) {
-        setGalleryPreviews({
-          banners: galleryData.banners || [],
-          logos: galleryData.logos || [],
-          images: galleryData.images || []
-        });
       }
     } else if (!isEditing) {
       resetForm();
@@ -659,78 +655,53 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   };
 
   // Gallery functions
-  const handleGalleryUpload = async (files: FileList, type: 'banners' | 'logos' | 'images') => {
-    setUploadingGallery(prev => ({ ...prev, [type]: true }));
+  const handleGalleryUpload = async (files: FileList) => {
+    if (files.length === 0) return;
     
+    setUploadingGallery(true);
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-          toast({
-            title: "File too large",
-            description: `${file.name} is over 5MB. Please select a smaller file.`,
-            variant: "destructive"
-          });
-          return null;
-        }
-        
-        const result = await uploadFile(file, `gallery-${type}`);
-        if (result.success && result.url) {
-          return {
-            name: file.name,
-            url: result.url,
-            type: file.type,
-            size: file.size
-          };
-        }
-        return null;
-      });
+      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'gallery'));
+      const results = await Promise.all(uploadPromises);
       
-      const uploadedFiles = (await Promise.all(uploadPromises)).filter(Boolean);
+      const successfulUploads = results.filter(r => r.success && r.url).map(r => r.url as string);
       
-      if (uploadedFiles.length > 0) {
+      if (successfulUploads.length > 0) {
         setFormData(prev => ({
           ...prev,
-          gallery: {
-            ...prev.gallery,
-            [type]: [...prev.gallery[type], ...uploadedFiles]
-          }
+          gallery: [...prev.gallery, ...successfulUploads]
         }));
-        
-        // Update previews
-        setGalleryPreviews(prev => ({
-          ...prev,
-          [type]: [...prev[type], ...uploadedFiles]
-        }));
-        
         toast({
           title: "Images uploaded!",
-          description: `${uploadedFiles.length} ${type} uploaded successfully.`,
+          description: `Successfully uploaded ${successfulUploads.length} image${successfulUploads.length > 1 ? 's' : ''}.`,
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload images. Please try again.",
+          variant: "destructive",
         });
       }
     } catch (error) {
+      console.error('Error uploading gallery images:', error);
       toast({
         title: "Upload error",
-        description: `Failed to upload ${type}. Please try again.`,
+        description: "Something went wrong while uploading images.",
         variant: "destructive",
       });
     } finally {
-      setUploadingGallery(prev => ({ ...prev, [type]: false }));
+      setUploadingGallery(false);
     }
   };
   
-  const removeGalleryImage = (type: 'banners' | 'logos' | 'images', index: number) => {
+  const removeGalleryImage = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      gallery: {
-        ...prev.gallery,
-        [type]: prev.gallery[type].filter((_, i) => i !== index)
-      }
+      gallery: prev.gallery.filter((_, i) => i !== index)
     }));
-    
-    setGalleryPreviews(prev => ({
-      ...prev,
-      [type]: prev[type].filter((_, i) => i !== index)
-    }));
+    toast({
+      title: "Image removed",
+      description: "The image has been removed from your gallery.",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1185,6 +1156,70 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                       onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
                       className="hidden"
                     />
+                  </div>
+                </div>
+
+                {/* Photo Gallery */}
+                <div>
+                  <Label className="text-base font-medium mb-4 block">Photo Gallery (Optional)</Label>
+                  <div className="border-2 border-dashed border-border/50 rounded-xl p-6 glass-effect">
+                    <div className="text-center space-y-4 mb-4">
+                      <CloudUpload className="h-12 w-12 text-muted-foreground mx-auto" />
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() => document.getElementById('gallery-upload')?.click()}
+                          disabled={uploadingGallery}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
+                          data-testid="button-upload-gallery"
+                        >
+                          {uploadingGallery ? 'Uploading...' : 'Upload Images'}
+                        </Button>
+                        <input
+                          id="gallery-upload"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => e.target.files && handleGalleryUpload(e.target.files)}
+                          className="hidden"
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Upload multiple images to showcase your business. PNG, JPG up to 5MB each
+                      </p>
+                    </div>
+
+                    {/* Gallery Preview */}
+                    {formData.gallery.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-border/30">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {formData.gallery.map((imageUrl, index) => (
+                            <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-border/30">
+                              <img 
+                                src={imageUrl} 
+                                alt={`Gallery ${index + 1}`} 
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => removeGalleryImage(index)}
+                                  className="rounded-full"
+                                  data-testid={`button-remove-gallery-${index}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-3">
+                          {formData.gallery.length} image{formData.gallery.length > 1 ? 's' : ''} uploaded
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

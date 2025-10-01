@@ -764,7 +764,7 @@ export default function PublicBooking() {
                   </div>
 
                   {/* Image Gallery Slideshow */}
-                  {page.gallery && page.gallery.length > 0 && (
+                  {page.gallery && Array.isArray(page.gallery) && page.gallery.length > 0 && (
                     <div className="mb-8">
                       <ImageGallerySlideshow 
                         images={page.gallery} 
