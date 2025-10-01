@@ -30,6 +30,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     description: '',
     primaryColor: '#2563eb',
     calendarLink: '',
+    locationLink: '',
     logoUrl: '',
     theme: 'Ocean Blue',
     backgroundType: 'gradient',
@@ -244,6 +245,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       description: '',
       primaryColor: '#2563eb',
       calendarLink: '',
+      locationLink: '',
       logoUrl: '',
       theme: 'Ocean Blue',
       backgroundType: 'gradient',
@@ -313,6 +315,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
         description: editingPageData.data?.description || editingPageData.description || '',
         primaryColor: editingPageData.primaryColor || '#2563eb',
         calendarLink: editingPageData.calendarLink || '',
+        locationLink: editingPageData.locationLink || editingPageData.location_link || '',
         logoUrl: editingPageData.logoUrl || '',
         theme: editingPageData.theme || 'Ocean Blue',
         backgroundType: editingPageData.backgroundType || 'gradient',
@@ -487,7 +490,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       title: "Business Information",
       description: "Add contact details, business hours, location and visit information",
       icon: Settings,
-      fields: ['contactPhone', 'contactEmail', 'businessAddress', 'businessHours', 'calendarLink', 'cancellationPolicy', 'visitInfo']
+      fields: ['contactPhone', 'contactEmail', 'businessAddress', 'businessHours', 'locationLink', 'cancellationPolicy', 'visitInfo']
     },
     {
       number: 6,
@@ -1283,17 +1286,18 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                 </div>
 
                 <div className="glass-effect rounded-xl p-4 border border-border/50">
-                  <Label htmlFor="calendarLink" className="text-base font-medium flex items-center gap-2">
+                  <Label htmlFor="locationLink" className="text-base font-medium flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
                     Google Maps Link
                   </Label>
                   <Input
-                    id="calendarLink"
+                    id="locationLink"
                     type="url"
                     placeholder="https://maps.google.com/..."
-                    value={formData.calendarLink}
-                    onChange={(e) => setFormData(prev => ({ ...prev, calendarLink: e.target.value }))}
+                    value={formData.locationLink}
+                    onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
                     className="glass-effect border-border/50 mt-2"
+                    data-testid="input-location-link"
                   />
                   <p className="text-sm text-muted-foreground mt-2">
                     Add your Google Maps link so customers can easily find you
