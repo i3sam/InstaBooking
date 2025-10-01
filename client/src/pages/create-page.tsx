@@ -458,11 +458,19 @@ export default function CreatePage() {
       appointmentCancellationPolicy: formData.appointmentCancellationPolicy,
     };
 
+    // Transform gallery array to object format expected by database
+    const galleryObject = {
+      logos: [],
+      banners: [],
+      images: formData.gallery
+    };
+
     // Destructure to exclude the new business fields from top-level payload
     const { businessType, walkInsAccepted, parking, amenities, spokenLanguages, kidFriendly, appointmentCancellationPolicy, ...pagePayload } = formData;
 
     createPageMutation.mutate({
       ...pagePayload,
+      gallery: galleryObject,
       services: servicesWithNumbers,
       staff: formData.staff,
       faqs: validFaqs,

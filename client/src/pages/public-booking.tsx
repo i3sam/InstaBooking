@@ -422,7 +422,33 @@ export default function PublicBooking() {
   const page = pageData;
   const services = pageServices;
   const faqs = pageData.faqs || [];
-  const gallery = pageData.data?.gallery || pageData.gallery || { banners: [], logos: [], images: [] };
+  
+  // Normalize gallery data to handle both legacy array format and new object format
+  const gallery = (() => {
+    const rawGallery = pageData?.gallery ?? pageData?.data?.gallery ?? null;
+    
+    // If it's already an object with the expected structure, use it
+    if (rawGallery && typeof rawGallery === 'object' && !Array.isArray(rawGallery)) {
+      return {
+        logos: rawGallery.logos || [],
+        banners: rawGallery.banners || [],
+        images: rawGallery.images || []
+      };
+    }
+    
+    // If it's a legacy array format, convert to new format
+    if (Array.isArray(rawGallery)) {
+      return {
+        logos: [],
+        banners: [],
+        images: rawGallery
+      };
+    }
+    
+    // Default empty gallery
+    return { logos: [], banners: [], images: [] };
+  })();
+  
   const themeStyles = page ? getThemeStyles(page) : null;
 
   // Helper function to get business data from either new format (top-level) or old format (nested under businessInfo)
@@ -764,10 +790,10 @@ export default function PublicBooking() {
                   </div>
 
                   {/* Image Gallery Slideshow */}
-                  {page.gallery && Array.isArray(page.gallery) && page.gallery.length > 0 && (
+                  {gallery?.images && Array.isArray(gallery.images) && gallery.images.length > 0 && (
                     <div className="mb-8">
                       <ImageGallerySlideshow 
-                        images={page.gallery} 
+                        images={gallery.images} 
                         primaryColor={themeStyles?.primaryColor || '#2563eb'} 
                       />
                     </div>

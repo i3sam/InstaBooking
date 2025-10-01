@@ -731,18 +731,25 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     // Filter out empty FAQs
     const validFaqs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
 
+    // Transform gallery array to object format expected by database
+    const galleryObject = {
+      logos: [],
+      banners: [],
+      images: formData.gallery
+    };
+
     // Destructure to exclude fields that should go in data
     const { description, staff, visitInfo, gallery, businessInfo, services, faqs, ...pageFields } = formData;
     
     createPageMutation.mutate({
       ...pageFields,
+      gallery: galleryObject,
       services: servicesWithNumbers,
       faqs: validFaqs,
       data: {
         description: formData.description,
         staff: formData.staff,
         visitInfo: formData.visitInfo,
-        gallery: formData.gallery,
         businessInfo: formData.businessInfo
       }
     });
