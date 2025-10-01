@@ -1793,17 +1793,30 @@ export default function PublicBooking() {
                         
                         return (
                           <Card key={service.id} className="group hover:shadow-2xl hover:border-border/40 transition-all duration-500 border-border/15 bg-background/60 backdrop-blur-md overflow-hidden hover:-translate-y-1" data-testid={`card-service-${service.id}`}>
+                            {service.imageUrl && (
+                              <div className="relative w-full h-48 overflow-hidden">
+                                <img
+                                  src={service.imageUrl}
+                                  alt={service.name}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                  data-testid={`img-service-${service.id}`}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+                              </div>
+                            )}
                             <CardContent className="p-5 sm:p-6 lg:p-7">
                               <div className="flex flex-col sm:flex-row items-start gap-4 sm:space-x-4">
-                                <div 
-                                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 flex-shrink-0 shadow-lg"
-                                  style={{ 
-                                    backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                                    boxShadow: `0 8px 20px -4px ${themeStyles?.primaryColor || '#2563eb'}40`
-                                  }}
-                                >
-                                  <ServiceIcon className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
-                                </div>
+                                {!service.imageUrl && (
+                                  <div 
+                                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 flex-shrink-0 shadow-lg"
+                                    style={{ 
+                                      backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                                      boxShadow: `0 8px 20px -4px ${themeStyles?.primaryColor || '#2563eb'}40`
+                                    }}
+                                  >
+                                    <ServiceIcon className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+                                  </div>
+                                )}
                                 <div className="flex-1 min-w-0 w-full">
                                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
                                     <h4 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">

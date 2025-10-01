@@ -45,7 +45,18 @@ export async function getPublicServicesByPageId(pageId: string) {
       return [];
     }
 
-    return data || [];
+    // Convert snake_case to camelCase for frontend consistency
+    return (data || []).map((service: any) => ({
+      id: service.id,
+      pageId: service.page_id,
+      name: service.name,
+      description: service.description,
+      imageUrl: service.image_url,
+      durationMinutes: service.duration_minutes,
+      price: service.price,
+      currency: service.currency,
+      createdAt: service.created_at
+    }));
   } catch (error) {
     console.error('Error in getPublicServicesByPageId:', error);
     return [];

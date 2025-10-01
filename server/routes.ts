@@ -244,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const folder = req.body.folder || '';
       
       // Security: Only allow specific buckets
-      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images'];
       if (!allowedBuckets.includes(bucket)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
@@ -291,7 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { bucketName } = req.body;
       
       // Security: Only allow specific bucket names
-      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images'];
       if (!bucketName || !allowedBuckets.includes(bucketName)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
@@ -850,10 +850,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create services if they exist in demo data
       if (demoData.data.services && Array.isArray(demoData.data.services)) {
         for (const service of demoData.data.services) {
+          let imageUrl = null;
+          
+          // Upload service image if it exists as base64
+          if (service.imageUrl && service.imageUrl.startsWith('data:')) {
+            try {
+              // Extract base64 data and mime type
+              const matches = service.imageUrl.match(/^data:(.+);base64,(.+)$/);
+              if (matches && supabase) {
+                const mimeType = matches[1];
+                const base64Data = matches[2];
+                const buffer = Buffer.from(base64Data, 'base64');
+                
+                // Generate unique filename
+                const fileExt = mimeType.split('/')[1] || 'jpg';
+                const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const filePath = `services/${fileName}`;
+                
+                // Upload to service-images bucket
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                  .from('service-images')
+                  .upload(filePath, buffer, {
+                    contentType: mimeType,
+                    cacheControl: '3600',
+                    upsert: false
+                  });
+                
+                if (!uploadError && uploadData) {
+                  const { data: { publicUrl } } = supabase.storage
+                    .from('service-images')
+                    .getPublicUrl(filePath);
+                  imageUrl = publicUrl;
+                }
+              }
+            } catch (error) {
+              console.error('Error uploading service image:', error);
+            }
+          } else if (service.imageUrl && !service.imageUrl.startsWith('data:')) {
+            // Use existing URL if it's not base64
+            imageUrl = service.imageUrl;
+          }
+          
           const serviceData = {
             pageId: newPage.id,
             name: service.name,
             description: service.description || null,
+            imageUrl: imageUrl,
             durationMinutes: parseInt(service.duration) || 60,
             price: parseFloat(service.price) || 0,
             currency: 'USD'

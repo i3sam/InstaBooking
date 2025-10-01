@@ -5,12 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Clock, DollarSign } from 'lucide-react';
+import { Plus, X, Clock, DollarSign, Upload, Image as ImageIcon } from 'lucide-react';
 
 interface Service {
   name: string;
   duration: number;
   price: number;
+  imageUrl?: string;
 }
 
 interface DemoData {
@@ -54,6 +55,8 @@ const durationOptions = [
 ];
 
 export default function ServicesStep({ data, updateData }: ServicesStepProps) {
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
   const addService = () => {
     const newServices = [...data.services, { name: '', duration: 60, price: 0 }];
     updateData({ services: newServices });
@@ -68,6 +71,31 @@ export default function ServicesStep({ data, updateData }: ServicesStepProps) {
     const newServices = [...data.services];
     newServices[index] = { ...newServices[index], ...updates };
     updateData({ services: newServices });
+  };
+
+  const handleImageUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    setUploadingIndex(index);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      updateService(index, { imageUrl: base64 });
+      setUploadingIndex(null);
+    };
+    reader.readAsDataURL(file);
   };
 
   const updateBusinessHours = (day: string, hours: string) => {
@@ -216,6 +244,63 @@ export default function ServicesStep({ data, updateData }: ServicesStepProps) {
                     data-testid={`input-service-price-${index}`}
                   />
                 </div>
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-2 pt-2 border-t">
+                <Label data-testid={`label-service-image-${index}`}>
+                  <ImageIcon className="w-4 h-4 inline mr-1" />
+                  Service Image (Optional)
+                </Label>
+                <div className="flex items-center gap-4">
+                  {service.imageUrl && (
+                    <div className="w-20 h-20 rounded border border-border overflow-hidden flex-shrink-0">
+                      <img
+                        src={service.imageUrl}
+                        alt={`${service.name} preview`}
+                        className="w-full h-full object-cover"
+                        data-testid={`img-service-preview-${index}`}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(index, e)}
+                      className="hidden"
+                      id={`service-image-upload-${index}`}
+                      data-testid={`input-service-image-${index}`}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById(`service-image-upload-${index}`)?.click()}
+                      disabled={uploadingIndex === index}
+                      data-testid={`button-upload-service-image-${index}`}
+                      className="w-full sm:w-auto"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploadingIndex === index ? 'Uploading...' : service.imageUrl ? 'Change Image' : 'Upload Image'}
+                    </Button>
+                    {service.imageUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => updateService(index, { imageUrl: undefined })}
+                        data-testid={`button-remove-service-image-${index}`}
+                        className="ml-2"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 16:9 or square image, max 5MB
+                </p>
               </div>
             </div>
           ))}

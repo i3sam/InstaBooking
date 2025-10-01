@@ -57,6 +57,7 @@ export const services = pgTable("services", {
   pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  imageUrl: text("image_url"),
   durationMinutes: integer("duration_minutes").notNull(),
   price: numeric("price").notNull(),
   currency: text("currency").default("USD").notNull(),
