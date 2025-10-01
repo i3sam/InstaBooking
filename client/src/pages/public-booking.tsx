@@ -15,10 +15,10 @@ import { apiRequest } from '@/lib/queryClient';
 import { getCurrencyByCode } from '@/lib/currencies';
 import { getPublicPageBySlug, getPublicServicesByPageId, getPublicReviewsByPageId, getPublicStaffByPageId } from '@/lib/supabase-queries';
 import BookingModal from '@/components/modals/booking-modal';
-import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2, Info, Calendar as CalendarIcon } from 'lucide-react';
+import { Phone, Calendar, ArrowLeft, Clock, DollarSign, HelpCircle, MapPin, Mail, Clock3, Image, Star, MessageSquare, Sparkles, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Scissors, Coffee, Heart, User, Monitor, Camera, Palette, Zap, Target, Shield, Briefcase, Wrench, Headphones, Music, BookOpen, Rocket, Leaf, CheckCircle, AlertCircle, Copy, Check, ExternalLink, FileText, TrendingUp, Award, Users, Timer, Loader2, Info, Calendar as CalendarIcon } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Image Gallery Slideshow Component
 function ImageGallerySlideshow({ images, primaryColor }: { images: string[], primaryColor: string }) {
@@ -125,6 +125,12 @@ export default function PublicBooking() {
   // State for image viewer modal
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  
+  // State for contact dialogs
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   
   // State for tabbed interface
   const [activeTab, setActiveTab] = useState('about');
@@ -352,6 +358,48 @@ export default function PublicBooking() {
         description: "Unable to copy to clipboard",
         variant: "destructive",
       });
+    }
+  };
+
+  // Copy phone number
+  const handleCopyPhone = async () => {
+    if (page.contact_phone || page.contactPhone) {
+      try {
+        await navigator.clipboard.writeText(page.contact_phone || page.contactPhone);
+        setCopiedPhone(true);
+        toast({
+          title: "Copied!",
+          description: "Phone number copied to clipboard",
+        });
+        setTimeout(() => setCopiedPhone(false), 2000);
+      } catch (err) {
+        toast({
+          title: "Copy failed",
+          description: "Unable to copy phone number",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  // Copy email
+  const handleCopyEmail = async () => {
+    if (page.contact_email || page.contactEmail) {
+      try {
+        await navigator.clipboard.writeText(page.contact_email || page.contactEmail);
+        setCopiedEmail(true);
+        toast({
+          title: "Copied!",
+          description: "Email copied to clipboard",
+        });
+        setTimeout(() => setCopiedEmail(false), 2000);
+      } catch (err) {
+        toast({
+          title: "Copy failed",
+          description: "Unable to copy email",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -1546,28 +1594,28 @@ export default function PublicBooking() {
                                   <div className="flex gap-2 mt-4">
                                     {page.contact_phone && (
                                       <Button
-                                        asChild
                                         variant="outline"
+                                        onClick={() => setShowPhoneDialog(true)}
                                         className="flex-1 h-auto py-3 border-border/40 hover:border-primary/50 transition-all"
                                         data-testid="button-call"
                                       >
-                                        <a href={`tel:${page.contact_phone}`} className="flex flex-col items-center gap-1">
+                                        <div className="flex flex-col items-center gap-1">
                                           <Phone className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
                                           <span className="text-xs font-medium">Call</span>
-                                        </a>
+                                        </div>
                                       </Button>
                                     )}
                                     {page.contact_email && (
                                       <Button
-                                        asChild
                                         variant="outline"
+                                        onClick={() => setShowEmailDialog(true)}
                                         className="flex-1 h-auto py-3 border-border/40 hover:border-primary/50 transition-all"
                                         data-testid="button-message"
                                       >
-                                        <a href={`mailto:${page.contact_email}`} className="flex flex-col items-center gap-1">
+                                        <div className="flex flex-col items-center gap-1">
                                           <Mail className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
                                           <span className="text-xs font-medium">Message</span>
-                                        </a>
+                                        </div>
                                       </Button>
                                     )}
                                   </div>
@@ -2636,6 +2684,110 @@ export default function PublicBooking() {
                 data-testid="image-viewer-full"
               />
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Phone Dialog */}
+      <Dialog open={showPhoneDialog} onOpenChange={setShowPhoneDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            <Phone className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+            Call Us
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            View and copy the phone number or call directly
+          </DialogDescription>
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border/50">
+              <p className="text-sm text-muted-foreground mb-2">Phone Number</p>
+              <p className="text-2xl font-semibold text-foreground" data-testid="text-phone-number">
+                {page.contact_phone || page.contactPhone}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleCopyPhone}
+                className="flex-1"
+                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                data-testid="button-copy-phone"
+              >
+                {copiedPhone ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Number
+                  </>
+                )}
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="flex-1"
+                data-testid="button-call-now"
+              >
+                <a href={`tel:${page.contact_phone || page.contactPhone}`}>
+                  <Phone className="h-4 w-4 mr-2" />
+                  Call Now
+                </a>
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            <Mail className="h-5 w-5" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+            Send Message
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            View and copy the email address or send an email directly
+          </DialogDescription>
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border/50">
+              <p className="text-sm text-muted-foreground mb-2">Email Address</p>
+              <p className="text-lg font-semibold text-foreground break-all" data-testid="text-email-address">
+                {page.contact_email || page.contactEmail}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleCopyEmail}
+                className="flex-1"
+                style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                data-testid="button-copy-email"
+              >
+                {copiedEmail ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Email
+                  </>
+                )}
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="flex-1"
+                data-testid="button-send-email"
+              >
+                <a href={`mailto:${page.contact_email || page.contactEmail}`}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Send Email
+                </a>
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
