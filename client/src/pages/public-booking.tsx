@@ -114,8 +114,8 @@ export default function PublicBooking() {
   const [showBusinessHours, setShowBusinessHours] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [reviewFormData, setReviewFormData] = useState({
-    customerName: '',
-    customerEmail: '',
+    reviewerName: '',
+    reviewerEmail: '',
     rating: 0,
     reviewText: ''
   });
@@ -186,8 +186,8 @@ export default function PublicBooking() {
         description: "Thank you for your feedback. Your review is pending approval.",
       });
       setReviewFormData({
-        customerName: '',
-        customerEmail: '',
+        reviewerName: '',
+        reviewerEmail: '',
         rating: 0,
         reviewText: ''
       });
@@ -315,13 +315,13 @@ export default function PublicBooking() {
     const errors: {[key: string]: string} = {};
     
     switch (field) {
-      case 'customerName':
-        if (!value.trim()) errors.customerName = 'Name is required';
-        else if (value.trim().length < 2) errors.customerName = 'Name must be at least 2 characters';
+      case 'reviewerName':
+        if (!value.trim()) errors.reviewerName = 'Name is required';
+        else if (value.trim().length < 2) errors.reviewerName = 'Name must be at least 2 characters';
         break;
-      case 'customerEmail':
+      case 'reviewerEmail':
         if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          errors.customerEmail = 'Please enter a valid email address';
+          errors.reviewerEmail = 'Please enter a valid email address';
         }
         break;
       case 'rating':
@@ -360,8 +360,8 @@ export default function PublicBooking() {
     e.preventDefault();
     
     // Validate all fields
-    const nameValid = validateField('customerName', reviewFormData.customerName);
-    const emailValid = validateField('customerEmail', reviewFormData.customerEmail);
+    const nameValid = validateField('reviewerName', reviewFormData.reviewerName);
+    const emailValid = validateField('reviewerEmail', reviewFormData.reviewerEmail);
     const ratingValid = validateField('rating', reviewFormData.rating);
     const textValid = validateField('reviewText', reviewFormData.reviewText);
     
@@ -376,8 +376,8 @@ export default function PublicBooking() {
 
     submitReviewMutation.mutate({
       pageId: pageData.id,
-      customerName: reviewFormData.customerName,
-      customerEmail: reviewFormData.customerEmail,
+      reviewerName: reviewFormData.reviewerName,
+      reviewerEmail: reviewFormData.reviewerEmail,
       rating: reviewFormData.rating,
       reviewText: reviewFormData.reviewText
     });
@@ -1219,38 +1219,38 @@ export default function PublicBooking() {
                             <form onSubmit={handleReviewSubmit} className="space-y-6">
                               <div className="grid sm:grid-cols-2 gap-4">
                                 <div>
-                                  <Label htmlFor="customerName" className="text-sm font-medium text-foreground">
+                                  <Label htmlFor="reviewerName" className="text-sm font-medium text-foreground">
                                     Your Name *
                                   </Label>
                                   <Input
-                                    id="customerName"
+                                    id="reviewerName"
                                     type="text"
-                                    value={reviewFormData.customerName}
-                                    onChange={(e) => handleInputChange('customerName', e.target.value)}
-                                    className={`mt-1 w-full ${validationErrors.customerName ? 'border-red-500' : ''}`}
+                                    value={reviewFormData.reviewerName}
+                                    onChange={(e) => handleInputChange('reviewerName', e.target.value)}
+                                    className={`mt-1 w-full ${validationErrors.reviewerName ? 'border-red-500' : ''}`}
                                     placeholder="Enter your full name"
                                     data-testid="input-review-name"
                                   />
-                                  {validationErrors.customerName && (
-                                    <p className="text-red-500 text-xs mt-1">{validationErrors.customerName}</p>
+                                  {validationErrors.reviewerName && (
+                                    <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerName}</p>
                                   )}
                                 </div>
                                 
                                 <div>
-                                  <Label htmlFor="customerEmail" className="text-sm font-medium text-foreground">
+                                  <Label htmlFor="reviewerEmail" className="text-sm font-medium text-foreground">
                                     Email (Optional)
                                   </Label>
                                   <Input
-                                    id="customerEmail"
+                                    id="reviewerEmail"
                                     type="email"
-                                    value={reviewFormData.customerEmail}
-                                    onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                                    className={`mt-1 w-full ${validationErrors.customerEmail ? 'border-red-500' : ''}`}
+                                    value={reviewFormData.reviewerEmail}
+                                    onChange={(e) => handleInputChange('reviewerEmail', e.target.value)}
+                                    className={`mt-1 w-full ${validationErrors.reviewerEmail ? 'border-red-500' : ''}`}
                                     placeholder="your.email@example.com"
                                     data-testid="input-review-email"
                                   />
-                                  {validationErrors.customerEmail && (
-                                    <p className="text-red-500 text-xs mt-1">{validationErrors.customerEmail}</p>
+                                  {validationErrors.reviewerEmail && (
+                                    <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerEmail}</p>
                                   )}
                                 </div>
                               </div>
@@ -1360,38 +1360,38 @@ export default function PublicBooking() {
                               <form onSubmit={handleReviewSubmit} className="space-y-6">
                                 <div className="grid sm:grid-cols-2 gap-4">
                                   <div>
-                                    <Label htmlFor="customerName" className="text-sm font-medium text-foreground">
+                                    <Label htmlFor="reviewerName2" className="text-sm font-medium text-foreground">
                                       Your Name *
                                     </Label>
                                     <Input
-                                      id="customerName"
+                                      id="reviewerName2"
                                       type="text"
-                                      value={reviewFormData.customerName}
-                                      onChange={(e) => handleInputChange('customerName', e.target.value)}
-                                      className={`mt-1 w-full ${validationErrors.customerName ? 'border-red-500' : ''}`}
+                                      value={reviewFormData.reviewerName}
+                                      onChange={(e) => handleInputChange('reviewerName', e.target.value)}
+                                      className={`mt-1 w-full ${validationErrors.reviewerName ? 'border-red-500' : ''}`}
                                       placeholder="Enter your full name"
                                       data-testid="input-review-name"
                                     />
-                                    {validationErrors.customerName && (
-                                      <p className="text-red-500 text-xs mt-1">{validationErrors.customerName}</p>
+                                    {validationErrors.reviewerName && (
+                                      <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerName}</p>
                                     )}
                                   </div>
                                   
                                   <div>
-                                    <Label htmlFor="customerEmail" className="text-sm font-medium text-foreground">
+                                    <Label htmlFor="reviewerEmail2" className="text-sm font-medium text-foreground">
                                       Email (Optional)
                                     </Label>
                                     <Input
-                                      id="customerEmail"
+                                      id="reviewerEmail2"
                                       type="email"
-                                      value={reviewFormData.customerEmail}
-                                      onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                                      className={`mt-1 w-full ${validationErrors.customerEmail ? 'border-red-500' : ''}`}
+                                      value={reviewFormData.reviewerEmail}
+                                      onChange={(e) => handleInputChange('reviewerEmail', e.target.value)}
+                                      className={`mt-1 w-full ${validationErrors.reviewerEmail ? 'border-red-500' : ''}`}
                                       placeholder="your.email@example.com"
                                       data-testid="input-review-email"
                                     />
-                                    {validationErrors.customerEmail && (
-                                      <p className="text-red-500 text-xs mt-1">{validationErrors.customerEmail}</p>
+                                    {validationErrors.reviewerEmail && (
+                                      <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerEmail}</p>
                                     )}
                                   </div>
                                 </div>
