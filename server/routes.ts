@@ -529,12 +529,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
             }
             // Update existing service - only allow specific fields to be updated
-            const { id, name, description, durationMinutes, price } = service;
+            const { id, name, description, durationMinutes, price, imageUrl } = service;
             await storage.updateService(id, {
               name,
               description, 
               durationMinutes,
-              price
+              price,
+              imageUrl
             });
           } else {
             // Create new service
