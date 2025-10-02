@@ -444,6 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create services if provided
       if (services && Array.isArray(services)) {
         for (const service of services) {
+          console.log('Creating service with data:', JSON.stringify(service, null, 2));
           await storage.createService({
             ...service,
             pageId: page.id
@@ -530,6 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             // Update existing service - only allow specific fields to be updated
             const { id, name, description, durationMinutes, price, imageUrl } = service;
+            console.log('Updating service with imageUrl:', imageUrl);
             await storage.updateService(id, {
               name,
               description, 
