@@ -9,6 +9,7 @@ interface Service {
   name: string;
   duration: number;
   price: number;
+  imageUrl?: string;
 }
 
 interface DemoData {
@@ -320,17 +321,27 @@ export default function PreviewStep({
                   key={index}
                   className="group p-6 rounded-2xl border border-border/20 bg-card/60 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:border-border/40"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center space-x-4 flex-1">
-                      <div 
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
-                        style={{
-                          background: `linear-gradient(135deg, ${data.primaryColor}20 0%, ${data.primaryColor}10 100%)`
-                        }}
-                      >
-                        <Calendar className="w-6 h-6" style={{ color: data.primaryColor }} />
-                      </div>
-                      <div className="flex-1">
+                      {service.imageUrl ? (
+                        <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                          <img
+                            src={service.imageUrl}
+                            alt={`${service.name} preview`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div 
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+                          style={{
+                            background: `linear-gradient(135deg, ${data.primaryColor}20 0%, ${data.primaryColor}10 100%)`
+                          }}
+                        >
+                          <Calendar className="w-6 h-6" style={{ color: data.primaryColor }} />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
                         <h3 className="text-xl font-bold text-foreground mb-2">{service.name}</h3>
                         <div className="flex items-center gap-6 text-muted-foreground">
                           <span className="flex items-center gap-2">
@@ -345,7 +356,7 @@ export default function PreviewStep({
                       </div>
                     </div>
                     <Button 
-                      className="px-6 py-3 rounded-xl text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="px-6 py-3 rounded-xl text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex-shrink-0"
                       style={{ backgroundColor: data.primaryColor }}
                     >
                       Book Now
