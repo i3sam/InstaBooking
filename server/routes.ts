@@ -889,6 +889,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create services if they exist in demo data
       if (demoData.data.services && Array.isArray(demoData.data.services)) {
+        // Ensure service-images bucket exists before uploading
+        if (supabase) {
+          try {
+            const { data: buckets } = await supabase.storage.listBuckets();
+            const bucketExists = buckets?.some((b: any) => b.name === 'service-images');
+            
+            if (!bucketExists) {
+              await supabase.storage.createBucket('service-images', {
+                public: true,
+                allowedMimeTypes: ['image/*'],
+                fileSizeLimit: 5 * 1024 * 1024
+              });
+              console.log('✅ Created service-images bucket');
+            }
+          } catch (bucketError) {
+            console.error('Error ensuring service-images bucket:', bucketError);
+          }
+        }
+        
         for (const service of demoData.data.services) {
           let imageUrl = null;
           
@@ -921,6 +940,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     .from('service-images')
                     .getPublicUrl(filePath);
                   imageUrl = publicUrl;
+                  console.log('✅ Uploaded service image:', publicUrl);
+                } else {
+                  console.error('❌ Service image upload error:', uploadError);
                 }
               }
             } catch (error) {
