@@ -816,13 +816,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         counter++;
       }
       
+      // Upload logo if it exists as base64
+      let logoUrl = null;
+      if (demoData.data.logoBase64 && demoData.data.logoBase64.startsWith('data:')) {
+        try {
+          // Extract base64 data and mime type
+          const matches = demoData.data.logoBase64.match(/^data:(.+);base64,(.+)$/);
+          if (matches && supabase) {
+            const mimeType = matches[1];
+            const base64Data = matches[2];
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            // Generate unique filename
+            const fileExt = mimeType.split('/')[1] || 'jpg';
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `logos/${fileName}`;
+            
+            // Upload to logos bucket
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('logos')
+              .upload(filePath, buffer, {
+                contentType: mimeType,
+                cacheControl: '3600',
+                upsert: false
+              });
+            
+            if (!uploadError && uploadData) {
+              const { data: { publicUrl } } = supabase.storage
+                .from('logos')
+                .getPublicUrl(filePath);
+              logoUrl = publicUrl;
+            }
+          }
+        } catch (error) {
+          console.error('Error uploading logo:', error);
+        }
+      }
+      
       // Create the real page from demo data using storage abstraction
       const pageData = {
         ownerId: req.user.userId,
         title: demoData.data.businessName || 'My Booking Page',
         slug: slug,
         tagline: demoData.data.tagline || null,
-        logoUrl: null, // Logo will be uploaded separately if needed
+        logoUrl: logoUrl,
         primaryColor: demoData.data.primaryColor || '#2563eb',
         theme: demoData.data.theme || 'Ocean Blue',
         backgroundType: demoData.data.backgroundType || 'gradient',

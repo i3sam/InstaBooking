@@ -539,15 +539,24 @@ export default function PublicBooking() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
               <div 
-                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105"
+                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105 overflow-hidden"
                 style={{
-                  background: themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)',
+                  background: page.logoUrl ? 'transparent' : (themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'),
                   boxShadow: `0 4px 14px -2px ${themeStyles?.primaryColor || '#2563eb'}40`
                 }}
+                data-testid="header-logo"
               >
-                <span className="text-lg sm:text-2xl font-black text-white">
-                  {page.title?.charAt(0) || 'B'}
-                </span>
+                {page.logoUrl ? (
+                  <img 
+                    src={page.logoUrl} 
+                    alt={`${page.title} logo`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-lg sm:text-2xl font-black text-white">
+                    {page.title?.charAt(0) || 'B'}
+                  </span>
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <span className="text-base sm:text-xl lg:text-2xl font-black text-foreground truncate block">{page.title}</span>
