@@ -48,6 +48,7 @@ interface DemoData {
     name: string;
     duration: number;
     price: number;
+    imageUrl?: string;
   }>;
   businessHours: {
     monday: string;
@@ -77,7 +78,7 @@ const initialDemoData: DemoData = {
   fontSize: 'medium',
   showLogo: true,
   showPhone: true,
-  services: [{ name: '', duration: 60, price: 0 }],
+  services: [{ name: '', duration: 60, price: 0, imageUrl: undefined }],
   businessHours: {
     monday: '9:00-17:00',
     tuesday: '9:00-17:00',
