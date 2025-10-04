@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { uploadFile } from '@/lib/supabase';
 import { currencies, formatCurrencyDisplay, searchCurrencies, getCurrencyByCode } from '@/lib/currencies';
-import { ArrowLeft, ArrowRight, CloudUpload, Plus, X, Palette, FileText, MapPin, Settings, Check, Trash2, Search, Calendar, Phone, Mail, Edit, Users, User, Info } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CloudUpload, Plus, X, Palette, FileText, MapPin, Settings, Check, Trash2, Search, Calendar, Phone, Mail, Edit, Users, User, Info, Upload, Image as ImageIcon } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export default function CreatePage() {
@@ -48,7 +48,7 @@ export default function CreatePage() {
     cancellationPolicy: '',
     showBusinessHours: 'true',
     showContactInfo: 'true',
-    services: [{ name: '', description: '', durationMinutes: '', price: '', currency: 'USD' }],
+    services: [{ name: '', description: '', durationMinutes: '', price: '', currency: 'USD', imageUrl: '' }],
     staff: [] as Array<{name: string; bio: string; position: string; imageUrl: string; email: string; phone: string}>,
     businessType: 'salon',
     walkInsAccepted: 'accepted',
@@ -66,6 +66,7 @@ export default function CreatePage() {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [uploadingStaffImage, setUploadingStaffImage] = useState<{[key: number]: boolean}>({});
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingServiceImage, setUploadingServiceImage] = useState<{[key: number]: boolean}>({});
   
   // Step definitions
   const steps = [
@@ -235,7 +236,7 @@ export default function CreatePage() {
   const addService = () => {
     setFormData(prev => ({
       ...prev,
-      services: [...prev.services, { name: '', description: '', durationMinutes: '', price: '', currency: 'USD' }]
+      services: [...prev.services, { name: '', description: '', durationMinutes: '', price: '', currency: 'USD', imageUrl: '' }]
     }));
   };
 
@@ -253,6 +254,36 @@ export default function CreatePage() {
       ...prev,
       services: prev.services.map((service, i) => i === index ? { ...service, [field]: value } : service)
     }));
+  };
+
+  const handleServiceImageUpload = async (index: number, file: File) => {
+    try {
+      setUploadingServiceImage(prev => ({ ...prev, [index]: true }));
+      const result = await uploadFile(file, 'service-images');
+      
+      if (result.success && result.url) {
+        updateService(index, 'imageUrl', result.url);
+        toast({
+          title: "Service image uploaded",
+          description: "The service image has been uploaded successfully.",
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: result.error || "Failed to upload the service image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading service image:', error);
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading the service image.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingServiceImage(prev => ({ ...prev, [index]: false }));
+    }
   };
 
   // Staff management functions
@@ -648,6 +679,64 @@ export default function CreatePage() {
                             </Select>
                           </div>
                         </div>
+                      </div>
+
+                      <div className="space-y-2 pt-4 border-t">
+                        <Label className="text-base font-medium flex items-center gap-2">
+                          <ImageIcon className="w-4 h-4" />
+                          Service Image (Optional)
+                        </Label>
+                        <div className="flex items-center gap-4">
+                          {service.imageUrl && (
+                            <div className="w-20 h-20 rounded border border-border/30 overflow-hidden flex-shrink-0">
+                              <img
+                                src={service.imageUrl}
+                                alt={`${service.name} preview`}
+                                className="w-full h-full object-cover"
+                                data-testid={`img-service-preview-${index}`}
+                              />
+                            </div>
+                          )}
+                          
+                          <div className="flex-1">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => e.target.files?.[0] && handleServiceImageUpload(index, e.target.files[0])}
+                              className="hidden"
+                              id={`service-image-upload-${index}`}
+                              data-testid={`input-service-image-${index}`}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => document.getElementById(`service-image-upload-${index}`)?.click()}
+                              disabled={uploadingServiceImage[index]}
+                              className="glass-effect hover-lift rounded-xl"
+                              data-testid={`button-upload-service-image-${index}`}
+                            >
+                              <Upload className="w-4 h-4 mr-2" />
+                              {uploadingServiceImage[index] ? 'Uploading...' : service.imageUrl ? 'Change Image' : 'Upload Image'}
+                            </Button>
+                            {service.imageUrl && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateService(index, 'imageUrl', '')}
+                                className="ml-2"
+                                data-testid={`button-remove-service-image-${index}`}
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Recommended: Square or 16:9 image, max 5MB
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
