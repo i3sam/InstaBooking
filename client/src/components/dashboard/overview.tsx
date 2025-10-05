@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff } from 'lucide-react';
+import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
 import { useAuth } from '@/hooks/use-auth';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeSubscription';
+import TrialActivationModal from '@/components/modals/trial-activation-modal';
 
 interface OverviewProps {
   onSectionChange?: (section: string) => void;
@@ -32,10 +34,15 @@ interface RecentActivity {
 export default function Overview({ onSectionChange }: OverviewProps) {
   const [, setLocation] = useLocation();
   const { formatPrice } = useCurrency();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+  const [showTrialBanner, setShowTrialBanner] = useState(true);
 
   // Enable real-time subscriptions for live dashboard updates
   const { isConnected: isRealtimeConnected } = useRealtimeDashboard(user?.id);
+
+  // Check if user is eligible for trial
+  const isTrialAvailable = profile && (profile as any).trialStatus === 'available' && profile.membershipStatus !== 'pro';
 
   // Fetch dashboard statistics
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
@@ -139,6 +146,52 @@ export default function Overview({ onSectionChange }: OverviewProps) {
 
   return (
     <div className="animate-fade-in-up">
+      {/* Trial Activation Banner */}
+      {isTrialAvailable && showTrialBanner && (
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 border-purple-300/50 dark:border-purple-600/50 shadow-2xl mb-8 animate-slide-down relative overflow-hidden" data-testid="banner-trial-activation">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 via-pink-400/10 to-purple-400/10 animate-pulse"></div>
+          <CardContent className="p-6 relative z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+              onClick={() => setShowTrialBanner(false)}
+              data-testid="button-close-trial-banner"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-300/50 dark:border-purple-600/50 animate-pulse">
+                <Sparkles className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-purple-900 to-pink-900 dark:from-purple-100 dark:to-pink-100 bg-clip-text text-transparent mb-2">
+                  Start Your 7-Day Free Trial!
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-0">
+                  Experience all Pro features with no charge for 7 days. Cancel anytime.
+                </p>
+              </div>
+              <Button
+                onClick={() => setIsTrialModalOpen(true)}
+                size="lg"
+                className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg hover:scale-105 transition-all duration-300 border border-purple-300/50 dark:border-purple-600/50 font-semibold h-12"
+                data-testid="button-activate-trial-banner"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                Activate Free Trial
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Trial Activation Modal */}
+      <TrialActivationModal 
+        isOpen={isTrialModalOpen}
+        onClose={() => setIsTrialModalOpen(false)}
+      />
+
       {/* Stats Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {statsError ? (
