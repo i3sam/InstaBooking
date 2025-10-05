@@ -1809,6 +1809,10 @@ export default function PublicBooking() {
                                   alt={service.name}
                                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                   data-testid={`img-service-${service.id}`}
+                                  onError={(e) => {
+                                    console.error('Image failed to load:', service.imageUrl);
+                                    console.error('Error event:', e);
+                                  }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
                               </div>
