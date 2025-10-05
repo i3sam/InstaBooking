@@ -3,6 +3,12 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { useLocation } from 'wouter';
 import heroImage from '@assets/image_1758670396246.png';
 import DemoWizard from '@/components/demo/DemoWizard';
@@ -119,23 +125,29 @@ export default function Home() {
     {
       name: "Sarah Chen",
       role: "Yoga Instructor",
-      content: "BookingGen transformed my business. I went from managing bookings in spreadsheets to having a professional system that handles everything automatically.",
+      content: "BookingGen transformed my business. I went from managing bookings in spreadsheets to having a professional system that handles everything automatically. My revenue increased 65% in just 3 months!",
       rating: 5,
-      avatar: "SC"
+      avatar: "SC",
+      metric: "+65% Revenue",
+      timeframe: "3 months"
     },
     {
       name: "David Martinez",
       role: "Therapist",
-      content: "Managing appointments has never been easier! The automated scheduling and reminders save me hours every week. At just $10, it's incredibly affordable for such a powerful platform.",
+      content: "Managing appointments has never been easier! The automated scheduling and reminders save me 10+ hours every week. At just $14.99, it pays for itself with one extra booking per month.",
       rating: 5,
-      avatar: "DM"
+      avatar: "DM",
+      metric: "10+ Hours Saved",
+      timeframe: "per week"
     },
     {
       name: "Elena Rodriguez",
       role: "Personal Trainer",
-      content: "My clients love how easy it is to book sessions. The mobile experience is flawless, and I've seen a 40% increase in bookings since switching.",
+      content: "My clients love how easy it is to book sessions. The mobile experience is flawless, and I've seen a 40% increase in bookings since switching. Best investment I've made for my business!",
       rating: 5,
-      avatar: "ER"
+      avatar: "ER",
+      metric: "+40% Bookings",
+      timeframe: "1st month"
     }
   ];
 
@@ -186,54 +198,82 @@ export default function Home() {
           <div className="container mx-auto px-6">
             <div className="text-center max-w-5xl mx-auto">
               <div className="space-y-8 animate-fade-in-up">
-                {/* Notification Badge - Blue Theme */}
+                {/* Limited Time Offer Badge */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
-                  <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">New</span>
-                  New Analytics Feature
+                  <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">🎉 LIMITED TIME</span>
+                  Get 7 Days FREE - No Credit Card Required
+                </div>
+                
+                {/* Social Proof Stats */}
+                <div className="flex flex-wrap justify-center gap-6 sm:gap-12 text-center animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+                  <div>
+                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">10,000+</div>
+                    <div className="text-sm text-muted-foreground mt-1">Active Businesses</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">500K+</div>
+                    <div className="text-sm text-muted-foreground mt-1">Bookings Processed</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">98%</div>
+                    <div className="text-sm text-muted-foreground mt-1">Customer Satisfaction</div>
+                  </div>
                 </div>
                 
                 {/* Main Headline */}
                 <div className="hero-radial-beam">
                   <h1 className="text-clamp-xl font-bold leading-tight text-foreground animate-slide-in-left text-wrap-balance">
-                    Create{' '}
+                    Get More Bookings & Grow Revenue with{' '}
                     <span className="text-blue-gradient">
-                      beautiful booking pages
-                    </span>{' '}
-                    in minutes
+                      Professional Booking Pages
+                    </span>
                   </h1>
                 </div>
                 
                 {/* Subtitle */}
                 <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right break-words">
-                  Our AI-powered platform works 24/7 to create professional booking pages that convert visitors into clients effortlessly.
+                  Join 10,000+ service professionals who increased their bookings by 40% on average. Create stunning booking pages in minutes, not hours.
                 </p>
                 
-                {/* CTA Button */}
-                <div className="pt-4 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
+                {/* CTA Buttons */}
+                <div className="pt-4 animate-scale-in content-layer flex flex-col sm:flex-row gap-4 justify-center items-center" style={{animationDelay: '0.3s'}}>
                   <Button 
                     onClick={() => setLocation('/signup')}
                     size="lg"
                     className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
                     data-testid="button-get-started"
                   >
-                    Get Started for Free
+                    Start Your 7-Day FREE Trial
                     <ArrowRight className="ml-3 h-6 w-6" />
+                  </Button>
+                  <Button 
+                    onClick={() => setLocation('/pricing')}
+                    size="lg"
+                    variant="outline"
+                    className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
+                    data-testid="button-view-pricing"
+                  >
+                    View Pricing
                   </Button>
                 </div>
                 
-                {/* Feature Points */}
+                {/* Trust Indicators */}
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground pt-6">
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3" />
-                    Quick setup
+                    <strong className="text-foreground">No Credit Card Required</strong>
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3" />
-                    Professional features
+                    7-Day FREE Trial
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3" />
-                    Cancel anytime
+                    Cancel Anytime
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-green-500 mr-3" />
+                    Setup in 5 Minutes
                   </div>
                 </div>
               </div>
@@ -250,6 +290,70 @@ export default function Home() {
                 alt="BookingGen dashboard interface" 
                 className="w-full h-auto object-contain rounded-2xl"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Preview / Value Proposition Section */}
+      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMjggMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHpNOCAzNGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
+        <div className="relative container mx-auto px-6">
+          <div className="max-w-5xl mx-auto text-center space-y-12">
+            <div className="space-y-6 animate-fade-in-up">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+                Start Your 7-Day FREE Trial Today
+              </h2>
+              <p className="text-xl lg:text-2xl text-blue-100">
+                No credit card required. Full access to all Pro features. Cancel anytime.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
+                  <DollarSign className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold">Just $14.99/mo</h3>
+                <p className="text-blue-100 text-lg">
+                  After trial. 50% OFF regular price. Unlimited bookings, unlimited pages.
+                </p>
+              </div>
+
+              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
+                  <Zap className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold">Instant ROI</h3>
+                <p className="text-blue-100 text-lg">
+                  Users report 40% more bookings in first month. Pay for itself in days, not months.
+                </p>
+              </div>
+
+              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
+                  <Shield className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold">Risk-Free Guarantee</h3>
+                <p className="text-blue-100 text-lg">
+                  Love it or leave it. No contracts, no commitments. Cancel with one click.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-8 animate-scale-in" style={{animationDelay: '0.4s'}}>
+              <Button 
+                onClick={() => setLocation('/signup')}
+                size="lg"
+                className="bg-white text-blue-600 hover:bg-blue-50 px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target font-bold"
+                data-testid="button-trial-cta"
+              >
+                Claim Your FREE 7-Day Trial Now
+                <ArrowRight className="ml-3 h-6 w-6" />
+              </Button>
+              <p className="text-blue-100 mt-4 text-sm">
+                ✓ No Credit Card Required • ✓ Full Pro Access • ✓ Cancel Anytime
+              </p>
             </div>
           </div>
         </div>
@@ -652,10 +756,16 @@ export default function Home() {
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="group relative bg-background/60 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 mobile-no-blur" data-testid={`testimonial-${index}`}>
                 <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-gradient">{testimonial.metric}</div>
+                      <div className="text-xs text-muted-foreground">{testimonial.timeframe}</div>
+                    </div>
                   </div>
                   <p className="text-muted-foreground mb-8 italic text-lg leading-relaxed" data-testid={`testimonial-content-${index}`}>
                     "{testimonial.content}"
@@ -683,6 +793,114 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="relative py-24 overflow-hidden bg-background">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
+              Frequently Asked{' '}
+              <span className="text-blue-gradient">
+                Questions
+              </span>
+            </h2>
+            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              Everything you need to know about BookingGen and our 7-day free trial
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="item-1" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  Do I really need a credit card for the free trial?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  Absolutely not! Our 7-day free trial requires NO credit card. You get full access to all Pro features without any payment information. After the trial, you can choose to upgrade to continue using BookingGen.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  What happens after my 7-day free trial ends?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  After your trial ends, you'll be prompted to choose a plan. There's no automatic charge. You can upgrade to Pro for just $14.99/month (50% OFF regular price) or continue with limited features on the free plan. You're in complete control.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  Can I cancel my subscription anytime?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  Yes! Cancel anytime with just one click from your dashboard. No contracts, no commitments, no cancellation fees. We believe in earning your business every month, not trapping you in a contract.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  How quickly can I set up my booking page?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  Most users create their first professional booking page in under 5 minutes! Our intuitive builder guides you through adding your services, availability, and branding. You can start accepting bookings the same day you sign up.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  Is there a limit on bookings or pages?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  During your trial and with the Pro plan, you get UNLIMITED booking pages and UNLIMITED bookings. No hidden limits, no surprise charges. Whether you get 10 bookings or 10,000, the price stays the same at $14.99/month.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  What features are included in the free trial?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  You get FULL access to all Pro features: unlimited booking pages, custom branding, analytics dashboard, automated notifications, mobile optimization, priority support, and more. No features are locked or hidden during the trial.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-7" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  Will my booking page work on mobile devices?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  Yes! All booking pages are fully responsive and optimized for mobile devices. Over 60% of bookings happen on mobile, so we've made sure your pages look perfect and function flawlessly on phones, tablets, and desktops.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-8" className="glass-prism-card border border-border/50 rounded-lg px-6">
+                <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
+                  Do you offer support during the trial?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed">
+                  Absolutely! Trial users get access to our priority support team. We're here to help you succeed from day one. Get answers via email support, live chat, and our comprehensive help center with video tutorials.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          <div className="text-center mt-16 animate-fade-in-up">
+            <p className="text-lg text-muted-foreground mb-6">
+              Still have questions? We're here to help!
+            </p>
+            <Button 
+              onClick={() => setLocation('/contact')}
+              size="lg"
+              variant="outline"
+              className="glass-prism-button px-8 py-3 rounded-full text-lg min-touch-target"
+              data-testid="button-contact"
+            >
+              Contact Support
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="relative py-24 overflow-hidden gojiberry-gradient">
         {/* Glass Prism Background Elements */}
@@ -691,49 +909,64 @@ export default function Home() {
         
         <div className="relative container mx-auto px-6 content-layer">
           <div className="text-center max-w-5xl mx-auto animate-fade-in-up">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 rounded-full text-white text-sm font-semibold shadow-lg mb-8 animate-pulse">
+              <span className="bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-md mr-3">⏰ LIMITED OFFER</span>
+              Join 10,000+ Happy Customers Today
+            </div>
+            
             <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
-              Ready to transform your{' '}
+              Ready to{' '}
               <span className="text-blue-gradient">
-                booking process?
+                Boost Your Bookings by 40%?
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
-              Join thousands of professionals who have streamlined their business with BookingGen
+              Start your 7-day FREE trial now. No credit card required. Full Pro access. Cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
               <Button 
                 size="lg"
                 onClick={() => setLocation('/signup')}
-                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
+                className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target font-bold"
                 data-testid="button-cta-signup"
               >
-                Get Started for Free
+                Start Your 7-Day FREE Trial
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
               <Button 
                 size="lg"
                 variant="outline"
-                onClick={() => setLocation('/tutorial')}
+                onClick={() => setLocation('/pricing')}
                 className="glass-prism-button px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target"
-                data-testid="button-cta-tutorial"
+                data-testid="button-cta-pricing"
               >
-                <Play className="mr-3 h-6 w-6" />
-                Watch Tutorial
+                <DollarSign className="mr-3 h-6 w-6" />
+                View Pricing
               </Button>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-12 text-lg text-muted-foreground">
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
-                Professional features
+                <strong className="text-foreground">No Credit Card Required</strong>
               </div>
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
-                No setup fees
+                7-Day FREE Trial
               </div>
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
-                Cancel anytime
+                Cancel Anytime
               </div>
+              <div className="flex items-center">
+                <Check className="h-6 w-6 text-green-500 mr-3" />
+                Just $14.99/mo After Trial
+              </div>
+            </div>
+            
+            <div className="mt-12 pt-8 border-t border-border/30">
+              <p className="text-sm text-muted-foreground">
+                💡 <strong className="text-foreground">Limited Time Offer:</strong> Get 50% OFF the regular price when you subscribe after your trial. Only $14.99/month instead of $29.99!
+              </p>
             </div>
           </div>
         </div>
