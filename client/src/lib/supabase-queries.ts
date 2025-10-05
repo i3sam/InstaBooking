@@ -22,7 +22,30 @@ export async function getPublicPageBySlug(slug: string) {
       return null;
     }
 
-    return data;
+    // Convert snake_case to camelCase for frontend consistency
+    if (!data) return null;
+    
+    return {
+      ...data,
+      ownerId: data.owner_id,
+      logoUrl: data.logo_url,
+      primaryColor: data.primary_color,
+      backgroundType: data.background_type,
+      backgroundValue: data.background_value,
+      fontFamily: data.font_family,
+      calendarLink: data.calendar_link,
+      locationLink: data.location_link,
+      acceptReviews: data.accept_reviews,
+      businessHours: data.business_hours,
+      contactPhone: data.contact_phone,
+      contactEmail: data.contact_email,
+      businessAddress: data.business_address,
+      cancellationPolicy: data.cancellation_policy,
+      showBusinessHours: data.show_business_hours,
+      showContactInfo: data.show_contact_info,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
   } catch (error) {
     console.error('Error in getPublicPageBySlug:', error);
     return null;
