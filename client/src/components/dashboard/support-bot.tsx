@@ -75,9 +75,9 @@ export default function SupportBot() {
       return `Hello ${userName}! 👋 How can I assist you today?`;
     }
 
-    // Delete booking page
-    if ((message.includes('delete') || message.includes('remove')) && (message.includes('page') || message.includes('booking'))) {
-      return "To delete a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to delete\n3. Click the three dots menu (⋮) on the page card\n4. Select 'Delete Page'\n5. Confirm the deletion\n\nNote: This action cannot be undone, and all associated appointments will be removed.";
+    // Delete/archive booking page
+    if ((message.includes('delete') || message.includes('remove') || message.includes('archive') || message.includes('get rid')) && (message.includes('page') || message.includes('booking'))) {
+      return "To delete a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to delete\n3. Click the three dots menu (⋮) on the page card\n4. Select 'Delete Page'\n5. Confirm the deletion\n\nNote: This action cannot be undone, and all associated appointments will be removed.\n\n💡 Tip: You can unpublish a page instead of deleting it to keep it as a draft.";
     }
 
     // Edit booking page
@@ -95,6 +95,11 @@ export default function SupportBot() {
       return "To add services to your booking page:\n1. Edit your booking page\n2. Scroll to the 'Services' section\n3. Click 'Add Service'\n4. Enter service details:\n   • Name (e.g., '1-Hour Consultation')\n   • Description\n   • Duration in minutes\n   • Price and currency\n5. Click 'Save Service'\n6. Save your page changes\n\nYou can add multiple services per page!";
     }
 
+    // Edit or remove services
+    if ((message.includes('edit') || message.includes('remove') || message.includes('delete') || message.includes('update')) && (message.includes('service') || message.includes('offering'))) {
+      return "To edit or remove services:\n1. Edit your booking page\n2. Find the 'Services' section\n3. For each service:\n   • Click 'Edit' to modify details\n   • Click 'Delete' to remove it\n4. Make your changes\n5. Save your page\n\nNote: Removing a service doesn't affect existing appointments using that service.";
+    }
+
     // Manage appointments
     if ((message.includes('manage') || message.includes('handle')) && (message.includes('appointment') || message.includes('booking'))) {
       return "To manage appointments:\n1. Go to 'Appointments' in the sidebar\n2. View all pending, accepted, and rejected bookings\n3. For each appointment you can:\n   • Accept it (customer gets notified)\n   • Reject it (customer gets notified)\n   • View customer details\n   • See booking information\n\nCustomers receive automatic email notifications!";
@@ -103,6 +108,36 @@ export default function SupportBot() {
     // Accept/Reject appointments
     if ((message.includes('accept') || message.includes('reject') || message.includes('approve') || message.includes('decline')) && message.includes('appointment')) {
       return "To accept or reject appointments:\n1. Go to 'Appointments' section\n2. Find the pending appointment\n3. Click 'Accept' to confirm or 'Reject' to decline\n4. The customer receives an automatic notification\n\nAccepted appointments show in your revenue, rejected ones don't!";
+    }
+
+    // Reschedule or cancel appointments
+    if ((message.includes('reschedule') || message.includes('change time') || message.includes('move') || message.includes('change date')) && (message.includes('appointment') || message.includes('booking') || message.includes('client') || message.includes('customer'))) {
+      return "To reschedule an appointment:\n1. Go to 'Appointments' in the sidebar\n2. Find the appointment you want to reschedule\n3. Click the 'Reschedule' button\n4. Select a new date and time\n5. Add an optional note for the customer\n6. Click 'Send Reschedule'\n\nThe customer receives an automatic email notification with the new details!";
+    }
+
+    // Cancel appointments
+    if (message.includes('cancel') && (message.includes('appointment') || message.includes('booking'))) {
+      return "To cancel an appointment:\n1. Go to 'Appointments'\n2. Find the appointment\n3. Click 'Reject' to cancel\n4. Customer gets notified automatically\n\nCanceled appointments are removed from your revenue tracking.";
+    }
+
+    // Handle "I need to" type questions
+    if (message.includes('i need to') || message.includes('i want to') || message.includes('how can i')) {
+      if (message.includes('reschedule')) {
+        return "To reschedule an appointment:\n1. Go to 'Appointments'\n2. Find the appointment\n3. Click 'Reschedule' button\n4. Choose new date and time\n5. Add an optional note\n6. Submit\n\nThe customer gets notified automatically!";
+      }
+      if (message.includes('delete') || message.includes('remove')) {
+        if (message.includes('page')) {
+          return "To delete a page, go to 'Booking Pages', click the three dots menu (⋮) on the page, select 'Delete Page', and confirm. This cannot be undone!";
+        }
+        if (message.includes('service')) {
+          return "To delete a service, edit your booking page, find the service in the Services section, and click 'Delete'. Don't forget to save your changes!";
+        }
+      }
+    }
+
+    // View customer information
+    if ((message.includes('customer') || message.includes('client')) && (message.includes('info') || message.includes('details') || message.includes('view') || message.includes('see'))) {
+      return "To view customer information:\n1. Go to 'Appointments' section\n2. Click on any appointment\n3. View customer details:\n   • Name\n   • Email\n   • Phone number\n   • Booking preferences\n   • Appointment history\n\nCustomer data is automatically collected when they book!";
     }
 
     // Customize branding
@@ -171,9 +206,14 @@ export default function SupportBot() {
       return "To upload your logo:\n1. Edit your booking page\n2. Find the 'Logo' section\n3. Click 'Upload Logo'\n4. Select your logo file (JPG, PNG, or SVG)\n5. The logo will appear on your booking page\n6. Save your changes\n\nFor best results, use a square logo with transparent background!";
     }
 
-    // Add payment method
-    if (message.includes('payment') && (message.includes('add') || message.includes('setup') || message.includes('method'))) {
-      return "To add payment processing to your bookings:\n1. Currently, BookingGen tracks payments for record-keeping\n2. You can set prices for your services when creating them\n3. Payment collection happens outside BookingGen\n4. Track your revenue in the Analytics section\n\nFull payment integration coming soon!";
+    // Add payment method / payment setup
+    if (message.includes('payment') && (message.includes('add') || message.includes('setup') || message.includes('method') || message.includes('integration') || message.includes('razorpay'))) {
+      return "BookingGen uses Razorpay for payment processing!\n\n**To set up payments:**\n1. Go to Settings in the sidebar\n2. Click 'Payment Integration'\n3. Enter your Razorpay API credentials:\n   • Key ID\n   • Key Secret\n4. Save settings\n5. Set prices when creating services\n\nCustomers can now pay directly when booking!\n\n**Troubleshooting:**\n• Make sure your Razorpay account is active\n• Verify API keys are correct\n• Test with a small amount first";
+    }
+
+    // Payment troubleshooting
+    if (message.includes('payment') && (message.includes('not working') || message.includes('failed') || message.includes('error') || message.includes('issue') || message.includes('problem'))) {
+      return "Payment issues? Here's how to troubleshoot:\n\n1. **Verify Razorpay setup:**\n   • Check API keys in Settings\n   • Ensure Razorpay account is active\n   • Confirm business verification is complete\n\n2. **Common fixes:**\n   • Re-enter API credentials\n   • Clear browser cache\n   • Try a different payment method\n   • Check if service has a price set\n\n3. **Still not working?**\n   Contact support with error details!";
     }
 
     // Create booking page
@@ -246,8 +286,13 @@ export default function SupportBot() {
     }
 
     // Calendar sync
-    if (message.includes('calendar') || message.includes('google calendar') || message.includes('sync')) {
+    if (message.includes('calendar') && (message.includes('sync') || message.includes('google') || message.includes('connect') || message.includes('add') || message.includes('link'))) {
       return "To sync with Google Calendar:\n1. Edit your booking page\n2. Find 'Calendar Integration'\n3. Add your Google Calendar link\n4. Save changes\n\nAll appointments will sync to your calendar!";
+    }
+
+    // Calendar troubleshooting
+    if (message.includes('calendar') && (message.includes('not') || message.includes('issue') || message.includes('problem') || message.includes('error') || message.includes('wrong'))) {
+      return "Calendar sync issues? Try these fixes:\n\n1. **Check calendar link:**\n   • Use the correct iCal/calendar URL\n   • Make sure calendar is public\n   • Verify sharing settings in Google Calendar\n\n2. **Common fixes:**\n   • Re-enter the calendar link\n   • Wait a few minutes for sync\n   • Check appointment times match\n   • Ensure calendar has permissions\n\n3. **Still not syncing?**\n   • Remove and re-add the calendar link\n   • Contact support with details";
     }
 
     // Help menu
