@@ -632,16 +632,18 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
       return res.status(401).json({ error: "User not authenticated" });
     }
 
-    // Get user's active subscriptions
+    // Get user's active subscriptions (including trials)
     const userSubscriptions = await storage.getSubscriptionsByUser(authReq.user.userId);
     console.log('User subscriptions:', JSON.stringify(userSubscriptions, null, 2));
     
-    const activeSubscription = userSubscriptions.find(sub => 
-      sub.status?.toLowerCase() === 'active'
-    );
+    // Find subscription that's active, authenticated, or on trial
+    const activeSubscription = userSubscriptions.find(sub => {
+      const status = sub.status?.toLowerCase();
+      return status === 'active' || status === 'authenticated' || sub.isTrial;
+    });
 
     if (!activeSubscription) {
-      console.log('No active subscription found. Available subscriptions:', userSubscriptions.map(s => ({ id: s.id, status: s.status })));
+      console.log('No active subscription found. Available subscriptions:', userSubscriptions.map(s => ({ id: s.id, status: s.status, isTrial: s.isTrial })));
       return res.status(404).json({ error: "No active subscription found" });
     }
 
@@ -650,6 +652,38 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
       return res.status(409).json({ 
         error: "Subscription is already cancelled",
         message: "Your subscription has already been cancelled."
+      });
+    }
+
+    // Check if this is a trial subscription
+    if (activeSubscription.isTrial) {
+      // For trials, cancel immediately and downgrade user since no payment has been made
+      
+      // Cancel with Razorpay
+      await razorpay.subscriptions.cancel(activeSubscription.id);
+
+      // Update subscription status
+      await storage.updateSubscription(activeSubscription.id, {
+        status: 'cancelled'
+      });
+
+      // Get user profile and update trial status
+      const profile = await storage.getProfile(authReq.user.userId);
+      
+      // Downgrade user immediately and mark trial as used (they started it but cancelled)
+      await storage.updateProfile(authReq.user.userId, {
+        membershipStatus: 'free',
+        membershipPlan: null,
+        membershipExpires: null,
+        trialStatus: 'used' // Mark trial as used so they can't activate it again
+      });
+
+      console.log(`✅ Trial subscription cancelled: ${activeSubscription.id} for user ${authReq.user.userId}`);
+      
+      return res.json({
+        success: true,
+        message: "Your free trial has been cancelled.",
+        subscriptionId: activeSubscription.id
       });
     }
 
