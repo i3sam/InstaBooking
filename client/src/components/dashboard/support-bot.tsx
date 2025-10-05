@@ -45,12 +45,12 @@ export default function SupportBot() {
   const { user, profile } = useAuth();
   const { formatPrice } = useCurrency();
 
-  const { data: stats } = useQuery<DashboardStats>({
+  const { data: stats, error: statsError } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard/stats'],
     enabled: isOpen
   });
 
-  const { data: pages } = useQuery<BookingPage[]>({
+  const { data: pages, error: pagesError } = useQuery<BookingPage[]>({
     queryKey: ['/api/pages'],
     enabled: isOpen
   });
@@ -98,6 +98,9 @@ export default function SupportBot() {
     }
 
     if (message.includes('stats') || message.includes('analytics') || message.includes('revenue') || message.includes('booking')) {
+      if (statsError) {
+        return "I'm having trouble loading your analytics data right now. Please try again in a moment, or check the Analytics section directly.";
+      }
       if (!stats) {
         return "I'm loading your analytics data. Please try again in a moment.";
       }
@@ -115,6 +118,9 @@ export default function SupportBot() {
     }
 
     if (message.includes('page') || message.includes('pages')) {
+      if (pagesError) {
+        return "I'm having trouble loading your booking pages right now. Please try again in a moment, or check the Booking Pages section directly.";
+      }
       if (!pages || pages.length === 0) {
         return "You don't have any booking pages yet. Click 'Create New Page' to get started!";
       }
@@ -252,7 +258,7 @@ export default function SupportBot() {
   return (
     <>
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 w-96 h-[600px] glass-prism-card backdrop-blur-xl border-white/20 shadow-2xl flex flex-col z-50 animate-scale-in mobile-no-blur">
+        <Card className="fixed bottom-20 right-4 w-[calc(100vw-2rem)] sm:w-96 sm:right-6 sm:bottom-24 h-[500px] sm:h-[600px] max-w-[400px] glass-prism-card backdrop-blur-xl border-white/20 shadow-2xl flex flex-col z-50 animate-scale-in mobile-no-blur">
           <CardHeader className="border-b border-white/10 flex flex-row items-center justify-between p-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 glass-prism rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
@@ -328,7 +334,7 @@ export default function SupportBot() {
       <Button
         onClick={() => setIsOpen(!isOpen)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full glass-prism-button shadow-2xl z-50 p-0"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 rounded-full glass-prism-button shadow-2xl z-50 p-0"
         data-testid="button-toggle-support"
       >
         {isOpen ? (
