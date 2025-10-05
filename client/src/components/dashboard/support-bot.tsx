@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageCircle, X, Send, Sparkles, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Bot, HelpCircle, Zap, BookOpen, Settings, Calendar } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Message {
   id: string;
@@ -30,6 +32,115 @@ interface BookingPage {
   published: boolean;
 }
 
+interface FAQ {
+  id: string;
+  category: string;
+  question: string;
+  answer: string;
+  keywords: string[];
+}
+
+const faqs: FAQ[] = [
+  {
+    id: '1',
+    category: 'Pages',
+    question: 'How do I create a booking page?',
+    answer: "To create a booking page:\n1. Click 'Booking Pages' in the sidebar\n2. Click 'Create New Page' button\n3. Fill in:\n   • Page title\n   • Tagline\n   • Services you offer\n   • Business hours\n   • Branding (colors, logo, theme)\n4. Click 'Create Page'\n5. Toggle 'Published' to make it live!\n\nYour page will have a unique shareable link!",
+    keywords: ['create', 'new', 'page', 'booking', 'make', 'build']
+  },
+  {
+    id: '2',
+    category: 'Pages',
+    question: 'How do I delete a booking page?',
+    answer: "To delete a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to delete\n3. Click the three dots menu (⋮) on the page card\n4. Select 'Delete Page'\n5. Confirm the deletion\n\nNote: This action cannot be undone, and all associated appointments will be removed.\n\n💡 Tip: You can unpublish a page instead of deleting it to keep it as a draft.",
+    keywords: ['delete', 'remove', 'archive', 'page', 'get rid']
+  },
+  {
+    id: '3',
+    category: 'Pages',
+    question: 'How do I edit my booking page?',
+    answer: "To edit a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to edit\n3. Click the 'Edit' button on the page card\n4. Make your changes (services, branding, availability, etc.)\n5. Click 'Save Changes' when done\n\nYour changes will be reflected immediately on the live page!",
+    keywords: ['edit', 'modify', 'change', 'update', 'page']
+  },
+  {
+    id: '4',
+    category: 'Pages',
+    question: 'How do I share my booking link?',
+    answer: "To share your booking page:\n1. Go to 'Booking Pages'\n2. Find your published page\n3. Click 'Copy Link' button\n4. Share the link via:\n   • Your website\n   • Social media\n   • Email signature\n   • Business cards\n\nAnyone with the link can book your services!",
+    keywords: ['share', 'link', 'url', 'copy', 'send']
+  },
+  {
+    id: '5',
+    category: 'Services',
+    question: 'How do I add services?',
+    answer: "To add services to your booking page:\n1. Edit your booking page\n2. Scroll to the 'Services' section\n3. Click 'Add Service'\n4. Enter service details:\n   • Name (e.g., '1-Hour Consultation')\n   • Description\n   • Duration in minutes\n   • Price and currency\n5. Click 'Save Service'\n6. Save your page changes\n\nYou can add multiple services per page!",
+    keywords: ['add', 'service', 'offering', 'new']
+  },
+  {
+    id: '6',
+    category: 'Appointments',
+    question: 'How do I manage appointments?',
+    answer: "To manage appointments:\n1. Go to 'Appointments' in the sidebar\n2. View all pending, accepted, and rejected bookings\n3. For each appointment you can:\n   • Accept it (customer gets notified)\n   • Reject it (customer gets notified)\n   • View customer details\n   • See booking information\n\nCustomers receive automatic email notifications!",
+    keywords: ['manage', 'handle', 'appointment', 'booking', 'view']
+  },
+  {
+    id: '7',
+    category: 'Appointments',
+    question: 'How do I accept or reject appointments?',
+    answer: "To accept or reject appointments:\n1. Go to 'Appointments' section\n2. Find the pending appointment\n3. Click 'Accept' to confirm or 'Reject' to decline\n4. The customer receives an automatic notification\n\nAccepted appointments show in your revenue, rejected ones don't!",
+    keywords: ['accept', 'reject', 'approve', 'decline', 'appointment']
+  },
+  {
+    id: '8',
+    category: 'Appointments',
+    question: 'How do I reschedule an appointment?',
+    answer: "To reschedule an appointment:\n1. Go to 'Appointments' in the sidebar\n2. Find the appointment you want to reschedule\n3. Click the 'Reschedule' button\n4. Select a new date and time\n5. Add an optional note for the customer\n6. Click 'Send Reschedule'\n\nThe customer receives an automatic email notification with the new details!",
+    keywords: ['reschedule', 'change time', 'move', 'change date', 'appointment']
+  },
+  {
+    id: '9',
+    category: 'Customization',
+    question: 'How do I customize my branding?',
+    answer: "To customize your booking page branding:\n1. Edit your booking page\n2. Use the customization options:\n   • Choose a theme (Ocean Blue, Sunset, etc.)\n   • Select primary color\n   • Pick background style\n   • Upload your logo\n   • Choose font family\n3. Preview your changes in real-time\n4. Save when you're happy with the look!",
+    keywords: ['customize', 'brand', 'theme', 'color', 'logo', 'style']
+  },
+  {
+    id: '10',
+    category: 'Customization',
+    question: 'How do I set my availability?',
+    answer: "To set your availability:\n1. Edit your booking page\n2. Scroll to 'Business Hours'\n3. Set hours for each day:\n   • Enter opening time (e.g., 9:00)\n   • Enter closing time (e.g., 17:00)\n   • Or mark as 'Closed' for days off\n4. Save your changes\n\nCustomers can only book during your available hours!",
+    keywords: ['availability', 'hours', 'time', 'schedule', 'business hours']
+  },
+  {
+    id: '11',
+    category: 'Payment',
+    question: 'How do I set up payments?',
+    answer: "BookingGen uses Razorpay for payment processing!\n\n**To set up payments:**\n1. Go to Settings in the sidebar\n2. Click 'Payment Integration'\n3. Enter your Razorpay API credentials:\n   • Key ID\n   • Key Secret\n4. Save settings\n5. Set prices when creating services\n\nCustomers can now pay directly when booking!\n\n**Troubleshooting:**\n• Make sure your Razorpay account is active\n• Verify API keys are correct\n• Test with a small amount first",
+    keywords: ['payment', 'setup', 'razorpay', 'integration', 'money']
+  },
+  {
+    id: '12',
+    category: 'Account',
+    question: 'What features are included in Pro?',
+    answer: "As a Pro member, you have:\n• Unlimited booking pages\n• Unlimited appointments\n• Advanced analytics\n• Custom branding\n• Priority support\n• All future features!\n\nUpgrade anytime from the sidebar!",
+    keywords: ['pro', 'upgrade', 'subscription', 'features', 'premium']
+  },
+  {
+    id: '13',
+    category: 'Account',
+    question: 'How much does Pro cost?',
+    answer: "BookingGen offers a Pro plan at just $14.99/month (50% off the regular price)! This includes unlimited booking pages, unlimited appointments, advanced analytics, custom branding, and priority support. New users can try it free for 7 days!",
+    keywords: ['pricing', 'price', 'cost', 'how much', 'subscription']
+  },
+  {
+    id: '14',
+    category: 'Calendar',
+    question: 'How do I sync with Google Calendar?',
+    answer: "To sync with Google Calendar:\n1. Edit your booking page\n2. Find 'Calendar Integration'\n3. Add your Google Calendar link\n4. Save changes\n\nAll appointments will sync to your calendar!",
+    keywords: ['calendar', 'sync', 'google', 'connect', 'integration']
+  }
+];
+
 export default function SupportBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -41,6 +152,8 @@ export default function SupportBot() {
     }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [showFAQs, setShowFAQs] = useState(false);
+  const [faqCategory, setFaqCategory] = useState<string>('all');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, profile } = useAuth();
   const { formatPrice } = useCurrency();
@@ -70,92 +183,17 @@ export default function SupportBot() {
   const getResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase().trim();
 
-    // Greetings
     if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
       return `Hello ${userName}! 👋 How can I assist you today?`;
     }
 
-    // Delete/archive booking page
-    if ((message.includes('delete') || message.includes('remove') || message.includes('archive') || message.includes('get rid')) && (message.includes('page') || message.includes('booking'))) {
-      return "To delete a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to delete\n3. Click the three dots menu (⋮) on the page card\n4. Select 'Delete Page'\n5. Confirm the deletion\n\nNote: This action cannot be undone, and all associated appointments will be removed.\n\n💡 Tip: You can unpublish a page instead of deleting it to keep it as a draft.";
-    }
-
-    // Edit booking page
-    if ((message.includes('edit') || message.includes('modify') || message.includes('change')) && (message.includes('page') || message.includes('booking'))) {
-      return "To edit a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to edit\n3. Click the 'Edit' button on the page card\n4. Make your changes (services, branding, availability, etc.)\n5. Click 'Save Changes' when done\n\nYour changes will be reflected immediately on the live page!";
-    }
-
-    // Publish/Unpublish page
-    if ((message.includes('publish') || message.includes('unpublish') || message.includes('live')) && message.includes('page')) {
-      return "To publish or unpublish a page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find your page\n3. Toggle the 'Published' switch on the page card\n\n• Published pages are live and can accept bookings\n• Draft pages are only visible to you for editing";
-    }
-
-    // Add services
-    if (message.includes('add') && (message.includes('service') || message.includes('offering'))) {
-      return "To add services to your booking page:\n1. Edit your booking page\n2. Scroll to the 'Services' section\n3. Click 'Add Service'\n4. Enter service details:\n   • Name (e.g., '1-Hour Consultation')\n   • Description\n   • Duration in minutes\n   • Price and currency\n5. Click 'Save Service'\n6. Save your page changes\n\nYou can add multiple services per page!";
-    }
-
-    // Edit or remove services
-    if ((message.includes('edit') || message.includes('remove') || message.includes('delete') || message.includes('update')) && (message.includes('service') || message.includes('offering'))) {
-      return "To edit or remove services:\n1. Edit your booking page\n2. Find the 'Services' section\n3. For each service:\n   • Click 'Edit' to modify details\n   • Click 'Delete' to remove it\n4. Make your changes\n5. Save your page\n\nNote: Removing a service doesn't affect existing appointments using that service.";
-    }
-
-    // Manage appointments
-    if ((message.includes('manage') || message.includes('handle')) && (message.includes('appointment') || message.includes('booking'))) {
-      return "To manage appointments:\n1. Go to 'Appointments' in the sidebar\n2. View all pending, accepted, and rejected bookings\n3. For each appointment you can:\n   • Accept it (customer gets notified)\n   • Reject it (customer gets notified)\n   • View customer details\n   • See booking information\n\nCustomers receive automatic email notifications!";
-    }
-
-    // Accept/Reject appointments
-    if ((message.includes('accept') || message.includes('reject') || message.includes('approve') || message.includes('decline')) && message.includes('appointment')) {
-      return "To accept or reject appointments:\n1. Go to 'Appointments' section\n2. Find the pending appointment\n3. Click 'Accept' to confirm or 'Reject' to decline\n4. The customer receives an automatic notification\n\nAccepted appointments show in your revenue, rejected ones don't!";
-    }
-
-    // Reschedule or cancel appointments
-    if ((message.includes('reschedule') || message.includes('change time') || message.includes('move') || message.includes('change date')) && (message.includes('appointment') || message.includes('booking') || message.includes('client') || message.includes('customer'))) {
-      return "To reschedule an appointment:\n1. Go to 'Appointments' in the sidebar\n2. Find the appointment you want to reschedule\n3. Click the 'Reschedule' button\n4. Select a new date and time\n5. Add an optional note for the customer\n6. Click 'Send Reschedule'\n\nThe customer receives an automatic email notification with the new details!";
-    }
-
-    // Cancel appointments
-    if (message.includes('cancel') && (message.includes('appointment') || message.includes('booking'))) {
-      return "To cancel an appointment:\n1. Go to 'Appointments'\n2. Find the appointment\n3. Click 'Reject' to cancel\n4. Customer gets notified automatically\n\nCanceled appointments are removed from your revenue tracking.";
-    }
-
-    // Handle "I need to" type questions
-    if (message.includes('i need to') || message.includes('i want to') || message.includes('how can i')) {
-      if (message.includes('reschedule')) {
-        return "To reschedule an appointment:\n1. Go to 'Appointments'\n2. Find the appointment\n3. Click 'Reschedule' button\n4. Choose new date and time\n5. Add an optional note\n6. Submit\n\nThe customer gets notified automatically!";
-      }
-      if (message.includes('delete') || message.includes('remove')) {
-        if (message.includes('page')) {
-          return "To delete a page, go to 'Booking Pages', click the three dots menu (⋮) on the page, select 'Delete Page', and confirm. This cannot be undone!";
-        }
-        if (message.includes('service')) {
-          return "To delete a service, edit your booking page, find the service in the Services section, and click 'Delete'. Don't forget to save your changes!";
-        }
+    for (const faq of faqs) {
+      const hasKeyword = faq.keywords.some(keyword => message.includes(keyword));
+      if (hasKeyword) {
+        return faq.answer;
       }
     }
 
-    // View customer information
-    if ((message.includes('customer') || message.includes('client')) && (message.includes('info') || message.includes('details') || message.includes('view') || message.includes('see'))) {
-      return "To view customer information:\n1. Go to 'Appointments' section\n2. Click on any appointment\n3. View customer details:\n   • Name\n   • Email\n   • Phone number\n   • Booking preferences\n   • Appointment history\n\nCustomer data is automatically collected when they book!";
-    }
-
-    // Customize branding
-    if (message.includes('customize') || message.includes('brand') || message.includes('theme') || message.includes('color')) {
-      return "To customize your booking page branding:\n1. Edit your booking page\n2. Use the customization options:\n   • Choose a theme (Ocean Blue, Sunset, etc.)\n   • Select primary color\n   • Pick background style\n   • Upload your logo\n   • Choose font family\n3. Preview your changes in real-time\n4. Save when you're happy with the look!";
-    }
-
-    // Set availability
-    if (message.includes('availability') || message.includes('hours') || (message.includes('set') && message.includes('time'))) {
-      return "To set your availability:\n1. Edit your booking page\n2. Scroll to 'Business Hours'\n3. Set hours for each day:\n   • Enter opening time (e.g., 9:00)\n   • Enter closing time (e.g., 17:00)\n   • Or mark as 'Closed' for days off\n4. Save your changes\n\nCustomers can only book during your available hours!";
-    }
-
-    // Share booking link
-    if (message.includes('share') || message.includes('link') || message.includes('url')) {
-      return "To share your booking page:\n1. Go to 'Booking Pages'\n2. Find your published page\n3. Click 'Copy Link' button\n4. Share the link via:\n   • Your website\n   • Social media\n   • Email signature\n   • Business cards\n\nAnyone with the link can book your services!";
-    }
-
-    // View statistics - only show when specifically asking for stats
     if (message.includes('show') && (message.includes('stats') || message.includes('analytics') || message.includes('revenue'))) {
       if (statsError) {
         return "I'm having trouble loading your analytics data right now. Please try again in a moment, or check the Analytics section directly.";
@@ -176,7 +214,6 @@ export default function SupportBot() {
       return response;
     }
 
-    // View pages info
     if (message.includes('show') && (message.includes('page') || message.includes('pages'))) {
       if (pagesError) {
         return "I'm having trouble loading your booking pages right now. Please try again in a moment, or check the Booking Pages section directly.";
@@ -201,38 +238,6 @@ export default function SupportBot() {
       return response;
     }
 
-    // Upload logo
-    if (message.includes('upload') && (message.includes('logo') || message.includes('image'))) {
-      return "To upload your logo:\n1. Edit your booking page\n2. Find the 'Logo' section\n3. Click 'Upload Logo'\n4. Select your logo file (JPG, PNG, or SVG)\n5. The logo will appear on your booking page\n6. Save your changes\n\nFor best results, use a square logo with transparent background!";
-    }
-
-    // Add payment method / payment setup
-    if (message.includes('payment') && (message.includes('add') || message.includes('setup') || message.includes('method') || message.includes('integration') || message.includes('razorpay'))) {
-      return "BookingGen uses Razorpay for payment processing!\n\n**To set up payments:**\n1. Go to Settings in the sidebar\n2. Click 'Payment Integration'\n3. Enter your Razorpay API credentials:\n   • Key ID\n   • Key Secret\n4. Save settings\n5. Set prices when creating services\n\nCustomers can now pay directly when booking!\n\n**Troubleshooting:**\n• Make sure your Razorpay account is active\n• Verify API keys are correct\n• Test with a small amount first";
-    }
-
-    // Payment troubleshooting
-    if (message.includes('payment') && (message.includes('not working') || message.includes('failed') || message.includes('error') || message.includes('issue') || message.includes('problem'))) {
-      return "Payment issues? Here's how to troubleshoot:\n\n1. **Verify Razorpay setup:**\n   • Check API keys in Settings\n   • Ensure Razorpay account is active\n   • Confirm business verification is complete\n\n2. **Common fixes:**\n   • Re-enter API credentials\n   • Clear browser cache\n   • Try a different payment method\n   • Check if service has a price set\n\n3. **Still not working?**\n   Contact support with error details!";
-    }
-
-    // Create booking page
-    if (message.includes('create') && (message.includes('page') || message.includes('booking'))) {
-      return "To create a booking page:\n1. Click 'Booking Pages' in the sidebar\n2. Click 'Create New Page' button\n3. Fill in:\n   • Page title\n   • Tagline\n   • Services you offer\n   • Business hours\n   • Branding (colors, logo, theme)\n4. Click 'Create Page'\n5. Toggle 'Published' to make it live!\n\nYour page will have a unique shareable link!";
-    }
-
-    // Account & subscription
-    if (message.includes('pro') || message.includes('upgrade') || message.includes('subscription')) {
-      if (isPro) {
-        if (isTrialActive) {
-          return "You're currently on a Pro trial! You have access to all premium features. Your trial will automatically convert to a paid subscription unless you cancel.";
-        }
-        return "You're a Pro member! 🌟 You have unlimited access to all features including unlimited booking pages, advanced analytics, and priority support.";
-      }
-      return "You're currently on the Free plan. Upgrade to Pro to unlock unlimited booking pages, advanced analytics, custom branding, and more! Click the upgrade button in the sidebar to get started.";
-    }
-
-    // Trial info
     if (message.includes('trial')) {
       if (isTrialActive) {
         return "You're currently enjoying your 7-day Pro trial! All premium features are unlocked. Remember to add your payment details before the trial ends to continue enjoying Pro benefits.";
@@ -246,65 +251,19 @@ export default function SupportBot() {
       return "Your trial status is currently unavailable. Please contact support for assistance.";
     }
 
-    // Pricing
-    if (message.includes('pricing') || message.includes('price') || message.includes('cost')) {
-      return "BookingGen offers a Pro plan at just $14.99/month (50% off the regular price)! This includes unlimited booking pages, unlimited appointments, advanced analytics, custom branding, and priority support. New users can try it free for 7 days!";
-    }
-
-    // Cancellation
-    if (message.includes('cancel') && message.includes('subscription')) {
-      if (isPro) {
-        return "To cancel your subscription:\n1. Go to Settings in the sidebar\n2. Click 'Billing & Payments'\n3. Click 'Cancel Subscription'\n4. Confirm cancellation\n\nYou'll keep Pro access until the end of your billing period!";
-      }
-      return "You're on the Free plan, so there's nothing to cancel. If you upgrade to Pro, you can cancel anytime with no penalties.";
-    }
-
-    // Features & limits
-    if (message.includes('feature') || message.includes('limit') || message.includes('can i')) {
-      if (isPro) {
-        return "As a Pro member, you have:\n• Unlimited booking pages\n• Unlimited appointments\n• Advanced analytics\n• Custom branding\n• Priority support\n• All future features!";
-      }
-      return "Free plan includes:\n• 1 booking page\n• Up to 10 appointments/month\n• Basic analytics\n\nUpgrade to Pro for unlimited everything!";
-    }
-
-    // Contact support
-    if (message.includes('contact') || message.includes('support')) {
-      return "For personalized support, you can reach our team through the Contact page. We typically respond within 24 hours. Pro members get priority support!";
-    }
-
-    // Custom domain
-    if (message.includes('domain')) {
-      if (isPro) {
-        return "You can add a custom domain to your booking pages! Go to Settings and look for the 'Custom Domain' section to set it up.";
-      }
-      return "Custom domains are a Pro feature. Upgrade to Pro to use your own domain for your booking pages!";
-    }
-
-    // Notifications
-    if (message.includes('notification')) {
-      return "BookingGen sends automatic notifications for:\n• New booking requests\n• Appointment confirmations\n• Appointment rejections\n• Cancellations\n\nCustomers and you get notified via email automatically!";
-    }
-
-    // Calendar sync
-    if (message.includes('calendar') && (message.includes('sync') || message.includes('google') || message.includes('connect') || message.includes('add') || message.includes('link'))) {
-      return "To sync with Google Calendar:\n1. Edit your booking page\n2. Find 'Calendar Integration'\n3. Add your Google Calendar link\n4. Save changes\n\nAll appointments will sync to your calendar!";
-    }
-
-    // Calendar troubleshooting
-    if (message.includes('calendar') && (message.includes('not') || message.includes('issue') || message.includes('problem') || message.includes('error') || message.includes('wrong'))) {
-      return "Calendar sync issues? Try these fixes:\n\n1. **Check calendar link:**\n   • Use the correct iCal/calendar URL\n   • Make sure calendar is public\n   • Verify sharing settings in Google Calendar\n\n2. **Common fixes:**\n   • Re-enter the calendar link\n   • Wait a few minutes for sync\n   • Check appointment times match\n   • Ensure calendar has permissions\n\n3. **Still not syncing?**\n   • Remove and re-add the calendar link\n   • Contact support with details";
-    }
-
-    // Help menu
     if (message.includes('help') || message.includes('what can you do')) {
-      return `I can help you with:\n\n📄 **Booking Pages**\n• Create, edit, delete pages\n• Publish/unpublish pages\n• Customize branding & themes\n• Share booking links\n\n📅 **Appointments**\n• Accept/reject bookings\n• Manage appointments\n• View customer details\n\n⚙️ **Settings**\n• Add services\n• Set availability\n• Upload logo\n• Manage subscription\n\n📊 **Analytics**\n• View statistics\n• Track revenue\n• Monitor conversions\n\nJust ask me anything!`;
+      return `I can help you with:\n\n📄 **Booking Pages**\n• Create, edit, delete pages\n• Publish/unpublish pages\n• Customize branding & themes\n• Share booking links\n\n📅 **Appointments**\n• Accept/reject bookings\n• Manage appointments\n• View customer details\n\n⚙️ **Settings**\n• Add services\n• Set availability\n• Upload logo\n• Manage subscription\n\n📊 **Analytics**\n• View statistics\n• Track revenue\n• Monitor conversions\n\nType 'faqs' to browse frequently asked questions or just ask me anything!`;
     }
 
-    // Fallback
+    if (message.includes('faq') || message.includes('frequently asked')) {
+      setShowFAQs(true);
+      return "I've opened the FAQ section for you. Browse through common questions or ask me directly!";
+    }
+
     const casualResponses = [
-      "I'm not sure about that specific question. Try asking about:\n• Creating or editing booking pages\n• Managing appointments\n• Customizing your branding\n• Account settings\n• Or type 'help' to see what I can do!",
-      "That's a great question! For detailed assistance, contact our support team. I can help you with booking pages, appointments, customization, and settings. What would you like to know?",
-      "I can help you with booking pages, appointments, and account settings. Try asking about creating a page, managing bookings, or customizing your brand!"
+      "I'm not sure about that specific question. Try:\n• Asking 'help' to see what I can do\n• Type 'faqs' to browse common questions\n• Or ask about pages, appointments, or settings!",
+      "That's a great question! For detailed assistance, try typing 'faqs' or ask about:\n• Creating booking pages\n• Managing appointments\n• Customizing your branding\n• Account settings",
+      "I can help you with booking pages, appointments, and account settings. Try typing 'faqs' to see common questions or ask me directly!"
     ];
 
     return casualResponses[Math.floor(Math.random() * casualResponses.length)];
@@ -342,6 +301,37 @@ export default function SupportBot() {
     }
   };
 
+  const handleQuickAction = (question: string) => {
+    setInputValue(question);
+    handleSend();
+  };
+
+  const handleFAQClick = (faq: FAQ) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: faq.question,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+
+    setTimeout(() => {
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: faq.answer,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 300);
+
+    setShowFAQs(false);
+  };
+
+  const categories = ['all', ...Array.from(new Set(faqs.map(f => f.category)))];
+  const filteredFAQs = faqCategory === 'all' ? faqs : faqs.filter(f => f.category === faqCategory);
+
   return (
     <>
       {isOpen && (
@@ -356,71 +346,180 @@ export default function SupportBot() {
                 <p className="text-xs text-muted-foreground">Always here to help</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(false)}
-              className="h-8 w-8 p-0"
-              data-testid="button-close-support"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-
-          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map(message => (
-              <div
-                key={message.id}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-2xl p-3 ${
-                    message.type === 'user'
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
-                      : 'glass-prism backdrop-blur-md text-foreground'
-                  }`}
-                  data-testid={`message-${message.type}-${message.id}`}
-                >
-                  <p className="text-sm whitespace-pre-line break-words">{message.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </CardContent>
-
-          <div className="border-t border-white/10 p-4">
-            <div className="flex space-x-2">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me anything..."
-                className="flex-1 glass-prism backdrop-blur-md border-white/20"
-                data-testid="input-support-message"
-              />
+            <div className="flex gap-2">
               <Button
-                onClick={handleSend}
+                variant="ghost"
                 size="sm"
-                className="glass-prism-button"
-                data-testid="button-send-message"
+                onClick={() => setShowFAQs(!showFAQs)}
+                className="h-8 w-8 p-0"
+                data-testid="button-toggle-faqs"
               >
-                <Send className="h-4 w-4" />
+                <HelpCircle className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsOpen(false)}
+                className="h-8 w-8 p-0"
+                data-testid="button-close-support"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              <Sparkles className="h-3 w-3 inline mr-1" />
-              Powered by smart assistance
-            </p>
-          </div>
+          </CardHeader>
+
+          {showFAQs ? (
+            <CardContent className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFAQs(false)}
+                    data-testid="button-back-to-chat"
+                  >
+                    Back to Chat
+                  </Button>
+                </div>
+                <div className="flex gap-2 flex-wrap mb-4">
+                  {categories.map(cat => (
+                    <Button
+                      key={cat}
+                      variant={faqCategory === cat ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setFaqCategory(cat)}
+                      className={faqCategory === cat ? 'glass-prism-button' : 'glass-prism'}
+                      data-testid={`button-category-${cat}`}
+                    >
+                      {cat === 'all' ? 'All' : cat}
+                    </Button>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  {filteredFAQs.map((faq) => (
+                    <button
+                      key={faq.id}
+                      onClick={() => handleFAQClick(faq)}
+                      className="w-full text-left p-3 rounded-xl glass-prism hover:glass-prism-button transition-all duration-300 group"
+                      data-testid={`faq-item-${faq.id}`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <HelpCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium group-hover:text-white transition-colors">
+                            {faq.question}
+                          </p>
+                          <Badge variant="secondary" className="mt-1 text-xs">
+                            {faq.category}
+                          </Badge>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          ) : (
+            <>
+              <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map(message => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-2xl p-3 ${
+                        message.type === 'user'
+                          ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                          : 'glass-prism backdrop-blur-md text-foreground'
+                      }`}
+                      data-testid={`message-${message.type}-${message.id}`}
+                    >
+                      <p className="text-sm whitespace-pre-line break-words">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {messages.length === 1 && (
+                  <div className="space-y-2 mt-4">
+                    <p className="text-xs text-muted-foreground mb-2">Quick Actions:</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickAction('How do I create a page?')}
+                        className="glass-prism text-xs justify-start"
+                        data-testid="quick-action-create-page"
+                      >
+                        <Zap className="h-3 w-3 mr-1" />
+                        Create Page
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickAction('How do I manage appointments?')}
+                        className="glass-prism text-xs justify-start"
+                        data-testid="quick-action-appointments"
+                      >
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Appointments
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleQuickAction('How do I customize branding?')}
+                        className="glass-prism text-xs justify-start"
+                        data-testid="quick-action-branding"
+                      >
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Branding
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowFAQs(true)}
+                        className="glass-prism text-xs justify-start"
+                        data-testid="quick-action-faqs"
+                      >
+                        <BookOpen className="h-3 w-3 mr-1" />
+                        View FAQs
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </CardContent>
+
+              <div className="border-t border-white/10 p-4">
+                <div className="flex space-x-2">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask me anything..."
+                    className="flex-1 glass-prism backdrop-blur-md border-white/20"
+                    data-testid="input-support-message"
+                  />
+                  <Button
+                    onClick={handleSend}
+                    size="sm"
+                    className="glass-prism-button"
+                    data-testid="button-send-message"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </Card>
       )}
 
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        size="lg"
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 rounded-full glass-prism-button shadow-2xl z-50 p-0"
         data-testid="button-toggle-support"
       >

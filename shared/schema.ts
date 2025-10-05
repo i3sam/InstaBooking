@@ -178,6 +178,11 @@ export const notes = pgTable("notes", {
   userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
   title: text("title").notNull(),
   content: text("content").default(""),
+  category: text("category").default("General"),
+  tags: text("tags").default(""),
+  color: text("color").default("blue"),
+  isPinned: boolean("is_pinned").default(false),
+  isArchived: boolean("is_archived").default(false),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
 });
