@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown, User, ChevronUp, LogOut } from 'lucide-react';
+import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown, User, ChevronUp, LogOut, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import UpgradeModal from '@/components/modals/upgrade-modal';
+import TrialActivationModal from '@/components/modals/trial-activation-modal';
 import { useLocation } from 'wouter';
 
 interface SidebarProps {
@@ -17,6 +18,9 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   const { user, profile, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+
+  const isTrialAvailable = profile && (profile as any).trialStatus === 'available' && profile.membershipStatus !== 'pro';
 
   const getInitials = (name: string) => {
     return name
@@ -108,34 +112,53 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         </div>
       </nav>
       
-      {/* Enhanced Upgrade Card at Bottom */}
+      {/* Enhanced Upgrade/Trial Card at Bottom */}
       {profile && profile.membershipStatus !== 'pro' && (
         <div className="p-4">
-          <div className="relative glass-prism-card backdrop-blur-xl bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10 border border-white/20 rounded-2xl p-5 overflow-hidden shadow-2xl animate-float sm:animate-float mobile-no-blur">
+          <div className={`relative glass-prism-card backdrop-blur-xl ${isTrialAvailable ? 'bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-500/10' : 'bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-pink-500/10'} border border-white/20 rounded-2xl p-5 overflow-hidden shadow-2xl animate-float sm:animate-float mobile-no-blur`}>
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full -translate-y-10 translate-x-10 blur-xl mobile-hide"></div>
+            <div className={`absolute top-0 right-0 w-20 h-20 ${isTrialAvailable ? 'bg-gradient-to-br from-purple-400/20 to-pink-400/20' : 'bg-gradient-to-br from-blue-400/20 to-purple-400/20'} rounded-full -translate-y-10 translate-x-10 blur-xl mobile-hide`}></div>
             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full translate-y-8 -translate-x-8 blur-xl mobile-hide"></div>
             
             {/* Content */}
             <div className="relative z-10">
               <div className="flex items-center mb-3">
-                <Crown className="h-5 w-5 text-yellow-500 mr-2" />
-                <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Upgrade</h4>
+                {isTrialAvailable ? (
+                  <>
+                    <Sparkles className="h-5 w-5 text-purple-500 mr-2" />
+                    <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Free Trial</h4>
+                  </>
+                ) : (
+                  <>
+                    <Crown className="h-5 w-5 text-yellow-500 mr-2" />
+                    <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Upgrade</h4>
+                  </>
+                )}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                Upgrade to Pro to access all features
+                {isTrialAvailable ? 'Try Pro free for 7 days' : 'Upgrade to Pro to access all features'}
               </p>
               <Button 
-                className="w-full glass-prism-button text-white shadow-lg text-xs h-9 font-semibold" 
-                data-testid="button-upgrade"
-                onClick={() => setIsUpgradeModalOpen(true)}
+                className={`w-full ${isTrialAvailable ? 'glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 border border-purple-300/50 dark:border-purple-600/50' : 'glass-prism-button text-white'} shadow-lg text-xs h-9 font-semibold`}
+                data-testid={isTrialAvailable ? "button-trial-sidebar" : "button-upgrade"}
+                onClick={() => isTrialAvailable ? setIsTrialModalOpen(true) : setIsUpgradeModalOpen(true)}
               >
-                Upgrade
+                {isTrialAvailable ? (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    Start Free Trial
+                  </>
+                ) : 'Upgrade'}
               </Button>
             </div>
           </div>
         </div>
       )}
+
+      <TrialActivationModal 
+        isOpen={isTrialModalOpen}
+        onClose={() => setIsTrialModalOpen(false)}
+      />
 
       {/* Account Switcher */}
       <div className="p-4 mt-auto">
