@@ -70,34 +70,58 @@ export default function SupportBot() {
   const getResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase().trim();
 
+    // Greetings
     if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
       return `Hello ${userName}! 👋 How can I assist you today?`;
     }
 
-    if (message.includes('pro') || message.includes('upgrade') || message.includes('subscription')) {
-      if (isPro) {
-        if (isTrialActive) {
-          return "You're currently on a Pro trial! You have access to all premium features. Your trial will automatically convert to a paid subscription unless you cancel.";
-        }
-        return "You're a Pro member! 🌟 You have unlimited access to all features including unlimited booking pages, advanced analytics, and priority support.";
-      }
-      return "You're currently on the Free plan. Upgrade to Pro to unlock unlimited booking pages, advanced analytics, custom branding, and more! Click the upgrade button in the sidebar to get started.";
+    // Delete booking page
+    if ((message.includes('delete') || message.includes('remove')) && (message.includes('page') || message.includes('booking'))) {
+      return "To delete a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to delete\n3. Click the three dots menu (⋮) on the page card\n4. Select 'Delete Page'\n5. Confirm the deletion\n\nNote: This action cannot be undone, and all associated appointments will be removed.";
     }
 
-    if (message.includes('trial')) {
-      if (isTrialActive) {
-        return "You're currently enjoying your 7-day Pro trial! All premium features are unlocked. Remember to add your payment details before the trial ends to continue enjoying Pro benefits.";
-      }
-      if ((profile as any)?.trialStatus === 'used') {
-        return "You've already used your free trial. You can upgrade to Pro anytime to access all premium features!";
-      }
-      if ((profile as any)?.trialStatus === 'available') {
-        return "You're eligible for a 7-day free trial! Click the trial button in the sidebar to activate it and enjoy all Pro features.";
-      }
-      return "Your trial status is currently unavailable. Please contact support for assistance.";
+    // Edit booking page
+    if ((message.includes('edit') || message.includes('modify') || message.includes('change')) && (message.includes('page') || message.includes('booking'))) {
+      return "To edit a booking page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find the page you want to edit\n3. Click the 'Edit' button on the page card\n4. Make your changes (services, branding, availability, etc.)\n5. Click 'Save Changes' when done\n\nYour changes will be reflected immediately on the live page!";
     }
 
-    if (message.includes('stats') || message.includes('analytics') || message.includes('revenue') || message.includes('booking')) {
+    // Publish/Unpublish page
+    if ((message.includes('publish') || message.includes('unpublish') || message.includes('live')) && message.includes('page')) {
+      return "To publish or unpublish a page:\n1. Go to 'Booking Pages' in the sidebar\n2. Find your page\n3. Toggle the 'Published' switch on the page card\n\n• Published pages are live and can accept bookings\n• Draft pages are only visible to you for editing";
+    }
+
+    // Add services
+    if (message.includes('add') && (message.includes('service') || message.includes('offering'))) {
+      return "To add services to your booking page:\n1. Edit your booking page\n2. Scroll to the 'Services' section\n3. Click 'Add Service'\n4. Enter service details:\n   • Name (e.g., '1-Hour Consultation')\n   • Description\n   • Duration in minutes\n   • Price and currency\n5. Click 'Save Service'\n6. Save your page changes\n\nYou can add multiple services per page!";
+    }
+
+    // Manage appointments
+    if ((message.includes('manage') || message.includes('handle')) && (message.includes('appointment') || message.includes('booking'))) {
+      return "To manage appointments:\n1. Go to 'Appointments' in the sidebar\n2. View all pending, accepted, and rejected bookings\n3. For each appointment you can:\n   • Accept it (customer gets notified)\n   • Reject it (customer gets notified)\n   • View customer details\n   • See booking information\n\nCustomers receive automatic email notifications!";
+    }
+
+    // Accept/Reject appointments
+    if ((message.includes('accept') || message.includes('reject') || message.includes('approve') || message.includes('decline')) && message.includes('appointment')) {
+      return "To accept or reject appointments:\n1. Go to 'Appointments' section\n2. Find the pending appointment\n3. Click 'Accept' to confirm or 'Reject' to decline\n4. The customer receives an automatic notification\n\nAccepted appointments show in your revenue, rejected ones don't!";
+    }
+
+    // Customize branding
+    if (message.includes('customize') || message.includes('brand') || message.includes('theme') || message.includes('color')) {
+      return "To customize your booking page branding:\n1. Edit your booking page\n2. Use the customization options:\n   • Choose a theme (Ocean Blue, Sunset, etc.)\n   • Select primary color\n   • Pick background style\n   • Upload your logo\n   • Choose font family\n3. Preview your changes in real-time\n4. Save when you're happy with the look!";
+    }
+
+    // Set availability
+    if (message.includes('availability') || message.includes('hours') || (message.includes('set') && message.includes('time'))) {
+      return "To set your availability:\n1. Edit your booking page\n2. Scroll to 'Business Hours'\n3. Set hours for each day:\n   • Enter opening time (e.g., 9:00)\n   • Enter closing time (e.g., 17:00)\n   • Or mark as 'Closed' for days off\n4. Save your changes\n\nCustomers can only book during your available hours!";
+    }
+
+    // Share booking link
+    if (message.includes('share') || message.includes('link') || message.includes('url')) {
+      return "To share your booking page:\n1. Go to 'Booking Pages'\n2. Find your published page\n3. Click 'Copy Link' button\n4. Share the link via:\n   • Your website\n   • Social media\n   • Email signature\n   • Business cards\n\nAnyone with the link can book your services!";
+    }
+
+    // View statistics - only show when specifically asking for stats
+    if (message.includes('show') && (message.includes('stats') || message.includes('analytics') || message.includes('revenue'))) {
       if (statsError) {
         return "I'm having trouble loading your analytics data right now. Please try again in a moment, or check the Analytics section directly.";
       }
@@ -117,7 +141,8 @@ export default function SupportBot() {
       return response;
     }
 
-    if (message.includes('page') || message.includes('pages')) {
+    // View pages info
+    if (message.includes('show') && (message.includes('page') || message.includes('pages'))) {
       if (pagesError) {
         return "I'm having trouble loading your booking pages right now. Please try again in a moment, or check the Booking Pages section directly.";
       }
@@ -141,83 +166,100 @@ export default function SupportBot() {
       return response;
     }
 
-    if (message.includes('help') || message.includes('what can you do')) {
-      return `I can help you with:\n\n• Account & subscription info\n• Analytics & statistics\n• Booking pages overview\n• Pricing & plans\n• General questions about BookingGen\n\nJust ask me anything!`;
+    // Upload logo
+    if (message.includes('upload') && (message.includes('logo') || message.includes('image'))) {
+      return "To upload your logo:\n1. Edit your booking page\n2. Find the 'Logo' section\n3. Click 'Upload Logo'\n4. Select your logo file (JPG, PNG, or SVG)\n5. The logo will appear on your booking page\n6. Save your changes\n\nFor best results, use a square logo with transparent background!";
     }
 
+    // Add payment method
+    if (message.includes('payment') && (message.includes('add') || message.includes('setup') || message.includes('method'))) {
+      return "To add payment processing to your bookings:\n1. Currently, BookingGen tracks payments for record-keeping\n2. You can set prices for your services when creating them\n3. Payment collection happens outside BookingGen\n4. Track your revenue in the Analytics section\n\nFull payment integration coming soon!";
+    }
+
+    // Create booking page
+    if (message.includes('create') && (message.includes('page') || message.includes('booking'))) {
+      return "To create a booking page:\n1. Click 'Booking Pages' in the sidebar\n2. Click 'Create New Page' button\n3. Fill in:\n   • Page title\n   • Tagline\n   • Services you offer\n   • Business hours\n   • Branding (colors, logo, theme)\n4. Click 'Create Page'\n5. Toggle 'Published' to make it live!\n\nYour page will have a unique shareable link!";
+    }
+
+    // Account & subscription
+    if (message.includes('pro') || message.includes('upgrade') || message.includes('subscription')) {
+      if (isPro) {
+        if (isTrialActive) {
+          return "You're currently on a Pro trial! You have access to all premium features. Your trial will automatically convert to a paid subscription unless you cancel.";
+        }
+        return "You're a Pro member! 🌟 You have unlimited access to all features including unlimited booking pages, advanced analytics, and priority support.";
+      }
+      return "You're currently on the Free plan. Upgrade to Pro to unlock unlimited booking pages, advanced analytics, custom branding, and more! Click the upgrade button in the sidebar to get started.";
+    }
+
+    // Trial info
+    if (message.includes('trial')) {
+      if (isTrialActive) {
+        return "You're currently enjoying your 7-day Pro trial! All premium features are unlocked. Remember to add your payment details before the trial ends to continue enjoying Pro benefits.";
+      }
+      if ((profile as any)?.trialStatus === 'used') {
+        return "You've already used your free trial. You can upgrade to Pro anytime to access all premium features!";
+      }
+      if ((profile as any)?.trialStatus === 'available') {
+        return "You're eligible for a 7-day free trial! Click the trial button in the sidebar to activate it and enjoy all Pro features.";
+      }
+      return "Your trial status is currently unavailable. Please contact support for assistance.";
+    }
+
+    // Pricing
     if (message.includes('pricing') || message.includes('price') || message.includes('cost')) {
       return "BookingGen offers a Pro plan at just $14.99/month (50% off the regular price)! This includes unlimited booking pages, unlimited appointments, advanced analytics, custom branding, and priority support. New users can try it free for 7 days!";
     }
 
-    if (message.includes('cancel') || message.includes('cancellation')) {
+    // Cancellation
+    if (message.includes('cancel') && message.includes('subscription')) {
       if (isPro) {
-        return "You can cancel your Pro subscription anytime from the Settings section. If you're on a trial, canceling will stop auto-renewal but you'll keep Pro access until the trial ends.";
+        return "To cancel your subscription:\n1. Go to Settings in the sidebar\n2. Click 'Billing & Payments'\n3. Click 'Cancel Subscription'\n4. Confirm cancellation\n\nYou'll keep Pro access until the end of your billing period!";
       }
       return "You're on the Free plan, so there's nothing to cancel. If you upgrade to Pro, you can cancel anytime with no penalties.";
     }
 
-    if (message.includes('payment') || message.includes('billing')) {
-      if (isPro) {
-        return "Manage your payment methods and billing details in the Settings section. Click 'Billing & Payments' to view your subscription and update payment information.";
-      }
-      return "You're on the Free plan, so there are no billing details yet. When you upgrade to Pro, you'll be able to manage your payment methods in Settings.";
-    }
-
-    if (message.includes('feature') || message.includes('limit')) {
+    // Features & limits
+    if (message.includes('feature') || message.includes('limit') || message.includes('can i')) {
       if (isPro) {
         return "As a Pro member, you have:\n• Unlimited booking pages\n• Unlimited appointments\n• Advanced analytics\n• Custom branding\n• Priority support\n• All future features!";
       }
       return "Free plan includes:\n• 1 booking page\n• Up to 10 appointments/month\n• Basic analytics\n\nUpgrade to Pro for unlimited everything!";
     }
 
-    if (message.includes('contact') || message.includes('support') || message.includes('email')) {
+    // Contact support
+    if (message.includes('contact') || message.includes('support')) {
       return "For personalized support, you can reach our team through the Contact page. We typically respond within 24 hours. Pro members get priority support!";
     }
 
-    if (message.includes('custom domain') || message.includes('domain')) {
+    // Custom domain
+    if (message.includes('domain')) {
       if (isPro) {
         return "You can add a custom domain to your booking pages! Go to Settings and look for the 'Custom Domain' section to set it up.";
       }
       return "Custom domains are a Pro feature. Upgrade to Pro to use your own domain for your booking pages!";
     }
 
-    if (message.includes('notification') || message.includes('email')) {
-      return "BookingGen sends automatic notifications for:\n• New booking requests\n• Appointment confirmations\n• Cancellations\n\nYou can customize these in Settings > Notifications.";
+    // Notifications
+    if (message.includes('notification')) {
+      return "BookingGen sends automatic notifications for:\n• New booking requests\n• Appointment confirmations\n• Appointment rejections\n• Cancellations\n\nCustomers and you get notified via email automatically!";
     }
 
+    // Calendar sync
     if (message.includes('calendar') || message.includes('google calendar') || message.includes('sync')) {
-      return "You can sync your booking pages with Google Calendar! Add your calendar link in the page settings, and all appointments will automatically sync.";
+      return "To sync with Google Calendar:\n1. Edit your booking page\n2. Find 'Calendar Integration'\n3. Add your Google Calendar link\n4. Save changes\n\nAll appointments will sync to your calendar!";
     }
 
-    const faqResponses = [
-      {
-        keywords: ['how', 'create', 'page', 'booking'],
-        response: "To create a booking page: Click 'Create New Page' in the Booking Pages section, customize your page with services, branding, and availability, then publish it!"
-      },
-      {
-        keywords: ['accept', 'appointment', 'approve'],
-        response: "To manage appointments: Go to the Appointments section, review pending bookings, and click Accept or Reject. Customers get notified automatically!"
-      },
-      {
-        keywords: ['share', 'link', 'url'],
-        response: "Each booking page has a unique link you can share. Find it in your Booking Pages list - just copy and share it on your website, social media, or email!"
-      },
-      {
-        keywords: ['theme', 'color', 'brand', 'customize'],
-        response: "Customize your booking page by editing it! You can change colors, themes, fonts, upload your logo, and make it match your brand perfectly."
-      }
-    ];
-
-    for (const faq of faqResponses) {
-      if (faq.keywords.every(keyword => message.includes(keyword))) {
-        return faq.response;
-      }
+    // Help menu
+    if (message.includes('help') || message.includes('what can you do')) {
+      return `I can help you with:\n\n📄 **Booking Pages**\n• Create, edit, delete pages\n• Publish/unpublish pages\n• Customize branding & themes\n• Share booking links\n\n📅 **Appointments**\n• Accept/reject bookings\n• Manage appointments\n• View customer details\n\n⚙️ **Settings**\n• Add services\n• Set availability\n• Upload logo\n• Manage subscription\n\n📊 **Analytics**\n• View statistics\n• Track revenue\n• Monitor conversions\n\nJust ask me anything!`;
     }
 
+    // Fallback
     const casualResponses = [
-      "I'm not sure about that, but I'd be happy to help with your account info, analytics, or booking pages. What would you like to know?",
-      "That's a great question! For detailed assistance, you can contact our support team. I can help you with account stats, pages, and general BookingGen questions.",
-      "I can help you with information about your account, subscription, analytics, and booking pages. Try asking about your stats or pages!"
+      "I'm not sure about that specific question. Try asking about:\n• Creating or editing booking pages\n• Managing appointments\n• Customizing your branding\n• Account settings\n• Or type 'help' to see what I can do!",
+      "That's a great question! For detailed assistance, contact our support team. I can help you with booking pages, appointments, customization, and settings. What would you like to know?",
+      "I can help you with booking pages, appointments, and account settings. Try asking about creating a page, managing bookings, or customizing your brand!"
     ];
 
     return casualResponses[Math.floor(Math.random() * casualResponses.length)];
