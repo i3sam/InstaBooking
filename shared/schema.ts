@@ -139,6 +139,8 @@ export const subscriptions = pgTable("subscriptions", {
   amount: numeric("amount").notNull(),
   startTime: timestamp("start_time"),
   nextBillingTime: timestamp("next_billing_time"),
+  isTrial: boolean("is_trial").default(false),
+  trialEndsAt: timestamp("trial_ends_at"),
   createdAt: timestamp("created_at").default(sql`now()`),
   updatedAt: timestamp("updated_at").default(sql`now()`),
 });

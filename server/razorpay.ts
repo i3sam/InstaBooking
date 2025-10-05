@@ -118,7 +118,7 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
 
     const subscription = await razorpay.subscriptions.create(subscriptionParams) as any;
 
-    // Store subscription details in Supabase
+    // Store subscription details in Supabase (with trial info but don't activate yet)
     await storage.createSubscription({
       id: subscription.id,
       userId: authReq.user.userId,
@@ -126,22 +126,13 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       planName: plan,
       status: subscription.status,
       currency: planConfig.currency,
-      amount: planConfig.amount
+      amount: planConfig.amount,
+      isTrial: isTrial,
+      trialEndsAt: trialEndsAt?.toISOString()
     });
 
-    // Update trial status if this is a trial
-    if (isTrial && trialEndsAt) {
-      await storage.updateProfile(authReq.user.userId, {
-        trialStatus: 'active',
-        trialStartedAt: now.toISOString(),
-        trialEndsAt: trialEndsAt.toISOString(),
-        membershipStatus: 'pro', // Give pro access during trial
-        membershipExpires: trialEndsAt.toISOString()
-      });
-      console.log(`✅ Free trial activated for user ${authReq.user.userId}, ends at ${trialEndsAt.toISOString()}`);
-    }
-
-    console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId} ${isTrial ? '(with 7-day trial)' : ''}`);
+    // DO NOT activate trial here - it will be activated when subscription is authenticated via webhook
+    console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId} ${isTrial ? '(pending trial activation after checkout)' : ''}`);
     
     res.json({
       subscriptionId: subscription.id,
@@ -307,6 +298,12 @@ export async function handleRazorpayWebhook(req: Request, res: Response) {
 
     // Handle subscription events
     switch (event.event) {
+      case 'subscription.authenticated':
+        await handleSubscriptionAuthenticated(event.payload.subscription.entity);
+        break;
+      case 'subscription.activated':
+        await handleSubscriptionAuthenticated(event.payload.subscription.entity);
+        break;
       case 'subscription.charged':
         await handleSubscriptionCharged(event.payload.subscription.entity, event.payload.payment.entity);
         break;
