@@ -125,29 +125,29 @@ export default function Home() {
     {
       name: "Sarah Chen",
       role: "Yoga Instructor",
-      content: "BookingGen transformed my business. I went from managing bookings in spreadsheets to having a professional system that handles everything automatically. My revenue increased 65% in just 3 months!",
+      content: "BookingGen transformed my business. I went from managing bookings in spreadsheets to having a professional system that handles everything automatically. It's been a game-changer for my studio!",
       rating: 5,
       avatar: "SC",
-      metric: "+65% Revenue",
-      timeframe: "3 months"
+      metric: "Time Saver",
+      timeframe: "Daily use"
     },
     {
       name: "David Martinez",
       role: "Therapist",
-      content: "Managing appointments has never been easier! The automated scheduling and reminders save me 10+ hours every week. At just $14.99, it pays for itself with one extra booking per month.",
+      content: "Managing appointments has never been easier! The automated scheduling and reminders have streamlined my entire booking process. At just $14.99, it's an incredible value for what you get.",
       rating: 5,
       avatar: "DM",
-      metric: "10+ Hours Saved",
-      timeframe: "per week"
+      metric: "Highly Efficient",
+      timeframe: "Regular use"
     },
     {
       name: "Elena Rodriguez",
       role: "Personal Trainer",
-      content: "My clients love how easy it is to book sessions. The mobile experience is flawless, and I've seen a 40% increase in bookings since switching. Best investment I've made for my business!",
+      content: "My clients love how easy it is to book sessions. The mobile experience is flawless, and the professional look has really elevated my brand. Best investment I've made for my business!",
       rating: 5,
       avatar: "ER",
-      metric: "+40% Bookings",
-      timeframe: "1st month"
+      metric: "Client Favorite",
+      timeframe: "Daily use"
     }
   ];
 
@@ -201,7 +201,7 @@ export default function Home() {
                 {/* Limited Time Offer Badge */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
                   <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">🎉 LIMITED TIME</span>
-                  Get 7 Days FREE Trial - 50% OFF After Trial
+                  7 Days FREE Trial - Credit Card Required
                 </div>
                 
                 {/* Main Headline */}
@@ -289,7 +289,7 @@ export default function Home() {
                 Start Your 7-Day FREE Trial Today
               </h2>
               <p className="text-xl lg:text-2xl text-blue-100">
-                Full access to all Pro features. Cancel anytime.
+                Credit card required. Full access to all Pro features. Cancel anytime.
               </p>
             </div>
 
@@ -308,9 +308,9 @@ export default function Home() {
                 <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
                   <Zap className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold">Instant ROI</h3>
+                <h3 className="text-2xl font-bold">Great Value</h3>
                 <p className="text-blue-100 text-lg">
-                  Users report 40% more bookings in first month. Pay for itself in days, not months.
+                  Professional booking system at an affordable price. Streamline your business operations effortlessly.
                 </p>
               </div>
 
@@ -336,7 +336,7 @@ export default function Home() {
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
               <p className="text-blue-100 mt-4 text-sm">
-                ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
+                ✓ Credit Card Required • ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
               </p>
             </div>
           </div>
@@ -905,7 +905,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
-              Start your 7-day FREE trial now. Full Pro access. Cancel anytime.
+              Start your 7-day FREE trial now. Credit card required. Full Pro access. Cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
               <Button 
