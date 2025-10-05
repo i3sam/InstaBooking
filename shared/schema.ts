@@ -173,6 +173,15 @@ export const bookingPages = pgTable("booking_pages", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).default(sql`now()`),
 });
 
+export const notes = pgTable("notes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull(),
+  title: text("title").notNull(),
+  content: text("content").default(""),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+});
+
 // Insert schemas (users are managed by Supabase auth)
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -235,6 +244,12 @@ export const insertDemoPageSchema = createInsertSchema(demoPages).omit({
   expiresAt: true,
 });
 
+export const insertNoteSchema = createInsertSchema(notes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types (User type managed by Supabase auth)
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
@@ -254,3 +269,5 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type DemoPage = typeof demoPages.$inferSelect;
 export type InsertDemoPage = z.infer<typeof insertDemoPageSchema>;
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = z.infer<typeof insertNoteSchema>;

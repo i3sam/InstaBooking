@@ -3,6 +3,8 @@ import Sidebar from '@/components/dashboard/sidebar';
 import Overview from '@/components/dashboard/overview';
 import PagesList from '@/components/dashboard/pages-list';
 import AppointmentsList from '@/components/dashboard/appointments-list';
+import CalendarView from '@/components/dashboard/calendar';
+import Notes from '@/components/dashboard/notes';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +35,10 @@ export default function Dashboard() {
         return <AppointmentsList />;
       case 'analytics':
         return <AnalyticsSection />;
+      case 'calendar':
+        return <CalendarView />;
+      case 'notes':
+        return <Notes />;
       case 'settings':
         return <SettingsSection />;
       default:

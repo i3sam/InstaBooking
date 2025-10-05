@@ -999,6 +999,99 @@ export class SupabaseStorage implements IStorage {
       return undefined;
     }
   }
+
+  // ============= NOTES =============
+  
+  async createNote(note: any): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert([{
+          user_id: note.userId,
+          title: note.title,
+          content: note.content || '',
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return this.toCamelCase(data);
+    } catch (error) {
+      console.error('Create note error:', error);
+      throw error;
+    }
+  }
+
+  async getNoteById(id: string): Promise<any | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data ? this.toCamelCase(data) : undefined;
+    } catch (error) {
+      console.error('Get note by ID error:', error);
+      return undefined;
+    }
+  }
+
+  async getNotesByUser(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      return data ? data.map(note => this.toCamelCase(note)) : [];
+    } catch (error) {
+      console.error('Get notes by user error:', error);
+      return [];
+    }
+  }
+
+  async updateNote(id: string, updates: any): Promise<any | undefined> {
+    try {
+      const updateData: any = {
+        updated_at: new Date().toISOString()
+      };
+
+      if (updates.title !== undefined) updateData.title = updates.title;
+      if (updates.content !== undefined) updateData.content = updates.content;
+
+      const { data, error } = await supabase
+        .from('notes')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data ? this.toCamelCase(data) : undefined;
+    } catch (error) {
+      console.error('Update note error:', error);
+      return undefined;
+    }
+  }
+
+  async deleteNote(id: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Delete note error:', error);
+      return false;
+    }
+  }
 }
 
 console.log("✅ SupabaseStorage class ready");

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown, User, ChevronUp, LogOut, Sparkles } from 'lucide-react';
+import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown, User, ChevronUp, LogOut, Sparkles, Calendar, StickyNote } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -36,6 +36,14 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: 'pages', label: 'Booking Pages', icon: FileText },
     { id: 'appointments', label: 'Appointments', icon: CalendarCheck, badge: 0 },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  ];
+
+  const toolsNav = [
+    { id: 'calendar', label: 'Calendar', icon: Calendar },
+    { id: 'notes', label: 'Notes', icon: StickyNote },
+  ];
+
+  const settingsNav = [
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -70,7 +78,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         </div>
         
         <div className="space-y-1">
-          {navigation.slice(1, 3).map((item) => (
+          {navigation.slice(1).map((item) => (
             <button
               key={item.id}
               onClick={() => onSectionChange(item.id)}
@@ -93,8 +101,29 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         </div>
         
         <div className="pt-6 border-t border-white/10 mt-6">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-3">Tools</p>
+          <div className="space-y-1">
+            {toolsNav.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => onSectionChange(item.id)}
+                className={`w-full flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 group ${
+                  activeSection === item.id
+                    ? 'glass-prism-button text-white shadow-lg backdrop-blur-lg mobile-no-blur'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-black/10 hover:backdrop-blur-md mobile-no-blur'
+                }`}
+                data-testid={`nav-${item.id}`}
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                <span className="font-medium">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="pt-6 border-t border-white/10 mt-6">
           <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-3">Settings</p>
-          {navigation.slice(3).map((item) => (
+          {settingsNav.map((item) => (
             <button
               key={item.id}
               onClick={() => onSectionChange(item.id)}

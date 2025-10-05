@@ -679,6 +679,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notes routes
+  app.get("/api/notes", verifyToken, async (req: any, res) => {
+    try {
+      const notes = await storage.getNotesByUser(req.user.userId);
+      res.json(notes);
+    } catch (error) {
+      console.error("Get notes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/notes", verifyToken, async (req: any, res) => {
+    try {
+      const note = await storage.createNote({
+        userId: req.user.userId,
+        title: req.body.title,
+        content: req.body.content
+      });
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Create note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/notes/:id", verifyToken, async (req: any, res) => {
+    try {
+      const note = await storage.getNoteById(req.params.id);
+      if (!note) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+
+      if (note.userId !== req.user.userId) {
+        return res.status(403).json({ message: "Not authorized to update this note" });
+      }
+
+      const updated = await storage.updateNote(req.params.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Update note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/notes/:id", verifyToken, async (req: any, res) => {
+    try {
+      const note = await storage.getNoteById(req.params.id);
+      if (!note) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+
+      if (note.userId !== req.user.userId) {
+        return res.status(403).json({ message: "Not authorized to delete this note" });
+      }
+
+      await storage.deleteNote(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Demo routes
   app.post("/api/demo", async (req, res) => {
     try {

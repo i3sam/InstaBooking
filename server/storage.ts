@@ -66,6 +66,13 @@ export interface IStorage {
   getStaffByPageId(pageId: string): Promise<any[]>;
   updateStaff(id: string, updates: any): Promise<any | undefined>;
   deleteStaff(id: string): Promise<boolean>;
+  
+  // Notes
+  createNote(note: any): Promise<any>;
+  getNoteById(id: string): Promise<any | undefined>;
+  getNotesByUser(userId: string): Promise<any[]>;
+  updateNote(id: string, updates: any): Promise<any | undefined>;
+  deleteNote(id: string): Promise<boolean>;
 }
 
 // Initialize storage instance with SupabaseStorage
