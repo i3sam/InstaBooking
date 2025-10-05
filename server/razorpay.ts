@@ -481,6 +481,19 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
       membershipExpires: expiresAt.toISOString()
     });
 
+    // Create subscription record for tracking purposes (even for one-time payments)
+    // This ensures the billing panel can display subscription information
+    const subscriptionId = `sub_onetime_${razorpayPaymentId}`;
+    await storage.createSubscription({
+      id: subscriptionId,
+      userId: authReq.user.userId,
+      planId: 'one_time_payment',
+      planName: storedOrder.plan,
+      status: 'active',
+      currency: planConfig.currency,
+      amount: planConfig.amount
+    });
+
     console.log(`Successfully upgraded user ${authReq.user.userId} to ${storedOrder.plan} via Razorpay payment ${razorpayPaymentId}`);
 
     res.json({
