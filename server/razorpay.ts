@@ -69,11 +69,19 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       return res.status(503).json({ error: "Razorpay service not available" });
     }
 
-    const { plan = 'pro' } = req.body;
+    const { plan = 'pro', isTrial = false } = req.body;
     const authReq = req as any;
     
     if (!authReq.user || !authReq.user.userId) {
       return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    // Check if user has already used trial
+    if (isTrial) {
+      const profile = await storage.getProfile(authReq.user.userId);
+      if (!profile || profile.trialStatus !== 'available') {
+        return res.status(400).json({ error: "Trial not available for this account" });
+      }
     }
 
     // Server-side pricing
@@ -85,8 +93,13 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
     // Create subscription plan if needed
     const planId = await createSubscriptionPlan(plan, planConfig.amount, planConfig.currency);
 
-    // Create subscription
-    const subscription = await razorpay.subscriptions.create({
+    // Calculate trial dates if trial is requested
+    const now = new Date();
+    const trialEndsAt = isTrial ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : null;
+    const startAtTimestamp = trialEndsAt ? Math.floor(trialEndsAt.getTime() / 1000) : undefined;
+
+    // Create subscription with trial period if applicable
+    const subscriptionParams: any = {
       plan_id: planId,
       customer_notify: 1,
       quantity: 1,
@@ -94,9 +107,16 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       notes: {
         userId: authReq.user.userId,
         plan: plan,
-        serverAmount: planConfig.amount.toString()
+        serverAmount: planConfig.amount.toString(),
+        isTrial: isTrial.toString()
       }
-    }) as any;
+    };
+
+    if (isTrial && startAtTimestamp) {
+      subscriptionParams.start_at = startAtTimestamp;
+    }
+
+    const subscription = await razorpay.subscriptions.create(subscriptionParams) as any;
 
     // Store subscription details in Supabase
     await storage.createSubscription({
@@ -109,14 +129,28 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       amount: planConfig.amount
     });
 
-    console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId}`);
+    // Update trial status if this is a trial
+    if (isTrial && trialEndsAt) {
+      await storage.updateProfile(authReq.user.userId, {
+        trialStatus: 'active',
+        trialStartedAt: now.toISOString(),
+        trialEndsAt: trialEndsAt.toISOString(),
+        membershipStatus: 'pro', // Give pro access during trial
+        membershipExpires: trialEndsAt.toISOString()
+      });
+      console.log(`✅ Free trial activated for user ${authReq.user.userId}, ends at ${trialEndsAt.toISOString()}`);
+    }
+
+    console.log(`✅ Razorpay subscription created: ${subscription.id} for user ${authReq.user.userId} ${isTrial ? '(with 7-day trial)' : ''}`);
     
     res.json({
       subscriptionId: subscription.id,
       planId: planId,
       status: subscription.status,
       short_url: subscription.short_url,
-      key: RAZORPAY_KEY_ID
+      key: RAZORPAY_KEY_ID,
+      isTrial: isTrial,
+      trialEndsAt: trialEndsAt?.toISOString()
     });
   } catch (error) {
     console.error("Failed to create Razorpay subscription:", error);
@@ -323,10 +357,19 @@ async function handleSubscriptionCharged(subscription: any, payment: any) {
       }
     });
 
-    await storage.updateProfile(storedSub.userId, {
+    // Check if user is on trial and mark it as used
+    const profile = await storage.getProfile(storedSub.userId);
+    const updateData: any = {
       membershipStatus: 'pro',
       membershipExpires: expiresAt.toISOString()
-    });
+    };
+
+    if (profile && profile.trialStatus === 'active') {
+      updateData.trialStatus = 'used';
+      console.log(`✅ Trial ended and converted to paid subscription for user ${storedSub.userId}`);
+    }
+
+    await storage.updateProfile(storedSub.userId, updateData);
 
     // Update subscription status in database
     await storage.updateSubscription(subscription.id, {
