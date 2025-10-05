@@ -5,6 +5,7 @@ import PagesList from '@/components/dashboard/pages-list';
 import AppointmentsList from '@/components/dashboard/appointments-list';
 import CalendarView from '@/components/dashboard/calendar';
 import Notes from '@/components/dashboard/notes';
+import SupportBot from '@/components/dashboard/support-bot';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -1014,6 +1015,8 @@ function SettingsSection() {
         isOpen={showBillingModal} 
         onClose={() => setShowBillingModal(false)} 
       />
+
+      <SupportBot />
     </div>
   );
 }
