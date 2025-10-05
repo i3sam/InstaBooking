@@ -87,8 +87,11 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
     status: 'active',
     planId: 'pro',
     plan: 'pro',
-    // Calculate start date: 30 days before the expiration date
-    createdAt: profile.membershipExpires ? new Date(new Date(profile.membershipExpires).getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString() : new Date().toISOString(),
+    // Calculate start date: 1 year before the expiration date (or current date if expiration is in the past)
+    createdAt: profile.membershipExpires ? new Date(Math.min(
+      new Date(profile.membershipExpires).getTime() - (365 * 24 * 60 * 60 * 1000),
+      Date.now()
+    )).toISOString() : new Date().toISOString(),
     amount: 14.99,
     currency: 'USD',
     nextBillingDate: profile.membershipExpires
@@ -105,9 +108,19 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
           title: "Subscription cancelled",
           description: "Your subscription will remain active until the end of your billing period.",
         });
+        onClose();
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to cancel subscription');
+        // If no active subscription found, show a helpful message
+        if (response.status === 404) {
+          toast({
+            title: "Unable to cancel",
+            description: "No active subscription found. Please contact support for assistance.",
+            variant: "destructive",
+          });
+        } else {
+          throw new Error(errorData.error || 'Failed to cancel subscription');
+        }
       }
     } catch (error: any) {
       toast({
