@@ -541,7 +541,34 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
       });
     }
 
-    // Cancel with Razorpay - cancel at end of billing cycle
+    // Check if this is a one-time payment subscription (not a recurring Razorpay subscription)
+    const isOneTimePayment = activeSubscription.planId === 'one_time_payment' || 
+                            activeSubscription.id?.startsWith('sub_onetime_');
+
+    if (isOneTimePayment) {
+      // For one-time payments, simply update the subscription status and profile
+      // No need to call Razorpay API since this wasn't a recurring subscription
+      await storage.updateSubscription(activeSubscription.id, {
+        status: 'cancelled'
+      });
+
+      // Downgrade user immediately since one-time payments don't have billing cycles
+      await storage.updateProfile(authReq.user.userId, {
+        membershipStatus: 'free',
+        membershipPlan: null,
+        membershipExpires: null
+      });
+
+      console.log(`✅ One-time payment subscription cancelled: ${activeSubscription.id} for user ${authReq.user.userId}`);
+      
+      return res.json({
+        success: true,
+        message: "Your Pro membership has been cancelled.",
+        subscriptionId: activeSubscription.id
+      });
+    }
+
+    // Cancel with Razorpay - cancel at end of billing cycle (for recurring subscriptions)
     await razorpay.subscriptions.cancel(activeSubscription.id, {
       cancel_at_cycle_end: true
     } as any);
