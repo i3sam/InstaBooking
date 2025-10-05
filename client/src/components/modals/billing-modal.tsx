@@ -87,7 +87,8 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
     status: 'active',
     planId: 'pro',
     plan: 'pro',
-    createdAt: profile.membershipExpires ? new Date(new Date(profile.membershipExpires).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString() : new Date().toISOString(),
+    // Calculate start date: 30 days before the expiration date
+    createdAt: profile.membershipExpires ? new Date(new Date(profile.membershipExpires).getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString() : new Date().toISOString(),
     amount: 14.99,
     currency: 'USD',
     nextBillingDate: profile.membershipExpires
@@ -342,7 +343,10 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
                         </p>
                         <Button
                           variant="outline"
-                          onClick={() => window.open('mailto:support@bookinggen.com', '_blank')}
+                          onClick={() => {
+                            onClose();
+                            window.location.href = '/contact';
+                          }}
                           data-testid="button-contact-support"
                         >
                           Contact Support

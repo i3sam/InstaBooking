@@ -525,11 +525,14 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
 
     // Get user's active subscriptions
     const userSubscriptions = await storage.getSubscriptionsByUser(authReq.user.userId);
+    console.log('User subscriptions:', JSON.stringify(userSubscriptions, null, 2));
+    
     const activeSubscription = userSubscriptions.find(sub => 
-      sub.status === 'active' || sub.status === 'ACTIVE'
+      sub.status?.toLowerCase() === 'active'
     );
 
     if (!activeSubscription) {
+      console.log('No active subscription found. Available subscriptions:', userSubscriptions.map(s => ({ id: s.id, status: s.status })));
       return res.status(404).json({ error: "No active subscription found" });
     }
 
