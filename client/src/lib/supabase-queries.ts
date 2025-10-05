@@ -158,7 +158,28 @@ export async function getUserPages() {
       return [];
     }
 
-    return data || [];
+    // Convert snake_case to camelCase for frontend consistency
+    return (data || []).map((page: any) => ({
+      ...page,
+      ownerId: page.owner_id,
+      logoUrl: page.logo_url,
+      primaryColor: page.primary_color,
+      backgroundType: page.background_type,
+      backgroundValue: page.background_value,
+      fontFamily: page.font_family,
+      calendarLink: page.calendar_link,
+      locationLink: page.location_link,
+      acceptReviews: page.accept_reviews,
+      businessHours: page.business_hours,
+      contactPhone: page.contact_phone,
+      contactEmail: page.contact_email,
+      businessAddress: page.business_address,
+      cancellationPolicy: page.cancellation_policy,
+      showBusinessHours: page.show_business_hours,
+      showContactInfo: page.show_contact_info,
+      createdAt: page.created_at,
+      updatedAt: page.updated_at
+    }));
   } catch (error) {
     console.error('Error in getUserPages:', error);
     return [];
