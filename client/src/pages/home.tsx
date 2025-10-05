@@ -808,7 +808,7 @@ export default function Home() {
                   What happens after my 7-day free trial ends?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-base leading-relaxed">
-                  After your trial ends, you'll be prompted to choose a plan. There's no automatic charge. You can upgrade to Pro for just $14.99/month (50% OFF regular price) or continue with limited features on the free plan. You're in complete control.
+                  After your 7-day trial ends, you'll automatically be charged $14.99/month for the Pro plan. Your card information is securely stored when you activate your trial. You can cancel anytime during your trial to avoid charges, or cancel your subscription later with no cancellation fees.
                 </AccordionContent>
               </AccordionItem>
 
