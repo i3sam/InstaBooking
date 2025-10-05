@@ -201,23 +201,7 @@ export default function Home() {
                 {/* Limited Time Offer Badge */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
                   <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">🎉 LIMITED TIME</span>
-                  Get 7 Days FREE - No Credit Card Required
-                </div>
-                
-                {/* Social Proof Stats */}
-                <div className="flex flex-wrap justify-center gap-6 sm:gap-12 text-center animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                  <div>
-                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">10,000+</div>
-                    <div className="text-sm text-muted-foreground mt-1">Active Businesses</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">500K+</div>
-                    <div className="text-sm text-muted-foreground mt-1">Bookings Processed</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl sm:text-4xl font-bold text-blue-gradient">98%</div>
-                    <div className="text-sm text-muted-foreground mt-1">Customer Satisfaction</div>
-                  </div>
+                  Get 7 Days FREE Trial - 50% OFF After Trial
                 </div>
                 
                 {/* Main Headline */}
@@ -232,7 +216,7 @@ export default function Home() {
                 
                 {/* Subtitle */}
                 <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto animate-slide-in-right break-words">
-                  Join 10,000+ service professionals who increased their bookings by 40% on average. Create stunning booking pages in minutes, not hours.
+                  Create stunning, professional booking pages in minutes. Increase your bookings and grow your revenue effortlessly.
                 </p>
                 
                 {/* CTA Buttons */}
@@ -261,10 +245,6 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-muted-foreground pt-6">
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3" />
-                    <strong className="text-foreground">No Credit Card Required</strong>
-                  </div>
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-green-500 mr-3" />
                     7-Day FREE Trial
                   </div>
                   <div className="flex items-center">
@@ -274,6 +254,10 @@ export default function Home() {
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-green-500 mr-3" />
                     Setup in 5 Minutes
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-green-500 mr-3" />
+                    Just $14.99/mo After Trial
                   </div>
                 </div>
               </div>
@@ -305,7 +289,7 @@ export default function Home() {
                 Start Your 7-Day FREE Trial Today
               </h2>
               <p className="text-xl lg:text-2xl text-blue-100">
-                No credit card required. Full access to all Pro features. Cancel anytime.
+                Full access to all Pro features. Cancel anytime.
               </p>
             </div>
 
@@ -348,11 +332,11 @@ export default function Home() {
                 className="bg-white text-blue-600 hover:bg-blue-50 px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target font-bold"
                 data-testid="button-trial-cta"
               >
-                Claim Your FREE 7-Day Trial Now
+                Start Your FREE 7-Day Trial Now
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
               <p className="text-blue-100 mt-4 text-sm">
-                ✓ No Credit Card Required • ✓ Full Pro Access • ✓ Cancel Anytime
+                ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
               </p>
             </div>
           </div>
@@ -460,7 +444,7 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center">
                         <Check className="h-4 w-4 text-green-500 mr-2" />
-                        No credit card
+                        Free demo preview
                       </div>
                       <div className="flex items-center">
                         <Check className="h-4 w-4 text-green-500 mr-2" />
@@ -812,10 +796,10 @@ export default function Home() {
             <Accordion type="single" collapsible className="space-y-4">
               <AccordionItem value="item-1" className="glass-prism-card border border-border/50 rounded-lg px-6">
                 <AccordionTrigger className="text-left text-lg font-semibold hover:text-primary">
-                  Do I really need a credit card for the free trial?
+                  Do I need a credit card for the free trial?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-base leading-relaxed">
-                  Absolutely not! Our 7-day free trial requires NO credit card. You get full access to all Pro features without any payment information. After the trial, you can choose to upgrade to continue using BookingGen.
+                  Yes, a credit card is required to start your 7-day free trial. This ensures uninterrupted access to all Pro features. You won't be charged during the trial period, and you can cancel anytime before it ends with no charges.
                 </AccordionContent>
               </AccordionItem>
 
@@ -911,17 +895,17 @@ export default function Home() {
           <div className="text-center max-w-5xl mx-auto animate-fade-in-up">
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 rounded-full text-white text-sm font-semibold shadow-lg mb-8 animate-pulse">
               <span className="bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-md mr-3">⏰ LIMITED OFFER</span>
-              Join 10,000+ Happy Customers Today
+              50% OFF - Only $14.99/Month
             </div>
             
             <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 leading-tight">
               Ready to{' '}
               <span className="text-blue-gradient">
-                Boost Your Bookings by 40%?
+                Transform Your Booking Process?
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
-              Start your 7-day FREE trial now. No credit card required. Full Pro access. Cancel anytime.
+              Start your 7-day FREE trial now. Full Pro access. Cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
               <Button 
@@ -947,11 +931,11 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-12 text-lg text-muted-foreground">
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
-                <strong className="text-foreground">No Credit Card Required</strong>
+                7-Day FREE Trial
               </div>
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
-                7-Day FREE Trial
+                Full Pro Access
               </div>
               <div className="flex items-center">
                 <Check className="h-6 w-6 text-green-500 mr-3" />
