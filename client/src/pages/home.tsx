@@ -202,7 +202,7 @@ export default function Home() {
                 {/* Limited Time Offer Badge */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
                   <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">🎉 LIMITED TIME</span>
-                  7 Days FREE Trial - Credit Card Required
+                  7 Days FREE Trial
                 </div>
                 
                 {/* Main Headline */}
@@ -290,7 +290,7 @@ export default function Home() {
                 Start Your 7-Day FREE Trial Today
               </h2>
               <p className="text-xl lg:text-2xl text-blue-100">
-                Credit card required. Full access to all Pro features. Cancel anytime.
+                Full access to all Pro features. Cancel anytime.
               </p>
             </div>
 
@@ -337,7 +337,7 @@ export default function Home() {
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
               <p className="text-blue-100 mt-4 text-sm">
-                ✓ Credit Card Required • ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
+                ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
               </p>
             </div>
           </div>
@@ -955,7 +955,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-xl lg:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto">
-              Start your 7-day FREE trial now. Credit card required. Full Pro access. Cancel anytime.
+              Start your 7-day FREE trial now. Full Pro access. Cancel anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-scale-in content-layer" style={{animationDelay: '0.3s'}}>
               <Button 
