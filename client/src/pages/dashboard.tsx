@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -831,26 +832,42 @@ function SettingsSection() {
             {profile?.membershipStatus === 'pro' ? (
               <div className="space-y-6">
                 {/* Plan Status */}
-                <div className="glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6">
+                <div className={`glass-prism backdrop-blur-md ${(profile as any)?.trialStatus === 'active' ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20' : 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20'} rounded-xl p-6`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 glass-prism rounded-xl flex items-center justify-center mr-3 backdrop-blur-md bg-green-500/20 border border-green-500/30">
-                        <Crown className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <div className={`w-10 h-10 glass-prism rounded-xl flex items-center justify-center mr-3 backdrop-blur-md ${(profile as any)?.trialStatus === 'active' ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-green-500/20 border border-green-500/30'}`}>
+                        {(profile as any)?.trialStatus === 'active' ? (
+                          <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                        ) : (
+                          <Crown className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        )}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-800 dark:text-gray-100">Pro Plan</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-gray-800 dark:text-gray-100">
+                            {(profile as any)?.trialStatus === 'active' ? 'Free Trial' : 'Pro Plan'}
+                          </h4>
+                          {(profile as any)?.trialStatus === 'active' && (
+                            <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30 text-xs">
+                              Trial
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">All features unlocked</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-green-600 dark:text-green-400 font-medium mb-1 flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <div className={`text-sm font-medium mb-1 flex items-center ${(profile as any)?.trialStatus === 'active' ? 'text-purple-600 dark:text-purple-400' : 'text-green-600 dark:text-green-400'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-2 ${(profile as any)?.trialStatus === 'active' ? 'bg-purple-500' : 'bg-green-500'}`}></div>
                         Active
                       </div>
                       {profile?.membershipExpires && (
                         <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                           <Calendar className="h-3 w-3 mr-1" />
-                          Renews {new Date(profile.membershipExpires).toLocaleDateString()}
+                          {(profile as any)?.trialStatus === 'active' 
+                            ? `Trial ends ${new Date(profile.membershipExpires).toLocaleDateString()}`
+                            : `Renews ${new Date(profile.membershipExpires).toLocaleDateString()}`
+                          }
                         </p>
                       )}
                     </div>

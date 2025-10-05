@@ -326,6 +326,75 @@ export async function handleRazorpayWebhook(req: Request, res: Response) {
 }
 
 // Webhook event handlers
+async function handleSubscriptionAuthenticated(subscription: any) {
+  try {
+    const storedSub = await storage.getSubscription(subscription.id);
+    if (!storedSub) {
+      console.warn(`Subscription ${subscription.id} not found in database`);
+      return;
+    }
+
+    // CRITICAL: Only activate if subscription status is 'authenticated' or 'active'
+    // This prevents activation when user abandons checkout
+    if (subscription.status !== 'authenticated' && subscription.status !== 'active') {
+      console.log(`Subscription ${subscription.id} status is ${subscription.status}, not activating yet`);
+      await storage.updateSubscription(subscription.id, {
+        status: subscription.status
+      });
+      return;
+    }
+
+    const profile = await storage.getProfile(storedSub.userId);
+    if (!profile) {
+      console.warn(`Profile not found for user ${storedSub.userId}`);
+      return;
+    }
+
+    // Check if this is a trial subscription
+    if (storedSub.isTrial) {
+      // Only activate trial if user hasn't used it already
+      if (profile.trialStatus !== 'available') {
+        console.warn(`Trial not available for user ${storedSub.userId}, current status: ${profile.trialStatus}`);
+        return;
+      }
+
+      // Calculate trial dates
+      const now = new Date();
+      const trialEndsAt = storedSub.trialEndsAt ? new Date(storedSub.trialEndsAt) : new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      // Activate trial
+      await storage.updateProfile(storedSub.userId, {
+        membershipStatus: 'pro',
+        membershipExpires: trialEndsAt.toISOString(),
+        trialStatus: 'active',
+        trialStartedAt: now.toISOString(),
+        trialEndsAt: trialEndsAt.toISOString()
+      });
+
+      console.log(`✅ Free trial activated for user ${storedSub.userId}, ends at ${trialEndsAt.toISOString()}`);
+    } else {
+      // Regular subscription (non-trial)
+      const planConfig = PLAN_PRICING[storedSub.planName];
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
+
+      await storage.updateProfile(storedSub.userId, {
+        membershipStatus: 'pro',
+        membershipExpires: expiresAt.toISOString()
+      });
+
+      console.log(`✅ Subscription activated for user ${storedSub.userId}`);
+    }
+
+    // Update subscription status in database
+    await storage.updateSubscription(subscription.id, {
+      status: subscription.status
+    });
+  } catch (error) {
+    console.error('Failed to handle subscription authentication:', error);
+  }
+}
+
 async function handleSubscriptionCharged(subscription: any, payment: any) {
   try {
     const storedSub = await storage.getSubscription(subscription.id);

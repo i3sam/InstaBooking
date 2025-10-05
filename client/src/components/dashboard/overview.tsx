@@ -43,6 +43,19 @@ export default function Overview({ onSectionChange }: OverviewProps) {
 
   // Check if user is eligible for trial
   const isTrialAvailable = profile && (profile as any).trialStatus === 'available' && profile.membershipStatus !== 'pro';
+  
+  // Check if user is currently on a trial
+  const isOnTrial = profile && (profile as any).trialStatus === 'active' && profile.membershipStatus === 'pro';
+  
+  // Calculate days remaining in trial
+  const getDaysRemaining = () => {
+    if (!isOnTrial || !(profile as any).trialEndsAt) return 0;
+    const now = new Date();
+    const trialEnd = new Date((profile as any).trialEndsAt);
+    const diffTime = trialEnd.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
 
   // Fetch dashboard statistics
   const { data: dashboardStats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
@@ -191,6 +204,45 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         isOpen={isTrialModalOpen}
         onClose={() => setIsTrialModalOpen(false)}
       />
+
+      {/* Active Trial Banner */}
+      {isOnTrial && (
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-purple-500/15 via-blue-500/15 to-purple-500/15 border-purple-300/50 dark:border-purple-600/50 shadow-2xl mb-8 animate-slide-down" data-testid="banner-active-trial">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-purple-300/50 dark:border-purple-600/50">
+                  <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    Free Trial Active
+                  </h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {getDaysRemaining() > 0 ? (
+                      <>
+                        <span className="font-semibold text-purple-600 dark:text-purple-400">{getDaysRemaining()} {getDaysRemaining() === 1 ? 'day' : 'days'}</span> remaining in your trial
+                        {(profile as any).trialEndsAt && (
+                          <> • Ends {new Date((profile as any).trialEndsAt).toLocaleDateString()}</>
+                        )}
+                      </>
+                    ) : (
+                      'Your trial is ending soon'
+                    )}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => onSectionChange?.('settings')}
+                className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg border border-purple-300/50 dark:border-purple-600/50 font-semibold"
+                data-testid="button-upgrade-from-trial"
+              >
+                Upgrade to Pro
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
