@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X } from 'lucide-react';
+import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
@@ -47,9 +47,12 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   // Check if user is currently on a trial
   const isOnTrial = profile && (profile as any).trialStatus === 'active' && profile.membershipStatus === 'pro';
   
+  // Check if user has a cancelled trial (still has access until it expires)
+  const isCancelledTrial = profile && (profile as any).trialStatus === 'cancelled' && profile.membershipStatus === 'pro';
+  
   // Calculate days remaining in trial
   const getDaysRemaining = () => {
-    if (!isOnTrial || !(profile as any).trialEndsAt) return 0;
+    if ((!isOnTrial && !isCancelledTrial) || !(profile as any).trialEndsAt) return 0;
     const now = new Date();
     const trialEnd = new Date((profile as any).trialEndsAt);
     const diffTime = trialEnd.getTime() - now.getTime();
@@ -238,6 +241,45 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                 data-testid="button-upgrade-from-trial"
               >
                 Upgrade to Pro
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cancelled Trial Banner - User still has access until trial ends */}
+      {isCancelledTrial && (
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-orange-500/15 via-red-500/15 to-orange-500/15 border-orange-300/50 dark:border-orange-600/50 shadow-2xl mb-8 animate-slide-down" data-testid="banner-cancelled-trial">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-orange-500/30 to-red-500/30 border border-orange-300/50 dark:border-orange-600/50">
+                  <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
+                    Trial Cancelled
+                  </h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {getDaysRemaining() > 0 ? (
+                      <>
+                        You still have <span className="font-semibold text-orange-600 dark:text-orange-400">{getDaysRemaining()} {getDaysRemaining() === 1 ? 'day' : 'days'}</span> of Pro access
+                        {(profile as any).trialEndsAt && (
+                          <> • Ends {new Date((profile as any).trialEndsAt).toLocaleDateString()}</>
+                        )}
+                      </>
+                    ) : (
+                      'Your trial access is ending soon'
+                    )}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => onSectionChange?.('settings')}
+                className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-orange-100 via-orange-200 to-orange-300 dark:from-orange-800 dark:via-orange-700 dark:to-orange-600 hover:from-orange-200 hover:via-orange-300 hover:to-orange-400 dark:hover:from-orange-700 dark:hover:via-orange-600 dark:hover:to-orange-500 text-orange-800 dark:text-orange-100 shadow-lg border border-orange-300/50 dark:border-orange-600/50 font-semibold"
+                data-testid="button-upgrade-from-cancelled-trial"
+              >
+                Upgrade to Keep Access
               </Button>
             </div>
           </CardContent>

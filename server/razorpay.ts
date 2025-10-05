@@ -658,7 +658,7 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
 
     // Check if this is a trial subscription
     if (activeSubscription.isTrial) {
-      // For trials, cancel immediately and downgrade user since no payment has been made
+      // For trials, cancel the subscription but keep access until trial ends
       
       // Cancel with Razorpay
       await razorpay.subscriptions.cancel(activeSubscription.id);
@@ -668,22 +668,21 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
         status: 'cancelled'
       });
 
-      // Get user profile and update trial status
+      // Get user profile
       const profile = await storage.getProfile(authReq.user.userId);
       
-      // Downgrade user immediately and mark trial as used (they started it but cancelled)
+      // Mark trial as cancelled but keep Pro access until trial end date
+      // The user keeps access until trialEndsAt, then the system will downgrade them
       await storage.updateProfile(authReq.user.userId, {
-        membershipStatus: 'free',
-        membershipPlan: null,
-        membershipExpires: null,
-        trialStatus: 'used' // Mark trial as used so they can't activate it again
+        trialStatus: 'cancelled' // Mark as cancelled, not "used"
+        // Keep membershipStatus as 'pro', membershipExpires as is - user has access until trial ends
       });
 
-      console.log(`✅ Trial subscription cancelled: ${activeSubscription.id} for user ${authReq.user.userId}`);
+      console.log(`✅ Trial subscription cancelled: ${activeSubscription.id} for user ${authReq.user.userId} - access continues until ${profile?.trialEndsAt}`);
       
       return res.json({
         success: true,
-        message: "Your free trial has been cancelled.",
+        message: "Your free trial has been cancelled. You'll continue to have Pro access until your trial ends.",
         subscriptionId: activeSubscription.id
       });
     }
