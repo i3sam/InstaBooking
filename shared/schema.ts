@@ -11,6 +11,9 @@ export const profiles = pgTable("profiles", {
   membershipStatus: text("membership_status").default("free"), // free | demo | pro
   membershipPlan: text("membership_plan"),
   membershipExpires: timestamp("membership_expires"),
+  trialStatus: text("trial_status").default("available"), // available | active | used | expired
+  trialStartedAt: timestamp("trial_started_at"),
+  trialEndsAt: timestamp("trial_ends_at"),
 });
 
 export const pages = pgTable("pages", {
