@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface RazorpaySubscriptionButtonProps {
   plan?: string;
+  isTrial?: boolean;
   onSuccess?: (subscriptionId: string) => void;
   onError?: (error: any) => void;
   onCancel?: () => void;
@@ -23,6 +24,7 @@ declare global {
 
 export default function RazorpaySubscriptionButton({
   plan = 'pro',
+  isTrial = false,
   onSuccess,
   onError,
   onCancel,
@@ -61,7 +63,8 @@ export default function RazorpaySubscriptionButton({
 
       // Create subscription on backend
       const response = await apiRequest('POST', '/api/razorpay/subscriptions', {
-        plan: plan
+        plan: plan,
+        isTrial: isTrial
       });
 
       if (!response.ok) {
@@ -76,7 +79,7 @@ export default function RazorpaySubscriptionButton({
         key: subscriptionData.key,
         subscription_id: subscriptionData.subscriptionId,
         name: 'BookingGen Pro',
-        description: 'Monthly Pro Subscription - $14.99/month',
+        description: isTrial ? '7-Day Free Trial - Then $14.99/month' : 'Monthly Pro Subscription - $14.99/month',
         handler: async (response: any) => {
           try {
             console.log('Razorpay subscription response:', response);
@@ -93,8 +96,8 @@ export default function RazorpaySubscriptionButton({
             }
             
             toast({
-              title: "Subscription Created!",
-              description: "Your monthly Pro subscription is now active.",
+              title: isTrial ? "Free Trial Activated!" : "Subscription Created!",
+              description: isTrial ? "Your 7-day free trial has started. You won't be charged until the trial ends." : "Your monthly Pro subscription is now active.",
             });
 
             if (onSuccess) {
