@@ -80,6 +80,19 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
     sub.status === 'active' || sub.status === 'ACTIVE'
   );
 
+  // Fallback: Create a pseudo-subscription from profile data if user has Pro status but no subscription record
+  // This handles legacy users who upgraded before subscription records were created for one-time payments
+  const displaySubscription = activeSubscription || (profile?.membershipStatus === 'pro' && profile?.membershipExpires ? {
+    subscriptionId: 'legacy',
+    status: 'active',
+    planId: 'pro',
+    plan: 'pro',
+    createdAt: profile.membershipExpires ? new Date(new Date(profile.membershipExpires).getTime() - 30 * 24 * 60 * 60 * 1000).toISOString() : new Date().toISOString(),
+    amount: 14.99,
+    currency: 'USD',
+    nextBillingDate: profile.membershipExpires
+  } : null);
+
   const handleCancelSubscription = async () => {
     setCancelLoading(true);
     try {
@@ -163,7 +176,7 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Loading subscription details...</span>
                     </div>
-                  ) : profile?.membershipStatus === 'pro' && activeSubscription ? (
+                  ) : profile?.membershipStatus === 'pro' && displaySubscription ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
@@ -171,8 +184,8 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
                           <p className="text-gray-600 dark:text-gray-400">All features unlocked</p>
                         </div>
                         <div className="text-right">
-                          {getStatusBadge(activeSubscription.status)}
-                          <p className="text-2xl font-bold mt-1">{formatPrice(activeSubscription.amount)}<span className="text-sm font-normal text-gray-500">/month</span></p>
+                          {getStatusBadge(displaySubscription.status)}
+                          <p className="text-2xl font-bold mt-1">{formatPrice(displaySubscription.amount)}<span className="text-sm font-normal text-gray-500">/month</span></p>
                         </div>
                       </div>
                       
@@ -192,7 +205,7 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
                           <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                           <div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">Plan started</p>
-                            <p className="font-medium">{activeSubscription.createdAt ? formatDate(activeSubscription.createdAt) : 'N/A'}</p>
+                            <p className="font-medium">{displaySubscription.createdAt ? formatDate(displaySubscription.createdAt) : 'N/A'}</p>
                           </div>
                         </div>
                       </div>
@@ -291,7 +304,7 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {profile?.membershipStatus === 'pro' && activeSubscription ? (
+                  {profile?.membershipStatus === 'pro' && displaySubscription ? (
                     <div className="space-y-4">
                       <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                         <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Cancel Subscription</h4>
