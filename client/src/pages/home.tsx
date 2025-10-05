@@ -35,7 +35,8 @@ import {
   Coffee,
   Scissors,
   Monitor,
-  Calendar
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
 
 export default function Home() {
@@ -717,6 +718,55 @@ export default function Home() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Preview Booking Page Section */}
+      <section className="relative py-24 overflow-hidden bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-blue-950/30 dark:via-background dark:to-purple-950/30">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMjggMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHpNOCAzNGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
+        
+        <div className="relative container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
+            <div className="space-y-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                Still confused?{' '}
+                <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Take a look at a booking page yourself
+                </span>
+                {' '}to see how it looks
+              </h2>
+              <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Experience a real booking page in action and see exactly what your customers will interact with
+              </p>
+            </div>
+
+            <div className="flex justify-center pt-6">
+              <Button
+                size="lg"
+                onClick={() => window.open('https://www.bookinggen.xyz/marcos-hair-salon', '_blank')}
+                className="glass-prism-button px-10 py-6 rounded-full text-lg h-auto font-bold shadow-lg hover:shadow-xl transition-all duration-300 min-touch-target group"
+                data-testid="button-preview-booking-page"
+              >
+                <ExternalLink className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                Preview Booking Page
+              </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm text-muted-foreground pt-4">
+              <div className="flex items-center">
+                <Check className="h-4 w-4 text-green-500 mr-2" />
+                Live example page
+              </div>
+              <div className="flex items-center">
+                <Check className="h-4 w-4 text-green-500 mr-2" />
+                No signup needed
+              </div>
+              <div className="flex items-center">
+                <Check className="h-4 w-4 text-green-500 mr-2" />
+                See it in action
+              </div>
+            </div>
           </div>
         </div>
       </section>
