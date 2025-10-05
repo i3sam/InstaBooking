@@ -79,7 +79,7 @@ export default function BillingModal({ isOpen, onClose }: BillingModalProps) {
 
   const activeSubscription = subscriptions?.find((sub: SubscriptionDetails) => {
     const status = sub.status?.toLowerCase();
-    return status === 'active' || status === 'authenticated' || sub.isTrial;
+    return status === 'active' || status === 'authenticated' || status === 'created' || sub.isTrial;
   });
 
   // Fallback: Create a pseudo-subscription from profile data if user has Pro status but no subscription record

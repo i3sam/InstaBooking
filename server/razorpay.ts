@@ -636,10 +636,11 @@ export async function cancelRazorpaySubscription(req: Request, res: Response) {
     const userSubscriptions = await storage.getSubscriptionsByUser(authReq.user.userId);
     console.log('User subscriptions:', JSON.stringify(userSubscriptions, null, 2));
     
-    // Find subscription that's active, authenticated, or on trial
+    // Find subscription that's active, authenticated, created, or on trial
+    // "created" status means user started checkout but may not have completed it yet
     const activeSubscription = userSubscriptions.find(sub => {
       const status = sub.status?.toLowerCase();
-      return status === 'active' || status === 'authenticated' || sub.isTrial;
+      return status === 'active' || status === 'authenticated' || status === 'created' || sub.isTrial;
     });
 
     if (!activeSubscription) {
