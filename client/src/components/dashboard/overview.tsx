@@ -520,6 +520,10 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                     rescheduled: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                   };
 
+                  // Find the page this appointment belongs to
+                  const appointmentPage = (userPages || []).find(page => page.id === apt.pageId);
+                  const pageTitle = appointmentPage?.title || 'Unknown Page';
+
                   return (
                     <div 
                       key={apt.id || index} 
@@ -539,7 +543,13 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                           <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                             {apt.serviceName || 'Service'}
                           </p>
-                          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
+                          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500 flex-wrap">
+                            {selectedPageId === 'all' && (
+                              <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                                <FileText className="h-3 w-3" />
+                                {pageTitle}
+                              </span>
+                            )}
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               {dateLabel}
