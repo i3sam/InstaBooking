@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle } from 'lucide-react';
+import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle, TrendingUp, Percent } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
 import { useAuth } from '@/hooks/use-auth';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeSubscription';
 import TrialActivationModal from '@/components/modals/trial-activation-modal';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface OverviewProps {
   onSectionChange?: (section: string) => void;
@@ -29,6 +30,12 @@ interface RecentActivity {
   description: string;
   time: string;
   status: string;
+}
+
+interface AnalyticsCharts {
+  bookingTrend: Array<{ date: string; bookings: number; revenue: number }>;
+  statusDistribution: Array<{ name: string; value: number; color: string }>;
+  revenueData: Array<{ status: string; revenue: number; color: string }>;
 }
 
 export default function Overview({ onSectionChange }: OverviewProps) {
@@ -72,24 +79,54 @@ export default function Overview({ onSectionChange }: OverviewProps) {
     enabled: true
   });
 
+  // Fetch analytics charts data
+  const { data: analyticsCharts, isLoading: chartsLoading } = useQuery<AnalyticsCharts>({
+    queryKey: ['/api/dashboard/analytics-charts'],
+    enabled: true
+  });
+
   const stats = [
     {
       title: "Booking Pages",
       value: statsLoading ? "..." : (dashboardStats?.pagesCount?.toString() || "0"),
       icon: FileText,
-      color: "bg-primary/10 text-primary"
+      color: "bg-primary/10 text-primary",
+      gradient: "from-blue-500/20 to-purple-500/20"
     },
     {
       title: "Total Bookings",
       value: statsLoading ? "..." : (dashboardStats?.totalAppointments?.toString() || "0"),
       icon: CalendarCheck,
-      color: "bg-green-100 text-green-600"
+      color: "bg-green-100 text-green-600",
+      gradient: "from-green-500/20 to-cyan-500/20"
     },
     {
       title: "Pending",
       value: statsLoading ? "..." : (dashboardStats?.pendingAppointments?.toString() || "0"),
       icon: Clock,
-      color: "bg-orange-100 text-orange-600"
+      color: "bg-orange-100 text-orange-600",
+      gradient: "from-orange-500/20 to-yellow-500/20"
+    },
+    {
+      title: "Total Revenue",
+      value: statsLoading ? "..." : formatPrice(dashboardStats?.totalRevenue || 0),
+      icon: DollarSign,
+      color: "bg-emerald-100 text-emerald-600",
+      gradient: "from-emerald-500/20 to-teal-500/20"
+    },
+    {
+      title: "Conversion Rate",
+      value: statsLoading ? "..." : `${dashboardStats?.conversionRate || 0}%`,
+      icon: Percent,
+      color: "bg-purple-100 text-purple-600",
+      gradient: "from-purple-500/20 to-pink-500/20"
+    },
+    {
+      title: "Avg Booking Value",
+      value: statsLoading ? "..." : formatPrice(dashboardStats?.avgBookingValue || 0),
+      icon: TrendingUp,
+      color: "bg-blue-100 text-blue-600",
+      gradient: "from-blue-500/20 to-indigo-500/20"
     }
   ];
 
@@ -287,7 +324,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       )}
 
       {/* Stats Grid */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
         {statsError ? (
           <div className="col-span-full">
             <Card className="border-red-200">
@@ -300,21 +337,142 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         ) : (
           stats.map((stat, index) => (
             <Card key={index} className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-scale-in">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br ${stat.color.includes('primary') ? 'from-blue-500/20 to-purple-500/20' : stat.color.includes('green') ? 'from-green-500/20 to-cyan-500/20' : 'from-orange-500/20 to-yellow-500/20'} border border-white/30 flex items-center justify-center`}>
-                    <stat.icon className="h-6 w-6" />
+              <CardContent className="p-4 lg:p-6">
+                <div className="flex items-center justify-between mb-3 lg:mb-4">
+                  <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br ${stat.gradient} border border-white/30 flex items-center justify-center`}>
+                    <stat.icon className="h-5 w-5 lg:h-6 lg:w-6" />
                   </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent" data-testid={`stat-${stat.title.toLowerCase().replace(' ', '-')}`}>
+                  <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent" data-testid={`stat-${stat.title.toLowerCase().replace(/ /g, '-')}`}>
                     {stat.value}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">{stat.title}</h3>
+                <h3 className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300">{stat.title}</h3>
               </CardContent>
             </Card>
           ))
         )}
       </div>
+
+      {/* Charts Section */}
+      {!chartsLoading && analyticsCharts && (analyticsCharts.bookingTrend.length > 0 || analyticsCharts.statusDistribution.length > 0) && (
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          {/* Booking Trend Chart */}
+          {analyticsCharts.bookingTrend.length > 0 && (
+            <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Booking Trends (Last 30 Days)</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={analyticsCharts.bookingTrend}>
+                    <defs>
+                      <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#888" 
+                      tick={{ fill: '#888', fontSize: 12 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        borderRadius: '8px',
+                        backdropFilter: 'blur(10px)'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="bookings" 
+                      stroke="#3b82f6" 
+                      fillOpacity={1} 
+                      fill="url(#colorBookings)"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Status Distribution Chart */}
+          {analyticsCharts.statusDistribution.length > 0 && (
+            <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Appointment Status</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={analyticsCharts.statusDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {analyticsCharts.statusDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        borderRadius: '8px',
+                        backdropFilter: 'blur(10px)'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Revenue Chart (full width if exists) */}
+      {!chartsLoading && analyticsCharts && analyticsCharts.revenueData.length > 0 && (
+        <div className="mb-8">
+          <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Revenue by Status</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={analyticsCharts.revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis 
+                    dataKey="status" 
+                    stroke="#888" 
+                    tick={{ fill: '#888', fontSize: 12 }}
+                  />
+                  <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: '8px',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                    formatter={(value) => formatPrice(Number(value))}
+                  />
+                  <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
+                    {analyticsCharts.revenueData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
