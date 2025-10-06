@@ -85,6 +85,12 @@ export default function Overview({ onSectionChange }: OverviewProps) {
     enabled: true
   });
 
+  // Fetch appointments for calendar preview
+  const { data: appointments, isLoading: appointmentsLoading } = useQuery<any[]>({
+    queryKey: ['/api/appointments'],
+    enabled: true
+  });
+
   const stats = [
     {
       title: "Booking Pages",
@@ -196,6 +202,21 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       }
     }
   ];
+
+  // Get upcoming appointments for calendar preview
+  const upcomingAppointments = (appointments || [])
+    .filter(apt => {
+      const appointmentDate = new Date(apt.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return appointmentDate >= today;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    })
+    .slice(0, 5);
 
   return (
     <div className="animate-fade-in-up">
@@ -354,87 +375,180 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       </div>
 
       {/* Charts Section */}
-      {!chartsLoading && analyticsCharts && (analyticsCharts.bookingTrend.length > 0 || analyticsCharts.statusDistribution.length > 0) && (
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
-          {/* Booking Trend Chart */}
-          {analyticsCharts.bookingTrend.length > 0 && (
-            <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Booking Trends (Last 30 Days)</h3>
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={analyticsCharts.bookingTrend}>
-                    <defs>
-                      <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#888" 
-                      tick={{ fill: '#888', fontSize: 12 }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                    />
-                    <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        borderRadius: '8px',
-                        backdropFilter: 'blur(10px)'
-                      }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="bookings" 
-                      stroke="#3b82f6" 
-                      fillOpacity={1} 
-                      fill="url(#colorBookings)"
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        {/* Booking Trend Chart */}
+        {!chartsLoading && analyticsCharts && analyticsCharts.bookingTrend.length > 0 && (
+          <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Booking Trends (Last 30 Days)</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={analyticsCharts.bookingTrend}>
+                  <defs>
+                    <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#888" 
+                    tick={{ fill: '#888', fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: '8px',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="bookings" 
+                    stroke="#3b82f6" 
+                    fillOpacity={1} 
+                    fill="url(#colorBookings)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
 
-          {/* Status Distribution Chart */}
-          {analyticsCharts.statusDistribution.length > 0 && (
-            <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Appointment Status</h3>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={analyticsCharts.statusDistribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
+        {/* Calendar Preview */}
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Upcoming Appointments</h3>
+              <Button
+                onClick={() => onSectionChange?.('calendar')}
+                variant="ghost"
+                size="sm"
+                className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 text-gray-800 dark:text-gray-100"
+                data-testid="button-view-full-calendar"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                View Full Calendar
+              </Button>
+            </div>
+            
+            <div className="space-y-3 max-h-[250px] overflow-y-auto">
+              {appointmentsLoading ? (
+                <div className="text-center py-8">
+                  <div className="text-2xl mb-2">⏳</div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Loading appointments...</p>
+                </div>
+              ) : upcomingAppointments.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-2">📅</div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">No upcoming appointments</p>
+                  <Button
+                    onClick={() => onSectionChange?.('pages')}
+                    variant="link"
+                    size="sm"
+                    className="mt-2 text-blue-600 dark:text-blue-400"
+                    data-testid="button-create-page"
+                  >
+                    Create a booking page
+                  </Button>
+                </div>
+              ) : (
+                upcomingAppointments.map((apt, index) => {
+                  const appointmentDate = new Date(apt.date);
+                  const isToday = appointmentDate.toDateString() === new Date().toDateString();
+                  const isTomorrow = appointmentDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
+                  
+                  let dateLabel = appointmentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  if (isToday) dateLabel = 'Today';
+                  if (isTomorrow) dateLabel = 'Tomorrow';
+                  
+                  const statusColors: Record<string, string> = {
+                    pending: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
+                    accepted: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+                    declined: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+                    rescheduled: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  };
+
+                  return (
+                    <div 
+                      key={apt.id || index} 
+                      className="glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/20 rounded-lg p-3 hover:bg-white/10 dark:hover:bg-black/10 transition-all duration-200"
+                      data-testid={`calendar-preview-appointment-${index}`}
                     >
-                      {analyticsCharts.statusDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        borderRadius: '8px',
-                        backdropFilter: 'blur(10px)'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                              {apt.customerName}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[apt.status] || statusColors.pending}`}>
+                              {apt.status}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            {apt.serviceName || 'Service'}
+                          </p>
+                          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {dateLabel}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {apt.time}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Status Distribution Chart */}
+      {!chartsLoading && analyticsCharts && analyticsCharts.statusDistribution.length > 0 && (
+        <div className="mb-8">
+          <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift animate-fade-in">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">Appointment Status Distribution</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={analyticsCharts.statusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {analyticsCharts.statusDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      borderRadius: '8px',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
       )}
 
