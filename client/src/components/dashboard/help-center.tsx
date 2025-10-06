@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { HelpCircle, BookOpen, MessageCircle, Search, ChevronRight, Sparkles, Clock, TrendingUp, Calendar, Palette, BarChart, ArrowRight, CheckCircle, Star, ChevronDown } from 'lucide-react';
+import { HelpCircle, BookOpen, MessageCircle, Search, ChevronRight, Sparkles, Clock, TrendingUp, Calendar, Palette, BarChart, ArrowRight, CheckCircle, Star, ChevronDown, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -308,6 +308,16 @@ export default function HelpCenter() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [activeTab, setActiveTab] = useState('guides');
+  const [botMessages, setBotMessages] = useState<Array<{ id: string; type: 'user' | 'bot'; content: string; timestamp: Date }>>([
+    {
+      id: '1',
+      type: 'bot',
+      content: "👋 Hi! I'm your BookingGen assistant. I'm here to help you with pages, appointments, and settings. How can I help you today?",
+      timestamp: new Date()
+    }
+  ]);
+  const [botInput, setBotInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const blogCategories = Array.from(new Set(blogPosts.map(post => post.category)));
   const faqCategories = Array.from(new Set(faqs.map(faq => faq.category)));
@@ -329,6 +339,66 @@ export default function HelpCenter() {
     acc[category] = filteredFAQs.filter(faq => faq.category === category);
     return acc;
   }, {} as Record<string, FAQ[]>);
+
+  const getBotResponse = (userMessage: string): string => {
+    const message = userMessage.toLowerCase().trim();
+
+    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+      return `Hello! 👋 How can I assist you today?`;
+    }
+
+    if (message.includes('create') && message.includes('page')) {
+      return "To create a booking page:\n1. Click 'Booking Pages' in the sidebar\n2. Click 'Create New Page'\n3. Fill in your details, services, and branding\n4. Click 'Create Page'\n5. Toggle 'Published' to make it live!";
+    }
+
+    if (message.includes('appointment') || message.includes('booking')) {
+      return "To manage appointments:\n1. Go to 'Appointments' in the sidebar\n2. View pending, accepted, and rejected bookings\n3. Accept or reject appointments\n4. Customers get automatic notifications!";
+    }
+
+    if (message.includes('customize') || message.includes('brand') || message.includes('theme')) {
+      return "To customize your page:\n1. Edit your booking page\n2. Choose a theme (Ocean Blue, Sunset, etc.)\n3. Select colors and upload your logo\n4. Preview changes in real-time\n5. Save when ready!";
+    }
+
+    if (message.includes('help') || message.includes('what can you do')) {
+      return "I can help you with:\n\n📄 Booking Pages - Create, edit, customize\n📅 Appointments - Accept, reject, manage\n⚙️ Settings - Services, availability, branding\n📊 Analytics - Stats, revenue, conversions\n\nJust ask me anything!";
+    }
+
+    return "I'm here to help! Try asking about:\n• Creating booking pages\n• Managing appointments\n• Customizing branding\n• Or type 'help' to see what I can do!";
+  };
+
+  const handleBotSend = () => {
+    if (!botInput.trim()) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      type: 'user' as const,
+      content: botInput,
+      timestamp: new Date()
+    };
+
+    setBotMessages(prev => [...prev, userMessage]);
+
+    setTimeout(() => {
+      const botResponse = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot' as const,
+        content: getBotResponse(botInput),
+        timestamp: new Date()
+      };
+      setBotMessages(prev => [...prev, botResponse]);
+    }, 500);
+
+    setBotInput('');
+  };
+
+  const handleQuickQuestion = (question: string) => {
+    setBotInput(question);
+    setTimeout(() => handleBotSend(), 100);
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [botMessages]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -578,82 +648,144 @@ export default function HelpCenter() {
               <CardHeader>
                 <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  Quick Help
+                  Quick Actions
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="glass-prism p-4 rounded-xl">
-                  <div className="flex items-start gap-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                  onClick={() => handleQuickQuestion('How do I create a booking page?')}
+                  data-testid="quick-action-create-page"
+                >
+                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
                       <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">24/7 Support Bot</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Get instant answers to common questions about pages, appointments, and settings.
-                      </p>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Create Booking Page</h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Get started with your first page</p>
                     </div>
                   </div>
-                </div>
+                </Button>
                 
-                <div className="glass-prism p-4 rounded-xl">
-                  <div className="flex items-start gap-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                  onClick={() => handleQuickQuestion('How do I manage appointments?')}
+                  data-testid="quick-action-appointments"
+                >
+                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Browse FAQs</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Find answers to frequently asked questions organized by category.
-                      </p>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Manage Appointments</h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Accept and organize bookings</p>
                     </div>
                   </div>
-                </div>
+                </Button>
 
-                <div className="glass-prism p-4 rounded-xl">
-                  <div className="flex items-start gap-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                  onClick={() => handleQuickQuestion('How do I customize my branding?')}
+                  data-testid="quick-action-branding"
+                >
+                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
                       <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Smart Responses</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Our bot learns from your questions to provide better, personalized help.
-                      </p>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Customize Branding</h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Match your business style</p>
                     </div>
                   </div>
-                </div>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                  onClick={() => setActiveTab('faqs')}
+                  data-testid="quick-action-browse-faqs"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Browse FAQs</h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Find answers by category</p>
+                    </div>
+                  </div>
+                </Button>
               </CardContent>
             </Card>
 
             <div className="lg:col-span-2">
               <Card className="glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-white/20 shadow-2xl h-full animate-slide-in-right mobile-no-blur">
-                <CardHeader>
-                  <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                    Chat with Support Bot
-                  </CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Ask anything about BookingGen - from creating pages to managing appointments
-                  </p>
+                <CardHeader className="border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 glass-prism rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                      <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                        Support Assistant
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Ask anything about BookingGen
+                      </p>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[500px] flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto bg-gradient-to-br from-blue-500/20 to-purple-500/20 animate-pulse">
-                        <MessageCircle className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <CardContent className="p-0 flex flex-col h-[500px]">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {botMessages.map(message => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-2xl p-3 ${
+                            message.type === 'user'
+                              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                              : 'glass-prism text-gray-800 dark:text-gray-200'
+                          }`}
+                          data-testid={`bot-message-${message.type}-${message.id}`}
+                        >
+                          <p className="text-sm whitespace-pre-line break-words">{message.content}</p>
+                          <p className={`text-xs mt-1 ${message.type === 'user' ? 'opacity-70' : 'opacity-60'}`}>
+                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                          Support Bot Available
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          Click the support bot icon in the bottom right corner to start chatting
-                        </p>
-                        <Button className="glass-prism-button text-white shadow-lg" data-testid="button-open-support-hint">
-                          <ArrowRight className="h-4 w-4 mr-2" />
-                          Look for the chat icon
-                        </Button>
-                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+                  <div className="border-t border-white/10 p-4">
+                    <div className="flex gap-2">
+                      <Input
+                        value={botInput}
+                        onChange={(e) => setBotInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleBotSend();
+                          }
+                        }}
+                        placeholder="Ask me anything..."
+                        className="flex-1 glass-prism bg-white/5 border-white/20"
+                        data-testid="input-bot-message"
+                      />
+                      <Button
+                        onClick={handleBotSend}
+                        size="sm"
+                        className="glass-prism-button text-white"
+                        data-testid="button-send-bot-message"
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
