@@ -5,6 +5,7 @@ import PagesList from '@/components/dashboard/pages-list';
 import AppointmentsList from '@/components/dashboard/appointments-list';
 import CalendarView from '@/components/dashboard/calendar';
 import Notes from '@/components/dashboard/notes';
+import HelpCenter from '@/components/dashboard/help-center';
 import SupportBot from '@/components/dashboard/support-bot';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,6 +41,8 @@ export default function Dashboard() {
         return <CalendarView />;
       case 'notes':
         return <Notes />;
+      case 'help-center':
+        return <HelpCenter />;
       case 'settings':
         return <SettingsSection />;
       default:
