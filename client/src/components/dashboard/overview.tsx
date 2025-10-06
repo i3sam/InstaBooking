@@ -427,7 +427,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Upcoming Appointments</h3>
               <Button
-                onClick={() => onSectionChange?.('calendar')}
+                onClick={() => onSectionChange?.('appointments')}
                 variant="ghost"
                 size="sm"
                 className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20 text-gray-800 dark:text-gray-100"
