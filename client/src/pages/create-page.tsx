@@ -152,6 +152,9 @@ export default function CreatePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics-charts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-activity'] });
       toast({
         title: "Page created!",
         description: "Your booking page has been created successfully.",

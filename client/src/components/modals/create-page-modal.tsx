@@ -211,6 +211,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/pages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/analytics-charts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-activity'] });
       
       // Check if there are warnings about services that couldn't be deleted
       if (data.warnings?.servicesNotDeleted?.length > 0) {
