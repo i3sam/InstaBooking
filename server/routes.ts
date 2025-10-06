@@ -1388,6 +1388,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics chart data route
+  app.get("/api/dashboard/analytics-charts", verifyToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Get all appointments for this user
+      const appointments = await storage.getAppointmentsByOwner(userId);
+      const validAppointments = Array.isArray(appointments) ? appointments : [];
+      
+      // Get the last 30 days
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      
+      // Initialize daily booking data for the last 30 days
+      const dailyBookings: { [key: string]: number } = {};
+      const dailyRevenue: { [key: string]: number } = {};
+      
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dateKey = date.toISOString().split('T')[0];
+        dailyBookings[dateKey] = 0;
+        dailyRevenue[dateKey] = 0;
+      }
+      
+      // Count bookings by creation date (last 30 days)
+      validAppointments.forEach(apt => {
+        if (apt.createdAt) {
+          const createdDate = new Date(apt.createdAt);
+          if (createdDate >= thirtyDaysAgo) {
+            const dateKey = createdDate.toISOString().split('T')[0];
+            if (dailyBookings[dateKey] !== undefined) {
+              dailyBookings[dateKey]++;
+              if (apt.status === 'accepted') {
+                dailyRevenue[dateKey] += Number(apt.price) || 0;
+              }
+            }
+          }
+        }
+      });
+      
+      // Format for chart
+      const bookingTrend = Object.keys(dailyBookings)
+        .sort()
+        .map(date => ({
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          bookings: dailyBookings[date],
+          revenue: Math.round(dailyRevenue[date] * 100) / 100
+        }));
+      
+      // Status distribution
+      const statusCounts = {
+        pending: 0,
+        accepted: 0,
+        declined: 0,
+        rescheduled: 0
+      };
+      
+      validAppointments.forEach(apt => {
+        const status = apt.status || 'pending';
+        if (status in statusCounts) {
+          statusCounts[status as keyof typeof statusCounts]++;
+        }
+      });
+      
+      const statusDistribution = [
+        { name: 'Pending', value: statusCounts.pending, color: '#f97316' },
+        { name: 'Accepted', value: statusCounts.accepted, color: '#10b981' },
+        { name: 'Declined', value: statusCounts.declined, color: '#ef4444' },
+        { name: 'Rescheduled', value: statusCounts.rescheduled, color: '#3b82f6' }
+      ].filter(item => item.value > 0);
+      
+      // Revenue by status
+      const revenueByStatus = {
+        accepted: 0,
+        pending: 0,
+        rescheduled: 0
+      };
+      
+      validAppointments.forEach(apt => {
+        const revenue = Number(apt.price) || 0;
+        if (apt.status === 'accepted') {
+          revenueByStatus.accepted += revenue;
+        } else if (apt.status === 'pending') {
+          revenueByStatus.pending += revenue;
+        } else if (apt.status === 'rescheduled') {
+          revenueByStatus.rescheduled += revenue;
+        }
+      });
+      
+      const revenueData = [
+        { status: 'Accepted', revenue: Math.round(revenueByStatus.accepted * 100) / 100, color: '#10b981' },
+        { status: 'Pending', revenue: Math.round(revenueByStatus.pending * 100) / 100, color: '#f97316' },
+        { status: 'Rescheduled', revenue: Math.round(revenueByStatus.rescheduled * 100) / 100, color: '#3b82f6' }
+      ].filter(item => item.revenue > 0);
+      
+      res.json({
+        bookingTrend,
+        statusDistribution,
+        revenueData
+      });
+    } catch (error) {
+      console.error("Get analytics charts error:", error);
+      res.status(500).json({ 
+        bookingTrend: [],
+        statusDistribution: [],
+        revenueData: []
+      });
+    }
+  });
+
 
   // Razorpay payment routes (conditionally registered)
   if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
