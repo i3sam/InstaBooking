@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle, TrendingUp, Percent } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
@@ -44,6 +45,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   const { user, profile } = useAuth();
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
   const [showTrialBanner, setShowTrialBanner] = useState(true);
+  const [selectedPageId, setSelectedPageId] = useState<string>('all');
 
   // Enable real-time subscriptions for live dashboard updates
   const { isConnected: isRealtimeConnected } = useRealtimeDashboard(user?.id);
@@ -88,6 +90,12 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   // Fetch appointments for calendar preview
   const { data: appointments, isLoading: appointmentsLoading } = useQuery<any[]>({
     queryKey: ['/api/appointments'],
+    enabled: true
+  });
+
+  // Fetch user's booking pages
+  const { data: userPages, isLoading: pagesLoading } = useQuery<any[]>({
+    queryKey: ['/api/pages'],
     enabled: true
   });
 
@@ -203,9 +211,15 @@ export default function Overview({ onSectionChange }: OverviewProps) {
     }
   ];
 
-  // Get upcoming appointments for calendar preview
+  // Get upcoming appointments for calendar preview (filtered by selected page)
   const upcomingAppointments = (appointments || [])
     .filter(apt => {
+      // Filter by selected page
+      if (selectedPageId !== 'all' && apt.pageId !== selectedPageId) {
+        return false;
+      }
+      
+      // Filter for upcoming appointments only
       const appointmentDate = new Date(apt.date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -437,9 +451,32 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                 View Full Calendar
               </Button>
             </div>
+
+            {/* Page Selector */}
+            <div className="mb-4">
+              <Select value={selectedPageId} onValueChange={setSelectedPageId}>
+                <SelectTrigger className="glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 text-gray-800 dark:text-gray-100" data-testid="select-booking-page">
+                  <SelectValue placeholder="Select booking page" />
+                </SelectTrigger>
+                <SelectContent className="glass-prism-card backdrop-blur-xl bg-white/95 dark:bg-gray-900/95 border border-white/20">
+                  <SelectItem value="all" className="cursor-pointer">All Pages</SelectItem>
+                  {pagesLoading ? (
+                    <SelectItem value="loading" disabled>Loading pages...</SelectItem>
+                  ) : (userPages || []).length === 0 ? (
+                    <SelectItem value="none" disabled>No pages yet</SelectItem>
+                  ) : (
+                    (userPages || []).map((page) => (
+                      <SelectItem key={page.id} value={page.id} className="cursor-pointer">
+                        {page.title || 'Untitled Page'}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
             
-            <div className="space-y-3 max-h-[250px] overflow-y-auto">
-              {appointmentsLoading ? (
+            <div className="space-y-3 max-h-[200px] overflow-y-auto">
+              {appointmentsLoading || pagesLoading ? (
                 <div className="text-center py-8">
                   <div className="text-2xl mb-2">⏳</div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Loading appointments...</p>
@@ -447,16 +484,24 @@ export default function Overview({ onSectionChange }: OverviewProps) {
               ) : upcomingAppointments.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">📅</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">No upcoming appointments</p>
-                  <Button
-                    onClick={() => onSectionChange?.('pages')}
-                    variant="link"
-                    size="sm"
-                    className="mt-2 text-blue-600 dark:text-blue-400"
-                    data-testid="button-create-page"
-                  >
-                    Create a booking page
-                  </Button>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {(userPages || []).length === 0 
+                      ? 'Create your first booking page to start receiving appointments'
+                      : selectedPageId === 'all' 
+                        ? 'No upcoming appointments across all pages'
+                        : 'No upcoming appointments for this page'}
+                  </p>
+                  {(userPages || []).length === 0 && (
+                    <Button
+                      onClick={() => onSectionChange?.('pages')}
+                      variant="link"
+                      size="sm"
+                      className="mt-2 text-blue-600 dark:text-blue-400"
+                      data-testid="button-create-page"
+                    >
+                      Create a booking page
+                    </Button>
+                  )}
                 </div>
               ) : (
                 upcomingAppointments.map((apt, index) => {
