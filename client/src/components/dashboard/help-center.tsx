@@ -651,74 +651,74 @@ export default function HelpCenter() {
                   Quick Actions
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+              <CardContent className="p-4 space-y-3">
+                <button
                   onClick={() => handleQuickQuestion('How do I create a booking page?')}
+                  className="w-full p-4 rounded-xl glass-prism border border-white/20 hover:border-blue-500/50 transition-all duration-300 group hover:scale-[1.02] active:scale-[0.98]"
                   data-testid="quick-action-create-page"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-blue-500/50 transition-shadow">
+                      <Star className="h-6 w-6 text-white" />
                     </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Create Booking Page</h4>
+                    <div className="text-left flex-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Create Booking Page</h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Get started with your first page</p>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
                   </div>
-                </Button>
+                </button>
                 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                <button
                   onClick={() => handleQuickQuestion('How do I manage appointments?')}
+                  className="w-full p-4 rounded-xl glass-prism border border-white/20 hover:border-green-500/50 transition-all duration-300 group hover:scale-[1.02] active:scale-[0.98]"
                   data-testid="quick-action-appointments"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-cyan-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-green-500/50 transition-shadow">
+                      <Calendar className="h-6 w-6 text-white" />
                     </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Manage Appointments</h4>
+                    <div className="text-left flex-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">Manage Appointments</h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Accept and organize bookings</p>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:translate-x-1 transition-all" />
                   </div>
-                </Button>
+                </button>
 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                <button
                   onClick={() => handleQuickQuestion('How do I customize my branding?')}
+                  className="w-full p-4 rounded-xl glass-prism border border-white/20 hover:border-purple-500/50 transition-all duration-300 group hover:scale-[1.02] active:scale-[0.98]"
                   data-testid="quick-action-branding"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
+                      <Sparkles className="h-6 w-6 text-white" />
                     </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Customize Branding</h4>
+                    <div className="text-left flex-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Customize Branding</h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Match your business style</p>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
                   </div>
-                </Button>
+                </button>
 
-                <Button
-                  variant="outline"
-                  className="w-full justify-start glass-prism hover:glass-prism-button transition-all"
+                <button
                   onClick={() => setActiveTab('faqs')}
+                  className="w-full p-4 rounded-xl glass-prism border border-white/20 hover:border-orange-500/50 transition-all duration-300 group hover:scale-[1.02] active:scale-[0.98]"
                   data-testid="quick-action-browse-faqs"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-yellow-500/20 flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-yellow-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-orange-500/50 transition-shadow">
+                      <BookOpen className="h-6 w-6 text-white" />
                     </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Browse FAQs</h4>
+                    <div className="text-left flex-1">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Browse FAQs</h4>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Find answers by category</p>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
                   </div>
-                </Button>
+                </button>
               </CardContent>
             </Card>
 
