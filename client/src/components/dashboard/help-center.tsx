@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { HelpCircle, BookOpen, MessageCircle, Search, ChevronRight, Sparkles, Clock, TrendingUp, Calendar, Palette, BarChart, ArrowRight, CheckCircle, Star } from 'lucide-react';
+import { HelpCircle, BookOpen, MessageCircle, Search, ChevronRight, Sparkles, Clock, TrendingUp, Calendar, Palette, BarChart, ArrowRight, CheckCircle, Star, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import SupportBot from './support-bot';
 
 function renderFormattedContent(content: string) {
@@ -527,29 +528,34 @@ export default function HelpCenter() {
                       {category}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {categoryFAQs.map((faq, index) => (
-                      <div
-                        key={faq.id}
-                        className="glass-prism p-5 rounded-xl hover:glass-prism-button transition-all duration-300 group cursor-pointer animate-fade-in"
-                        style={{ animationDelay: `${index * 0.05}s` }}
-                        data-testid={`faq-item-${faq.id}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-white transition-colors">
-                              {faq.question}
-                            </h4>
-                            <p className="text-gray-600 dark:text-gray-400 group-hover:text-white/80 transition-colors leading-relaxed">
+                  <CardContent>
+                    <Accordion type="single" collapsible className="space-y-2">
+                      {categoryFAQs.map((faq, index) => (
+                        <AccordionItem 
+                          key={faq.id} 
+                          value={faq.id}
+                          className="glass-prism rounded-xl border-0 animate-fade-in"
+                          style={{ animationDelay: `${index * 0.05}s` }}
+                          data-testid={`faq-item-${faq.id}`}
+                        >
+                          <AccordionTrigger className="px-5 py-4 hover:no-underline group [&[data-state=open]]:bg-gradient-to-r [&[data-state=open]]:from-blue-500/10 [&[data-state=open]]:to-purple-500/10 rounded-t-xl transition-all">
+                            <div className="flex items-start gap-3 flex-1 text-left">
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
+                                <HelpCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                              </div>
+                              <h4 className="font-semibold text-gray-800 dark:text-gray-100 pr-4">
+                                {faq.question}
+                              </h4>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-5 pb-4 pt-2">
+                            <div className="ml-9 text-gray-700 dark:text-gray-300 leading-relaxed">
                               {faq.answer}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
                   </CardContent>
                 </Card>
               )
