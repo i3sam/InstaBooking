@@ -7,6 +7,120 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SupportBot from './support-bot';
 
+function renderFormattedContent(content: string) {
+  const lines = content.split('\n');
+  
+  return lines.map((line, lineIndex) => {
+    if (!line.trim()) {
+      return <div key={lineIndex} className="h-4" />;
+    }
+
+    let formattedLine = line;
+    const parts: JSX.Element[] = [];
+    let currentText = '';
+    let inBold = false;
+    let key = 0;
+
+    for (let i = 0; i < formattedLine.length; i++) {
+      if (formattedLine[i] === '*' && formattedLine[i + 1] === '*') {
+        if (currentText) {
+          parts.push(
+            inBold ? (
+              <strong key={key++} className="font-bold text-gray-900 dark:text-white">
+                {currentText}
+              </strong>
+            ) : (
+              <span key={key++}>{currentText}</span>
+            )
+          );
+          currentText = '';
+        }
+        inBold = !inBold;
+        i++;
+      } else {
+        currentText += formattedLine[i];
+      }
+    }
+
+    if (currentText) {
+      parts.push(
+        inBold ? (
+          <strong key={key++} className="font-bold text-gray-900 dark:text-white">
+            {currentText}
+          </strong>
+        ) : (
+          <span key={key++}>{currentText}</span>
+        )
+      );
+    }
+
+    const trimmedLine = line.trim();
+    const isNumberedList = /^\d+\./.test(trimmedLine);
+    const isBulletList = trimmedLine.startsWith('•') || trimmedLine.startsWith('-');
+
+    if (isNumberedList) {
+      return (
+        <div key={lineIndex} className="ml-4 mb-2">
+          {parts}
+        </div>
+      );
+    } else if (isBulletList) {
+      const textWithoutBullet = trimmedLine.startsWith('•') ? trimmedLine.slice(1).trim() : trimmedLine.slice(1).trim();
+      
+      const cleanParts: JSX.Element[] = [];
+      let cleanText = '';
+      let inBoldClean = false;
+      let keyClean = 0;
+
+      for (let i = 0; i < textWithoutBullet.length; i++) {
+        if (textWithoutBullet[i] === '*' && textWithoutBullet[i + 1] === '*') {
+          if (cleanText) {
+            cleanParts.push(
+              inBoldClean ? (
+                <strong key={keyClean++} className="font-bold text-gray-900 dark:text-white">
+                  {cleanText}
+                </strong>
+              ) : (
+                <span key={keyClean++}>{cleanText}</span>
+              )
+            );
+            cleanText = '';
+          }
+          inBoldClean = !inBoldClean;
+          i++;
+        } else {
+          cleanText += textWithoutBullet[i];
+        }
+      }
+
+      if (cleanText) {
+        cleanParts.push(
+          inBoldClean ? (
+            <strong key={keyClean++} className="font-bold text-gray-900 dark:text-white">
+              {cleanText}
+            </strong>
+          ) : (
+            <span key={keyClean++}>{cleanText}</span>
+          )
+        );
+      }
+
+      return (
+        <div key={lineIndex} className="ml-4 mb-2 flex items-start">
+          <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+          <span className="flex-1">{cleanParts}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div key={lineIndex} className="mb-3">
+          {parts}
+        </div>
+      );
+    }
+  });
+}
+
 interface BlogPost {
   id: string;
   title: string;
@@ -230,7 +344,7 @@ export default function HelpCenter() {
         <TabsList className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border-white/20 p-1 mobile-no-blur">
           <TabsTrigger 
             value="guides" 
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-gray-700 dark:text-gray-300 data-[state=active]:glass-prism-button data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
             data-testid="tab-guides"
           >
             <BookOpen className="h-4 w-4 mr-2" />
@@ -238,7 +352,7 @@ export default function HelpCenter() {
           </TabsTrigger>
           <TabsTrigger 
             value="faqs" 
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-gray-700 dark:text-gray-300 data-[state=active]:glass-prism-button data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
             data-testid="tab-faqs"
           >
             <HelpCircle className="h-4 w-4 mr-2" />
@@ -246,7 +360,7 @@ export default function HelpCenter() {
           </TabsTrigger>
           <TabsTrigger 
             value="support" 
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-gray-700 dark:text-gray-300 data-[state=active]:glass-prism-button data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
             data-testid="tab-support"
           >
             <MessageCircle className="h-4 w-4 mr-2" />
@@ -273,7 +387,7 @@ export default function HelpCenter() {
                     variant={selectedCategory === 'all' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSelectedCategory('all')}
-                    className={selectedCategory === 'all' ? 'glass-prism-button' : 'glass-prism'}
+                    className={selectedCategory === 'all' ? 'glass-prism-button text-gray-900 dark:text-white' : 'glass-prism text-gray-700 dark:text-gray-300'}
                     data-testid="button-category-all"
                   >
                     All
@@ -284,7 +398,7 @@ export default function HelpCenter() {
                       variant={selectedCategory === category ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => setSelectedCategory(category)}
-                      className={selectedCategory === category ? 'glass-prism-button' : 'glass-prism'}
+                      className={selectedCategory === category ? 'glass-prism-button text-gray-900 dark:text-white' : 'glass-prism text-gray-700 dark:text-gray-300'}
                       data-testid={`button-category-${category.toLowerCase().replace(/\s+/g, '-')}`}
                     >
                       {category}
@@ -325,8 +439,8 @@ export default function HelpCenter() {
               </CardHeader>
               <CardContent>
                 <div className="prose dark:prose-invert max-w-none">
-                  <div className="glass-prism p-6 rounded-xl whitespace-pre-wrap text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {selectedPost.content}
+                  <div className="glass-prism p-6 rounded-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {renderFormattedContent(selectedPost.content)}
                   </div>
                 </div>
               </CardContent>
