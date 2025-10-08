@@ -991,7 +991,7 @@ function SettingsSection() {
               </Button>
               <Button
                 variant="destructive"
-                className="glass-prism backdrop-blur-md bg-red-500/90 dark:bg-red-600/90 border-2 border-red-500 hover:bg-red-600 dark:hover:bg-red-700 text-white font-semibold transition-all duration-300 flex items-center justify-center h-12 w-full shadow-lg hover:shadow-xl"
+                className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white font-semibold transition-all duration-300 flex items-center justify-center h-12 w-full shadow-lg hover:shadow-xl border-0"
                 onClick={() => {
                   logout();
                   setLocation('/');
