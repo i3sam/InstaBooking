@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { getUserAppointments } from '@/lib/supabase-queries';
+import { useAuth } from '@/hooks/use-auth';
 
 type ViewMode = 'month' | 'week' | 'day';
 
@@ -16,9 +18,12 @@ export default function CalendarView() {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const { data: appointments = [] } = useQuery({
-    queryKey: ['/api/appointments'],
+    queryKey: [`user-appointments-${user?.id}`],
+    queryFn: getUserAppointments,
+    enabled: !!user?.id,
   });
 
   const updateAppointmentMutation = useMutation({
@@ -28,7 +33,7 @@ export default function CalendarView() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      queryClient.invalidateQueries({ queryKey: [`user-appointments-${user?.id}`] });
       toast({
         title: 'Success',
         description: 'Appointment updated successfully.',
@@ -119,7 +124,7 @@ export default function CalendarView() {
   const getAppointmentsForDate = (date: Date) => {
     const appointmentsArray = appointments as any[];
     let filtered = appointmentsArray.filter((apt: any) => {
-      const aptDate = new Date(apt.startTime);
+      const aptDate = new Date(apt.date);
       return (
         aptDate.getDate() === date.getDate() &&
         aptDate.getMonth() === date.getMonth() &&
@@ -186,10 +191,12 @@ export default function CalendarView() {
             <span className="text-sm font-medium">{day}</span>
             {hasAppointments && (
               <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-0.5">
-                {dayAppointments.slice(0, 3).map((_: any, i: number) => (
+                {dayAppointments.slice(0, 3).map((apt: any, i: number) => (
                   <div
                     key={i}
-                    className="w-1 h-1 rounded-full bg-blue-500 animate-pulse"
+                    className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                      apt.status === 'accepted' ? 'bg-green-500' : 'bg-blue-500'
+                    }`}
                     style={{ animationDelay: `${i * 0.2}s` }}
                   />
                 ))}
@@ -236,11 +243,15 @@ export default function CalendarView() {
                 {hasAppointments && (
                   <div className="text-xs space-y-1">
                     {dayAppointments.slice(0, 2).map((apt: any, i: number) => (
-                      <div key={i} className="truncate bg-blue-500/20 px-1 py-0.5 rounded">
-                        {new Date(apt.startTime).toLocaleTimeString('en-US', {
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}
+                      <div 
+                        key={i} 
+                        className={`truncate px-1 py-0.5 rounded ${
+                          apt.status === 'accepted' 
+                            ? 'bg-green-500/30 border border-green-500/50' 
+                            : 'bg-blue-500/20'
+                        }`}
+                      >
+                        {apt.time}
                       </div>
                     ))}
                     {dayAppointments.length > 2 && (
@@ -284,19 +295,17 @@ export default function CalendarView() {
                   <h4 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors">
                     {apt.serviceName}
                   </h4>
-                  <Badge variant={apt.status === 'confirmed' ? 'default' : 'secondary'} className="text-xs">
+                  <Badge 
+                    variant={apt.status === 'accepted' ? 'default' : 'secondary'} 
+                    className={`text-xs ${apt.status === 'accepted' ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                  >
                     {apt.status}
                   </Badge>
                 </div>
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 transition-colors">
                   <div className="flex items-center gap-2">
                     <Clock className="h-3.5 w-3.5" />
-                    <span>
-                      {new Date(apt.startTime).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                    <span>{apt.time}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <User className="h-3.5 w-3.5" />
@@ -314,7 +323,7 @@ export default function CalendarView() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => updateAppointmentMutation.mutate({ id: apt.id, status: 'confirmed' })}
+                      onClick={() => updateAppointmentMutation.mutate({ id: apt.id, status: 'accepted' })}
                       className="flex-1 glass-prism-button"
                       data-testid={`button-accept-${apt.id}`}
                     >
@@ -374,7 +383,7 @@ export default function CalendarView() {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="accepted">Accepted</SelectItem>
               <SelectItem value="declined">Declined</SelectItem>
             </SelectContent>
           </Select>
@@ -462,19 +471,17 @@ export default function CalendarView() {
                       <h4 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors">
                         {apt.serviceName}
                       </h4>
-                      <Badge variant={apt.status === 'confirmed' ? 'default' : 'secondary'} className="text-xs">
+                      <Badge 
+                        variant={apt.status === 'accepted' ? 'default' : 'secondary'} 
+                        className={`text-xs ${apt.status === 'accepted' ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                      >
                         {apt.status}
                       </Badge>
                     </div>
                     <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 transition-colors">
                       <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5" />
-                        <span>
-                          {new Date(apt.startTime).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          })}
-                        </span>
+                        <span>{apt.time}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <User className="h-3.5 w-3.5" />
@@ -492,7 +499,7 @@ export default function CalendarView() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => updateAppointmentMutation.mutate({ id: apt.id, status: 'confirmed' })}
+                          onClick={() => updateAppointmentMutation.mutate({ id: apt.id, status: 'accepted' })}
                           disabled={updateAppointmentMutation.isPending}
                           className="flex-1 glass-prism-button"
                           data-testid={`button-accept-appointment-${apt.id}`}
