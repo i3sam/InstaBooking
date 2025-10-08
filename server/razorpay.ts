@@ -426,6 +426,7 @@ async function handleSubscriptionCharged(subscription: any, payment: any) {
       userId: storedSub.userId,
       plan: storedSub.planName,
       amount: (payment.amount / 100).toString(), // Convert from smallest unit
+      currency: planConfig.currency,
       status: "completed",
       paymentId: payment.id,
       paymentMethod: "razorpay_subscription",
@@ -582,6 +583,7 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
       userId: authReq.user.userId,
       plan: storedOrder.plan,
       amount: planConfig.amount.toString(),
+      currency: planConfig.currency,
       status: "completed",
       paymentId: razorpayPaymentId,
       paymentMethod: "razorpay",
