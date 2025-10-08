@@ -203,17 +203,23 @@ export default function AdminPage() {
   };
 
   const fetchRecentPayments = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !adminKey) return;
     
     setIsLoadingPayments(true);
     try {
       const response = await fetch('/api/admin/recent-payments?limit=20', {
+        method: 'GET',
         headers: {
+          'Content-Type': 'application/json',
           'x-admin-key': adminKey,
         },
       });
 
       if (!response.ok) {
+        if (response.status === 403) {
+          setIsAuthenticated(false);
+          throw new Error('Admin key expired or invalid');
+        }
         throw new Error('Failed to fetch recent payments');
       }
 
@@ -221,6 +227,11 @@ export default function AdminPage() {
       setRecentPayments(data.payments || []);
     } catch (error) {
       console.error('Failed to load recent payments:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to load recent payments",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingPayments(false);
     }

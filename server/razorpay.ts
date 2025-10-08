@@ -255,20 +255,38 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
       status: subscription.status
     });
 
-    // If subscription is active and user is not pro, update profile
-    if (subscription.status === 'active') {
+    // If subscription is authenticated or active, activate user membership
+    if (subscription.status === 'authenticated' || subscription.status === 'active') {
       const profile = await storage.getProfile(authReq.user.userId);
       if (profile && profile.membershipStatus !== 'pro') {
-        const planConfig = PLAN_PRICING[storedSub.planName];
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
+        // Check if this is a trial subscription
+        if (storedSub.isTrial && profile.trialStatus === 'available') {
+          // Activate trial
+          const now = new Date();
+          const trialEndsAt = storedSub.trialEndsAt ? new Date(storedSub.trialEndsAt) : new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-        await storage.updateProfile(authReq.user.userId, {
-          membershipStatus: 'pro',
-          membershipExpires: expiresAt.toISOString()
-        });
+          await storage.updateProfile(authReq.user.userId, {
+            membershipStatus: 'pro',
+            membershipExpires: trialEndsAt.toISOString(),
+            trialStatus: 'active',
+            trialStartedAt: now.toISOString(),
+            trialEndsAt: trialEndsAt.toISOString()
+          });
 
-        console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check`);
+          console.log(`✅ Trial activated for user ${authReq.user.userId} via subscription check, ends at ${trialEndsAt.toISOString()}`);
+        } else {
+          // Regular subscription activation
+          const planConfig = PLAN_PRICING[storedSub.planName];
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
+
+          await storage.updateProfile(authReq.user.userId, {
+            membershipStatus: 'pro',
+            membershipExpires: expiresAt.toISOString()
+          });
+
+          console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check`);
+        }
       }
     }
 
