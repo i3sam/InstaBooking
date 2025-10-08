@@ -27,6 +27,7 @@ import RequestFeature from "@/pages/request-feature";
 import HelpCenter from "@/pages/help-center";
 import SubscriptionSuccess from "@/pages/subscription/success";
 import SubscriptionCancel from "@/pages/subscription/cancel";
+import SubscriptionDelays from "@/pages/subscription-delays";
 import AdminPage from "@/pages/admin";
 
 function Router() {
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/help-center" component={HelpCenter} />
       <Route path="/subscription/success" component={SubscriptionSuccess} />
       <Route path="/subscription/cancel" component={SubscriptionCancel} />
+      <Route path="/subscription-delays" component={SubscriptionDelays} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/dashboard">
         <AuthGuard>

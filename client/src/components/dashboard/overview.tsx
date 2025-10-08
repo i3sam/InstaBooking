@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle, TrendingUp, Percent } from 'lucide-react';
+import { FileText, CalendarCheck, Clock, DollarSign, Plus, Calendar, BarChart3, Edit, Check, User, AlertCircle, Wifi, WifiOff, Sparkles, X, XCircle, TrendingUp, Percent, ArrowRight, AlertTriangle } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrency } from '@/hooks/use-currency';
@@ -47,6 +47,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [showTrialBanner, setShowTrialBanner] = useState(true);
+  const [showCautionBanner, setShowCautionBanner] = useState(true);
   const [selectedPageId, setSelectedPageId] = useState<string>('all');
 
   // Enable real-time subscriptions for live dashboard updates
@@ -287,6 +288,44 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
+
+      {/* Subscription Activation Caution Banner */}
+      {showCautionBanner && (
+        <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-yellow-400/20 via-amber-400/20 to-yellow-400/20 border-yellow-500/50 dark:border-yellow-600/50 shadow-2xl mb-8 animate-slide-down relative overflow-hidden" data-testid="banner-subscription-caution">
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/10 via-amber-300/10 to-yellow-300/10 animate-pulse"></div>
+          <CardContent className="p-6 relative z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+              onClick={() => setShowCautionBanner(false)}
+              data-testid="button-close-caution-banner"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-yellow-500/30 to-amber-500/30 border border-yellow-400/50 dark:border-yellow-600/50 animate-pulse">
+                <AlertTriangle className="h-8 w-8 text-yellow-700 dark:text-yellow-400" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-900 to-amber-900 dark:from-yellow-100 dark:to-amber-100 bg-clip-text text-transparent mb-2">
+                  Experiencing High Server Load
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-0">
+                  If you've recently purchased a membership, activated your free trial, or upgraded to Pro, please allow 2-5 minutes for activation. We're experiencing higher than normal traffic and are working to resolve this.
+                </p>
+              </div>
+              <Button
+                onClick={() => setLocation('/subscription-delays')}
+                className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-300 dark:from-yellow-800 dark:via-yellow-700 dark:to-yellow-600 hover:from-yellow-200 hover:via-yellow-300 hover:to-yellow-400 dark:hover:from-yellow-700 dark:hover:via-yellow-600 dark:hover:to-yellow-500 text-yellow-800 dark:text-yellow-100 shadow-lg hover:scale-105 transition-all duration-300 border border-yellow-400/50 dark:border-yellow-600/50 font-semibold h-12 whitespace-nowrap"
+                data-testid="button-read-more-delays"
+              >
+                Read more <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Active Trial Banner */}
       {isOnTrial && (

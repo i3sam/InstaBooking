@@ -233,7 +233,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.location.href = 'mailto:team@bookinggen.xyz'}
+                      onClick={() => {
+                        const subject = encodeURIComponent('Subscription Activation Issue - BookingGen');
+                        const body = encodeURIComponent('Hi BookingGen Team,\n\nI need help with my subscription activation.\n\nPlease provide details about your issue:\n\n');
+                        window.location.href = `mailto:team@bookinggen.xyz?subject=${subject}&body=${body}`;
+                      }}
                       className="bg-yellow-100 dark:bg-yellow-800/50 border-yellow-400 dark:border-yellow-600 text-yellow-900 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-700/50 transition-colors"
                       data-testid="button-contact-us"
                     >
