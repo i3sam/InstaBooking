@@ -253,6 +253,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     // Create profile in our database only if user is immediately confirmed
     if (data.user && data.session) {
       try {
+        // Store token BEFORE making profile creation request
+        localStorage.setItem('token', data.session.access_token);
+        
         await apiRequest('POST', '/api/profile', {
           userId: data.user.id,
           fullName: fullName,
