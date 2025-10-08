@@ -1600,6 +1600,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoints for debugging and support
+  app.get("/api/admin/user-status/:userId", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const userId = req.params.userId;
+      
+      // Get user profile
+      const profile = await storage.getProfile(userId);
+      if (!profile) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get user subscriptions
+      const subscriptions = await storage.getSubscriptionsByUser(userId);
+      
+      // Get user payments
+      const payments = await storage.getPaymentsByUser(userId);
+
+      res.json({
+        profile: {
+          id: profile.id,
+          email: profile.email,
+          fullName: profile.fullName,
+          membershipStatus: profile.membershipStatus,
+          membershipExpires: profile.membershipExpires,
+          trialStatus: profile.trialStatus,
+          trialStartedAt: profile.trialStartedAt,
+          trialEndsAt: profile.trialEndsAt,
+        },
+        subscriptions: subscriptions.map(sub => ({
+          id: sub.id,
+          status: sub.status,
+          planName: sub.planName,
+          amount: sub.amount,
+          currency: sub.currency,
+          isTrial: sub.isTrial,
+          trialEndsAt: sub.trialEndsAt,
+          createdAt: sub.createdAt,
+        })),
+        payments: payments.map(payment => ({
+          id: payment.id,
+          amount: payment.amount,
+          currency: payment.currency,
+          status: payment.status,
+          plan: payment.plan,
+          createdAt: payment.createdAt,
+        })),
+      });
+    } catch (error) {
+      console.error("Admin user status error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin endpoint to generate login token for a user (for debugging)
+  app.post("/api/admin/generate-login-token", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      if (!supabase) {
+        return res.status(503).json({ message: "Supabase not configured" });
+      }
+
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+      }
+
+      // Generate a login link for the user
+      const { data, error } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: userId, // This should be the user's email, but we're using ID
+      });
+
+      if (error) {
+        console.error("Generate login token error:", error);
+        return res.status(500).json({ message: "Failed to generate login token", error: error.message });
+      }
+
+      res.json({
+        message: "Login token generated successfully",
+        loginUrl: data.properties?.action_link,
+        note: "This link can be used to login as the user for debugging purposes"
+      });
+    } catch (error) {
+      console.error("Admin generate token error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
