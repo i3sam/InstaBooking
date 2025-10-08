@@ -84,16 +84,36 @@ export default function RazorpaySubscriptionButton({
           try {
             console.log('Razorpay subscription response:', response);
             
-            // Check subscription status immediately for better UX
-            try {
-              const statusResponse = await apiRequest('GET', `/api/razorpay/subscriptions/${subscriptionData.subscriptionId}`);
-              if (statusResponse.ok) {
-                const statusData = await statusResponse.json();
-                console.log('Subscription status:', statusData);
+            // Check subscription status with retry logic (Razorpay needs time to update status)
+            const checkStatus = async (retries = 3, delay = 2000): Promise<void> => {
+              for (let i = 0; i < retries; i++) {
+                try {
+                  if (i > 0) {
+                    // Wait before retry
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                  }
+                  
+                  const statusResponse = await apiRequest('GET', `/api/razorpay/subscriptions/${subscriptionData.subscriptionId}`);
+                  if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    console.log(`Subscription status check (attempt ${i + 1}):`, statusData);
+                    
+                    // If status is authenticated or active, activation is complete
+                    if (statusData.status === 'authenticated' || statusData.status === 'active') {
+                      console.log('✅ Subscription activated successfully');
+                      return;
+                    }
+                  }
+                } catch (statusError) {
+                  console.warn(`Status check failed (attempt ${i + 1}):`, statusError);
+                }
               }
-            } catch (statusError) {
-              console.warn('Failed to check subscription status:', statusError);
-            }
+              
+              console.warn('Subscription status may still be pending. User will be activated when webhook arrives.');
+            };
+            
+            // Start status check in background
+            checkStatus().catch(err => console.error('Status check error:', err));
             
             toast({
               title: isTrial ? "Free Trial Activated!" : "Subscription Created!",
