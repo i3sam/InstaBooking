@@ -227,12 +227,12 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && adminKey) {
       fetchRecentPayments();
       const interval = setInterval(fetchRecentPayments, 30000);
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, adminKey]);
 
   if (!isAuthenticated) {
     return (
