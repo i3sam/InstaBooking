@@ -416,8 +416,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Extract services from request body before validation
-      const { services, ...pageDataFromRequest } = req.body;
+      // Extract services and staff from request body before validation
+      const { services, staff, ...pageDataFromRequest } = req.body;
       
       // Validate page data (without services)
       const validation = insertPageSchema.safeParse(pageDataFromRequest);
@@ -447,6 +447,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('Creating service with data:', JSON.stringify(service, null, 2));
           await storage.createService({
             ...service,
+            pageId: page.id
+          });
+        }
+      }
+
+      // Create staff members if provided
+      if (staff && Array.isArray(staff)) {
+        for (const staffMember of staff) {
+          await storage.createStaff({
+            ...staffMember,
             pageId: page.id
           });
         }
@@ -507,11 +517,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Page not found" });
       }
 
-      // Extract services from request body
-      const { services, ...pageData } = req.body;
+      // Extract services and staff from request body
+      const { services, staff, ...pageData } = req.body;
 
       // Update page data
       const updated = await storage.updatePage(req.params.id, pageData);
+
+      // Handle staff update if provided
+      if (staff && Array.isArray(staff)) {
+        const existingStaff = await storage.getStaffByPageId(req.params.id);
+        const existingStaffIds = existingStaff.map(s => s.id);
+        const submittedStaffIds = staff.filter(s => s.id).map(s => s.id);
+        
+        // Update existing staff and create new ones
+        for (const staffMember of staff) {
+          if (staffMember.id) {
+            // Security check: Only allow updates to staff that belong to this page
+            if (!existingStaffIds.includes(staffMember.id)) {
+              return res.status(400).json({ 
+                message: "Invalid staff ID", 
+                details: "One or more staff IDs do not belong to this page" 
+              });
+            }
+            // Update existing staff member
+            await storage.updateStaff(staffMember.id, {
+              name: staffMember.name,
+              bio: staffMember.bio,
+              position: staffMember.position,
+              imageUrl: staffMember.imageUrl,
+              email: staffMember.email,
+              phone: staffMember.phone,
+              displayOrder: staffMember.displayOrder,
+              isActive: staffMember.isActive
+            });
+          } else {
+            // Create new staff member
+            await storage.createStaff({
+              ...staffMember,
+              pageId: req.params.id
+            });
+          }
+        }
+        
+        // Handle removed staff
+        const staffToRemove = existingStaffIds.filter(id => !submittedStaffIds.includes(id));
+        for (const staffId of staffToRemove) {
+          await storage.deleteStaff(staffId);
+        }
+      }
 
       // Handle services update if provided
       if (services && Array.isArray(services)) {
