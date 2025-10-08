@@ -65,7 +65,7 @@ export default function Pricing() {
       isPrimary: false,
       badge: null,
       icon: Sparkles,
-      gradient: "from-purple-500/20 to-pink-500/20"
+      gradient: "from-blue-500/20 to-cyan-500/20"
     }
   ];
 
@@ -114,18 +114,18 @@ export default function Pricing() {
       
       {/* Glass Prism Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-overlay pointer-events-none -z-10"></div>
-      <div className="absolute top-20 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-gradient-to-br from-blue-400/20 to-purple-400/20 pointer-events-none -z-10"></div>
-      <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-gradient-to-br from-purple-400/20 to-pink-400/20 pointer-events-none -z-10" style={{animationDelay: '1.5s'}}></div>
-      <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-gradient-to-br from-pink-400/20 to-blue-400/20 pointer-events-none -z-10" style={{animationDelay: '3s'}}></div>
+      <div className="absolute top-20 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-gradient-to-br from-blue-400/20 to-cyan-400/20 pointer-events-none -z-10"></div>
+      <div className="absolute top-32 right-20 w-96 h-96 glass-prism rounded-full opacity-20 animate-float bg-gradient-to-br from-cyan-400/20 to-blue-400/20 pointer-events-none -z-10" style={{animationDelay: '1.5s'}}></div>
+      <div className="absolute bottom-20 left-1/3 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-gradient-to-br from-blue-400/20 to-cyan-400/20 pointer-events-none -z-10" style={{animationDelay: '3s'}}></div>
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative content-layer">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16 animate-fade-in-up">
-            <div className="inline-flex items-center justify-center w-16 h-16 glass-prism rounded-full mb-6 backdrop-blur-md bg-gradient-to-br from-blue-500/30 to-purple-500/30 border border-white/30 animate-pulse">
+            <div className="inline-flex items-center justify-center w-16 h-16 glass-prism rounded-full mb-6 backdrop-blur-md bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/30 animate-pulse">
               <Crown className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-6">
+            <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent mb-6">
               Choose the plan that fits you
             </h1>
             <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
@@ -178,7 +178,7 @@ export default function Pricing() {
                         <p className="text-muted-foreground mb-4">{plan.description}</p>
                         <div className="mb-2">
                           {plan.price === null ? (
-                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                            <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
                               Custom
                             </div>
                           ) : (
@@ -189,7 +189,7 @@ export default function Pricing() {
                                 </div>
                               )}
                               <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                                <span className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
                                   {formatPrice(plan.price)}
                                 </span>
                                 <span className="text-lg font-normal text-muted-foreground">/month</span>
@@ -231,7 +231,7 @@ export default function Pricing() {
 
           {/* Benefits Section */}
           <div className="max-w-5xl mx-auto mb-16 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
               Why Choose BookingGen?
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -256,7 +256,7 @@ export default function Pricing() {
 
           {/* FAQ Section */}
           <div className="max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
@@ -285,13 +285,13 @@ export default function Pricing() {
 
           {/* CTA Section */}
           <div className="max-w-4xl mx-auto mt-16 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-            <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-blue-500/15 via-purple-500/15 to-blue-500/15 border-blue-300/50 dark:border-blue-600/50 shadow-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-blue-400/10 animate-pulse pointer-events-none"></div>
+            <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-blue-500/15 via-cyan-500/15 to-blue-500/15 border-blue-300/50 dark:border-blue-600/50 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-cyan-400/10 to-blue-400/10 animate-pulse pointer-events-none"></div>
               <CardContent className="p-8 md:p-12 text-center relative z-10">
-                <div className="inline-flex items-center justify-center w-16 h-16 glass-prism rounded-full mb-6 backdrop-blur-md bg-gradient-to-br from-blue-500/30 to-purple-500/30 border border-white/30 mx-auto animate-pulse">
+                <div className="inline-flex items-center justify-center w-16 h-16 glass-prism rounded-full mb-6 backdrop-blur-md bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-white/30 mx-auto animate-pulse">
                   <Mail className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
                   Still have questions?
                 </h2>
                 <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">

@@ -190,6 +190,9 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         isTrial={false}
                         onSuccess={handleSubscriptionSuccess}
                         onError={handlePaymentError}
+                        onPaymentStart={() => {
+                          onClose();
+                        }}
                         onCancel={() => {
                           toast({
                             title: "Subscription Cancelled",
