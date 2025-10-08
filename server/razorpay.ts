@@ -418,10 +418,18 @@ async function handleSubscriptionAuthenticated(subscription: any) {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
 
-      await storage.updateProfile(storedSub.userId, {
+      // Check if user has an active trial and mark it as used since they're now on a paid subscription
+      const updateData: any = {
         membershipStatus: 'pro',
         membershipExpires: expiresAt.toISOString()
-      });
+      };
+
+      if (profile.trialStatus === 'active') {
+        updateData.trialStatus = 'used';
+        console.log(`✅ User ${storedSub.userId} upgraded from trial to paid subscription`);
+      }
+
+      await storage.updateProfile(storedSub.userId, updateData);
 
       console.log(`✅ Subscription activated for user ${storedSub.userId} (expires: ${expiresAt.toISOString()})`);
     }
