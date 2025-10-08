@@ -119,6 +119,8 @@ export const paymentsDemo = pgTable("payments_demo", {
   status: text("status"),
   paymentIntentId: text("payment_intent_id"), // Legacy Stripe field
   subscriptionId: text("subscription_id"), // Legacy subscription field
+  paymentId: text("payment_id"), // Razorpay payment ID
+  paymentMethod: text("payment_method"), // Payment method used (razorpay, razorpay_subscription, etc.)
   plan: text("plan"),
   paypalOrderId: text("paypal_order_id"), // Legacy field - PayPal no longer used
   paypalPaymentId: text("paypal_payment_id"), // Legacy field - PayPal no longer used
