@@ -257,7 +257,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                   Start Your 7-Day Free Trial!
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-0">
-                  Experience all Pro features with no charge for 7 days. Cancel anytime.
+                  No credit card required - Experience all Pro features instantly for 7 days!
                 </p>
               </div>
               <Button

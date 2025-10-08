@@ -166,7 +166,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
                 )}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                {isTrialAvailable ? 'Try Pro free for 7 days' : 'Upgrade to Pro to access all features'}
+                {isTrialAvailable ? '7 days free - No card required' : 'Upgrade to Pro to access all features'}
               </p>
               <Button 
                 className={`w-full ${isTrialAvailable ? 'glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 border border-purple-300/50 dark:border-purple-600/50' : 'glass-prism-button text-white'} shadow-lg text-xs h-9 font-semibold`}

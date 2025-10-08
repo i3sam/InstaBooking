@@ -287,7 +287,7 @@ const faqs: FAQ[] = [
     id: '13',
     category: 'Account',
     question: 'How does the 7-day free trial work?',
-    answer: "If you're eligible, activate your free trial from the sidebar. Enjoy all Pro features for 7 days with no payment required upfront. If you love it, add payment details to continue; otherwise, you'll revert to Starter."
+    answer: "Activate your free trial instantly from the sidebar - no credit card required! Enjoy all Pro features for 7 days completely free. After the trial, you can choose to upgrade to Pro for $14.99/month or continue with the free plan."
   },
   {
     id: '14',

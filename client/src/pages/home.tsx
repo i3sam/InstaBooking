@@ -849,7 +849,7 @@ export default function Home() {
                   Do I need a credit card for the free trial?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-base leading-relaxed">
-                  Yes, a credit card is required to start your 7-day free trial. This ensures uninterrupted access to all Pro features. You won't be charged during the trial period, and you can cancel anytime before it ends with no charges.
+                  No credit card required! Start your 7-day free trial instantly with just your email. Experience all Pro features with no payment information needed. It's completely free, no strings attached.
                 </AccordionContent>
               </AccordionItem>
 
@@ -858,7 +858,7 @@ export default function Home() {
                   What happens after my 7-day free trial ends?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-base leading-relaxed">
-                  After your 7-day trial ends, you'll automatically be charged $14.99/month for the Pro plan. Your card information is securely stored when you activate your trial. You can cancel anytime during your trial to avoid charges, or cancel your subscription later with no cancellation fees.
+                  After your 7-day trial ends, you can choose to upgrade to Pro for $14.99/month to continue enjoying all features. There's no automatic billing - you'll only be charged if you decide to upgrade. Your account will simply revert to the free plan if you don't upgrade.
                 </AccordionContent>
               </AccordionItem>
 
