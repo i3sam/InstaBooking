@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Sparkles, CreditCard, Clock, Shield } from 'lucide-react';
+import { Check, Sparkles, Clock, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import RazorpaySubscriptionButton from '@/components/RazorpaySubscriptionButton';
 import { useToast } from '@/hooks/use-toast';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, apiRequest } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
 
 interface TrialActivationModalProps {
@@ -18,39 +17,39 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
-  const [showPayment, setShowPayment] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
 
-  const handleActivateTrial = () => {
-    setShowPayment(true);
-  };
-
-  const handleTrialSuccess = async (subscriptionId: string) => {
+  const handleActivateTrial = async () => {
     try {
+      setIsActivating(true);
+      
+      const response = await apiRequest('POST', '/api/trial/activate', {});
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to activate trial');
+      }
+
+      const result = await response.json();
+      
       queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
       
       toast({
         title: "Free Trial Activated! 🎉",
-        description: "Your 7-day free trial has started. You won't be charged until the trial ends.",
+        description: "Your 7-day free trial has started. Enjoy all Pro features!",
       });
       
       onClose();
     } catch (error) {
-      console.error('Profile refresh failed:', error);
+      console.error('Trial activation error:', error);
       toast({
-        title: "Trial activated",
-        description: "Your free trial has started successfully. Please refresh the page.",
+        title: "Trial activation failed",
+        description: error instanceof Error ? error.message : "There was an error activating your trial. Please try again.",
+        variant: "destructive",
       });
-      onClose();
+    } finally {
+      setIsActivating(false);
     }
-  };
-
-  const handleTrialError = (error: any) => {
-    console.error('Trial activation error:', error);
-    toast({
-      title: "Trial activation failed",
-      description: "There was an error activating your trial. Please try again.",
-      variant: "destructive",
-    });
   };
 
   if (!profile || (profile as any).trialStatus !== 'available') {
@@ -76,7 +75,7 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
                 Start Your 7-Day Free Trial
               </DialogTitle>
               <DialogDescription className="text-gray-600 dark:text-gray-300 mt-2">
-                Experience all Pro features with no charge for 7 days
+                No credit card required - Start instantly!
               </DialogDescription>
             </DialogHeader>
         
@@ -93,7 +92,7 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-900 to-purple-700 dark:from-purple-100 dark:to-white bg-clip-text text-transparent">7-Day Free Trial</h3>
-                    <p className="text-gray-600 dark:text-gray-300">Then {formatPrice(14.99)}/month</p>
+                    <p className="text-gray-600 dark:text-gray-300">No credit card required</p>
                   </div>
                 </div>
                 
@@ -104,8 +103,8 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
                       <Shield className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">No charge now</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">We'll only capture your payment method, no charges for 7 days</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">No payment required</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Start your trial instantly without entering any payment information</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -113,17 +112,17 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
                       <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Full access immediately</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Get instant access to all Pro features during your trial</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Full access for 7 days</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Experience all Pro features with no limitations during your trial</p>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <div className="w-8 h-8 glass-prism rounded-lg flex items-center justify-center mr-3 flex-shrink-0 backdrop-blur-md bg-gradient-to-br from-white/60 via-purple-50/50 to-white/40 border border-white/30">
-                      <CreditCard className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <Check className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Automatic billing after trial</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">After 7 days, you'll be charged {formatPrice(14.99)}/month. Cancel anytime.</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">No automatic billing</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">After 7 days, you can choose to upgrade to Pro for {formatPrice(14.99)}/month</p>
                     </div>
                   </div>
                 </div>
@@ -149,77 +148,28 @@ export default function TrialActivationModal({ isOpen, onClose }: TrialActivatio
                 </div>
               </div>
 
-              {/* Payment Setup Section */}
-              {showPayment && (
-                <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-white/90 via-purple-50/70 to-white/80 dark:from-gray-900/90 dark:via-purple-950/70 dark:to-gray-900/80 border border-white/30 dark:border-white/20 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold bg-gradient-to-r from-purple-900 to-purple-700 dark:from-purple-100 dark:to-white bg-clip-text text-transparent mb-2">
-                      Setup Your Payment Method
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Secure payment setup with Razorpay - No charge for 7 days
-                    </p>
-                  </div>
-                  
-                  <div className="max-w-md mx-auto">
-                    <div className="glass-prism-card backdrop-blur-sm bg-gradient-to-br from-white/80 via-purple-50/60 to-white/70 dark:from-gray-800/80 dark:via-purple-950/60 dark:to-gray-800/70 border border-white/30 dark:border-white/20 rounded-xl p-6" data-testid="section-trial-payment">
-                      <div className="text-center mb-6">
-                        <div className="w-16 h-16 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-purple-50/50 to-white/40 border border-white/30">
-                          <CreditCard className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                        </div>
-                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Add Payment Method</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">7 days free, then {formatPrice(14.99)}/month</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">Cancel anytime during trial • No charge until trial ends</p>
-                      </div>
-                      <RazorpaySubscriptionButton
-                        plan="pro"
-                        isTrial={true}
-                        onSuccess={(subscriptionId) => {
-                          console.log('Trial subscription successful:', subscriptionId);
-                          handleTrialSuccess(subscriptionId);
-                        }}
-                        onError={handleTrialError}
-                        onCancel={() => {
-                          toast({
-                            title: "Trial setup cancelled",
-                            description: "You can activate your trial anytime.",
-                            variant: "default",
-                          });
-                        }}
-                        onPaymentStart={() => {
-                          onClose();
-                        }}
-                        className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
-                      >
-                        Start Free Trial
-                      </RazorpaySubscriptionButton>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <Button
                   variant="ghost"
                   onClick={onClose}
+                  disabled={isActivating}
                   className="flex-1 h-12 glass-prism backdrop-blur-md bg-gradient-to-r from-white/40 via-purple-50/30 to-white/30 dark:from-gray-800/40 dark:via-purple-950/30 dark:to-gray-800/30 border border-white/30 hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300 text-purple-700 dark:text-purple-300 font-medium"
                   data-testid="button-cancel-trial"
                 >
                   Maybe Later
                 </Button>
-                {!showPayment && (
-                  <Button
-                    type="button"
-                    size="lg"
-                    onClick={handleActivateTrial}
-                    className="flex-1 h-12 glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold"
-                    data-testid="button-activate-trial"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Activate Free Trial
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={handleActivateTrial}
+                  disabled={isActivating}
+                  className="flex-1 h-12 glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  data-testid="button-activate-trial"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {isActivating ? 'Activating...' : 'Start Free Trial Now'}
+                </Button>
               </div>
             </div>
           </div>
