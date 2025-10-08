@@ -444,7 +444,7 @@ export default function HelpCenter() {
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 dark:text-gray-400 z-10 pointer-events-none" />
                   <Input
                     placeholder="Search guides and tips..."
                     value={searchQuery}
@@ -576,7 +576,7 @@ export default function HelpCenter() {
           <Card className="glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-white/20 shadow-2xl mobile-no-blur">
             <CardContent className="p-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 dark:text-gray-400 z-10 pointer-events-none" />
                 <Input
                   placeholder="Search frequently asked questions..."
                   value={searchQuery}
