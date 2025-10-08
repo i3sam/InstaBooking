@@ -330,13 +330,13 @@ export default function Home() {
               <Button 
                 onClick={() => setLocation('/signup')}
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 px-12 py-6 rounded-full text-xl h-auto mobile-full-width min-touch-target font-bold"
+                className="bg-white text-blue-600 hover:bg-blue-50 px-8 sm:px-12 py-4 sm:py-6 rounded-full text-lg sm:text-xl h-auto w-full sm:w-auto min-touch-target font-bold"
                 data-testid="button-trial-cta"
               >
-                Start Your FREE 7-Day Trial Now
-                <ArrowRight className="ml-3 h-6 w-6" />
+                <span className="truncate">Start Your FREE 7-Day Trial Now</span>
+                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
               </Button>
-              <p className="text-blue-100 mt-4 text-sm">
+              <p className="text-blue-100 mt-4 text-xs sm:text-sm px-4 sm:px-0">
                 ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
               </p>
             </div>
