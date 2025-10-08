@@ -1600,6 +1600,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trial activation endpoint (no payment required)
+  app.post("/api/trial/activate", verifyToken, async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      const profile = await storage.getProfile(userId);
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+
+      if (profile.trialStatus !== 'available') {
+        return res.status(400).json({ 
+          message: "Trial not available", 
+          trialStatus: profile.trialStatus 
+        });
+      }
+
+      if (profile.membershipStatus === 'pro') {
+        return res.status(400).json({ 
+          message: "You already have Pro membership" 
+        });
+      }
+
+      const now = new Date();
+      const trialEndsAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+      await storage.updateProfile(userId, {
+        membershipStatus: 'pro',
+        membershipExpires: trialEndsAt.toISOString(),
+        trialStatus: 'active',
+        trialStartedAt: now.toISOString(),
+        trialEndsAt: trialEndsAt.toISOString()
+      });
+
+      console.log(`✅ Free trial activated for user ${userId} (no payment), ends at ${trialEndsAt.toISOString()}`);
+
+      res.json({
+        success: true,
+        message: "Free trial activated successfully",
+        trialEndsAt: trialEndsAt.toISOString()
+      });
+    } catch (error) {
+      console.error("Trial activation error:", error);
+      res.status(500).json({ message: "Failed to activate trial" });
+    }
+  });
+
   // Admin endpoints for debugging and support
   app.post("/api/admin/validate", async (req, res) => {
     try {
