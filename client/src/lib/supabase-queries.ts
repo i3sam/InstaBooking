@@ -222,7 +222,8 @@ export async function getUserAppointments() {
       .from('appointments')
       .select(`
         *,
-        services(name, price)
+        services(name, price),
+        pages(page_name)
       `)
       .eq('owner_id', user.id)
       .order('created_at', { ascending: false });
@@ -248,7 +249,8 @@ export async function getUserAppointments() {
       createdAt: appointment.created_at,
       updatedAt: appointment.updated_at,
       serviceName: appointment.services?.name || 'Service',
-      servicePrice: appointment.services?.price || 0
+      servicePrice: appointment.services?.price || 0,
+      pageName: appointment.pages?.page_name || 'Booking Page'
     }));
 
     return formattedData;

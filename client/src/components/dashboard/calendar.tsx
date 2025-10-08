@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, MapPin, Check, X, Filter } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Mail, Building2, Check, X, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -190,14 +190,17 @@ export default function CalendarView() {
           >
             <span className="text-sm font-medium">{day}</span>
             {hasAppointments && (
-              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-0.5">
+              <div className="absolute bottom-0 left-0 right-0 h-1 flex gap-px px-1">
                 {dayAppointments.slice(0, 3).map((apt: any, i: number) => (
                   <div
                     key={i}
-                    className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                      apt.status === 'accepted' ? 'bg-green-500' : 'bg-blue-500'
+                    className={`flex-1 rounded-sm ${
+                      apt.status === 'accepted' 
+                        ? 'bg-green-500' 
+                        : apt.status === 'pending'
+                        ? 'bg-yellow-500'
+                        : 'bg-blue-500'
                     }`}
-                    style={{ animationDelay: `${i * 0.2}s` }}
                   />
                 ))}
               </div>
@@ -292,17 +295,21 @@ export default function CalendarView() {
                 data-testid={`appointment-${apt.id}`}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors">
+                  <h4 className="font-semibold text-gray-800 dark:text-gray-100">
                     {apt.serviceName}
                   </h4>
                   <Badge 
                     variant={apt.status === 'accepted' ? 'default' : 'secondary'} 
-                    className={`text-xs ${apt.status === 'accepted' ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                    className={`text-xs capitalize ${apt.status === 'accepted' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
                   >
                     {apt.status}
                   </Badge>
                 </div>
-                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 transition-colors">
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-3.5 w-3.5" />
+                    <span>{apt.pageName}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-3.5 w-3.5" />
                     <span>{apt.time}</span>
@@ -313,7 +320,7 @@ export default function CalendarView() {
                   </div>
                   {apt.customerEmail && (
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-3.5 w-3.5" />
+                      <Mail className="h-3.5 w-3.5" />
                       <span className="truncate">{apt.customerEmail}</span>
                     </div>
                   )}
@@ -468,17 +475,21 @@ export default function CalendarView() {
                     data-testid={`appointment-${apt.id}`}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-100">
                         {apt.serviceName}
                       </h4>
                       <Badge 
                         variant={apt.status === 'accepted' ? 'default' : 'secondary'} 
-                        className={`text-xs ${apt.status === 'accepted' ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                        className={`text-xs capitalize ${apt.status === 'accepted' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
                       >
                         {apt.status}
                       </Badge>
                     </div>
-                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 transition-colors">
+                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-3.5 w-3.5" />
+                        <span>{apt.pageName}</span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-3.5 w-3.5" />
                         <span>{apt.time}</span>
@@ -489,7 +500,7 @@ export default function CalendarView() {
                       </div>
                       {apt.customerEmail && (
                         <div className="flex items-center gap-2">
-                          <MapPin className="h-3.5 w-3.5" />
+                          <Mail className="h-3.5 w-3.5" />
                           <span className="truncate">{apt.customerEmail}</span>
                         </div>
                       )}
