@@ -6,7 +6,7 @@ import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
-import RazorpayButton from '@/components/RazorpayButton';
+import RazorpaySubscriptionButton from '@/components/RazorpaySubscriptionButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -30,9 +30,9 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
     setShowPayment(true);
   };
 
-  const handlePaymentSuccess = async (paymentId: string, orderId: string) => {
+  const handleSubscriptionSuccess = async (subscriptionId: string) => {
     try {
-      console.log('Payment successful:', { paymentId, orderId });
+      console.log('Subscription successful:', { subscriptionId });
       
       // Invalidate profile query to refresh user data
       await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
@@ -41,7 +41,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       toast({
-        title: "Payment Successful!",
+        title: "Subscription Activated!",
         description: "You've been upgraded to Pro! All features are now unlocked.",
       });
       
@@ -53,7 +53,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       console.error('Profile refresh failed:', error);
       toast({
         title: "Upgrade successful",
-        description: "Your payment was processed successfully. Please refresh the page to see your new features.",
+        description: "Your subscription was activated successfully. Please refresh the page to see your new features.",
       });
       onClose();
     }
@@ -115,7 +115,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 
                 <div className="flex flex-wrap items-baseline mb-6 sm:mb-8 gap-2">
                   <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">{formatPrice(14.99)}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">for 30 days</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">/month</span>
                   <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 border border-white/30 rounded-lg px-2 sm:px-3 py-1">
                     <span className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-semibold line-through">{formatPrice(29.99)}</span>
                   </div>
@@ -177,29 +177,30 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         <div className="w-16 h-16 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30">
                           <CreditCard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Upgrade to Pro</h4>
+                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Subscribe to Pro</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          One-time payment of {formatPrice(14.99)} for 30 days of Pro access
+                          Recurring monthly subscription at {formatPrice(14.99)}/month
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-500">
-                          Secure payment • Instant activation • Full access to all Pro features
+                          Secure payment • Instant activation • Cancel anytime • Full access to all Pro features
                         </p>
                       </div>
-                      <RazorpayButton
+                      <RazorpaySubscriptionButton
                         plan="pro"
-                        onSuccess={handlePaymentSuccess}
+                        isTrial={false}
+                        onSuccess={handleSubscriptionSuccess}
                         onError={handlePaymentError}
                         onCancel={() => {
                           toast({
-                            title: "Payment Cancelled",
+                            title: "Subscription Cancelled",
                             description: "You can try again anytime.",
                             variant: "default",
                           });
                         }}
                         className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 hover:from-green-200 hover:via-green-300 hover:to-green-400 dark:hover:from-green-700 dark:hover:via-green-600 dark:hover:to-green-500 text-green-800 dark:text-green-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
                       >
-                        Pay {formatPrice(14.99)} Now
-                      </RazorpayButton>
+                        Subscribe for {formatPrice(14.99)}/month
+                      </RazorpaySubscriptionButton>
                     </div>
                   </div>
                 </div>
