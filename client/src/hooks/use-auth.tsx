@@ -244,8 +244,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     });
 
     if (error) {
+      console.error('Supabase signup error:', error);
       throw new Error(error.message);
     }
+    
+    console.log('Signup response:', { user: data.user?.id, session: !!data.session, needsConfirmation: !data.session });
 
     // Check if email confirmation is needed
     const needsEmailConfirmation = !data.session && data.user && !data.user.email_confirmed_at;
@@ -256,10 +259,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
         // Store token BEFORE making profile creation request
         localStorage.setItem('token', data.session.access_token);
         
-        await apiRequest('POST', '/api/profile', {
+        console.log('Creating profile for user:', data.user.id);
+        const profileResponse = await apiRequest('POST', '/api/profile', {
           userId: data.user.id,
           fullName: fullName,
         });
+        console.log('Profile creation response:', profileResponse.status);
 
         // Check for pending demo association after signup
         const pendingDemoInfo = localStorage.getItem('pending_demo_info');
