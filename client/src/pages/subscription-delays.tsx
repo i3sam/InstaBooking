@@ -87,13 +87,13 @@ Best regards,
       <Header />
       
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-yellow-50 to-background dark:from-yellow-950/20 dark:to-background">
+      <section className="pt-8 pb-20 bg-gradient-to-b from-yellow-50 to-background dark:from-yellow-950/20 dark:to-background">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <Button 
               variant="ghost" 
               onClick={() => setLocation('/dashboard')}
-              className="mb-6 inline-flex items-center"
+              className="mt-4 mb-6 inline-flex items-center"
               data-testid="button-back-to-dashboard"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
