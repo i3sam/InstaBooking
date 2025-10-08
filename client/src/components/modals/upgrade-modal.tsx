@@ -115,7 +115,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 
                 <div className="flex flex-wrap items-baseline mb-6 sm:mb-8 gap-2">
                   <span className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">{formatPrice(14.99)}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">/month</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">for 30 days</span>
                   <div className="glass-prism backdrop-blur-md bg-gradient-to-r from-white/60 via-blue-50/40 to-white/50 border border-white/30 rounded-lg px-2 sm:px-3 py-1">
                     <span className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-semibold line-through">{formatPrice(29.99)}</span>
                   </div>
