@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Search, User, CreditCard, Calendar, AlertCircle, XCircle, Edit } from 'lucide-react';
+import { Lock, Search, User, CreditCard, Calendar, AlertCircle, XCircle, Edit, Bell, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -22,6 +22,8 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpiryDialogOpen, setIsExpiryDialogOpen] = useState(false);
   const [newExpiryDate, setNewExpiryDate] = useState('');
+  const [recentPayments, setRecentPayments] = useState<any[]>([]);
+  const [isLoadingPayments, setIsLoadingPayments] = useState(false);
   const { toast } = useToast();
 
   const handleAuth = async () => {
@@ -200,6 +202,38 @@ export default function AdminPage() {
     }
   };
 
+  const fetchRecentPayments = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsLoadingPayments(true);
+    try {
+      const response = await fetch('/api/admin/recent-payments?limit=20', {
+        headers: {
+          'x-admin-key': adminKey,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch recent payments');
+      }
+
+      const data = await response.json();
+      setRecentPayments(data.payments || []);
+    } catch (error) {
+      console.error('Failed to load recent payments:', error);
+    } finally {
+      setIsLoadingPayments(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRecentPayments();
+      const interval = setInterval(fetchRecentPayments, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
@@ -248,6 +282,79 @@ export default function AdminPage() {
             Authenticated
           </Badge>
         </div>
+
+        {/* Recent Payments Dashboard */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Recent Purchases
+                </CardTitle>
+                <CardDescription>Real-time payment notifications (auto-updates every 30s)</CardDescription>
+              </div>
+              <Button
+                onClick={fetchRecentPayments}
+                disabled={isLoadingPayments}
+                variant="outline"
+                size="sm"
+                data-testid="button-refresh-payments"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoadingPayments ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingPayments && recentPayments.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400">Loading recent payments...</p>
+            ) : recentPayments.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400">No recent payments</p>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {recentPayments.map((payment) => (
+                  <div 
+                    key={payment.id} 
+                    className="border rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    data-testid={`recent-payment-${payment.id}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{payment.userFullName}</p>
+                          <Badge variant={payment.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                            {payment.status}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{payment.userEmail}</p>
+                        <div className="flex items-center gap-4 mt-1">
+                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                            {payment.currency} {payment.amount}
+                          </p>
+                          <p className="text-xs text-gray-500">{payment.plan} plan</p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(payment.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          setUserId(payment.userId);
+                          handleSearch();
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        data-testid={`button-view-user-${payment.id}`}
+                      >
+                        View User
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Search */}
         <Card>
