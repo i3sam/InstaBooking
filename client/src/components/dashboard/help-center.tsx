@@ -449,7 +449,7 @@ export default function HelpCenter() {
                     placeholder="Search guides and tips..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 glass-prism bg-white/5 border-white/20"
+                    className="pl-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500"
                     data-testid="input-search-guides"
                   />
                 </div>
@@ -581,7 +581,7 @@ export default function HelpCenter() {
                   placeholder="Search frequently asked questions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 glass-prism bg-white/5 border-white/20"
+                  className="pl-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500"
                   data-testid="input-search-faqs"
                 />
               </div>
