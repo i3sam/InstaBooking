@@ -258,7 +258,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     // If subscription is authenticated or active, activate user membership
     if (subscription.status === 'authenticated' || subscription.status === 'active') {
       const profile = await storage.getProfile(authReq.user.userId);
-      if (profile && profile.membershipStatus !== 'pro') {
+      if (profile) {
         // Check if this is a trial subscription
         if (storedSub.isTrial && profile.trialStatus === 'available') {
           // Activate trial
@@ -274,8 +274,8 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
           });
 
           console.log(`✅ Trial activated for user ${authReq.user.userId} via subscription check, ends at ${trialEndsAt.toISOString()}`);
-        } else {
-          // Regular subscription activation
+        } else if (!storedSub.isTrial) {
+          // Regular subscription activation - ALWAYS update expiry even if already Pro
           const planConfig = PLAN_PRICING[storedSub.planName];
           const expiresAt = new Date();
           expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
@@ -285,7 +285,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
             membershipExpires: expiresAt.toISOString()
           });
 
-          console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check`);
+          console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check (expires: ${expiresAt.toISOString()})`);
         }
       }
     }
@@ -405,7 +405,7 @@ async function handleSubscriptionAuthenticated(subscription: any) {
 
       console.log(`✅ Free trial activated for user ${storedSub.userId}, ends at ${trialEndsAt.toISOString()}`);
     } else {
-      // Regular subscription (non-trial)
+      // Regular subscription (non-trial) - ALWAYS update expiry even if already Pro
       const planConfig = PLAN_PRICING[storedSub.planName];
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
@@ -415,7 +415,7 @@ async function handleSubscriptionAuthenticated(subscription: any) {
         membershipExpires: expiresAt.toISOString()
       });
 
-      console.log(`✅ Subscription activated for user ${storedSub.userId}`);
+      console.log(`✅ Subscription activated for user ${storedSub.userId} (expires: ${expiresAt.toISOString()})`);
     }
 
     // Update subscription status in database
