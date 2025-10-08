@@ -76,18 +76,10 @@ export async function createRazorpaySubscription(req: Request, res: Response) {
       return res.status(401).json({ error: "User not authenticated" });
     }
 
-    // Check trial status and enforce trial usage if available
+    // Check trial status
     const profile = await storage.getProfile(authReq.user.userId);
     if (!profile) {
       return res.status(400).json({ error: "User profile not found" });
-    }
-
-    // If trial is available, MUST use trial (cannot bypass to paid)
-    if (profile.trialStatus === 'available' && !isTrial) {
-      return res.status(400).json({ 
-        error: "Trial must be used first", 
-        details: "You must start with the free 7-day trial before subscribing directly"
-      });
     }
 
     // If requesting trial, verify it's available
