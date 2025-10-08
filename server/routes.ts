@@ -416,8 +416,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Extract services and staff from request body before validation
-      const { services, staff, ...pageDataFromRequest } = req.body;
+      // Extract services from request body and staff from data object before validation
+      const { services, data, ...pageDataFromRequest } = req.body;
+      const staff = data?.staff || [];
       
       // Validate page data (without services)
       const validation = insertPageSchema.safeParse(pageDataFromRequest);
@@ -517,8 +518,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Page not found" });
       }
 
-      // Extract services and staff from request body
-      const { services, staff, ...pageData } = req.body;
+      // Extract services from request body and staff from data object  
+      const { services, data, ...pageData } = req.body;
+      const staff = data?.staff || [];
 
       // Update page data
       const updated = await storage.updatePage(req.params.id, pageData);
