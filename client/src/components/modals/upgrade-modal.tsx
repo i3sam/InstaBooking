@@ -170,11 +170,22 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                           <CreditCard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
                         <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Pay with Credit / Debit card</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Monthly subscription {formatPrice(14.99)}/month</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">Auto-renewing • Cancel anytime • Secure payments</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          {(profile as any)?.trialStatus === 'available' 
+                            ? `7-Day Free Trial - Then ${formatPrice(14.99)}/month`
+                            : `Monthly subscription ${formatPrice(14.99)}/month`
+                          }
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          {(profile as any)?.trialStatus === 'available'
+                            ? 'Free for 7 days • Cancel anytime before trial ends • No charge until trial ends'
+                            : 'Auto-renewing • Cancel anytime • Secure payments'
+                          }
+                        </p>
                       </div>
                       <RazorpaySubscriptionButton
                         plan="pro"
+                        isTrial={(profile as any)?.trialStatus === 'available'}
                         onSuccess={(subscriptionId) => {
                           console.log('Razorpay subscription successful:', subscriptionId);
                           handlePaymentSuccess();
