@@ -202,7 +202,7 @@ export default function Home() {
                 {/* Limited Time Offer Badge */}
                 <div className="inline-flex items-center px-4 py-2 notification-badge rounded-full text-white text-sm font-semibold shadow-lg animate-scale-in">
                   <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-md mr-3">🎉 LIMITED TIME</span>
-                  7 Days FREE Trial
+                  7 Days FREE Trial - No Credit Card Required
                 </div>
                 
                 {/* Main Headline */}
