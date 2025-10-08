@@ -85,31 +85,37 @@ export default function RazorpaySubscriptionButton({
             console.log('Razorpay subscription response:', response);
             
             // Check subscription status with retry logic (Razorpay needs time to update status)
-            const checkStatus = async (retries = 3, delay = 2000): Promise<void> => {
+            const checkStatus = async (retries = 5, delay = 3000): Promise<void> => {
               for (let i = 0; i < retries; i++) {
                 try {
                   if (i > 0) {
-                    // Wait before retry
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    // Wait before retry (longer for first retry to give Razorpay time)
+                    const waitTime = i === 1 ? 4000 : delay;
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
                   }
                   
                   const statusResponse = await apiRequest('GET', `/api/razorpay/subscriptions/${subscriptionData.subscriptionId}`);
                   if (statusResponse.ok) {
                     const statusData = await statusResponse.json();
-                    console.log(`Subscription status check (attempt ${i + 1}):`, statusData);
+                    console.log(`✅ Subscription status check (attempt ${i + 1}):`, statusData);
                     
                     // If status is authenticated or active, activation is complete
                     if (statusData.status === 'authenticated' || statusData.status === 'active') {
-                      console.log('✅ Subscription activated successfully');
+                      console.log('🎉 Subscription activated successfully!');
                       return;
                     }
+                    
+                    console.log(`⏳ Status still "${statusData.status}", will retry...`);
+                  } else {
+                    const errorText = await statusResponse.text();
+                    console.warn(`❌ Status check HTTP ${statusResponse.status} (attempt ${i + 1}):`, errorText);
                   }
                 } catch (statusError) {
-                  console.warn(`Status check failed (attempt ${i + 1}):`, statusError);
+                  console.error(`❌ Status check failed (attempt ${i + 1}):`, statusError);
                 }
               }
               
-              console.warn('Subscription status may still be pending. User will be activated when webhook arrives.');
+              console.warn('⚠️ Subscription status may still be pending. Your membership will be activated shortly.');
             };
             
             // Start status check in background

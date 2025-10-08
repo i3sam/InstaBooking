@@ -250,6 +250,8 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     // Fetch current status from Razorpay
     const subscription = await razorpay.subscriptions.fetch(subscriptionId);
     
+    console.log(`📋 Subscription status check: ${subscriptionId} - Status: ${subscription.status} for user ${authReq.user.userId}`);
+    
     // Update subscription status in database
     await storage.updateSubscription(subscriptionId, {
       status: subscription.status
@@ -259,6 +261,8 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
     if (subscription.status === 'authenticated' || subscription.status === 'active') {
       const profile = await storage.getProfile(authReq.user.userId);
       if (profile) {
+        console.log(`👤 User profile: membershipStatus=${profile.membershipStatus}, trialStatus=${profile.trialStatus}, isTrial=${storedSub.isTrial}`);
+        
         // Check if this is a trial subscription
         if (storedSub.isTrial && profile.trialStatus === 'available') {
           // Activate trial
@@ -286,8 +290,12 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
           });
 
           console.log(`✅ Updated user ${authReq.user.userId} to Pro via subscription check (expires: ${expiresAt.toISOString()})`);
+        } else {
+          console.warn(`⚠️ Subscription not activated - isTrial=${storedSub.isTrial}, trialStatus=${profile.trialStatus}`);
         }
       }
+    } else {
+      console.log(`⏳ Subscription ${subscriptionId} not yet active (status: ${subscription.status})`);
     }
 
     res.json({
