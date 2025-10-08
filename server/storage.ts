@@ -30,6 +30,7 @@ export interface IStorage {
   // Payments
   createPayment(payment: any): Promise<any>;
   getPaymentsByUser(userId: string): Promise<any[]>;
+  getAllRecentPayments(limit: number): Promise<any[]>;
   
   // Reviews
   createReview(review: any): Promise<any>;

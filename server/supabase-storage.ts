@@ -543,6 +543,22 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async getAllRecentPayments(limit: number): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('payments_demo')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []).map(item => this.toCamelCase(item));
+    } catch (error) {
+      console.error("Get all recent payments error:", error);
+      return [];
+    }
+  }
+
   // Reviews
   async createReview(review: any): Promise<any> {
     try {

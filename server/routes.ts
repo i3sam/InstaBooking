@@ -1789,6 +1789,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to get recent payments for notifications
+  app.get("/api/admin/recent-payments", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const allPayments = await storage.getAllRecentPayments(limit);
+
+      const paymentsWithUserDetails = await Promise.all(
+        allPayments.map(async (payment) => {
+          const profile = payment.userId ? await storage.getProfile(payment.userId) : null;
+          return {
+            id: payment.id,
+            userId: payment.userId,
+            userEmail: profile?.email || 'Unknown',
+            userFullName: profile?.fullName || 'Unknown User',
+            amount: payment.amount,
+            currency: payment.currency,
+            status: payment.status,
+            plan: payment.plan,
+            paymentMethod: payment.paymentMethod,
+            createdAt: payment.createdAt,
+          };
+        })
+      );
+
+      res.json({ payments: paymentsWithUserDetails });
+    } catch (error) {
+      console.error("Admin recent payments error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Admin endpoint to generate login token for a user (for debugging)
   app.post("/api/admin/generate-login-token", async (req, res) => {
     try {
