@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Crown, CreditCard } from 'lucide-react';
+import { Check, Crown, CreditCard, AlertTriangle, Mail } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
@@ -202,6 +202,44 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         Subscribe for {formatPrice(14.99)}/month
                       </RazorpaySubscriptionButton>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Warning about activation time */}
+              {showPayment && (
+                <div className="glass-prism-card backdrop-blur-md bg-gradient-to-br from-yellow-50/90 via-yellow-100/70 to-yellow-50/80 dark:from-yellow-900/30 dark:via-yellow-800/20 dark:to-yellow-900/30 border-2 border-yellow-400/50 dark:border-yellow-600/50 rounded-xl p-4 sm:p-6 shadow-lg" data-testid="warning-activation">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-400/30 dark:bg-yellow-600/30 flex items-center justify-center">
+                      <AlertTriangle className="h-5 w-5 text-yellow-700 dark:text-yellow-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-yellow-900 dark:text-yellow-200 leading-relaxed">
+                        After you checkout, to activate your subscription, the app may take around 3-5 minutes, please be patient & if you have any issues please contact us at{' '}
+                        <a 
+                          href="mailto:team@bookinggen.xyz" 
+                          className="font-semibold underline hover:text-yellow-700 dark:hover:text-yellow-300 transition-colors"
+                          data-testid="link-contact-email"
+                        >
+                          team@bookinggen.xyz
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-yellow-400/30 dark:border-yellow-600/30">
+                    <p className="text-sm font-medium text-yellow-900 dark:text-yellow-200">
+                      Facing any issues?
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.location.href = 'mailto:team@bookinggen.xyz'}
+                      className="bg-yellow-100 dark:bg-yellow-800/50 border-yellow-400 dark:border-yellow-600 text-yellow-900 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-700/50 transition-colors"
+                      data-testid="button-contact-us"
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Contact Us
+                    </Button>
                   </div>
                 </div>
               )}
