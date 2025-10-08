@@ -9,6 +9,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { useAuth } from '@/hooks/use-auth';
 import { useRealtimeDashboard } from '@/hooks/useRealtimeSubscription';
 import TrialActivationModal from '@/components/modals/trial-activation-modal';
+import UpgradeModal from '@/components/modals/upgrade-modal';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface OverviewProps {
@@ -44,6 +45,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   const { formatPrice } = useCurrency();
   const { user, profile } = useAuth();
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [showTrialBanner, setShowTrialBanner] = useState(true);
   const [selectedPageId, setSelectedPageId] = useState<string>('all');
 
@@ -280,6 +282,12 @@ export default function Overview({ onSectionChange }: OverviewProps) {
         onClose={() => setIsTrialModalOpen(false)}
       />
 
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+      />
+
       {/* Active Trial Banner */}
       {isOnTrial && (
         <Card className="glass-prism-card backdrop-blur-xl bg-gradient-to-r from-purple-500/15 via-blue-500/15 to-purple-500/15 border-purple-300/50 dark:border-purple-600/50 shadow-2xl mb-8 animate-slide-down" data-testid="banner-active-trial">
@@ -308,7 +316,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                 </div>
               </div>
               <Button
-                onClick={() => onSectionChange?.('settings')}
+                onClick={() => setIsUpgradeModalOpen(true)}
                 className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 dark:from-purple-800 dark:via-purple-700 dark:to-purple-600 hover:from-purple-200 hover:via-purple-300 hover:to-purple-400 dark:hover:from-purple-700 dark:hover:via-purple-600 dark:hover:to-purple-500 text-purple-800 dark:text-purple-100 shadow-lg border border-purple-300/50 dark:border-purple-600/50 font-semibold"
                 data-testid="button-upgrade-from-trial"
               >
@@ -347,7 +355,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
                 </div>
               </div>
               <Button
-                onClick={() => onSectionChange?.('settings')}
+                onClick={() => setIsUpgradeModalOpen(true)}
                 className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-orange-100 via-orange-200 to-orange-300 dark:from-orange-800 dark:via-orange-700 dark:to-orange-600 hover:from-orange-200 hover:via-orange-300 hover:to-orange-400 dark:hover:from-orange-700 dark:hover:via-orange-600 dark:hover:to-orange-500 text-orange-800 dark:text-orange-100 shadow-lg border border-orange-300/50 dark:border-orange-600/50 font-semibold"
                 data-testid="button-upgrade-from-cancelled-trial"
               >

@@ -619,10 +619,20 @@ export async function verifyRazorpayPayment(req: Request, res: Response) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + planConfig.duration);
 
-    await storage.updateProfile(authReq.user.userId, {
+    // Get user profile to check trial status
+    const profile = await storage.getProfile(authReq.user.userId);
+    const updateData: any = {
       membershipStatus: 'pro',
       membershipExpires: expiresAt.toISOString()
-    });
+    };
+
+    // If user has an active trial, mark it as used when they upgrade to paid
+    if (profile && profile.trialStatus === 'active') {
+      updateData.trialStatus = 'used';
+      console.log(`✅ Trial ended and converted to paid subscription for user ${authReq.user.userId}`);
+    }
+
+    await storage.updateProfile(authReq.user.userId, updateData);
 
     // Create subscription record for tracking purposes (even for one-time payments)
     // This ensures the billing panel can display subscription information
