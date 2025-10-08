@@ -257,8 +257,16 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
       status: subscription.status
     });
 
-    // If subscription is authenticated or active, activate user membership
-    if (subscription.status === 'authenticated' || subscription.status === 'active') {
+    // Check if subscription has been paid (even if status is still "created")
+    // This handles cases where payment succeeds but webhook hasn't fired yet
+    let hasBeenPaid = false;
+    if (subscription.status === 'created' && subscription.paid_count > 0) {
+      hasBeenPaid = true;
+      console.log(`💳 Subscription ${subscriptionId} has been paid (paid_count: ${subscription.paid_count}) - activating even though status is "created"`);
+    }
+
+    // If subscription is authenticated, active, or has been paid, activate user membership
+    if (subscription.status === 'authenticated' || subscription.status === 'active' || hasBeenPaid) {
       const profile = await storage.getProfile(authReq.user.userId);
       if (profile) {
         console.log(`👤 User profile: membershipStatus=${profile.membershipStatus}, trialStatus=${profile.trialStatus}, isTrial=${storedSub.isTrial}`);
@@ -295,7 +303,7 @@ export async function getRazorpaySubscription(req: Request, res: Response) {
         }
       }
     } else {
-      console.log(`⏳ Subscription ${subscriptionId} not yet active (status: ${subscription.status})`);
+      console.log(`⏳ Subscription ${subscriptionId} not yet active (status: ${subscription.status}, paid_count: ${subscription.paid_count || 0})`);
     }
 
     res.json({
