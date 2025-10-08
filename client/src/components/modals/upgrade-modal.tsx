@@ -6,7 +6,7 @@ import { Check, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
-import RazorpaySubscriptionButton from '@/components/RazorpaySubscriptionButton';
+import RazorpayButton from '@/components/RazorpayButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -30,17 +30,25 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
     setShowPayment(true);
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (paymentId: string, orderId: string) => {
     try {
+      console.log('Payment successful:', { paymentId, orderId });
+      
       // Invalidate profile query to refresh user data
-      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      
+      // Force a small delay to ensure backend has updated the profile
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       toast({
-        title: "Success!",
-        description: "You've successfully upgraded to Pro! Your new features are now available.",
+        title: "Payment Successful!",
+        description: "You've been upgraded to Pro! All features are now unlocked.",
       });
       
       onClose();
+      
+      // Reload the page to ensure all UI updates
+      window.location.reload();
     } catch (error) {
       console.error('Profile refresh failed:', error);
       toast({
@@ -169,43 +177,29 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         <div className="w-16 h-16 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30">
                           <CreditCard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Pay with Credit / Debit card</h4>
+                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Upgrade to Pro</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          {(profile as any)?.trialStatus === 'available' 
-                            ? `7-Day Free Trial - Then ${formatPrice(14.99)}/month`
-                            : `Monthly subscription ${formatPrice(14.99)}/month`
-                          }
+                          One-time payment of {formatPrice(14.99)} for 30 days of Pro access
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-500">
-                          {(profile as any)?.trialStatus === 'available'
-                            ? 'Free for 7 days • Cancel anytime before trial ends • No charge until trial ends'
-                            : 'Auto-renewing • Cancel anytime • Secure payments'
-                          }
+                          Secure payment • Instant activation • Full access to all Pro features
                         </p>
                       </div>
-                      <RazorpaySubscriptionButton
+                      <RazorpayButton
                         plan="pro"
-                        isTrial={(profile as any)?.trialStatus === 'available'}
-                        onSuccess={(subscriptionId) => {
-                          console.log('Razorpay subscription successful:', subscriptionId);
-                          handlePaymentSuccess();
-                        }}
+                        onSuccess={handlePaymentSuccess}
                         onError={handlePaymentError}
                         onCancel={() => {
                           toast({
-                            title: "Subscription cancelled",
+                            title: "Payment Cancelled",
                             description: "You can try again anytime.",
                             variant: "default",
                           });
                         }}
-                        onPaymentStart={() => {
-                          // Close the upgrade modal when RazorPay popup opens
-                          onClose();
-                        }}
                         className="w-full glass-prism-button backdrop-blur-lg bg-gradient-to-r from-green-100 via-green-200 to-green-300 dark:from-green-800 dark:via-green-700 dark:to-green-600 hover:from-green-200 hover:via-green-300 hover:to-green-400 dark:hover:from-green-700 dark:hover:via-green-600 dark:hover:to-green-500 text-green-800 dark:text-green-100 shadow-lg hover:scale-105 transition-all duration-300 border border-white/30 font-semibold h-12"
                       >
-                        Pay with Credit / Debit card
-                      </RazorpaySubscriptionButton>
+                        Pay {formatPrice(14.99)} Now
+                      </RazorpayButton>
                     </div>
                   </div>
                 </div>
