@@ -991,14 +991,14 @@ function SettingsSection() {
               </Button>
               <Button
                 variant="destructive"
-                className="glass-prism backdrop-blur-md bg-red-500 dark:bg-red-600 border-2 border-red-400 hover:bg-red-600 dark:hover:bg-red-700 text-white font-semibold transition-all duration-300 flex items-center justify-center h-12 w-full shadow-lg hover:shadow-xl"
+                className="glass-prism backdrop-blur-md bg-red-500/90 dark:bg-red-600/90 border-2 border-red-500 hover:bg-red-600 dark:hover:bg-red-700 text-white font-semibold transition-all duration-300 flex items-center justify-center h-12 w-full shadow-lg hover:shadow-xl"
                 onClick={() => {
                   logout();
                   setLocation('/');
                 }}
                 data-testid="button-logout"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 mr-2 text-white" />
                 Logout
               </Button>
             </div>
