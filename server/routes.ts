@@ -1674,6 +1674,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to cancel a subscription
+  app.post("/api/admin/cancel-subscription", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const { userId, subscriptionId } = req.body;
+      
+      if (!userId || !subscriptionId) {
+        return res.status(400).json({ message: "userId and subscriptionId are required" });
+      }
+
+      // Update subscription status
+      await storage.updateSubscription(subscriptionId, { status: 'cancelled' });
+
+      // Downgrade user to free
+      await storage.updateProfile(userId, {
+        membershipStatus: 'free',
+        membershipExpires: null
+      });
+
+      console.log(`Admin cancelled subscription ${subscriptionId} for user ${userId}`);
+
+      res.json({ 
+        success: true, 
+        message: "Subscription cancelled successfully" 
+      });
+    } catch (error) {
+      console.error("Admin cancel subscription error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Admin endpoint to update membership expiry
+  app.post("/api/admin/update-expiry", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const { userId, expiryDate } = req.body;
+      
+      if (!userId || !expiryDate) {
+        return res.status(400).json({ message: "userId and expiryDate are required" });
+      }
+
+      // Update membership expiry
+      await storage.updateProfile(userId, {
+        membershipExpires: new Date(expiryDate).toISOString()
+      });
+
+      console.log(`Admin updated expiry for user ${userId} to ${expiryDate}`);
+
+      res.json({ 
+        success: true, 
+        message: "Membership expiry updated successfully" 
+      });
+    } catch (error) {
+      console.error("Admin update expiry error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Admin endpoint to generate login token for a user (for debugging)
   app.post("/api/admin/generate-login-token", async (req, res) => {
     try {

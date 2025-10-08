@@ -3,8 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Search, User, CreditCard, Calendar, AlertCircle } from 'lucide-react';
+import { Lock, Search, User, CreditCard, Calendar, AlertCircle, XCircle, Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState('');
@@ -12,6 +20,8 @@ export default function AdminPage() {
   const [userId, setUserId] = useState('');
   const [userStatus, setUserStatus] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpiryDialogOpen, setIsExpiryDialogOpen] = useState(false);
+  const [newExpiryDate, setNewExpiryDate] = useState('');
   const { toast } = useToast();
 
   const handleAuth = async () => {
@@ -95,6 +105,96 @@ export default function AdminPage() {
         variant: "destructive",
       });
       setUserStatus(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async (subscriptionId: string) => {
+    if (!confirm('Are you sure you want to cancel this subscription?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey,
+        },
+        body: JSON.stringify({
+          userId: userStatus.profile.id,
+          subscriptionId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel subscription');
+      }
+
+      toast({
+        title: "Success",
+        description: "Subscription cancelled successfully",
+      });
+
+      // Refresh user status
+      await handleSearch();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to cancel subscription",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateExpiry = async () => {
+    if (!newExpiryDate) {
+      toast({
+        title: "Error",
+        description: "Please select a new expiry date",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/update-expiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey,
+        },
+        body: JSON.stringify({
+          userId: userStatus.profile.id,
+          expiryDate: newExpiryDate,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update expiry date');
+      }
+
+      toast({
+        title: "Success",
+        description: "Membership expiry updated successfully",
+      });
+
+      setIsExpiryDialogOpen(false);
+      setNewExpiryDate('');
+
+      // Refresh user status
+      await handleSearch();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update expiry date",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -204,11 +304,26 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Membership Expires</p>
-                  <p data-testid="text-membership-expires">
-                    {userStatus.profile.membershipExpires 
-                      ? new Date(userStatus.profile.membershipExpires).toLocaleDateString()
-                      : 'N/A'}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p data-testid="text-membership-expires">
+                      {userStatus.profile.membershipExpires 
+                        ? new Date(userStatus.profile.membershipExpires).toLocaleDateString()
+                        : 'N/A'}
+                    </p>
+                    {userStatus.profile.membershipStatus === 'pro' && (
+                      <Button
+                        onClick={() => {
+                          setNewExpiryDate(userStatus.profile.membershipExpires?.split('T')[0] || '');
+                          setIsExpiryDialogOpen(true);
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        data-testid="button-edit-expiry"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Trial Status</p>
@@ -239,7 +354,7 @@ export default function AdminPage() {
                 ) : (
                   <div className="space-y-4">
                     {userStatus.subscriptions.map((sub: any) => (
-                      <div key={sub.id} className="border rounded-lg p-4 space-y-2" data-testid={`subscription-${sub.id}`}>
+                      <div key={sub.id} className="border rounded-lg p-4 space-y-3" data-testid={`subscription-${sub.id}`}>
                         <div className="flex items-center justify-between">
                           <p className="font-medium">{sub.planName}</p>
                           <Badge variant={sub.status === 'active' ? 'default' : 'secondary'}>
@@ -251,6 +366,19 @@ export default function AdminPage() {
                           {sub.isTrial && <span className="ml-2 text-blue-600">(Trial)</span>}
                         </p>
                         <p className="text-xs text-gray-400 font-mono">{sub.id}</p>
+                        {(sub.status === 'active' || sub.status === 'created' || sub.status === 'authenticated') && (
+                          <Button
+                            onClick={() => handleCancelSubscription(sub.id)}
+                            variant="destructive"
+                            size="sm"
+                            disabled={isLoading}
+                            data-testid={`button-cancel-subscription-${sub.id}`}
+                            className="w-full"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Cancel Subscription
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -299,6 +427,48 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Update Expiry Dialog */}
+      <Dialog open={isExpiryDialogOpen} onOpenChange={setIsExpiryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Membership Expiry</DialogTitle>
+            <DialogDescription>
+              Set a new expiry date for this user's membership
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="expiry-date" className="text-sm font-medium">
+                New Expiry Date
+              </label>
+              <Input
+                id="expiry-date"
+                type="date"
+                value={newExpiryDate}
+                onChange={(e) => setNewExpiryDate(e.target.value)}
+                data-testid="input-new-expiry-date"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsExpiryDialogOpen(false)}
+              data-testid="button-cancel-expiry"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateExpiry}
+              disabled={isLoading}
+              data-testid="button-save-expiry"
+            >
+              {isLoading ? 'Updating...' : 'Update Expiry'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
