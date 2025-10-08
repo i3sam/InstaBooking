@@ -1601,6 +1601,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin endpoints for debugging and support
+  app.post("/api/admin/validate", async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      
+      if (adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      res.json({ message: "Valid admin key", authenticated: true });
+    } catch (error) {
+      console.error("Admin validation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/admin/user-status/:userId", async (req, res) => {
     try {
       const adminKey = req.headers['x-admin-key'];
