@@ -93,11 +93,11 @@ Best regards,
             <Button 
               variant="ghost" 
               onClick={() => setLocation('/dashboard')}
-              className="mb-6"
+              className="mb-6 flex items-center gap-2"
               data-testid="button-back-to-dashboard"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Dashboard</span>
             </Button>
             
             <div className="text-center mb-12">

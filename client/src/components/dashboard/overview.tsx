@@ -297,13 +297,13 @@ export default function Overview({ onSectionChange }: OverviewProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+              className="absolute top-2 right-2 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 z-20"
               onClick={() => setShowCautionBanner(false)}
               data-testid="button-close-caution-banner"
             >
               <X className="h-4 w-4" />
             </Button>
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 pr-10">
               <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-yellow-500/30 to-amber-500/30 border border-yellow-400/50 dark:border-yellow-600/50 animate-pulse">
                 <AlertTriangle className="h-8 w-8 text-yellow-700 dark:text-yellow-400" />
               </div>
