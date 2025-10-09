@@ -1739,38 +1739,32 @@ export default function PublicBooking() {
                         {!page.business_address && !(normalizedBooleans.showBusinessHours && page.business_hours) && normalizedBooleans.showContactInfo && (page.contact_phone || page.contact_email) && (
                           <div className="p-6">
                             <h4 className="text-lg font-semibold text-foreground mb-4">Contact Information</h4>
-                            <div className="space-y-3">
+                            <div className="flex gap-3">
                               {page.contact_phone && (
-                                <div className="flex items-center space-x-3">
-                                  <div 
-                                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <Phone className="h-4 w-4 text-white" />
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setShowPhoneDialog(true)}
+                                  className="flex-1 h-auto py-4 border-border/40 hover:border-primary/50 transition-all"
+                                  data-testid="button-call"
+                                >
+                                  <div className="flex flex-col items-center gap-2">
+                                    <Phone className="h-6 w-6" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                    <span className="text-sm font-semibold">Call</span>
                                   </div>
-                                  <div>
-                                    <p className="text-sm text-muted-foreground">Phone</p>
-                                    <a href={`tel:${page.contact_phone}`} className="font-medium text-foreground hover:underline">
-                                      {page.contact_phone}
-                                    </a>
-                                  </div>
-                                </div>
+                                </Button>
                               )}
                               {page.contact_email && (
-                                <div className="flex items-center space-x-3">
-                                  <div 
-                                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                                    style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                                  >
-                                    <Mail className="h-4 w-4 text-white" />
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setShowEmailDialog(true)}
+                                  className="flex-1 h-auto py-4 border-border/40 hover:border-primary/50 transition-all"
+                                  data-testid="button-email"
+                                >
+                                  <div className="flex flex-col items-center gap-2">
+                                    <Mail className="h-6 w-6" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                                    <span className="text-sm font-semibold">Email</span>
                                   </div>
-                                  <div>
-                                    <p className="text-sm text-muted-foreground">Email</p>
-                                    <a href={`mailto:${page.contact_email}`} className="font-medium text-foreground hover:underline">
-                                      {page.contact_email}
-                                    </a>
-                                  </div>
-                                </div>
+                                </Button>
                               )}
                             </div>
                           </div>
