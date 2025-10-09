@@ -843,6 +843,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
 
     // Filter out empty FAQs
     const validFaqs = formData.faqs.filter(faq => faq.question.trim() && faq.answer.trim());
+    
+    // Filter out staff members without names
+    const validStaff = formData.staff.filter(member => member.name.trim());
 
     // Transform gallery array to object format expected by database
     const galleryObject = {
@@ -861,7 +864,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       faqs: validFaqs,
       data: {
         description: formData.description,
-        staff: formData.staff,
+        staff: validStaff,
         visitInfo: formData.visitInfo,
         businessInfo: formData.businessInfo
       }

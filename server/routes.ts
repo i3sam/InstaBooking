@@ -244,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const folder = req.body.folder || '';
       
       // Security: Only allow specific buckets
-      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images', 'staff-images'];
       if (!allowedBuckets.includes(bucket)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
@@ -291,7 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { bucketName } = req.body;
       
       // Security: Only allow specific bucket names
-      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images'];
+      const allowedBuckets = ['logos', 'gallery-banners', 'gallery-logos', 'gallery-images', 'service-images', 'staff-images'];
       if (!bucketName || !allowedBuckets.includes(bucketName)) {
         return res.status(400).json({ message: "Invalid bucket name" });
       }
@@ -480,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get page by ID with services (for editing)
+  // Get page by ID with services and staff (for editing)
   app.get("/api/pages/:id/edit", verifyToken, async (req: any, res) => {
     try {
       const page = await storage.getPage(req.params.id);
@@ -489,7 +489,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const services = await storage.getServicesByPageId(page.id);
-      res.json({ ...page, services });
+      const staff = await storage.getStaffByPageId(page.id);
+      
+      // Include staff in the data object if it exists, otherwise create a new data object
+      const pageData = {
+        ...page,
+        services,
+        data: {
+          ...(page.data || {}),
+          staff
+        }
+      };
+      
+      res.json(pageData);
     } catch (error) {
       console.error("Get page for edit error:", error);
       res.status(500).json({ message: "Internal server error" });
