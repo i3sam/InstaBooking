@@ -841,10 +841,10 @@ export default function PublicBooking() {
       <section className="py-8 sm:py-12 lg:py-16 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Modern Tab Navigation with improved mobile design */}
-            <div className="flex justify-center mb-8 sm:mb-12">
+            {/* Modern Tab Navigation - Fully Mobile Optimized */}
+            <div className="flex justify-center mb-8 sm:mb-12 overflow-x-auto pb-2 scrollbar-hide">
               <TabsList 
-                className="inline-flex items-center gap-2 sm:gap-3 p-2 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 shadow-2xl hover:shadow-3xl transition-all duration-300"
+                className="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 shadow-2xl hover:shadow-3xl transition-all duration-300 min-w-fit"
                 style={{
                   background: themeStyles 
                     ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 100%), rgba(255, 255, 255, 0.6)`
@@ -858,7 +858,7 @@ export default function PublicBooking() {
                     <TabsTrigger 
                       key={item.id} 
                       value={item.id}
-                      className="group relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+                      className="group relative flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 lg:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 whitespace-nowrap"
                       style={{
                         color: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb',
                         background: isActive 
@@ -878,18 +878,18 @@ export default function PublicBooking() {
                             backgroundColor: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb'
                           }}
                         ></div>
-                        <IconComponent className={`relative h-5 w-5 sm:h-6 sm:w-6 transition-all duration-300 ${isActive ? 'drop-shadow-lg' : ''}`} />
+                        <IconComponent className={`relative h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-all duration-300 ${isActive ? 'drop-shadow-lg' : ''}`} />
                       </div>
                       
-                      {/* Label - hidden on very small screens for Services/Staff */}
-                      <span className={`relative font-bold tracking-wide transition-all duration-300 ${index > 0 ? 'hidden sm:inline-block' : ''}`}>
+                      {/* Label - Now visible on all screen sizes */}
+                      <span className="relative font-bold tracking-wide transition-all duration-300">
                         {item.label}
                       </span>
 
                       {/* Active indicator line */}
                       {isActive && (
                         <div 
-                          className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-12 sm:w-16 rounded-full transition-all duration-300"
+                          className="absolute -bottom-0.5 sm:-bottom-1 left-1/2 -translate-x-1/2 h-0.5 sm:h-1 w-8 sm:w-12 md:w-16 rounded-full transition-all duration-300"
                           style={{ backgroundColor: 'white' }}
                         ></div>
                       )}
