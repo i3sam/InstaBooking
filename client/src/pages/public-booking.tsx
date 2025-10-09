@@ -686,7 +686,11 @@ export default function PublicBooking() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mb-4 sm:mb-6 max-w-md sm:max-w-none mx-auto">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
-                  className="px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+                  style={{
+                    backgroundColor: themeStyles?.primaryColor || '#2563eb',
+                    color: 'white'
+                  }}
                   data-testid="button-book-appointment"
                 >
                   <div className="flex items-center justify-center">
@@ -715,23 +719,19 @@ export default function PublicBooking() {
               </div>
               
               {/* Enhanced Trust indicators with better mobile design */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-xl mx-auto mb-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto mb-8">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            <Award className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
-                          </div>
-                          <div className="text-center sm:text-left">
-                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Professional Service</span>
-                            <span className="text-xs text-muted-foreground hidden sm:block">Expert quality</span>
-                          </div>
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <div 
+                          className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        >
+                          <Award className="w-6 h-6 text-white" />
                         </div>
+                        <span className="font-semibold text-foreground text-xs sm:text-sm text-center">Professional</span>
+                        <span className="text-xs text-muted-foreground text-center">Expert quality</span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -743,19 +743,15 @@ export default function PublicBooking() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="group flex items-center justify-center sm:justify-start p-4 sm:p-3 rounded-2xl sm:rounded-xl bg-card/40 backdrop-blur-sm border border-border/20 hover:border-border/40 transition-all duration-300 hover:shadow-lg">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full mr-3 sm:mr-2 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
-                          >
-                            <Shield className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
-                          </div>
-                          <div className="text-center sm:text-left">
-                            <span className="font-semibold text-foreground text-sm sm:text-xs block">Secure Booking</span>
-                            <span className="text-xs text-muted-foreground hidden sm:block">Safe & protected</span>
-                          </div>
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <div 
+                          className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                        >
+                          <Shield className="w-6 h-6 text-white" />
                         </div>
+                        <span className="font-semibold text-foreground text-xs sm:text-sm text-center">Secure</span>
+                        <span className="text-xs text-muted-foreground text-center">Safe & protected</span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -763,9 +759,77 @@ export default function PublicBooking() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+
+                {pageServices.length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                          <div 
+                            className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            <Sparkles className="w-6 h-6 text-white" />
+                          </div>
+                          <span className="font-semibold text-foreground text-xs sm:text-sm text-center">{pageServices.length} {pageServices.length === 1 ? 'Service' : 'Services'}</span>
+                          <span className="text-xs text-muted-foreground text-center">Available</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Multiple services to choose from</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+
+                {pageStaff.filter((s: any) => s.isActive !== false).length > 0 && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                          <div 
+                            className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          >
+                            <Users className="w-6 h-6 text-white" />
+                          </div>
+                          <span className="font-semibold text-foreground text-xs sm:text-sm text-center">Expert Team</span>
+                          <span className="text-xs text-muted-foreground text-center">{pageStaff.filter((s: any) => s.isActive !== false).length} {pageStaff.filter((s: any) => s.isActive !== false).length === 1 ? 'member' : 'members'}</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Professional team ready to serve you</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </div>
 
-
+              {/* Quick Contact Info Pills */}
+              {(page.contactPhone || page.contactEmail) && (
+                <div className="flex flex-wrap gap-3 justify-center max-w-2xl mx-auto">
+                  {page.contactPhone && (
+                    <a 
+                      href={`tel:${page.contactPhone}`}
+                      className="group inline-flex items-center px-4 py-2 rounded-full bg-card/40 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-md"
+                      data-testid="hero-phone-link"
+                    >
+                      <Phone className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                      <span className="text-sm font-medium text-foreground">{page.contactPhone}</span>
+                    </a>
+                  )}
+                  {page.contactEmail && (
+                    <a 
+                      href={`mailto:${page.contactEmail}`}
+                      className="group inline-flex items-center px-4 py-2 rounded-full bg-card/40 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-md"
+                      data-testid="hero-email-link"
+                    >
+                      <Mail className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                      <span className="text-sm font-medium text-foreground">{page.contactEmail}</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
