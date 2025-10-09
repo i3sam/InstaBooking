@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, X, Calendar, Mail, Filter, Download, Wifi, WifiOff } from 'lucide-react';
+import { SiGooglecalendar } from 'react-icons/si';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
@@ -158,9 +159,21 @@ export default function AppointmentsList() {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="text-foreground" data-testid={`service-name-${appointment.id}`}>
-                        {appointment.serviceName || 'Service'}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-foreground" data-testid={`service-name-${appointment.id}`}>
+                          {appointment.serviceName || 'Service'}
+                        </span>
+                        {appointment.syncedFromGoogle && (
+                          <Badge 
+                            variant="outline" 
+                            className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs flex items-center gap-1"
+                            data-testid={`synced-badge-${appointment.id}`}
+                          >
+                            <SiGooglecalendar className="h-3 w-3" />
+                            Synced from Google
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <div>
