@@ -916,9 +916,13 @@ export default function PublicBooking() {
                     )}
                   </div>
 
-                  {/* Image Gallery Slideshow */}
+                  {/* Image Gallery Slideshow with Photos Header */}
                   {gallery?.images && Array.isArray(gallery.images) && gallery.images.length > 0 && (
                     <div className="mb-8">
+                      <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-4 flex items-center">
+                        <Image className="h-5 w-5 sm:h-6 sm:w-6 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                        Photos
+                      </h4>
                       <ImageGallerySlideshow 
                         images={gallery.images} 
                         primaryColor={themeStyles?.primaryColor || '#2563eb'} 
@@ -926,57 +930,62 @@ export default function PublicBooking() {
                     </div>
                   )}
 
-                  <div className="space-y-6 mb-8">
-                    {/* Business Description */}
-                    <div>
-                      <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-4 flex items-center">
-                        <Info className="h-5 w-5 sm:h-6 sm:w-6 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        Description
-                      </h4>
-                      <div className="bg-background/50 rounded-xl p-6 border border-border/20">
-                        <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
-                          {page.data?.description || page.cancellationPolicy || `Welcome to ${page.title}! We are pleased to inform you that ${page.title?.split(' ')[0]} will be providing you with exceptional professional services. Our team is dedicated to delivering high-quality service and ensuring your satisfaction. We look forward to serving you and exceeding your expectations.`}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Key Features */}
-                    <div>
-                      <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-4 flex items-center">
-                        <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                        What We Offer
-                      </h4>
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {services.length > 0 && (
-                          <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
-                            <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground text-sm sm:text-base">{services.length} Professional Service{services.length > 1 ? 's' : ''} Available</span>
-                          </div>
-                        )}
-                        {pageStaff.length > 0 && (
-                          <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
-                            <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground text-sm sm:text-base">Expert Team of {pageStaff.length} Professional{pageStaff.length > 1 ? 's' : ''}</span>
-                          </div>
-                        )}
-                        {normalizedBooleans.acceptReviews && (
-                          <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
-                            <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground text-sm sm:text-base">Customer Reviews & Ratings</span>
-                          </div>
-                        )}
-                        {page.calendarLink && (
-                          <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
-                            <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground text-sm sm:text-base">Online Booking Available</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Information Section - Show if we have contact phone or business data */}
-                    {(page.contactPhone || businessData.businessType || businessData.businessName) && (
+                  <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+                    {/* Left Column - Description */}
+                    <div className="space-y-6">
                       <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-4 flex items-center">
+                          <Info className="h-5 w-5 sm:h-6 sm:w-6 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                          Description
+                        </h4>
+                        <div className="bg-background/50 rounded-xl p-6 border border-border/20">
+                          <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+                            {page.data?.description || page.cancellationPolicy || `Welcome to ${page.title}! We are pleased to inform you that ${page.title?.split(' ')[0]} will be providing you with exceptional professional services. Our team is dedicated to delivering high-quality service and ensuring your satisfaction. We look forward to serving you and exceeding your expectations.`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column - Features */}
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-4 flex items-center">
+                          <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
+                          What We Offer
+                        </h4>
+                        <div className="grid gap-3">
+                          {services.length > 0 && (
+                            <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
+                              <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground text-sm sm:text-base">{services.length} Professional Service{services.length > 1 ? 's' : ''} Available</span>
+                            </div>
+                          )}
+                          {pageStaff.length > 0 && (
+                            <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
+                              <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground text-sm sm:text-base">Expert Team of {pageStaff.length} Professional{pageStaff.length > 1 ? 's' : ''}</span>
+                            </div>
+                          )}
+                          {normalizedBooleans.acceptReviews && (
+                            <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
+                              <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground text-sm sm:text-base">Customer Reviews & Ratings</span>
+                            </div>
+                          )}
+                          {page.calendarLink && (
+                            <div className="bg-background/50 rounded-lg p-4 border border-border/20 flex items-center hover:border-border/40 transition-colors">
+                              <CheckCircle className="h-5 w-5 mr-3 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground text-sm sm:text-base">Online Booking Available</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Information Section - Show if we have contact phone or business data */}
+                  {(page.contactPhone || businessData.businessType || businessData.businessName) && (
+                    <div>
                           <h4 className="text-xl font-semibold text-foreground mb-4 flex items-center">
                             <Info className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
                             Information
@@ -1160,64 +1169,6 @@ export default function PublicBooking() {
                           </div>
                         </div>
                       )}
-
-                    {/* Business Photos */}
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                          <Image className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                          Photos
-                        </h4>
-                        {gallery.images && gallery.images.length > 0 ? (
-                          <div className="relative px-12">
-                            <Carousel className="w-full">
-                              <CarouselContent>
-                                {gallery.images.map((image: any, index: number) => (
-                                  <CarouselItem key={index}>
-                                    <div 
-                                      className="relative aspect-square rounded-xl overflow-hidden bg-black/5 border border-border/20 cursor-pointer group"
-                                      onClick={() => {
-                                        setSelectedImage(image.url || image);
-                                        setIsImageModalOpen(true);
-                                      }}
-                                    >
-                                      <img 
-                                        src={image.url || image} 
-                                        alt={`${page.title} - Photo ${index + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                      />
-                                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                                    </div>
-                                  </CarouselItem>
-                                ))}
-                              </CarouselContent>
-                              <CarouselPrevious 
-                                className="absolute -left-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full shadow-lg border-2 hover:scale-110 transition-all"
-                                style={{ 
-                                  backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                                  color: 'white',
-                                  borderColor: 'white'
-                                }}
-                              />
-                              <CarouselNext 
-                                className="absolute -right-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full shadow-lg border-2 hover:scale-110 transition-all"
-                                style={{ 
-                                  backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                                  color: 'white',
-                                  borderColor: 'white'
-                                }}
-                              />
-                            </Carousel>
-                          </div>
-                        ) : (
-                          <div className="bg-background/50 rounded-lg p-8 border border-border/20 text-center">
-                            <Image className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                            <p className="text-muted-foreground">No photos available yet</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Reviews Section - Always Visible */}
                   <div className="mt-8 pt-8 border-t border-border/20">
