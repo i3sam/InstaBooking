@@ -121,7 +121,7 @@ export default function GoogleCalendarPage() {
       });
       
       // Clean up URL
-      setLocation('/dashboard/google-calendar');
+      setLocation('/google-calendar');
       
       // Hide success animation after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
@@ -133,7 +133,7 @@ export default function GoogleCalendarPage() {
       });
       
       // Clean up URL
-      setLocation('/dashboard/google-calendar');
+      setLocation('/google-calendar');
     }
   }, []);
 
