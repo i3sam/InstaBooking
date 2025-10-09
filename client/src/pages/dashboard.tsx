@@ -7,7 +7,6 @@ import CalendarView from '@/components/dashboard/calendar';
 import Notes from '@/components/dashboard/notes';
 import HelpCenter from '@/components/dashboard/help-center';
 import SupportBot from '@/components/dashboard/support-bot';
-import GoogleCalendarPage from '@/pages/google-calendar';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,8 +39,6 @@ export default function Dashboard() {
         return <AnalyticsSection />;
       case 'calendar':
         return <CalendarView />;
-      case 'google-calendar':
-        return <GoogleCalendarPage />;
       case 'notes':
         return <Notes />;
       case 'help-center':

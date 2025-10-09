@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, PieChart, FileText, CalendarCheck, BarChart3, Settings, Crown, User, ChevronUp, LogOut, Sparkles, Calendar, StickyNote, HelpCircle } from 'lucide-react';
-import { SiGooglecalendar } from 'react-icons/si';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -41,7 +40,6 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
   const toolsNav = [
     { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'google-calendar', label: 'Google Calendar', icon: SiGooglecalendar },
     { id: 'notes', label: 'Notes', icon: StickyNote },
     { id: 'help-center', label: 'Help Center', icon: HelpCircle },
   ];
