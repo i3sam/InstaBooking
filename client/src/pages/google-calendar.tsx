@@ -43,15 +43,16 @@ export default function GoogleCalendarPage() {
   // Connect to Google Calendar
   const connectMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/google/auth', 'GET');
-      return response;
+      const response = await apiRequest('GET', '/api/google/auth');
+      return response.json();
     },
     onSuccess: (data) => {
       if (data.url) {
         window.location.href = data.url;
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Google connect error:', error);
       toast({
         title: 'Connection failed',
         description: 'Failed to connect to Google Calendar. Please try again.',
@@ -63,7 +64,8 @@ export default function GoogleCalendarPage() {
   // Disconnect from Google Calendar
   const disconnectMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/google/disconnect', 'POST', {});
+      const response = await apiRequest('POST', '/api/google/disconnect', {});
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/google/status'] });
@@ -84,7 +86,8 @@ export default function GoogleCalendarPage() {
   // Sync events to appointments
   const syncMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/google/sync', 'POST', {});
+      const response = await apiRequest('POST', '/api/google/sync', {});
+      return response.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });

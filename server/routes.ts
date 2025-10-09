@@ -1940,11 +1940,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/google/auth", verifyToken, async (req: any, res) => {
     try {
       const userId = req.user.userId;
+      console.log('Generating Google auth URL for user:', userId);
       const authUrl = getAuthUrl(userId);
+      console.log('Generated auth URL successfully');
       res.json({ url: authUrl });
     } catch (error) {
       console.error("Google auth URL generation error:", error);
-      res.status(500).json({ message: "Failed to generate auth URL" });
+      res.status(500).json({ message: "Failed to generate auth URL", error: String(error) });
     }
   });
 

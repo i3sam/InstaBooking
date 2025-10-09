@@ -8,11 +8,18 @@ if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
   console.warn('Google OAuth credentials not found - Google Calendar integration will be unavailable');
 }
 
+// Determine the correct redirect URI
+const redirectUri = process.env.REPLIT_DEV_DOMAIN 
+  ? `https://${process.env.REPLIT_DEV_DOMAIN}/api/google/callback`
+  : 'http://localhost:5000/api/google/callback';
+
+console.log('Google OAuth redirect URI configured as:', redirectUri);
+
 // OAuth2 client configuration
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : 'http://localhost:5000'}/api/google/callback`
+  redirectUri
 );
 
 const SCOPES = [
