@@ -108,7 +108,7 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-3xl max-h-[95vh] overflow-y-auto p-0 border-0 shadow-2xl !rounded-2xl overflow-hidden"
+        className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 border-0 shadow-2xl !rounded-2xl"
         style={{
           background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.04) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.95)`,
           borderRadius: '1rem'
@@ -234,7 +234,7 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
                     <SelectTrigger className="h-12 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200" data-testid="select-service">
                       <SelectValue placeholder="Choose a service" />
                     </SelectTrigger>
-                    <SelectContent className="bg-card/95 backdrop-blur-md border-0 shadow-xl">
+                    <SelectContent className="bg-card/95 backdrop-blur-md border-0 shadow-xl z-[100]">
                       {services.map((service) => (
                         <SelectItem key={service.id} value={service.id} className="focus:bg-primary/10 cursor-pointer">
                           <div className="flex items-center justify-between w-full">
@@ -300,7 +300,7 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
                       <SelectTrigger className="h-12 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200" data-testid="select-time">
                         <SelectValue placeholder="Select time slot" />
                       </SelectTrigger>
-                      <SelectContent className="bg-card/95 backdrop-blur-md border-0 shadow-xl">
+                      <SelectContent className="bg-card/95 backdrop-blur-md border-0 shadow-xl z-[100]">
                         {timeSlots.map((time) => (
                           <SelectItem key={time} value={time} className="focus:bg-primary/10 cursor-pointer">
                             <div className="flex items-center space-x-2">
