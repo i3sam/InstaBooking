@@ -191,16 +191,6 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").default(sql`now()`),
 });
 
-export const googleTokens = pgTable("google_tokens", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => profiles.id, { onDelete: "cascade" }).notNull().unique(),
-  accessToken: text("access_token").notNull(),
-  refreshToken: text("refresh_token").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").default(sql`now()`),
-  updatedAt: timestamp("updated_at").default(sql`now()`),
-});
-
 // Insert schemas (users are managed by Supabase auth)
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
@@ -269,12 +259,6 @@ export const insertNoteSchema = createInsertSchema(notes).omit({
   updatedAt: true,
 });
 
-export const insertGoogleTokenSchema = createInsertSchema(googleTokens).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
 // Types (User type managed by Supabase auth)
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
@@ -296,5 +280,3 @@ export type DemoPage = typeof demoPages.$inferSelect;
 export type InsertDemoPage = z.infer<typeof insertDemoPageSchema>;
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = z.infer<typeof insertNoteSchema>;
-export type GoogleToken = typeof googleTokens.$inferSelect;
-export type InsertGoogleToken = z.infer<typeof insertGoogleTokenSchema>;
