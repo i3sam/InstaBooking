@@ -30,6 +30,17 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
     notes: ''
   });
 
+  // Extract theme color from page
+  const primaryColor = page?.primaryColor || '#2563eb';
+
+  // Helper function to convert hex to RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result 
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : '37, 99, 235';
+  };
+
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/appointments', data);
@@ -96,27 +107,47 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[95vh] overflow-y-auto p-0 border-0 bg-gradient-to-br from-background/95 to-background/90 backdrop-blur-xl shadow-2xl">
-        <div className="p-8">
-          <DialogHeader className="text-center space-y-4 mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mb-4">
-              <Sparkles className="h-8 w-8 text-primary" />
+      <DialogContent 
+        className="max-w-3xl max-h-[95vh] overflow-y-auto p-0 border-0 shadow-2xl rounded-2xl"
+        style={{
+          background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.04) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.95)`
+        }}
+      >
+        <div className="p-6 sm:p-8">
+          <DialogHeader className="text-center space-y-2 mb-6">
+            <div 
+              className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-2 shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`
+              }}
+            >
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
-            <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <DialogTitle className="text-3xl font-bold text-foreground">
               Book Your Appointment
             </DialogTitle>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            <p className="text-base text-muted-foreground max-w-md mx-auto">
               Choose your preferred time and let us create something amazing together
             </p>
           </DialogHeader>
         
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Information Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
+            <Card 
+              className="border-0 shadow-lg backdrop-blur-sm rounded-2xl"
+              style={{
+                background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.03) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.6)`
+              }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl flex items-center justify-center">
-                    <User className="h-5 w-5 text-blue-600" />
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.15) 0%, rgba(${hexToRgb(primaryColor)}, 0.08) 100%)`
+                    }}
+                  >
+                    <User className="h-5 w-5" style={{ color: primaryColor }} />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground">Personal Information</h3>
                 </div>
@@ -175,11 +206,21 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
             </Card>
             
             {/* Service Selection Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
+            <Card 
+              className="border-0 shadow-lg backdrop-blur-sm rounded-2xl"
+              style={{
+                background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.03) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.6)`
+              }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-purple-600" />
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.15) 0%, rgba(${hexToRgb(primaryColor)}, 0.08) 100%)`
+                    }}
+                  >
+                    <Sparkles className="h-5 w-5" style={{ color: primaryColor }} />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground">Select Your Service</h3>
                 </div>
@@ -212,11 +253,21 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
             </Card>
             
             {/* Appointment Timing Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
+            <Card 
+              className="border-0 shadow-lg backdrop-blur-sm rounded-2xl"
+              style={{
+                background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.03) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.6)`
+              }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-xl flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-green-600" />
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.15) 0%, rgba(${hexToRgb(primaryColor)}, 0.08) 100%)`
+                    }}
+                  >
+                    <Calendar className="h-5 w-5" style={{ color: primaryColor }} />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground">Schedule Your Appointment</h3>
                 </div>
@@ -265,11 +316,21 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
             </Card>
             
             {/* Additional Information Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
+            <Card 
+              className="border-0 shadow-lg backdrop-blur-sm rounded-2xl"
+              style={{
+                background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.03) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.6)`
+              }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-orange-600" />
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.15) 0%, rgba(${hexToRgb(primaryColor)}, 0.08) 100%)`
+                    }}
+                  >
+                    <FileText className="h-5 w-5" style={{ color: primaryColor }} />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground">Additional Information</h3>
                 </div>
@@ -290,14 +351,25 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
                   />
                 </div>
                 
-                <div className="mt-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-4 border border-blue-200/20">
+                <div 
+                  className="mt-6 rounded-xl p-4"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.08) 0%, rgba(${hexToRgb(primaryColor)}, 0.04) 100%)`,
+                    border: `1px solid rgba(${hexToRgb(primaryColor)}, 0.15)`
+                  }}
+                >
                   <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                    <div 
+                      className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{
+                        background: `rgba(${hexToRgb(primaryColor)}, 0.2)`
+                      }}
+                    >
+                      <Check className="h-3 w-3" style={{ color: primaryColor }} />
                     </div>
                     <div className="text-sm">
-                      <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">What happens next?</p>
-                      <p className="text-blue-700 dark:text-blue-200">You'll receive a confirmation email within 30 minutes, and we'll contact you to confirm your appointment details.</p>
+                      <p className="font-medium text-foreground mb-1">What happens next?</p>
+                      <p className="text-muted-foreground">You'll receive a confirmation email within 30 minutes, and we'll contact you to confirm your appointment details.</p>
                     </div>
                   </div>
                 </div>
@@ -305,11 +377,11 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
             </Card>
             
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-8">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6">
               <Button 
                 type="button" 
                 variant="outline" 
-                className="flex-1 h-14 border-2 hover:bg-muted/50 transition-all duration-200 text-base font-medium"
+                className="flex-1 h-14 border-2 hover:bg-muted/50 transition-all duration-200 text-base font-medium rounded-xl"
                 onClick={onClose}
                 data-testid="button-cancel"
               >
@@ -317,7 +389,10 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                className="flex-1 h-14 text-base font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
+                style={{
+                  background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`
+                }}
                 disabled={createAppointmentMutation.isPending}
                 data-testid="button-submit-booking"
               >
