@@ -841,54 +841,71 @@ export default function PublicBooking() {
       <section className="py-8 sm:py-12 lg:py-16 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* Modern Tab Navigation - Fully Mobile Optimized */}
-            <div className="flex justify-center mb-8 sm:mb-12 overflow-x-auto scrollbar-hide">
-              <TabsList 
-                className="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-card/80 backdrop-blur-xl border border-border/30 shadow-2xl hover:shadow-3xl transition-all duration-300 min-w-fit"
+            {/* Modern Tab Navigation - Premium Design for PC & Mobile */}
+            <div className="flex justify-center mb-8 sm:mb-12 overflow-x-auto scrollbar-hide px-2">
+              <div 
+                className="inline-flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-2xl backdrop-blur-xl border border-border/30 shadow-2xl transition-all duration-300 min-w-fit"
                 style={{
                   background: themeStyles 
-                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 100%), rgba(255, 255, 255, 0.6)`
-                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%), rgba(255, 255, 255, 0.6)'
+                    ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 100%), rgba(255, 255, 255, 0.7)`
+                    : 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%), rgba(255, 255, 255, 0.7)'
                 }}
               >
-                {tabItems.map((item, index) => {
-                  const IconComponent = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <TabsTrigger 
-                      key={item.id} 
-                      value={item.id}
-                      className="group relative flex items-center gap-2 sm:gap-2 md:gap-3 px-4 sm:px-5 md:px-6 lg:px-8 py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 whitespace-nowrap overflow-visible"
-                      style={{
-                        color: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb',
-                        background: isActive 
-                          ? themeStyles 
-                            ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
-                            : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
-                          : 'transparent',
-                        boxShadow: isActive ? `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}40` : 'none'
-                      }}
-                      data-testid={`tab-${item.id}`}
-                    >
-                      {/* Icon with animated background */}
-                      <div className={`relative flex items-center justify-center transition-all duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-                        <div 
-                          className={`absolute inset-0 rounded-full blur-md transition-opacity duration-300 ${isActive ? 'opacity-50' : 'opacity-0 group-hover:opacity-30'}`}
-                          style={{ 
-                            backgroundColor: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb'
-                          }}
-                        ></div>
-                        <IconComponent className={`relative h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-all duration-300 ${isActive ? 'drop-shadow-lg' : ''}`} />
-                      </div>
-                      
-                      {/* Label - Now visible on all screen sizes */}
-                      <span className="relative font-bold tracking-wide transition-all duration-300">
-                        {item.label}
-                      </span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
+                <TabsList className="flex items-center gap-2 sm:gap-3 bg-transparent">
+                  {tabItems.map((item, index) => {
+                    const IconComponent = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <TabsTrigger 
+                        key={item.id} 
+                        value={item.id}
+                        className="group relative flex items-center gap-2 sm:gap-2.5 md:gap-3 px-4 sm:px-5 md:px-7 lg:px-9 py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base font-bold rounded-xl transition-all duration-300 ease-out whitespace-nowrap data-[state=active]:shadow-xl border-0"
+                        style={{
+                          color: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb',
+                          background: isActive 
+                            ? themeStyles 
+                              ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)`
+                              : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'
+                            : 'transparent',
+                          boxShadow: isActive ? `0 10px 30px -6px ${themeStyles?.primaryColor || '#2563eb'}50` : 'none',
+                          transform: isActive ? 'translateY(-2px)' : 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.background = themeStyles 
+                              ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.12) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+                              : 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.transform = 'none';
+                          }
+                        }}
+                        data-testid={`tab-${item.id}`}
+                      >
+                        {/* Icon with animated background */}
+                        <div className={`relative flex items-center justify-center transition-all duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                          <div 
+                            className={`absolute inset-0 rounded-full blur-sm transition-opacity duration-300 ${isActive ? 'opacity-40' : 'opacity-0 group-hover:opacity-25'}`}
+                            style={{ 
+                              backgroundColor: isActive ? 'white' : themeStyles?.primaryColor || '#2563eb'
+                            }}
+                          ></div>
+                          <IconComponent className={`relative h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 transition-all duration-300 ${isActive ? 'drop-shadow-lg' : ''}`} />
+                        </div>
+                        
+                        {/* Label - Now visible on all screen sizes with better typography */}
+                        <span className="relative font-bold tracking-wide transition-all duration-300 leading-none">
+                          {item.label}
+                        </span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
             </div>
 
             <TabsContent value="about">
