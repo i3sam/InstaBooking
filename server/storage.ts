@@ -74,6 +74,12 @@ export interface IStorage {
   getNotesByUser(userId: string): Promise<any[]>;
   updateNote(id: string, updates: any): Promise<any | undefined>;
   deleteNote(id: string): Promise<boolean>;
+  
+  // Google Tokens
+  createGoogleToken(token: any): Promise<any>;
+  getGoogleToken(userId: string): Promise<any | undefined>;
+  updateGoogleToken(userId: string, updates: any): Promise<any | undefined>;
+  deleteGoogleToken(userId: string): Promise<boolean>;
 }
 
 // Initialize storage instance with SupabaseStorage
