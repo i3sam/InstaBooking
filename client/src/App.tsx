@@ -29,7 +29,6 @@ import SubscriptionSuccess from "@/pages/subscription/success";
 import SubscriptionCancel from "@/pages/subscription/cancel";
 import SubscriptionDelays from "@/pages/subscription-delays";
 import AdminPage from "@/pages/admin";
-import GoogleCalendar from "@/pages/google-calendar";
 
 function Router() {
   return (
@@ -69,11 +68,6 @@ function Router() {
       <Route path="/request-feature">
         <AuthGuard>
           <RequestFeature />
-        </AuthGuard>
-      </Route>
-      <Route path="/google-calendar">
-        <AuthGuard>
-          <GoogleCalendar />
         </AuthGuard>
       </Route>
       <Route path="/:slug" component={PublicBooking} />
