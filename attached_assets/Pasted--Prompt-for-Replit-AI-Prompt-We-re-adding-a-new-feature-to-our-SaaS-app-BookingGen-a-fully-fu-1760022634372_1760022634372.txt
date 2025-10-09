@@ -1,0 +1,109 @@
+🧠 Prompt for Replit AI
+
+Prompt:
+
+We’re adding a new feature to our SaaS app BookingGen — a fully functional Google Calendar integration.
+
+The app already uses:
+
+Frontend: React + Vite + Tailwind CSS + Shadcn UI (with glassmorphism design)
+
+Backend: Express.js API routes
+
+Auth: Supabase
+
+DB: Supabase (PostgreSQL)
+
+🎯 Goal
+
+Add a “Google Calendar” page in the dashboard, with a sidebar button labeled “Google Calendar” and a dedicated route /dashboard/google-calendar.
+
+When the user opens this page:
+
+Display a card-style UI with glassmorphism (blurred translucent background, subtle shadows, rounded corners).
+
+Add a centered “Sign in with Google Calendar” button with the Google Calendar logo on the left side and the label next to it.
+
+Animate the card slightly on hover (soft scale-up effect).
+
+Once the user signs in, show a success animation or icon (like ✅ or a checkmark glow effect) and a section titled “Your Google Calendar Events”.
+
+Underneath, list their imported events in a clean table or list view with:
+
+Event Title
+
+Start Time
+
+End Time
+
+Date
+
+(Optional) Calendar name or type
+
+⚙️ Functionality Details
+
+OAuth Setup
+
+Add a new route /api/google/auth that starts Google OAuth flow.
+
+Use environment variables:
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+
+Scopes required:
+
+https://www.googleapis.com/auth/calendar.readonly
+https://www.googleapis.com/auth/calendar.events
+
+
+Callback Route
+
+Add /api/google/callback to exchange the code for access & refresh tokens.
+
+Save tokens in Supabase (linked to the current logged-in user).
+
+Redirect user to /dashboard/google-calendar?connected=true after success.
+
+Import Calendar Events
+
+Add a backend route /api/google/events that fetches events from the user’s Google Calendar using their stored access token:
+
+GET https://www.googleapis.com/calendar/v3/calendars/primary/events
+
+
+Map relevant data (event name, time, date, etc.) and return as JSON.
+
+Store imported events in Supabase (under user’s table or “appointments”).
+
+Sync with BookingGen
+
+When the user imports their Google Calendar events, those events should automatically appear in their BookingGen Appointments page, seamlessly merging with existing appointments.
+
+Add a subtle label like “📅 Synced from Google Calendar” next to imported events.
+
+UI/UX Notes
+
+Maintain the same glass morphism style and animations as the rest of the dashboard.
+
+Add a smooth transition between logged-out → connected state.
+
+Use loading states or skeleton screens while events are being fetched.
+
+Add small text below the “Connect” button:
+“Securely connect your Google Calendar to automatically sync appointments.”
+
+✅ Summary
+
+Add sidebar button → /dashboard/google-calendar
+
+Add Google sign-in button & integration flow (OAuth)
+
+Fetch and display events from user’s calendar
+
+Sync imported events to BookingGen’s appointment list
+
+Maintain BookingGen’s modern & minimal glassmorphism UI aesthetic
+
+Please implement this end-to-end (frontend + backend), ensure the integration is secure, and test that imported Google Calendar events display correctly inside both the Google Calendar page and the main Appointments dashboard.
