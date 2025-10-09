@@ -84,6 +84,9 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
   
   // Service image upload state
   const [uploadingServiceIndex, setUploadingServiceIndex] = useState<number | null>(null);
+  
+  // Staff image upload state
+  const [uploadingStaffIndex, setUploadingStaffIndex] = useState<number | null>(null);
 
   // Fetch page data for editing
   const { data: editingPageData } = useQuery({
@@ -487,6 +490,56 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
       });
     } finally {
       setUploadingServiceIndex(null);
+    }
+  };
+
+  const handleStaffImageUpload = async (staffIndex: number, file: File) => {
+    setUploadingStaffIndex(staffIndex);
+    try {
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Image must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Upload to Supabase
+      const result = await uploadFile(file, 'staff-images');
+      
+      if (result.success && result.url) {
+        updateStaffMember(staffIndex, 'imageUrl', result.url);
+        toast({
+          title: "Image uploaded!",
+          description: "Profile picture has been uploaded successfully.",
+        });
+      } else {
+        toast({
+          title: "Upload failed",
+          description: result.error || "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Upload error",
+        description: "Something went wrong while uploading the image.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingStaffIndex(null);
     }
   };
 
@@ -1012,6 +1065,69 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                               className="glass-effect border-border/50 mt-2"
                               data-testid={`input-staff-phone-${index}`}
                             />
+                          </div>
+                        </div>
+
+                        {/* Staff Profile Image Upload */}
+                        <div className="pt-4 border-t border-border/30">
+                          <Label className="text-base font-medium flex items-center gap-2 mb-3">
+                            <Image className="h-4 w-4" />
+                            Profile Picture (Optional)
+                          </Label>
+                          <div className="flex items-center gap-4">
+                            {member.imageUrl && (
+                              <div className="w-20 h-20 rounded-full border border-border/50 overflow-hidden flex-shrink-0 glass-effect">
+                                <img
+                                  src={member.imageUrl}
+                                  alt={`${member.name} profile`}
+                                  className="w-full h-full object-cover"
+                                  data-testid={`img-staff-preview-${index}`}
+                                />
+                              </div>
+                            )}
+                            
+                            <div className="flex-1">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleStaffImageUpload(index, file);
+                                }}
+                                className="hidden"
+                                id={`staff-image-upload-${index}`}
+                                data-testid={`input-staff-image-${index}`}
+                              />
+                              <div className="flex gap-2 flex-wrap">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => document.getElementById(`staff-image-upload-${index}`)?.click()}
+                                  disabled={uploadingStaffIndex === index}
+                                  data-testid={`button-upload-staff-image-${index}`}
+                                  className="glass-effect border-border/50"
+                                >
+                                  <CloudUpload className="w-4 h-4 mr-2" />
+                                  {uploadingStaffIndex === index ? 'Uploading...' : member.imageUrl ? 'Change Picture' : 'Upload Picture'}
+                                </Button>
+                                {member.imageUrl && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => updateStaffMember(index, 'imageUrl', '')}
+                                    data-testid={`button-remove-staff-image-${index}`}
+                                  >
+                                    <X className="w-4 h-4 mr-1" />
+                                    Remove
+                                  </Button>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Recommended: Square image, max 5MB
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
