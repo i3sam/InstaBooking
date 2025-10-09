@@ -108,9 +108,10 @@ export default function BookingModal({ open, onClose, page, services }: BookingM
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-3xl max-h-[95vh] overflow-y-auto p-0 border-0 shadow-2xl rounded-2xl"
+        className="max-w-3xl max-h-[95vh] overflow-y-auto p-0 border-0 shadow-2xl !rounded-2xl overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.04) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.95)`
+          background: `linear-gradient(135deg, rgba(${hexToRgb(primaryColor)}, 0.04) 0%, rgba(${hexToRgb(primaryColor)}, 0.01) 100%), rgba(255, 255, 255, 0.95)`,
+          borderRadius: '1rem'
         }}
       >
         <div className="p-6 sm:p-8">
