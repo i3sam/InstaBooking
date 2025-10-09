@@ -161,46 +161,77 @@ export default function GoogleCalendarPage() {
       </div>
 
       {!isConnected ? (
-        <Card 
-          className="glass-prism-card backdrop-blur-xl bg-white/40 dark:bg-black/40 border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] max-w-2xl mx-auto"
-          data-testid="card-google-connect"
-        >
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-4 shadow-lg">
-              <SiGooglecalendar className="h-10 w-10 text-white" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Connect Google Calendar
-            </CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-400 text-base">
-              Securely connect your Google Calendar to automatically sync appointments
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-4 pb-8">
-            <Button 
-              onClick={() => connectMutation.mutate()}
-              disabled={connectMutation.isPending}
-              className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-xl px-8 py-6 text-lg font-semibold"
-              data-testid="button-connect-google"
-            >
-              {connectMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  <SiGooglecalendar className="mr-2 h-5 w-5" />
-                  Sign in with Google Calendar
-                </>
-              )}
-            </Button>
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md">
-              We'll only access your calendar events to help you manage your appointments better.
-              You can disconnect anytime.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card 
+            className="glass-prism-card backdrop-blur-xl bg-white/40 dark:bg-black/40 border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] max-w-2xl mx-auto"
+            data-testid="card-google-connect"
+          >
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto w-24 h-24 rounded-2xl bg-white dark:bg-gray-800 flex items-center justify-center mb-4 shadow-2xl border border-gray-200 dark:border-gray-700">
+                <SiGooglecalendar className="h-16 w-16 text-[#4285f4]" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                Connect Google Calendar
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400 text-base">
+                Securely connect your Google Calendar to automatically sync appointments
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-4 pb-8">
+              <Button 
+                onClick={() => connectMutation.mutate()}
+                disabled={connectMutation.isPending}
+                className="glass-prism-button backdrop-blur-lg bg-[#4285f4] hover:bg-[#357ae8] text-white shadow-xl px-8 py-6 text-lg font-semibold"
+                data-testid="button-connect-google"
+              >
+                {connectMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <SiGooglecalendar className="mr-3 h-6 w-6" />
+                    Sign in with Google Calendar
+                  </>
+                )}
+              </Button>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md">
+                We'll only access your calendar events to help you manage your appointments better.
+                You can disconnect anytime.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Setup Instructions */}
+          <Card className="glass-prism-card backdrop-blur-xl bg-yellow-50/40 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-lg text-yellow-900 dark:text-yellow-100 flex items-center">
+                <span className="text-2xl mr-2">⚠️</span>
+                Setup Required
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                Before connecting, make sure you've added this redirect URI to your Google Cloud Console OAuth credentials:
+              </p>
+              <div className="bg-white/60 dark:bg-black/40 p-3 rounded-lg border border-yellow-300 dark:border-yellow-700">
+                <code className="text-xs text-yellow-900 dark:text-yellow-100 break-all">
+                  {window.location.origin}/api/google/callback
+                </code>
+              </div>
+              <div className="text-xs text-yellow-700 dark:text-yellow-300 space-y-1">
+                <p><strong>Steps to add redirect URI:</strong></p>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a></li>
+                  <li>Select your OAuth 2.0 Client ID</li>
+                  <li>Add the above URI to "Authorized redirect URIs"</li>
+                  <li>Save changes and return here to connect</li>
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
         <div className="space-y-6">
           {/* Success Animation */}
