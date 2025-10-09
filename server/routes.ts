@@ -1955,7 +1955,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { code, state } = req.query;
       
       if (!code || !state) {
-        return res.redirect('/dashboard/google-calendar?error=missing_params');
+        return res.redirect('/google-calendar?error=missing_params');
       }
 
       const userId = state as string;
@@ -1964,7 +1964,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tokens = await getTokensFromCode(code as string);
       
       if (!tokens.access_token || !tokens.refresh_token) {
-        return res.redirect('/dashboard/google-calendar?error=token_exchange_failed');
+        return res.redirect('/google-calendar?error=token_exchange_failed');
       }
 
       // Calculate expiry time (tokens typically expire in 1 hour)
@@ -1979,10 +1979,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Redirect back to Google Calendar page with success
-      res.redirect('/dashboard/google-calendar?connected=true');
+      res.redirect('/google-calendar?connected=true');
     } catch (error) {
       console.error("Google OAuth callback error:", error);
-      res.redirect('/dashboard/google-calendar?error=auth_failed');
+      res.redirect('/google-calendar?error=auth_failed');
     }
   });
 
