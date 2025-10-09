@@ -805,28 +805,30 @@ export default function PublicBooking() {
                 )}
               </div>
 
-              {/* Quick Contact Info Pills */}
+              {/* Quick Contact Buttons */}
               {(page.contactPhone || page.contactEmail) && (
                 <div className="flex flex-wrap gap-3 justify-center max-w-2xl mx-auto">
                   {page.contactPhone && (
-                    <a 
-                      href={`tel:${page.contactPhone}`}
-                      className="group inline-flex items-center px-4 py-2 rounded-full bg-card/40 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-md"
-                      data-testid="hero-phone-link"
+                    <Button
+                      onClick={() => setShowPhoneDialog(true)}
+                      className="group inline-flex items-center px-6 py-3 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                      data-testid="button-call"
                     >
-                      <Phone className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                      <span className="text-sm font-medium text-foreground">{page.contactPhone}</span>
-                    </a>
+                      <Phone className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                      <span className="text-sm">Call</span>
+                    </Button>
                   )}
                   {page.contactEmail && (
-                    <a 
-                      href={`mailto:${page.contactEmail}`}
-                      className="group inline-flex items-center px-4 py-2 rounded-full bg-card/40 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-md"
-                      data-testid="hero-email-link"
+                    <Button
+                      onClick={() => setShowEmailDialog(true)}
+                      className="group inline-flex items-center px-6 py-3 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                      data-testid="button-email"
                     >
-                      <Mail className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                      <span className="text-sm font-medium text-foreground">{page.contactEmail}</span>
-                    </a>
+                      <Mail className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                      <span className="text-sm">Email</span>
+                    </Button>
                   )}
                 </div>
               )}
