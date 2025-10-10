@@ -1224,6 +1224,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all reviews for user's pages (for dashboard management)
+  app.get("/api/user/reviews", verifyToken, async (req: any, res) => {
+    try {
+      const reviews = await storage.getReviewsByOwner(req.user.userId);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Get user reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update review approval status
+  app.patch("/api/reviews/:id/status", verifyToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { isApproved } = req.body;
+
+      if (!['pending', 'approved', 'rejected'].includes(isApproved)) {
+        return res.status(400).json({ message: "Invalid approval status" });
+      }
+
+      // Get the review first to verify ownership
+      const reviews = await storage.getReviewsByOwner(req.user.userId);
+      const review = reviews.find(r => r.id === id);
+
+      if (!review) {
+        return res.status(404).json({ message: "Review not found or you don't have permission" });
+      }
+
+      const updatedReview = await storage.updateReview(id, { isApproved });
+      res.json(updatedReview);
+    } catch (error) {
+      console.error("Update review status error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Appointments routes
   app.post("/api/appointments", async (req, res) => {
     try {
