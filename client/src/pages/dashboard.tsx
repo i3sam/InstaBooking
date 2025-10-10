@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe, Sparkles } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe, Sparkles, Star, FileText, BookOpen } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -283,151 +283,93 @@ interface BugFixesChangelogSectionProps {
 function BugFixesChangelogSection({ onReportBug }: BugFixesChangelogSectionProps) {
   const changelogData = [
     {
-      version: "2.1.0",
-      date: "September 2025",
+      version: "1.3.0",
+      date: "October 2025",
       type: "feature",
-      title: "Enhanced Glass Prism UI Design",
-      description: "Redesigned the entire interface with our beautiful glass prism effect, featuring improved transparency, blur effects, and white/blue gradients throughout the app.",
+      title: "Customer Reviews Management",
+      description: "Added comprehensive review management system allowing you to manage and display customer feedback on your booking pages.",
+      icon: Star,
+      items: [
+        "Approve or decline customer reviews",
+        "Filter reviews by pending, approved, and declined status",
+        "Display reviews on public booking pages",
+        "Email notifications for new reviews",
+        "Star rating system with detailed feedback"
+      ]
+    },
+    {
+      version: "1.2.5",
+      date: "October 2025",
+      type: "fix",
+      title: "Tab Navigation Text Visibility Fix",
+      description: "Fixed issue where tab text disappeared when selected in the reviews section.",
       icon: Palette,
       items: [
-        "Updated all components with glass prism styling",
-        "Improved responsive design for mobile devices",
-        "Added subtle animations and hover effects",
-        "Enhanced color consistency across the platform"
+        "Fixed inactive tab text visibility",
+        "Improved tab color contrast",
+        "Enhanced active state styling",
+        "Better dark mode support for tabs"
       ]
     },
     {
-      version: "2.0.5",
-      date: "September 2025",
-      type: "fix",
-      title: "Payment Processing Improvements",
-      description: "Fixed critical issues with Razorpay integration and improved payment success rates.",
-      icon: CreditCard,
-      items: [
-        "Fixed upgrade modal payment flow",
-        "Improved error handling for failed payments",
-        "Added better loading states during payment processing",
-        "Enhanced subscription management features"
-      ]
-    },
-    {
-      version: "2.0.4",
-      date: "September 2025", 
+      version: "1.2.0",
+      date: "October 2025",
       type: "feature",
-      title: "Advanced Booking Page Customization",
-      description: "Added powerful customization options for booking pages with new themes and layout options.",
-      icon: Smartphone,
-      items: [
-        "New booking page themes and color schemes",
-        "Custom logo upload functionality",
-        "Advanced typography options",
-        "Mobile-optimized booking forms",
-        "Real-time preview while editing"
-      ]
-    },
-    {
-      version: "2.0.3",
-      date: "August 2025",
-      type: "fix",
-      title: "Database Performance Optimization",
-      description: "Significantly improved app performance through database optimizations and caching.",
-      icon: Database,
-      items: [
-        "Optimized database queries for faster loading",
-        "Implemented intelligent caching system",
-        "Fixed memory leaks in data fetching",
-        "Improved connection pooling for better stability"
-      ]
-    },
-    {
-      version: "2.0.2",
-      date: "August 2025",
-      type: "feature",
-      title: "Smart Analytics Dashboard",
-      description: "Introduced comprehensive analytics with conversion tracking and revenue insights.",
-      icon: Search,
-      items: [
-        "Real-time booking conversion analytics",
-        "Revenue tracking and forecasting",
-        "Customer behavior insights",
-        "Exportable reports and data",
-        "Custom date range filtering"
-      ]
-    },
-    {
-      version: "2.0.1",
-      date: "August 2025",
-      type: "fix",
-      title: "Authentication & Security Enhancements", 
-      description: "Strengthened security measures and improved user authentication experience.",
-      icon: Shield,
-      items: [
-        "Enhanced JWT token security",
-        "Improved password reset flow",
-        "Added two-factor authentication support",
-        "Fixed session timeout issues",
-        "Strengthened API endpoint security"
-      ]
-    },
-    {
-      version: "2.0.0",
-      date: "July 2025",
-      type: "feature",
-      title: "Multi-Currency Support & Internationalization",
-      description: "Added support for multiple currencies and international payment methods.",
-      icon: Globe,
-      items: [
-        "Support for 50+ currencies worldwide",
-        "Automatic currency conversion",
-        "Region-specific payment methods",
-        "Localized date and time formatting",
-        "International tax calculation support"
-      ]
-    },
-    {
-      version: "1.9.8",
-      date: "July 2025",
-      type: "feature",
-      title: "Email Automation & Notifications",
-      description: "Powerful email automation system for booking confirmations and reminders.",
-      icon: Mail,
-      items: [
-        "Automated booking confirmation emails",
-        "Customizable email templates",
-        "Smart reminder scheduling",
-        "Email deliverability improvements",
-        "Customer communication tracking"
-      ]
-    },
-    {
-      version: "1.9.7",
-      date: "June 2025",
-      type: "fix",
-      title: "Mobile Responsiveness Fixes",
-      description: "Fixed various mobile responsiveness issues and improved touch interactions.",
-      icon: Smartphone,
-      items: [
-        "Fixed mobile navigation menu issues",
-        "Improved touch target sizes",
-        "Fixed form input focus on mobile devices",
-        "Enhanced mobile booking flow",
-        "Optimized loading speeds on slower connections"
-      ]
-    },
-    {
-      version: "1.9.6",
-      date: "June 2025",
-      type: "feature",
-      title: "Advanced Calendar Integration",
-      description: "Seamless integration with popular calendar applications and scheduling tools.",
+      title: "Calendar & Scheduling Tools",
+      description: "Introduced powerful calendar management for viewing and organizing all your appointments in one place.",
       icon: Calendar,
       items: [
-        "Google Calendar synchronization",
-        "Outlook calendar integration",
-        "iCal export functionality",
-        "Automatic timezone detection",
-        "Conflict detection and prevention",
-        "Bulk calendar operations"
+        "Interactive calendar view of all appointments",
+        "Filter by appointment status",
+        "Quick appointment details preview",
+        "Navigate between months",
+        "Color-coded status indicators"
+      ]
+    },
+    {
+      version: "1.1.0",
+      date: "October 2025",
+      type: "feature",
+      title: "Notes & Documentation System",
+      description: "Added notes feature for keeping track of important information and reminders.",
+      icon: FileText,
+      items: [
+        "Create and manage personal notes",
+        "Archive old notes",
+        "Rich text support",
+        "Search and filter notes",
+        "Quick access from dashboard"
+      ]
+    },
+    {
+      version: "1.0.5",
+      date: "October 2025",
+      type: "feature",
+      title: "Help Center & Support Resources",
+      description: "Comprehensive help center with guides, tutorials, and FAQs to help you get the most out of BookingGen.",
+      icon: BookOpen,
+      items: [
+        "Getting started guides",
+        "Feature tutorials and walkthroughs",
+        "FAQ section with common questions",
+        "Category-based help articles",
+        "Search functionality for quick answers"
+      ]
+    },
+    {
+      version: "1.0.0",
+      date: "October 2025",
+      type: "feature",
+      title: "Core Booking Platform Launch",
+      description: "Initial release of BookingGen with essential booking page creation and management features.",
+      icon: Zap,
+      items: [
+        "Create unlimited booking pages",
+        "Customizable services and pricing",
+        "Appointment management dashboard",
+        "Email notifications for bookings",
+        "Mobile-responsive booking pages",
+        "Secure payment processing integration"
       ]
     }
   ];
