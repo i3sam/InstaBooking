@@ -3,7 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, Calendar, Mail, Filter, Download, Wifi, WifiOff, ChevronDown, ChevronUp, Eye, DollarSign, Phone, FileText, ExternalLink, User } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, X, Calendar, Mail, Filter, Download, Wifi, WifiOff, ChevronDown, ChevronUp, Eye, DollarSign, Phone, FileText, ExternalLink, User, Copy } from 'lucide-react';
 import { SiGooglecalendar } from 'react-icons/si';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -58,8 +59,12 @@ export default function AppointmentsList() {
     updateAppointmentMutation.mutate({ id, status });
   };
 
-  const handleEmail = (email: string) => {
-    window.open(`mailto:${email}`, '_blank');
+  const handleCopyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    toast({
+      title: "Email copied!",
+      description: "Customer email has been copied to clipboard",
+    });
   };
 
   const handleReschedule = (appointment: any) => {
@@ -246,15 +251,35 @@ export default function AppointmentsList() {
                               <Calendar className="h-4 w-4" />
                             </Button>
                             {appointment.customerEmail && (
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-all"
-                                data-testid={`button-email-${appointment.id}`}
-                                onClick={() => handleEmail(appointment.customerEmail)}
-                              >
-                                <Mail className="h-4 w-4" />
-                              </Button>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-all"
+                                    data-testid={`button-email-${appointment.id}`}
+                                  >
+                                    <Mail className="h-4 w-4" />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 glass-prism-card backdrop-blur-xl bg-white/90 dark:bg-black/90 border border-white/30 shadow-2xl">
+                                  <div className="space-y-3">
+                                    <div>
+                                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Customer Email</h4>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">Click to copy the email address</p>
+                                    </div>
+                                    <div 
+                                      onClick={() => handleCopyEmail(appointment.customerEmail)}
+                                      className="flex items-center justify-between p-3 glass-prism backdrop-blur-md bg-white/30 dark:bg-black/30 border border-white/30 rounded-lg cursor-pointer hover:bg-white/50 dark:hover:bg-black/50 transition-all group"
+                                    >
+                                      <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate flex-1">
+                                        {appointment.customerEmail}
+                                      </span>
+                                      <Copy className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 ml-2 flex-shrink-0" />
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
                             )}
                           </div>
                         </td>
