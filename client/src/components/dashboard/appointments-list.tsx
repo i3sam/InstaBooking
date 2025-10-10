@@ -76,24 +76,24 @@ export default function AppointmentsList() {
   }
 
   return (
-    <div className="animate-fade-in-up">
-      <div className="flex items-center justify-between mb-8">
+    <div className="animate-fade-in-up space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Appointments</h2>
           <p className="text-gray-600 dark:text-gray-300">Manage your upcoming and past appointments</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Real-time connection indicator */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-black/10 border border-white/20">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20">
             {isRealtimeConnected ? (
               <>
                 <Wifi className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-500">Live</span>
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">Live</span>
               </>
             ) : (
               <>
                 <WifiOff className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-400">Offline</span>
+                <span className="text-sm font-medium text-gray-500">Offline</span>
               </>
             )}
           </div>
@@ -109,10 +109,10 @@ export default function AppointmentsList() {
       </div>
 
       {appointments.length === 0 ? (
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl animate-scale-in">
           <CardContent className="p-12 text-center">
-            <div className="text-6xl text-gray-400 mb-4">📅</div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">No appointments yet</h3>
+            <div className="text-6xl mb-4">📅</div>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">No appointments yet</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Once people start booking appointments through your pages, they'll appear here.
             </p>
@@ -126,33 +126,33 @@ export default function AppointmentsList() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur animate-scale-in">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border-b border-white/10">
+              <thead className="glass-prism backdrop-blur-md bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-white/20">
                 <tr>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Customer</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Service</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Date & Time</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Status</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-600 dark:text-gray-300">Actions</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Customer</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Service</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Date & Time</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Status</th>
+                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
-                {appointments.map((appointment: any) => (
-                  <tr key={appointment.id}>
+              <tbody className="divide-y divide-white/10">
+                {appointments.map((appointment: any, index: number) => (
+                  <tr key={appointment.id} className="hover:bg-white/5 dark:hover:bg-black/5 transition-colors duration-200">
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary">
-                            {appointment.customerName?.charAt(0)}
+                        <div className="w-11 h-11 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-300/30 dark:border-blue-600/30">
+                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                            {appointment.customerName?.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-foreground" data-testid={`customer-name-${appointment.id}`}>
+                          <p className="font-semibold text-gray-800 dark:text-gray-100" data-testid={`customer-name-${appointment.id}`}>
                             {appointment.customerName}
                           </p>
-                          <p className="text-sm text-muted-foreground" data-testid={`customer-email-${appointment.id}`}>
+                          <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`customer-email-${appointment.id}`}>
                             {appointment.customerEmail}
                           </p>
                         </div>
@@ -160,7 +160,7 @@ export default function AppointmentsList() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
-                        <span className="text-foreground" data-testid={`service-name-${appointment.id}`}>
+                        <span className="font-medium text-gray-800 dark:text-gray-200" data-testid={`service-name-${appointment.id}`}>
                           {appointment.serviceName || 'Service'}
                         </span>
                         {appointment.syncedFromGoogle && (
@@ -170,25 +170,25 @@ export default function AppointmentsList() {
                             data-testid={`synced-badge-${appointment.id}`}
                           >
                             <SiGooglecalendar className="h-3 w-3" />
-                            Synced from Google
+                            Synced
                           </Badge>
                         )}
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div>
-                        <p className="text-foreground">{appointment.date}</p>
-                        <p className="text-sm text-muted-foreground">{appointment.time}</p>
+                        <p className="font-medium text-gray-800 dark:text-gray-200">{appointment.date}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.time}</p>
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <Badge 
                         variant={appointment.status === 'pending' ? 'secondary' : 'default'}
                         className={
-                          appointment.status === 'pending' ? 'bg-orange-100 text-orange-800' :
-                          appointment.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                          appointment.status === 'declined' ? 'bg-red-100 text-red-800' :
-                          'bg-blue-100 text-blue-800'
+                          appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
+                          appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
+                          appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
+                          'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
                         }
                         data-testid={`status-${appointment.id}`}
                       >
@@ -196,13 +196,13 @@ export default function AppointmentsList() {
                       </Badge>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-1">
                         {appointment.status === 'pending' && (
                           <>
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="text-green-600 hover:text-green-700 p-1"
+                              className="text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 p-2 rounded-lg transition-all"
                               data-testid={`button-accept-${appointment.id}`}
                               onClick={() => handleStatusUpdate(appointment.id, 'accepted')}
                               disabled={updateAppointmentMutation.isPending}
@@ -212,7 +212,7 @@ export default function AppointmentsList() {
                             <Button 
                               size="sm" 
                               variant="ghost" 
-                              className="text-red-600 hover:text-red-700 p-1"
+                              className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 p-2 rounded-lg transition-all"
                               data-testid={`button-decline-${appointment.id}`}
                               onClick={() => handleStatusUpdate(appointment.id, 'declined')}
                               disabled={updateAppointmentMutation.isPending}
@@ -224,7 +224,7 @@ export default function AppointmentsList() {
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="text-blue-600 hover:text-blue-700 p-1"
+                          className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-2 rounded-lg transition-all"
                           data-testid={`button-reschedule-${appointment.id}`}
                           onClick={() => handleReschedule(appointment)}
                         >
@@ -234,7 +234,7 @@ export default function AppointmentsList() {
                           <Button 
                             size="sm" 
                             variant="ghost" 
-                            className="text-gray-600 hover:text-gray-700 p-1"
+                            className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-all"
                             data-testid={`button-email-${appointment.id}`}
                             onClick={() => handleEmail(appointment.customerEmail)}
                           >

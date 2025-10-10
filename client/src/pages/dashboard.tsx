@@ -165,7 +165,7 @@ function AnalyticsSection() {
   // Check for errors first
   if (!statsLoading && dashboardStats === undefined) {
     return (
-      <div>
+      <div className="animate-fade-in-up">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-2">Analytics</h2>
           <p className="text-muted-foreground">Track your booking performance and revenue</p>
@@ -181,25 +181,25 @@ function AnalyticsSection() {
   }
 
   return (
-    <div>
+    <div className="animate-fade-in-up space-y-6">
       <div className="mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">Analytics</h2>
         <p className="text-gray-600 dark:text-gray-300">Track your booking performance and revenue</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-3 lg:gap-6 mb-8">
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur">
+      <div className="grid lg:grid-cols-2 gap-4 lg:gap-6">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur animate-scale-in" style={{animationDelay: '0.1s'}}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Conversion Rate</h3>
-              <div className="w-8 h-8 rounded-lg glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/30 flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400">📊</span>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Conversion Rate</h3>
+              <div className="w-12 h-12 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/30 to-purple-500/30 border border-white/30 flex items-center justify-center">
+                <span className="text-2xl">📊</span>
               </div>
             </div>
-            <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+            <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2">
               {statsLoading ? "..." : `${dashboardStats?.conversionRate || 0}%`}
             </div>
-            <p className="text-sm text-blue-600 dark:text-blue-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {statsLoading 
                 ? "Loading..." 
                 : (dashboardStats?.totalAppointments || 0) === 0 
@@ -210,18 +210,18 @@ function AnalyticsSection() {
           </CardContent>
         </Card>
         
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur">
+        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl hover-lift mobile-no-blur animate-scale-in" style={{animationDelay: '0.2s'}}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Booking Value</h3>
-              <div className="w-8 h-8 rounded-lg glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/30 flex items-center justify-center">
-                <span className="text-purple-600 dark:text-purple-400">📈</span>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Avg. Booking Value</h3>
+              <div className="w-12 h-12 rounded-xl glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-white/30 flex items-center justify-center">
+                <span className="text-2xl">📈</span>
               </div>
             </div>
-            <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
+            <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-2">
               {statsLoading ? "..." : formatPrice(dashboardStats?.avgBookingValue || 0)}
             </div>
-            <p className="text-sm text-purple-600 dark:text-purple-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {statsLoading 
                 ? "Loading..." 
                 : (dashboardStats?.totalAppointments || 0) === 0 
@@ -233,40 +233,41 @@ function AnalyticsSection() {
         </Card>
       </div>
 
-      <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur">
+      <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur animate-scale-in" style={{animationDelay: '0.3s'}}>
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Key Metrics</h3>
+          <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Key Metrics Overview</h3>
           {statsLoading ? (
             <div className="h-64 glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl text-gray-400 mb-4">⏳</div>
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
                 <p className="text-gray-600 dark:text-gray-400">Loading analytics data...</p>
               </div>
             </div>
           ) : dashboardStats?.totalAppointments === 0 ? (
             <div className="h-64 glass-prism backdrop-blur-md bg-white/5 dark:bg-black/5 border border-white/10 rounded-xl flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl text-gray-400 mb-4">📊</div>
+                <div className="text-5xl text-gray-400 mb-4">📊</div>
+                <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">No Data Yet</h4>
                 <p className="text-gray-600 dark:text-gray-400">Analytics will appear here once you have booking data</p>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
-              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/20 rounded-xl mobile-no-blur">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">{dashboardStats?.pagesCount || 0}</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Active Pages</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              <div className="text-center p-4 lg:p-6 glass-prism backdrop-blur-md bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-300/30 dark:border-blue-600/30 rounded-xl mobile-no-blur hover-lift transition-all duration-300">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{dashboardStats?.pagesCount || 0}</div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Active Pages</p>
               </div>
-              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/10 to-cyan-500/10 border border-white/20 rounded-xl mobile-no-blur">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{dashboardStats?.totalAppointments || 0}</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Bookings</p>
+              <div className="text-center p-4 lg:p-6 glass-prism backdrop-blur-md bg-gradient-to-br from-green-500/20 to-cyan-500/20 border border-green-300/30 dark:border-green-600/30 rounded-xl mobile-no-blur hover-lift transition-all duration-300">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{dashboardStats?.totalAppointments || 0}</div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Bookings</p>
               </div>
-              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-white/20 rounded-xl mobile-no-blur">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Pending Approval</p>
+              <div className="text-center p-4 lg:p-6 glass-prism backdrop-blur-md bg-gradient-to-br from-orange-500/20 to-yellow-500/20 border border-orange-300/30 dark:border-orange-600/30 rounded-xl mobile-no-blur hover-lift transition-all duration-300">
+                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-2">{dashboardStats?.pendingAppointments || 0}</div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Pending Approval</p>
               </div>
-              <div className="text-center p-3 lg:p-4 glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-white/20 rounded-xl mobile-no-blur">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</p>
+              <div className="text-center p-4 lg:p-6 glass-prism backdrop-blur-md bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-300/30 dark:border-purple-600/30 rounded-xl mobile-no-blur hover-lift transition-all duration-300">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">{formatPrice(dashboardStats?.totalRevenue || 0)}</div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Revenue</p>
               </div>
             </div>
           )}
