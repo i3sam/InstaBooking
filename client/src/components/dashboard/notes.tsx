@@ -319,10 +319,10 @@ export default function Notes() {
                       data-testid={`note-item-${note.id}`}
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <h4 className="text-sm sm:text-base font-semibold truncate flex-1">{note.title}</h4>
+                        <h4 className="text-sm sm:text-base font-semibold truncate flex-1 group-hover:text-white dark:group-hover:text-white">{note.title}</h4>
                         {note.isPinned && <Pin className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-2 flex-shrink-0 fill-current" />}
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 line-clamp-2 mb-2">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-100 dark:group-hover:text-gray-200 line-clamp-2 mb-2">
                         {note.content || 'No content'}
                       </p>
                       <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -336,7 +336,7 @@ export default function Notes() {
                             </Badge>
                           ))}
                         </div>
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 group-hover:text-white/60 whitespace-nowrap">
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 group-hover:text-gray-200 dark:group-hover:text-gray-300 whitespace-nowrap">
                           {new Date(note.updatedAt).toLocaleDateString()}
                         </p>
                       </div>
