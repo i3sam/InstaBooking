@@ -54,7 +54,7 @@ export default function Notes() {
   });
 
   const createNoteMutation = useMutation({
-    mutationFn: async (data: { title: string; content: string; category: string; tags: string; color: string }) => {
+    mutationFn: async (data: { title: string; content: string; category: string; tags: string; color: string; isPinned: boolean; isArchived: boolean }) => {
       const response = await apiRequest('POST', '/api/notes', data);
       if (!response.ok) throw new Error('Failed to create note');
       return response.json();
@@ -168,7 +168,9 @@ export default function Notes() {
       content: editContent, 
       category: editCategory, 
       tags: editTags, 
-      color: editColor 
+      color: editColor,
+      isPinned: false,
+      isArchived: false
     });
   };
 
