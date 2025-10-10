@@ -103,7 +103,19 @@ export async function getPublicReviewsByPageId(pageId: string) {
       return [];
     }
 
-    return data || [];
+    // Convert snake_case to camelCase for frontend consistency
+    return (data || []).map((review: any) => ({
+      id: review.id,
+      pageId: review.page_id,
+      reviewerName: review.reviewer_name,
+      reviewerEmail: review.reviewer_email,
+      rating: review.rating,
+      reviewText: review.review_text,
+      status: review.status,
+      isApproved: review.is_approved,
+      createdAt: review.created_at,
+      updatedAt: review.updated_at
+    }));
   } catch (error) {
     console.error('Error in getPublicReviewsByPageId:', error);
     return [];
