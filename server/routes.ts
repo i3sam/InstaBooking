@@ -762,7 +762,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const note = await storage.createNote({
         userId: req.user.userId,
         title: req.body.title,
-        content: req.body.content
+        content: req.body.content,
+        category: req.body.category,
+        tags: req.body.tags,
+        color: req.body.color,
+        isPinned: req.body.isPinned,
+        isArchived: req.body.isArchived
       });
       res.status(201).json(note);
     } catch (error) {
