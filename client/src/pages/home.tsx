@@ -657,12 +657,12 @@ export default function Home() {
           <div className="text-center mt-16 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
             <Button 
               size="lg"
-              onClick={() => setLocation('/tutorial')}
+              onClick={() => setLocation('/pricing')}
               className="glass-prism-button px-8 py-3 rounded-full text-lg font-semibold hover-lift mobile-full-width min-touch-target"
-              data-testid="button-see-tutorial"
+              data-testid="button-view-pricing"
             >
-              <Play className="mr-2 h-5 w-5" />
-              See Full Tutorial
+              <DollarSign className="mr-2 h-5 w-5" />
+              View Pricing
             </Button>
           </div>
         </div>
