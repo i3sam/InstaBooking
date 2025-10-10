@@ -67,6 +67,7 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
   const containerRef = useRef<HTMLDivElement>(null);
   const [appointments, setAppointments] = useState<AppointmentData[]>([]);
   const animationRef = useRef<number>();
+  const mousePos = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -75,6 +76,21 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
     const rect = container.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      mousePos.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    const handleMouseLeave = () => {
+      mousePos.current = { x: -1000, y: -1000 };
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseleave', handleMouseLeave);
 
     const initialAppointments: AppointmentData[] = Array.from({ length: count }, (_, i) => ({
       id: i,
@@ -107,6 +123,18 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
           const cardWidth = 220;
           const cardHeight = 95;
 
+          // Repel from mouse cursor
+          const dx = (apt.x + cardWidth / 2) - mousePos.current.x;
+          const dy = (apt.y + cardHeight / 2) - mousePos.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const repelRadius = 150;
+
+          if (distance < repelRadius && distance > 0) {
+            const force = (repelRadius - distance) / repelRadius;
+            newVx += (dx / distance) * force * 3;
+            newVy += (dy / distance) * force * 3;
+          }
+
           if (newX <= 0 || newX >= containerWidth - cardWidth) {
             newVx = -newVx * 0.95;
             newX = newX <= 0 ? 0 : containerWidth - cardWidth;
@@ -137,6 +165,8 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [count]);
 
@@ -149,14 +179,14 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
       {appointments.map((apt) => (
         <div
           key={apt.id}
-          className="absolute transition-all duration-200 hover:scale-110 hover:z-50 cursor-pointer group"
+          className="absolute pointer-events-none"
           style={{
             left: `${apt.x}px`,
             top: `${apt.y}px`,
             width: '220px'
           }}
         >
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-4 border-2 border-blue-400 dark:border-blue-500 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-[0_0_35px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_35px_rgba(96,165,250,0.5)] transition-all duration-200">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-2xl p-4 border-2 border-blue-400/80 dark:border-blue-500/80 transition-all duration-200">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-9 h-9 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <User className="w-5 h-5 text-white" />
