@@ -12,6 +12,7 @@ import {
 import { useLocation } from 'wouter';
 import DemoWizard from '@/components/demo/DemoWizard';
 import AppointmentBallpit from '@/components/animations/AppointmentBallpit';
+import ScrollStack, { ScrollStackItem } from '@/components/animations/ScrollStack';
 import { 
   Palette, 
   CalendarCheck, 
@@ -272,6 +273,66 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Features Section with ScrollStack */}
+      <section id="features" className="relative overflow-hidden gojiberry-gradient">
+        {/* Glass Prism Background Elements */}
+        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
+        
+        <div className="relative content-layer py-24">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-20 animate-fade-in-up">
+              <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
+                Everything you need to{' '}
+                <span className="text-blue-gradient">
+                  accept bookings
+                </span>
+              </h2>
+              <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+                Powerful features designed to help you create professional booking experiences that your clients will love.
+              </p>
+            </div>
+          </div>
+
+          <ScrollStack 
+            useWindowScroll={true}
+            itemDistance={50}
+            itemScale={0.02}
+            itemStackDistance={40}
+            stackPosition="30%"
+            scaleEndPosition="15%"
+            baseScale={0.9}
+          >
+            {features.map((feature, index) => (
+              <ScrollStackItem key={index}>
+                <div className="container mx-auto px-6">
+                  <Card className="group glass-prism-card hover-lift max-w-4xl mx-auto">
+                    <CardContent className="p-12">
+                      <div className="flex flex-col md:flex-row items-center gap-8">
+                        <div className="relative shrink-0">
+                          <div className="w-24 h-24 glass-prism rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <feature.icon className="h-12 w-12 text-primary group-hover:text-blue-600 transition-colors duration-300" />
+                          </div>
+                          <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                          <h3 className="text-3xl font-bold text-foreground mb-4 group-hover:text-blue-gradient transition-colors duration-300">
+                            {feature.title}
+                          </h3>
+                          <p className="text-lg text-muted-foreground leading-relaxed">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollStackItem>
+            ))}
+          </ScrollStack>
+        </div>
+      </section>
+
       {/* Test Before You Launch Section */}
       <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-blue-50/30 dark:to-blue-950/30">
         {/* Glass Prism Background Elements */}
@@ -405,48 +466,6 @@ export default function Home() {
           onClose={() => setShowDemoWizard(false)}
         />
       )}
-
-      {/* Features Section */}
-      <section id="features" className="relative py-24 overflow-hidden gojiberry-gradient">
-        {/* Glass Prism Background Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
-        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
-        
-        <div className="relative container mx-auto px-6 content-layer">
-          <div className="text-center mb-20 animate-fade-in-up">
-            <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
-              Everything you need to{' '}
-              <span className="text-blue-gradient">
-                accept bookings
-              </span>
-            </h2>
-            <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              Powerful features designed to help you create professional booking experiences that your clients will love.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            {features.map((feature, index) => (
-              <Card 
-                key={index} 
-                className="group glass-prism-card hover-lift animate-fade-in-up"
-                style={{animationDelay: `${index * 0.1}s`}}
-              >
-                <CardContent className="p-8">
-                  <div className="relative mb-6">
-                    <div className="w-16 h-16 glass-prism rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <feature.icon className="h-8 w-8 text-primary group-hover:text-blue-600 transition-colors duration-300" />
-                    </div>
-                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-blue-gradient transition-colors duration-300">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* How It Works */}
       <section id="how-it-works" className="relative py-24 overflow-hidden">
