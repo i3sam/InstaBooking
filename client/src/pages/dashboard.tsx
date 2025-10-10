@@ -3,6 +3,7 @@ import Sidebar from '@/components/dashboard/sidebar';
 import Overview from '@/components/dashboard/overview';
 import PagesList from '@/components/dashboard/pages-list';
 import AppointmentsList from '@/components/dashboard/appointments-list';
+import ReviewsList from '@/components/dashboard/reviews-list';
 import CalendarView from '@/components/dashboard/calendar';
 import Notes from '@/components/dashboard/notes';
 import HelpCenter from '@/components/dashboard/help-center';
@@ -37,6 +38,8 @@ export default function Dashboard() {
         return <AppointmentsList />;
       case 'analytics':
         return <AnalyticsSection />;
+      case 'reviews':
+        return <ReviewsList />;
       case 'calendar':
         return <CalendarView />;
       case 'notes':
