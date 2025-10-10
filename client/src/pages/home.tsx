@@ -10,7 +10,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useLocation } from 'wouter';
-import heroImage from '@assets/image_1758670396246.png';
 import DemoWizard from '@/components/demo/DemoWizard';
 import AppointmentBallpit from '@/components/animations/AppointmentBallpit';
 import { 
@@ -268,83 +267,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Hero Image Section */}
-        <div className="relative pb-20 lg:pb-32">
-          <div className="container mx-auto px-6">
-            <div className="relative max-w-6xl mx-auto animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-              <img 
-                src={heroImage} 
-                alt="BookingGen dashboard interface" 
-                className="w-full h-auto object-contain rounded-2xl"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Preview / Value Proposition Section */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 text-white">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMjggMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTI4YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHpNOCAzNGMwLTIuMjEtMS43OS00LTQtNHMtNCAxLjc5LTQgNCAxLjc5IDQgNCA0IDQtMS43OSA0LTR6bTAtMjhjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
-        <div className="relative container mx-auto px-6">
-          <div className="max-w-5xl mx-auto text-center space-y-12">
-            <div className="space-y-6 animate-fade-in-up">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-                Start Your 7-Day FREE Trial Today
-              </h2>
-              <p className="text-xl lg:text-2xl text-blue-100">
-                Full access to all Pro features. Cancel anytime.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
-                  <DollarSign className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold">Just $14.99/mo</h3>
-                <p className="text-blue-100 text-lg">
-                  After trial. 50% OFF regular price. Unlimited bookings, unlimited pages.
-                </p>
-              </div>
-
-              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
-                  <Zap className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold">Great Value</h3>
-                <p className="text-blue-100 text-lg">
-                  Professional booking system at an affordable price. Streamline your business operations effortlessly.
-                </p>
-              </div>
-
-              <div className="space-y-4 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
-                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto">
-                  <Shield className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold">Risk-Free Guarantee</h3>
-                <p className="text-blue-100 text-lg">
-                  Love it or leave it. No contracts, no commitments. Cancel with one click.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-8 animate-scale-in" style={{animationDelay: '0.4s'}}>
-              <Button 
-                onClick={() => setLocation('/signup')}
-                size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 px-8 sm:px-12 py-4 sm:py-6 rounded-full text-lg sm:text-xl h-auto w-full sm:w-auto min-touch-target font-bold"
-                data-testid="button-trial-cta"
-              >
-                <span className="truncate">Start Your FREE 7-Day Trial Now</span>
-                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
-              </Button>
-              <p className="text-blue-100 mt-4 text-xs sm:text-sm px-4 sm:px-0">
-                ✓ Full Pro Access • ✓ Cancel Anytime • ✓ Just $14.99/mo After Trial
-              </p>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ interface AppointmentData {
   pageName: string;
   city: string;
   date: string;
+  status: 'pending' | 'accepted' | 'rescheduled';
   x: number;
   y: number;
   vx: number;
@@ -41,6 +42,23 @@ const generateRandomDate = () => {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
+const statuses: Array<'pending' | 'accepted' | 'rescheduled'> = ['pending', 'accepted', 'rescheduled'];
+
+const getRandomStatus = () => {
+  return statuses[Math.floor(Math.random() * statuses.length)];
+};
+
+const getStatusStyles = (status: 'pending' | 'accepted' | 'rescheduled') => {
+  switch (status) {
+    case 'pending':
+      return 'bg-yellow-400 dark:bg-yellow-500 text-yellow-900 dark:text-yellow-950';
+    case 'accepted':
+      return 'bg-green-500 dark:bg-green-600 text-white';
+    case 'rescheduled':
+      return 'bg-red-500 dark:bg-red-600 text-white';
+  }
+};
+
 interface AppointmentBallpitProps {
   count?: number;
 }
@@ -64,6 +82,7 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
       pageName: pageNames[Math.floor(Math.random() * pageNames.length)],
       city: cities[Math.floor(Math.random() * cities.length)],
       date: generateRandomDate(),
+      status: getRandomStatus(),
       x: Math.random() * (width - 200),
       y: Math.random() * (height - 100),
       vx: (Math.random() - 0.5) * 2,
@@ -85,8 +104,8 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
           let newVx = apt.vx;
           let newVy = apt.vy;
 
-          const cardWidth = 200;
-          const cardHeight = 80;
+          const cardWidth = 220;
+          const cardHeight = 95;
 
           if (newX <= 0 || newX >= containerWidth - cardWidth) {
             newVx = -newVx * 0.95;
@@ -124,40 +143,43 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className="absolute inset-0 overflow-hidden"
       style={{ zIndex: 0 }}
     >
       {appointments.map((apt) => (
         <div
           key={apt.id}
-          className="absolute transition-transform duration-100"
+          className="absolute transition-all duration-200 hover:scale-110 hover:z-50 cursor-pointer group"
           style={{
             left: `${apt.x}px`,
             top: `${apt.y}px`,
-            width: '200px'
+            width: '220px'
           }}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 border border-blue-100 dark:border-blue-900/30 backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-4 border-2 border-blue-400 dark:border-blue-500 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-[0_0_35px_rgba(59,130,246,0.5)] dark:hover:shadow-[0_0_35px_rgba(96,165,250,0.5)] transition-all duration-200">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <div className="w-9 h-9 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                   {apt.name}
                 </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 truncate">
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">
                   {apt.pageName}
                 </p>
               </div>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusStyles(apt.status)}`}>
+                {apt.status}
+              </span>
             </div>
-            <div className="flex items-center justify-between gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex items-center justify-between gap-2 text-xs font-medium text-gray-700 dark:text-gray-300">
               <div className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
+                <MapPin className="w-3.5 h-3.5" />
                 <span className="truncate">{apt.city}</span>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Calendar className="w-3 h-3" />
+                <Calendar className="w-3.5 h-3.5" />
                 <span>{apt.date}</span>
               </div>
             </div>
