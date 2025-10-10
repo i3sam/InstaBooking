@@ -36,6 +36,7 @@ export interface IStorage {
   createReview(review: any): Promise<any>;
   getReviewsByPageId(pageId: string): Promise<any[]>;
   getApprovedReviewsByPageId(pageId: string): Promise<any[]>;
+  getReviewsByOwner(ownerId: string): Promise<any[]>;
   updateReview(id: string, updates: any): Promise<any | undefined>;
   
   // Subscriptions

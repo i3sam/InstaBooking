@@ -614,6 +614,30 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async getReviewsByOwner(ownerId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          pages!inner(
+            id,
+            title,
+            slug,
+            owner_id
+          )
+        `)
+        .eq('pages.owner_id', ownerId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map(item => this.toCamelCase(item));
+    } catch (error) {
+      console.error("Get reviews by owner error:", error);
+      return [];
+    }
+  }
+
   async updateReview(id: string, updates: any): Promise<any | undefined> {
     try {
       const { data, error } = await supabase
