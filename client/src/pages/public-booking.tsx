@@ -532,50 +532,47 @@ export default function PublicBooking() {
       className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'} scroll-smooth`}
       style={themeStyles?.cssVariables}
     >
-      {/* Enhanced Responsive Header - Improved Mobile Design */}
-      <header className="border-b border-border/20 bg-card/80 backdrop-blur-2xl sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
-              <div 
-                className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105 overflow-hidden"
-                style={{
-                  background: page.logoUrl ? 'transparent' : (themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'),
-                  boxShadow: `0 4px 14px -2px ${themeStyles?.primaryColor || '#2563eb'}40`
-                }}
-                data-testid="header-logo"
-              >
-                {page.logoUrl ? (
-                  <img 
-                    src={page.logoUrl} 
-                    alt={`${page.title} logo`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg sm:text-2xl font-black text-white">
-                    {page.title?.charAt(0) || 'B'}
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="text-base sm:text-xl lg:text-2xl font-black text-foreground truncate block">{page.title}</span>
-                {page.tagline && (
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate hidden sm:block">{page.tagline}</p>
-                )}
+      {/* Detached Glossy Header */}
+      <div className="pt-4 sm:pt-6 px-3 sm:px-6 lg:px-8">
+        <header className="container mx-auto rounded-2xl sm:rounded-3xl border border-border/20 bg-card/60 backdrop-blur-3xl shadow-2xl overflow-hidden"
+          style={{
+            boxShadow: `0 8px 32px -4px ${themeStyles?.primaryColor || '#2563eb'}20, 0 0 0 1px ${themeStyles?.primaryColor || '#2563eb'}10`
+          }}
+        >
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+                <div 
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105 overflow-hidden"
+                  style={{
+                    background: page.logoUrl ? 'transparent' : (themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'),
+                    boxShadow: `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}50`
+                  }}
+                  data-testid="header-logo"
+                >
+                  {page.logoUrl ? (
+                    <img 
+                      src={page.logoUrl} 
+                      alt={`${page.title} logo`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xl sm:text-3xl font-black text-white">
+                      {page.title?.charAt(0) || 'B'}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-lg sm:text-2xl lg:text-3xl font-black text-foreground truncate block">{page.title}</span>
+                  {page.tagline && (
+                    <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-0.5 sm:mt-1 truncate">{page.tagline}</p>
+                  )}
+                </div>
               </div>
             </div>
-            <Button 
-              variant="ghost"
-              onClick={() => window.history.back()}
-              className="flex-shrink-0 h-9 sm:h-10 px-2 sm:px-4 hover:bg-background/50 transition-colors"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline font-semibold">Back</span>
-            </Button>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       {/* Mobile-First Hero Section with Glass Prism Effects */}
       <section 
