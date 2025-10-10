@@ -286,21 +286,21 @@ export default function ReviewsList() {
         <TabsList className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 p-1 mobile-no-blur">
           <TabsTrigger
             value="pending"
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-foreground data-[state=active]:glass-prism-button data-[state=active]:text-white"
             data-testid="tab-pending"
           >
             Pending {pendingReviews.length > 0 && `(${pendingReviews.length})`}
           </TabsTrigger>
           <TabsTrigger
             value="approved"
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-foreground data-[state=active]:glass-prism-button data-[state=active]:text-white"
             data-testid="tab-approved"
           >
             Approved {approvedReviews.length > 0 && `(${approvedReviews.length})`}
           </TabsTrigger>
           <TabsTrigger
             value="declined"
-            className="data-[state=active]:glass-prism-button data-[state=active]:text-white"
+            className="text-foreground data-[state=active]:glass-prism-button data-[state=active]:text-white"
             data-testid="tab-declined"
           >
             Declined {rejectedReviews.length > 0 && `(${rejectedReviews.length})`}
