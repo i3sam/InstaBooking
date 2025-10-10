@@ -230,11 +230,11 @@ export default function Notes() {
             variant={showArchived ? 'default' : 'outline'}
             size="sm"
             onClick={() => setShowArchived(!showArchived)}
-            className={showArchived ? 'glass-prism-button' : 'glass-prism'}
+            className={showArchived ? 'glass-prism-button bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700' : 'glass-prism'}
             data-testid="button-toggle-archived"
           >
-            <Archive className="h-4 w-4 mr-2" />
-            {showArchived ? 'Archived' : 'Active'}
+            {showArchived ? <Trash2 className="h-4 w-4 mr-2" /> : <Archive className="h-4 w-4 mr-2" />}
+            {showArchived ? 'Trash Bin' : 'Active Notes'}
           </Button>
           <Button
             onClick={() => {
@@ -287,7 +287,7 @@ export default function Notes() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
               {sortedNotes.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -310,17 +310,17 @@ export default function Notes() {
                       }}
                       className={`w-full text-left p-4 rounded-xl transition-all duration-300 group animate-fade-in border ${
                         selectedNote?.id === note.id
-                          ? 'glass-prism-button text-white shadow-lg'
-                          : `glass-prism hover:glass-prism-button hover:scale-105 ${colorClasses.bg} ${colorClasses.border}`
+                          ? 'glass-prism-button text-white shadow-lg scale-[1.02]'
+                          : `glass-prism hover:glass-prism-button ${colorClasses.bg} ${colorClasses.border}`
                       }`}
                       style={{ animationDelay: `${index * 0.05}s` }}
                       data-testid={`note-item-${note.id}`}
                     >
                       <div className="flex items-start justify-between mb-1">
                         <h4 className="font-semibold truncate flex-1">{note.title}</h4>
-                        {note.isPinned && <Pin className="h-3.5 w-3.5 ml-2 flex-shrink-0" />}
+                        {note.isPinned && <Pin className="h-3.5 w-3.5 ml-2 flex-shrink-0 fill-current" />}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 truncate mb-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 line-clamp-2 mb-2">
                         {note.content || 'No content'}
                       </p>
                       <div className="flex items-center justify-between gap-2">
@@ -334,7 +334,7 @@ export default function Notes() {
                             </Badge>
                           ))}
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 group-hover:text-white/60">
+                        <p className="text-xs text-gray-500 dark:text-gray-500 group-hover:text-white/60 whitespace-nowrap">
                           {new Date(note.updatedAt).toLocaleDateString()}
                         </p>
                       </div>
