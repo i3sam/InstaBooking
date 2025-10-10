@@ -191,7 +191,7 @@ export default function Home() {
       <section className="relative overflow-hidden gojiberry-hero-gradient">
         {/* Appointment Ballpit Animation */}
         <div className="absolute inset-0" style={{ height: '700px' }}>
-          <AppointmentBallpit count={50} />
+          <AppointmentBallpit count={35} />
         </div>
         
         {/* Glass Prism Background Elements */}

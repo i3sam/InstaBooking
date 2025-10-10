@@ -108,53 +108,64 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
 
     setAppointments(initialAppointments);
 
+    let lastUpdate = Date.now();
+    const targetFPS = 30; // Reduce from 60fps to 30fps for better performance
+    const frameInterval = 1000 / targetFPS;
+
     const animate = () => {
-      setAppointments(prev => {
-        const rect = container.getBoundingClientRect();
-        const containerWidth = rect.width;
-        const containerHeight = rect.height;
+      const now = Date.now();
+      const elapsed = now - lastUpdate;
 
-        return prev.map(apt => {
-          let newX = apt.x + apt.vx;
-          let newY = apt.y + apt.vy;
-          let newVx = apt.vx;
-          let newVy = apt.vy;
+      if (elapsed > frameInterval) {
+        lastUpdate = now - (elapsed % frameInterval);
 
-          const cardWidth = 220;
-          const cardHeight = 95;
+        setAppointments(prev => {
+          const rect = container.getBoundingClientRect();
+          const containerWidth = rect.width;
+          const containerHeight = rect.height;
 
-          // Repel from mouse cursor
-          const dx = (apt.x + cardWidth / 2) - mousePos.current.x;
-          const dy = (apt.y + cardHeight / 2) - mousePos.current.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const repelRadius = 150;
+          return prev.map(apt => {
+            let newX = apt.x + apt.vx;
+            let newY = apt.y + apt.vy;
+            let newVx = apt.vx;
+            let newVy = apt.vy;
 
-          if (distance < repelRadius && distance > 0) {
-            const force = (repelRadius - distance) / repelRadius;
-            newVx += (dx / distance) * force * 3;
-            newVy += (dy / distance) * force * 3;
-          }
+            const cardWidth = 220;
+            const cardHeight = 95;
 
-          if (newX <= 0 || newX >= containerWidth - cardWidth) {
-            newVx = -newVx * 0.95;
-            newX = newX <= 0 ? 0 : containerWidth - cardWidth;
-          }
+            // Repel from mouse cursor
+            const dx = (apt.x + cardWidth / 2) - mousePos.current.x;
+            const dy = (apt.y + cardHeight / 2) - mousePos.current.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const repelRadius = 150;
 
-          if (newY <= 0 || newY >= containerHeight - cardHeight) {
-            newVy = -newVy * 0.95;
-            newY = newY <= 0 ? 0 : containerHeight - cardHeight;
-          }
+            if (distance < repelRadius && distance > 0) {
+              const force = (repelRadius - distance) / repelRadius;
+              newVx += (dx / distance) * force * 3;
+              newVy += (dy / distance) * force * 3;
+            }
 
-          return {
-            ...apt,
-            x: newX,
-            y: newY,
-            vx: newVx,
-            vy: newVy,
-            rotation: apt.rotation + 0.5
-          };
+            if (newX <= 0 || newX >= containerWidth - cardWidth) {
+              newVx = -newVx * 0.95;
+              newX = newX <= 0 ? 0 : containerWidth - cardWidth;
+            }
+
+            if (newY <= 0 || newY >= containerHeight - cardHeight) {
+              newVy = -newVy * 0.95;
+              newY = newY <= 0 ? 0 : containerHeight - cardHeight;
+            }
+
+            return {
+              ...apt,
+              x: newX,
+              y: newY,
+              vx: newVx,
+              vy: newVy,
+              rotation: apt.rotation + 0.5
+            };
+          });
         });
-      });
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -186,7 +197,7 @@ export default function AppointmentBallpit({ count = 30 }: AppointmentBallpitPro
             width: '220px'
           }}
         >
-          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-2xl p-4 border-2 border-blue-400/80 dark:border-blue-500/80 transition-all duration-200">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-4 border-2 border-blue-500 dark:border-blue-400 transition-all duration-200">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-9 h-9 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <User className="w-5 h-5 text-white" />
