@@ -1306,146 +1306,6 @@ export default function PublicBooking() {
                           </div>
                         </div>
                       )}
-
-                      {/* Review Submission Form */}
-                      <Collapsible open={showReviews} onOpenChange={setShowReviews}>
-                        <CollapsibleContent className="space-y-4 mt-6">
-                          <div className="bg-background/50 rounded-lg p-4 sm:p-6 border border-border/20 max-w-2xl mx-auto">
-                            <h5 className="text-lg font-semibold text-foreground mb-6 flex items-center">
-                              <MessageSquare className="h-5 w-5 mr-2" style={{ color: themeStyles?.primaryColor || '#2563eb' }} />
-                              Share Your Experience
-                            </h5>
-                            
-                            <form onSubmit={handleReviewSubmit} className="space-y-6">
-                              <div className="grid sm:grid-cols-2 gap-4">
-                                <div>
-                                  <Label htmlFor="reviewerName" className="text-sm font-medium text-foreground">
-                                    Your Name *
-                                  </Label>
-                                  <Input
-                                    id="reviewerName"
-                                    type="text"
-                                    value={reviewFormData.reviewerName}
-                                    onChange={(e) => handleInputChange('reviewerName', e.target.value)}
-                                    className={`mt-1 w-full ${validationErrors.reviewerName ? 'border-red-500' : ''}`}
-                                    placeholder="Enter your full name"
-                                    data-testid="input-review-name"
-                                  />
-                                  {validationErrors.reviewerName && (
-                                    <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerName}</p>
-                                  )}
-                                </div>
-                                
-                                <div>
-                                  <Label htmlFor="reviewerEmail" className="text-sm font-medium text-foreground">
-                                    Email (Optional)
-                                  </Label>
-                                  <Input
-                                    id="reviewerEmail"
-                                    type="email"
-                                    value={reviewFormData.reviewerEmail}
-                                    onChange={(e) => handleInputChange('reviewerEmail', e.target.value)}
-                                    className={`mt-1 w-full ${validationErrors.reviewerEmail ? 'border-red-500' : ''}`}
-                                    placeholder="your.email@example.com"
-                                    data-testid="input-review-email"
-                                  />
-                                  {validationErrors.reviewerEmail && (
-                                    <p className="text-red-500 text-xs mt-1">{validationErrors.reviewerEmail}</p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div>
-                                <Label className="text-sm font-medium text-foreground">
-                                  Rating *
-                                </Label>
-                                <div className="flex items-center space-x-2 mt-2">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                      key={star}
-                                      type="button"
-                                      onClick={() => handleInputChange('rating', star)}
-                                      className="focus:outline-none"
-                                      data-testid={`button-rating-${star}`}
-                                    >
-                                      <Star 
-                                        className={`h-6 w-6 sm:h-8 sm:w-8 transition-colors ${
-                                          star <= reviewFormData.rating 
-                                            ? 'text-yellow-400 fill-current' 
-                                            : 'text-gray-300 hover:text-yellow-200'
-                                        }`}
-                                      />
-                                    </button>
-                                  ))}
-                                  <span className="text-muted-foreground text-sm ml-2">
-                                    {reviewFormData.rating > 0 && `${reviewFormData.rating} star${reviewFormData.rating !== 1 ? 's' : ''}`}
-                                  </span>
-                                </div>
-                                {validationErrors.rating && (
-                                  <p className="text-red-500 text-xs mt-1">{validationErrors.rating}</p>
-                                )}
-                              </div>
-
-                              <div>
-                                <Label htmlFor="reviewText" className="text-sm font-medium text-foreground">
-                                  Your Review (Optional)
-                                </Label>
-                                <Textarea
-                                  id="reviewText"
-                                  value={reviewFormData.reviewText}
-                                  onChange={(e) => handleInputChange('reviewText', e.target.value)}
-                                  className={`mt-1 min-h-[120px] w-full ${validationErrors.reviewText ? 'border-red-500' : ''}`}
-                                  placeholder="Tell us about your experience..."
-                                  maxLength={500}
-                                  data-testid="textarea-review-text"
-                                />
-                                <div className="flex justify-between items-center mt-1">
-                                  {validationErrors.reviewText && (
-                                    <p className="text-red-500 text-xs">{validationErrors.reviewText}</p>
-                                  )}
-                                  <p className="text-xs text-muted-foreground ml-auto">
-                                    {reviewFormData.reviewText.length}/500 characters
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/20">
-                                <Button 
-                                  type="submit"
-                                  disabled={submitReviewMutation.isPending}
-                                  className="flex-1 sm:flex-none px-6 py-2"
-                                  style={{
-                                    backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                                    color: 'white'
-                                  }}
-                                  data-testid="button-submit-review"
-                                >
-                                  {submitReviewMutation.isPending ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Submitting...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <MessageSquare className="h-4 w-4 mr-2" />
-                                      Submit Review
-                                    </>
-                                  )}
-                                </Button>
-                                <Button 
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => setShowReviews(false)}
-                                  className="flex-1 sm:flex-none px-6 py-2"
-                                  data-testid="button-cancel-review"
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
-                            </form>
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
                       
                       {/* Review Submission Form - Only show if reviews are accepted */}
                       {normalizedBooleans.acceptReviews && (
@@ -1460,11 +1320,11 @@ export default function PublicBooking() {
                               <form onSubmit={handleReviewSubmit} className="space-y-6">
                                 <div className="grid sm:grid-cols-2 gap-4">
                                   <div>
-                                    <Label htmlFor="reviewerName2" className="text-sm font-medium text-foreground">
+                                    <Label htmlFor="reviewerName" className="text-sm font-medium text-foreground">
                                       Your Name *
                                     </Label>
                                     <Input
-                                      id="reviewerName2"
+                                      id="reviewerName"
                                       type="text"
                                       value={reviewFormData.reviewerName}
                                       onChange={(e) => handleInputChange('reviewerName', e.target.value)}
@@ -1478,11 +1338,11 @@ export default function PublicBooking() {
                                   </div>
                                   
                                   <div>
-                                    <Label htmlFor="reviewerEmail2" className="text-sm font-medium text-foreground">
+                                    <Label htmlFor="reviewerEmail" className="text-sm font-medium text-foreground">
                                       Email (Optional)
                                     </Label>
                                     <Input
-                                      id="reviewerEmail2"
+                                      id="reviewerEmail"
                                       type="email"
                                       value={reviewFormData.reviewerEmail}
                                       onChange={(e) => handleInputChange('reviewerEmail', e.target.value)}
