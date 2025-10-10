@@ -12,6 +12,7 @@ import {
 import { useLocation } from 'wouter';
 import DemoWizard from '@/components/demo/DemoWizard';
 import AppointmentBallpit from '@/components/animations/AppointmentBallpit';
+import Stepper, { Step } from '@/components/ui/Stepper';
 import { 
   Palette, 
   CalendarCheck, 
@@ -454,35 +455,101 @@ export default function Home() {
         <div className="absolute top-32 left-10 w-80 h-80 glass-prism rounded-full opacity-15 animate-float mobile-hide"></div>
         
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20 animate-fade-in-up">
+          <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
               Launch your booking page in{' '}
               <span className="text-blue-gradient">
                 3 simple steps
               </span>
             </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Follow our interactive guide to see how easy it is to get started
+            </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-16">
-            {steps.map((step, index) => (
-              <div 
-                key={index} 
-                className="text-center group animate-fade-in-up"
-                style={{animationDelay: `${index * 0.2}s`}}
-              >
-                <div className="relative mb-8">
-                  <div className="w-24 h-24 glass-prism rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift">
-                    <span className="text-3xl font-bold text-blue-gradient">{step.number}</span>
+          <div className="max-w-4xl mx-auto animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <Stepper
+              initialStep={1}
+              backButtonText="Previous"
+              nextButtonText="Next Step"
+              onFinalStepCompleted={() => {
+                setLocation('/signup');
+              }}
+            >
+              <Step>
+                <div className="text-center space-y-6 py-8">
+                  <div className="w-24 h-24 glass-prism rounded-full flex items-center justify-center mx-auto shadow-lg">
+                    <span className="text-4xl font-bold text-blue-gradient">1</span>
                   </div>
-                  <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                  {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-400/30 to-transparent -translate-x-1/2"></div>
-                  )}
+                  <h3 className="text-3xl font-bold text-foreground">{steps[0].title}</h3>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    {steps[0].description}
+                  </p>
+                  <div className="pt-4 flex flex-wrap justify-center gap-3">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                      <Palette className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium">Custom Branding</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                      <CalendarCheck className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium">Set Availability</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                      <DollarSign className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium">Add Services</span>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-blue-gradient transition-colors duration-300">{step.title}</h3>
-                <p className="text-muted-foreground text-lg leading-relaxed">{step.description}</p>
-              </div>
-            ))}
+              </Step>
+              <Step>
+                <div className="text-center space-y-6 py-8">
+                  <div className="w-24 h-24 glass-prism rounded-full flex items-center justify-center mx-auto shadow-lg">
+                    <span className="text-4xl font-bold text-blue-gradient">2</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-foreground">{steps[1].title}</h3>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    {steps[1].description}
+                  </p>
+                  <div className="pt-4 flex justify-center">
+                    <div className="inline-block px-6 py-3 bg-muted rounded-lg font-mono text-sm">
+                      <Globe className="inline h-5 w-5 text-primary mr-2" />
+                      bookinggen.xyz/<span className="text-primary font-bold">yourname</span>
+                    </div>
+                  </div>
+                </div>
+              </Step>
+              <Step>
+                <div className="text-center space-y-6 py-8">
+                  <div className="w-24 h-24 glass-prism rounded-full flex items-center justify-center mx-auto shadow-lg">
+                    <span className="text-4xl font-bold text-blue-gradient">3</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-foreground">{steps[2].title}</h3>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    {steps[2].description}
+                  </p>
+                  <div className="pt-4 flex flex-wrap justify-center gap-3">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium">Automated Confirmations</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full">
+                      <Bell className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium">Email Notifications</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full">
+                      <BarChart3 className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium">Track Performance</span>
+                    </div>
+                  </div>
+                </div>
+              </Step>
+            </Stepper>
+          </div>
+
+          <div className="text-center mt-12 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>Pro tip:</strong> Complete all steps to automatically redirect to sign up
+            </p>
           </div>
         </div>
       </section>
