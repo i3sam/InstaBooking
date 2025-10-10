@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 
 interface Note {
-  id: number;
+  id: string;
   title: string;
   content: string;
   category: string;
@@ -82,7 +82,7 @@ export default function Notes() {
   });
 
   const updateNoteMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
       const response = await apiRequest('PATCH', `/api/notes/${id}`, data);
       if (!response.ok) throw new Error('Failed to update note');
       return response.json();
@@ -105,7 +105,7 @@ export default function Notes() {
   });
 
   const deleteNoteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const response = await apiRequest('DELETE', `/api/notes/${id}`);
       if (!response.ok) throw new Error('Failed to delete note');
       return response.json();
