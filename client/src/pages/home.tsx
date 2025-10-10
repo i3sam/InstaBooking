@@ -274,63 +274,41 @@ export default function Home() {
       </section>
 
       {/* Features Section with ScrollStack */}
-      <section id="features" className="relative overflow-hidden gojiberry-gradient">
-        {/* Glass Prism Background Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
-        <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
-        
-        <div className="relative content-layer py-24">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-clamp-lg font-bold text-foreground mb-8 text-wrap-balance">
-                Everything you need to{' '}
-                <span className="text-blue-gradient">
-                  accept bookings
-                </span>
-              </h2>
-              <p className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Powerful features designed to help you create professional booking experiences that your clients will love.
-              </p>
-            </div>
-          </div>
-
-          <ScrollStack 
-            useWindowScroll={true}
-            itemDistance={50}
-            itemScale={0.02}
-            itemStackDistance={40}
-            stackPosition="30%"
-            scaleEndPosition="15%"
-            baseScale={0.9}
-          >
-            {features.map((feature, index) => (
-              <ScrollStackItem key={index}>
-                <div className="container mx-auto px-6">
-                  <Card className="group glass-prism-card hover-lift max-w-4xl mx-auto">
-                    <CardContent className="p-12">
-                      <div className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="relative shrink-0">
-                          <div className="w-24 h-24 glass-prism rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <feature.icon className="h-12 w-12 text-primary group-hover:text-blue-600 transition-colors duration-300" />
-                          </div>
-                          <div className="absolute -inset-3 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+      <section id="features" className="relative overflow-x-hidden">
+        <ScrollStack>
+          {features.map((feature, index) => (
+            <ScrollStackItem key={index}>
+              <div className="absolute inset-0 gojiberry-gradient">
+                {/* Glass Prism Background Elements */}
+                <div className="absolute top-20 right-10 w-64 h-64 glass-prism rounded-full opacity-20 animate-float bg-overlay mobile-hide"></div>
+                <div className="absolute bottom-10 left-20 w-48 h-48 glass-prism rounded-full opacity-25 animate-float bg-overlay mobile-hide" style={{animationDelay: '2s'}}></div>
+              </div>
+              
+              <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
+                <Card className="group glass-prism-card hover-lift max-w-6xl w-full">
+                  <CardContent className="p-16 md:p-20">
+                    <div className="flex flex-col items-center text-center gap-12">
+                      <div className="relative">
+                        <div className="w-32 h-32 glass-prism rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <feature.icon className="h-16 w-16 text-primary group-hover:text-blue-600 transition-colors duration-300" />
                         </div>
-                        <div className="flex-1 text-center md:text-left">
-                          <h3 className="text-3xl font-bold text-foreground mb-4 group-hover:text-blue-gradient transition-colors duration-300">
-                            {feature.title}
-                          </h3>
-                          <p className="text-lg text-muted-foreground leading-relaxed">
-                            {feature.description}
-                          </p>
-                        </div>
+                        <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-blue-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ScrollStackItem>
-            ))}
-          </ScrollStack>
-        </div>
+                      <div className="space-y-6">
+                        <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground group-hover:text-blue-gradient transition-colors duration-300">
+                          {feature.title}
+                        </h3>
+                        <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground leading-relaxed max-w-4xl">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </ScrollStackItem>
+          ))}
+        </ScrollStack>
       </section>
 
       {/* Test Before You Launch Section */}
