@@ -220,21 +220,21 @@ export default function Notes() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
             Notes
           </h2>
-          <p className="text-muted-foreground mt-1">Keep track of important information</p>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Keep track of important information</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap w-full sm:w-auto">
           <Button
             variant={showArchived ? 'default' : 'outline'}
             size="sm"
             onClick={() => setShowArchived(!showArchived)}
-            className={showArchived ? 'glass-prism-button bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700' : 'glass-prism'}
+            className={`flex-1 sm:flex-initial ${showArchived ? 'glass-prism-button bg-red-500/20 hover:bg-red-500/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700' : 'glass-prism'}`}
             data-testid="button-toggle-archived"
           >
             {showArchived ? <Trash2 className="h-4 w-4 mr-2" /> : <Archive className="h-4 w-4 mr-2" />}
-            {showArchived ? 'Trash Bin' : 'Active Notes'}
+            <span className="truncate">{showArchived ? 'Trash Bin' : 'Active Notes'}</span>
           </Button>
           <Button
             onClick={() => {
@@ -246,20 +246,20 @@ export default function Notes() {
               setEditTags('');
               setEditColor('blue');
             }}
-            className="glass-prism-button text-white shadow-lg"
+            className="glass-prism-button text-white shadow-lg flex-1 sm:flex-initial"
             disabled={isCreating}
             data-testid="button-new-note"
           >
             <Plus className="h-4 w-4 mr-2" />
-            New Note
+            <span className="truncate">New Note</span>
           </Button>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <Card className="glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-white/20 shadow-2xl animate-slide-in-left mobile-no-blur">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100">
               All Notes ({sortedNotes.length})
             </CardTitle>
             <div className="space-y-3 mt-4">
@@ -286,8 +286,8 @@ export default function Notes() {
               </Select>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
+          <CardContent className="pt-0">
+            <div className="space-y-2 max-h-[400px] sm:max-h-[500px] lg:max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
               {sortedNotes.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -308,7 +308,7 @@ export default function Notes() {
                         setIsCreating(false);
                         setIsEditing(false);
                       }}
-                      className={`w-full text-left p-4 rounded-xl transition-all duration-300 group animate-fade-in border ${
+                      className={`w-full text-left p-3 sm:p-4 rounded-xl transition-all duration-300 group animate-fade-in border ${
                         selectedNote?.id === note.id
                           ? 'glass-prism-button text-white shadow-lg scale-[1.02]'
                           : `glass-prism hover:glass-prism-button ${colorClasses.bg} ${colorClasses.border}`
@@ -317,24 +317,24 @@ export default function Notes() {
                       data-testid={`note-item-${note.id}`}
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <h4 className="font-semibold truncate flex-1">{note.title}</h4>
-                        {note.isPinned && <Pin className="h-3.5 w-3.5 ml-2 flex-shrink-0 fill-current" />}
+                        <h4 className="text-sm sm:text-base font-semibold truncate flex-1">{note.title}</h4>
+                        {note.isPinned && <Pin className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-2 flex-shrink-0 fill-current" />}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 line-clamp-2 mb-2">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/80 line-clamp-2 mb-2">
                         {note.content || 'No content'}
                       </p>
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex flex-wrap gap-1">
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 py-0">
                             {note.category}
                           </Badge>
                           {note.tags && note.tags.split(',').slice(0, 2).map((tag, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
+                            <Badge key={i} variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0">
                               {tag.trim()}
                             </Badge>
                           ))}
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 group-hover:text-white/60 whitespace-nowrap">
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 group-hover:text-white/60 whitespace-nowrap">
                           {new Date(note.updatedAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -347,34 +347,34 @@ export default function Notes() {
         </Card>
 
         <Card className="lg:col-span-2 glass-prism-card backdrop-blur-xl bg-white/5 dark:bg-black/5 border-white/20 shadow-2xl animate-slide-in-right mobile-no-blur">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <CardTitle className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100">
                 {isCreating ? 'New Note' : isEditing ? 'Edit Note' : 'Note Details'}
               </CardTitle>
               {(selectedNote || isCreating) && (
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2 flex-wrap">
                   {isEditing || isCreating ? (
                     <>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={isCreating ? handleCancelCreate : handleCancelEdit}
-                        className="glass-prism"
+                        className="glass-prism text-xs sm:text-sm"
                         data-testid="button-cancel-edit"
                       >
-                        <X className="h-4 w-4 mr-1" />
-                        Cancel
+                        <X className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Cancel</span>
                       </Button>
                       <Button
                         size="sm"
                         onClick={isCreating ? handleCreateNote : handleSaveEdit}
-                        className="glass-prism-button text-white"
+                        className="glass-prism-button text-white text-xs sm:text-sm"
                         disabled={createNoteMutation.isPending || updateNoteMutation.isPending}
                         data-testid="button-save-note"
                       >
-                        <Save className="h-4 w-4 mr-1" />
-                        Save
+                        <Save className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Save</span>
                       </Button>
                     </>
                   ) : (
@@ -383,33 +383,33 @@ export default function Notes() {
                         variant="outline"
                         size="sm"
                         onClick={() => togglePin(selectedNote!)}
-                        className="glass-prism"
+                        className="glass-prism text-xs sm:text-sm"
                         disabled={updateNoteMutation.isPending}
                         data-testid="button-pin-note"
                       >
-                        <Pin className={`h-4 w-4 mr-1 ${selectedNote?.isPinned ? 'fill-current' : ''}`} />
-                        {selectedNote?.isPinned ? 'Unpin' : 'Pin'}
+                        <Pin className={`h-3 w-3 sm:h-4 sm:w-4 sm:mr-1 ${selectedNote?.isPinned ? 'fill-current' : ''}`} />
+                        <span className="hidden sm:inline">{selectedNote?.isPinned ? 'Unpin' : 'Pin'}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => toggleArchive(selectedNote!)}
-                        className="glass-prism"
+                        className="glass-prism text-xs sm:text-sm"
                         disabled={updateNoteMutation.isPending}
                         data-testid="button-archive-note"
                       >
-                        <Archive className="h-4 w-4 mr-1" />
-                        {selectedNote?.isArchived ? 'Unarchive' : 'Archive'}
+                        <Archive className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">{selectedNote?.isArchived ? 'Unarchive' : 'Archive'}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleStartEdit(selectedNote!)}
-                        className="glass-prism"
+                        className="glass-prism text-xs sm:text-sm"
                         data-testid="button-edit-note"
                       >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
                       <Button
                         variant="destructive"
@@ -418,8 +418,8 @@ export default function Notes() {
                         disabled={deleteNoteMutation.isPending}
                         data-testid="button-delete-note"
                       >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Delete</span>
                       </Button>
                     </>
                   )}
@@ -427,21 +427,21 @@ export default function Notes() {
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {isCreating || isEditing ? (
-              <div className="space-y-4 animate-fade-in">
+              <div className="space-y-3 sm:space-y-4 animate-fade-in">
                 <div>
                   <Input
                     placeholder="Note title"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="glass-prism bg-white/5 border-white/20 text-lg font-semibold"
+                    className="glass-prism bg-white/5 border-white/20 text-base sm:text-lg font-semibold"
                     data-testid="input-note-title"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Category</label>
+                    <label className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 block">Category</label>
                     <Select value={editCategory} onValueChange={setEditCategory}>
                       <SelectTrigger className="glass-prism bg-white/5 border-white/20" data-testid="select-category">
                         <SelectValue />
@@ -454,7 +454,7 @@ export default function Notes() {
                     </Select>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Color</label>
+                    <label className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 block">Color</label>
                     <Select value={editColor} onValueChange={setEditColor}>
                       <SelectTrigger className="glass-prism bg-white/5 border-white/20" data-testid="select-color">
                         <SelectValue />
@@ -473,7 +473,7 @@ export default function Notes() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 dark:text-gray-400 mb-1 block">Tags (comma-separated)</label>
+                  <label className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 block">Tags (comma-separated)</label>
                   <Input
                     placeholder="e.g., urgent, meeting, project"
                     value={editTags}
@@ -487,42 +487,42 @@ export default function Notes() {
                     placeholder="Write your note here..."
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="glass-prism bg-white/5 border-white/20 min-h-[350px] resize-none"
+                    className="glass-prism bg-white/5 border-white/20 min-h-[250px] sm:min-h-[350px] resize-none text-sm sm:text-base"
                     data-testid="textarea-note-content"
                   />
                 </div>
               </div>
             ) : selectedNote ? (
-              <div className="space-y-4 animate-fade-in">
-                <div className="flex items-start justify-between">
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex-1">
+              <div className="space-y-3 sm:space-y-4 animate-fade-in">
+                <div className="flex items-start justify-between flex-wrap gap-2">
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 flex-1 min-w-0 break-words">
                     {selectedNote.title}
                   </h3>
                   {selectedNote.isPinned && (
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge variant="secondary" className="flex-shrink-0">
                       <Pin className="h-3 w-3 mr-1 fill-current" />
                       Pinned
                     </Badge>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="default">{selectedNote.category}</Badge>
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                  <Badge variant="default" className="text-xs">{selectedNote.category}</Badge>
                   {selectedNote.tags && selectedNote.tags.split(',').map((tag, i) => (
-                    <Badge key={i} variant="outline">
+                    <Badge key={i} variant="outline" className="text-xs">
                       <Tag className="h-3 w-3 mr-1" />
                       {tag.trim()}
                     </Badge>
                   ))}
-                  <Badge className={getColorClasses(selectedNote.color).bg}>
+                  <Badge className={`${getColorClasses(selectedNote.color).bg} text-xs`}>
                     <Palette className="h-3 w-3 mr-1" />
                     {noteColors.find(c => c.value === selectedNote.color)?.name}
                   </Badge>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                   Last updated: {new Date(selectedNote.updatedAt).toLocaleString()}
                 </div>
                 <div className="prose dark:prose-invert max-w-none">
-                  <div className="glass-prism p-6 rounded-xl whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                  <div className="glass-prism p-4 sm:p-6 rounded-xl whitespace-pre-wrap text-sm sm:text-base text-gray-700 dark:text-gray-300">
                     {selectedNote.content || 'No content'}
                   </div>
                 </div>
