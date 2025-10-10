@@ -12,6 +12,7 @@ import {
 import { useLocation } from 'wouter';
 import heroImage from '@assets/image_1758670396246.png';
 import DemoWizard from '@/components/demo/DemoWizard';
+import AppointmentBallpit from '@/components/animations/AppointmentBallpit';
 import { 
   Palette, 
   CalendarCheck, 
@@ -189,6 +190,11 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative overflow-hidden gojiberry-hero-gradient">
+        {/* Appointment Ballpit Animation */}
+        <div className="absolute inset-0" style={{ height: '600px' }}>
+          <AppointmentBallpit count={25} />
+        </div>
+        
         {/* Glass Prism Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 bg-overlay"></div>
         <div className="absolute top-10 left-10 w-72 h-72 glass-prism rounded-full opacity-30 animate-float bg-overlay mobile-hide"></div>
