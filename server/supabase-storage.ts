@@ -1050,6 +1050,11 @@ export class SupabaseStorage implements IStorage {
           user_id: note.userId,
           title: note.title,
           content: note.content || '',
+          category: note.category || 'General',
+          tags: note.tags || '',
+          color: note.color || 'blue',
+          is_pinned: note.isPinned || false,
+          is_archived: note.isArchived || false,
         }])
         .select()
         .single();
@@ -1102,6 +1107,11 @@ export class SupabaseStorage implements IStorage {
 
       if (updates.title !== undefined) updateData.title = updates.title;
       if (updates.content !== undefined) updateData.content = updates.content;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.tags !== undefined) updateData.tags = updates.tags;
+      if (updates.color !== undefined) updateData.color = updates.color;
+      if (updates.isPinned !== undefined) updateData.is_pinned = updates.isPinned;
+      if (updates.isArchived !== undefined) updateData.is_archived = updates.isArchived;
 
       const { data, error } = await supabase
         .from('notes')
