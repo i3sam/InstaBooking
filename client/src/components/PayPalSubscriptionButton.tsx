@@ -25,9 +25,11 @@ export default function PayPalSubscriptionButton({
   const [error, setError] = useState<string | null>(null);
   const paypalRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const buttonRenderedRef = useRef(false);
 
   useEffect(() => {
-    if (!user || !paypalRef.current) return;
+    if (!user || !paypalRef.current || buttonRenderedRef.current) return;
 
     const loadPayPalScript = async () => {
       try {
@@ -42,13 +44,15 @@ export default function PayPalSubscriptionButton({
         const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
         
         if (!clientId) {
-          setError('PayPal Client ID not configured');
-          setIsLoading(false);
-          toast({
-            title: "Configuration Error",
-            description: "PayPal is not properly configured. Please contact support.",
-            variant: "destructive",
-          });
+          if (isMountedRef.current) {
+            setError('PayPal Client ID not configured');
+            setIsLoading(false);
+            toast({
+              title: "Configuration Error",
+              description: "PayPal is not properly configured. Please contact support.",
+              variant: "destructive",
+            });
+          }
           return;
         }
         
@@ -57,34 +61,41 @@ export default function PayPalSubscriptionButton({
         
         script.onload = () => {
           scriptLoadedRef.current = true;
-          renderPayPalButton();
+          if (isMountedRef.current) {
+            renderPayPalButton();
+          }
         };
         
         script.onerror = () => {
-          setError('Failed to load PayPal SDK');
-          setIsLoading(false);
-          toast({
-            title: "Error",
-            description: "Failed to load PayPal payment system",
-            variant: "destructive",
-          });
+          if (isMountedRef.current) {
+            setError('Failed to load PayPal SDK');
+            setIsLoading(false);
+            toast({
+              title: "Error",
+              description: "Failed to load PayPal payment system",
+              variant: "destructive",
+            });
+          }
         };
 
         document.body.appendChild(script);
       } catch (err) {
         console.error('Error loading PayPal:', err);
-        setError('Failed to initialize PayPal');
-        setIsLoading(false);
+        if (isMountedRef.current) {
+          setError('Failed to initialize PayPal');
+          setIsLoading(false);
+        }
       }
     };
 
     const renderPayPalButton = () => {
-      if (!window.paypal || !paypalRef.current) return;
+      if (!window.paypal || !paypalRef.current || buttonRenderedRef.current) return;
 
-      // Clear previous button
-      if (paypalRef.current) {
-        paypalRef.current.innerHTML = '';
-      }
+      // Mark button as rendered to prevent re-rendering
+      buttonRenderedRef.current = true;
+
+      // Capture profile at render time to avoid dependency issues
+      const userName = profile?.fullName || user.fullName;
 
       window.paypal.Buttons({
         style: {
@@ -100,7 +111,7 @@ export default function PayPalSubscriptionButton({
             const response = await apiRequest('POST', '/api/paypal/subscription', {
               userId: user.id,
               userEmail: user.email,
-              userName: profile?.fullName || user.fullName,
+              userName: userName,
             });
 
             const result = await response.json();
@@ -215,16 +226,18 @@ export default function PayPalSubscriptionButton({
         },
       }).render(paypalRef.current);
 
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     };
 
     loadPayPalScript();
 
     return () => {
-      // Cleanup: remove PayPal script when component unmounts
-      scriptLoadedRef.current = false;
+      // Cleanup: mark component as unmounted
+      isMountedRef.current = false;
     };
-  }, [user, profile]);
+  }, [user]);
 
   if (error) {
     return (
