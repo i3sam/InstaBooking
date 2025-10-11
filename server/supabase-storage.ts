@@ -288,6 +288,22 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async getServiceById(id: string): Promise<any | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return this.toCamelCase(data);
+    } catch (error) {
+      console.error("Get service by ID error:", error);
+      return undefined;
+    }
+  }
+
   async getServicesByPageId(pageId: string): Promise<any[]> {
     try {
       const { data, error } = await supabase

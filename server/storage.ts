@@ -17,6 +17,7 @@ export interface IStorage {
   
   // Services
   createService(service: any): Promise<any>;
+  getServiceById(id: string): Promise<any | undefined>;
   getServicesByPageId(pageId: string): Promise<any[]>;
   updateService(id: string, updates: any): Promise<any | undefined>;
   deleteService(id: string): Promise<boolean>;

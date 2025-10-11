@@ -22,7 +22,18 @@ export default function PublicReschedulePage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Fetch appointment details (public route, no auth needed)
-  const { data: appointment, isLoading, error } = useQuery({
+  const { data: appointment, isLoading, error } = useQuery<{
+    id: string;
+    customerName: string;
+    customerEmail: string;
+    date: string;
+    time: string;
+    status: string;
+    serviceName: string;
+    businessName: string;
+    contactEmail?: string;
+    contactPhone?: string;
+  }>({
     queryKey: [`/api/public/appointments/${appointmentId}`],
     enabled: !!appointmentId,
   });

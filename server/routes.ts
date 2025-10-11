@@ -9,6 +9,7 @@ import { createRazorpayOrder, verifyRazorpayPayment, createRazorpaySubscription,
 import multer from 'multer';
 import { Resend } from 'resend';
 import { insertReviewSchema, insertPageSchema, insertDemoPageSchema, insertServiceSchema } from '@shared/schema';
+import { generateEmailTemplate, type EmailTemplateData } from './email-templates';
 
 // Supabase setup
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -40,152 +41,231 @@ if (process.env.RESEND_API_KEY) {
   console.warn("RESEND_API_KEY not found. Email notifications will be disabled");
 }
 
-// Email notification functions
-async function sendNewAppointmentNotification(ownerEmail: string, customerName: string, date: string, time: string, serviceName: string) {
+// Email notification functions with beautiful templates
+async function sendAppointmentEmail(
+  appointmentId: string,
+  emailType: 'confirmation' | 'approved' | 'rejected' | 'rescheduled',
+  additionalData?: { note?: string; originalDate?: string; originalTime?: string }
+) {
   if (!resend) {
     console.warn("Email service not available - skipping email notification");
     return;
   }
 
   try {
+    // Fetch appointment details
+    const appointment = await storage.getAppointmentById(appointmentId);
+    if (!appointment) {
+      console.error("Appointment not found:", appointmentId);
+      return;
+    }
+
+    // Fetch page and service details
+    const page = await storage.getPage(appointment.pageId);
+    const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
+
+    if (!page) {
+      console.error("Page not found for appointment:", appointmentId);
+      return;
+    }
+
+    // Determine status for email template
+    let status: 'pending' | 'accepted' | 'declined' | 'rescheduled' = 'pending';
+    let subject = '';
+    
+    switch (emailType) {
+      case 'confirmation':
+        status = 'pending';
+        subject = `Appointment Request Received - ${page.title}`;
+        break;
+      case 'approved':
+        status = 'accepted';
+        subject = `Appointment Confirmed - ${page.title}`;
+        break;
+      case 'rejected':
+        status = 'declined';
+        subject = `Appointment Update - ${page.title}`;
+        break;
+      case 'rescheduled':
+        status = 'rescheduled';
+        subject = `Appointment Rescheduled - ${page.title}`;
+        break;
+    }
+
+    // Prepare email template data
+    const emailData: EmailTemplateData = {
+      businessName: page.title,
+      customerName: appointment.customerName,
+      serviceName: service?.name || 'Service',
+      date: appointment.date,
+      time: appointment.time,
+      status,
+      appointmentId: appointment.id,
+      contactEmail: page.contactEmail || undefined,
+      contactPhone: page.contactPhone || undefined,
+      note: additionalData?.note,
+      originalDate: additionalData?.originalDate,
+      originalTime: additionalData?.originalTime,
+    };
+
+    const htmlContent = generateEmailTemplate(emailData);
+
     await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
-      to: ownerEmail,
-      subject: 'You have a new appointment!',
-      html: `
-        <h2>New Appointment Request</h2>
-        <p>You have received a new appointment request from <strong>${customerName}</strong>.</p>
-        <p><strong>Service:</strong> ${serviceName}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p>Please log in to your dashboard to review and approve this appointment.</p>
-      `,
+      from: 'team@bookinggen.xyz',
+      to: appointment.customerEmail,
+      subject,
+      html: htmlContent,
     });
-    console.log(`New appointment notification sent to ${ownerEmail}`);
+
+    console.log(`${emailType} email sent to ${appointment.customerEmail}`);
   } catch (error) {
-    console.error("Failed to send new appointment notification:", error);
+    console.error(`Failed to send ${emailType} email:`, error);
   }
 }
 
-async function sendAppointmentApprovalEmail(customerEmail: string, customerName: string, date: string, time: string) {
+// Send notification to business owner about new appointment
+async function sendOwnerNotification(appointmentId: string) {
   if (!resend) {
     console.warn("Email service not available - skipping email notification");
     return;
   }
 
   try {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
-      to: customerEmail,
-      subject: 'Your appointment has been approved!',
-      html: `
-        <h2>Great news, ${customerName}!</h2>
-        <p>Your appointment request has been approved.</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p>We look forward to seeing you!</p>
-      `,
-    });
-    console.log(`Approval email sent to ${customerEmail}`);
-  } catch (error) {
-    console.error("Failed to send approval email:", error);
-  }
-}
+    const appointment = await storage.getAppointmentById(appointmentId);
+    if (!appointment) {
+      console.error("Appointment not found:", appointmentId);
+      return;
+    }
 
-async function sendAppointmentRejectionEmail(customerEmail: string, customerName: string) {
-  if (!resend) {
-    console.warn("Email service not available - skipping email notification");
-    return;
-  }
+    const page = await storage.getPage(appointment.pageId);
+    const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
 
-  try {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
-      to: customerEmail,
-      subject: 'Your appointment request has been declined',
-      html: `
-        <h2>Hello ${customerName},</h2>
-        <p>We regret to inform you that your appointment request has been declined.</p>
-        <p>Please feel free to submit another request for a different date and time.</p>
-        <p>Thank you for your understanding.</p>
-      `,
-    });
-    console.log(`Rejection email sent to ${customerEmail}`);
-  } catch (error) {
-    console.error("Failed to send rejection email:", error);
-  }
-}
+    if (!page) {
+      console.error("Page not found for appointment:", appointmentId);
+      return;
+    }
 
-async function sendCustomerAppointmentConfirmation(customerEmail: string, customerName: string, date: string, time: string, serviceName: string) {
-  if (!resend) {
-    console.warn("Email service not available - skipping email notification");
-    return;
-  }
+    // Get owner profile to get their email
+    const owner = await storage.getProfile(page.ownerId);
+    if (!owner || !owner.email) {
+      console.warn("Owner email not found for appointment:", appointmentId);
+      return;
+    }
 
-  try {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
-      to: customerEmail,
-      subject: 'Appointment Request Received!',
-      html: `
-        <h2>Thank you for your appointment request, ${customerName}!</h2>
-        <p>We have received your appointment request with the following details:</p>
-        <p><strong>Service:</strong> ${serviceName}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p>Your appointment is currently pending approval. You will receive another email once it has been reviewed.</p>
-        <p>Thank you for choosing our services!</p>
-      `,
-    });
-    console.log(`Customer confirmation email sent to ${customerEmail}`);
-  } catch (error) {
-    console.error("Failed to send customer confirmation email:", error);
-  }
-}
-
-async function sendAppointmentRescheduleEmail(customerEmail: string, customerName: string, serviceName: string, originalDate: string, originalTime: string, newDate: string, newTime: string, note?: string) {
-  if (!resend) {
-    console.warn("Email service not available - skipping email notification");
-    return;
-  }
-
-  try {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev', // Using Resend's onboarding domain for testing
-      to: customerEmail,
-      subject: 'Appointment Rescheduled',
-      html: `
-        <h2>Hello ${customerName},</h2>
-        <p>Your appointment has been rescheduled. Here are the updated details:</p>
-        
-        <div style="background-color: #f9f9f9; padding: 15px; margin: 15px 0; border-radius: 5px;">
-          <h3 style="color: #333; margin-bottom: 10px;">Previous Appointment:</h3>
-          <p><strong>Service:</strong> ${serviceName}</p>
-          <p><strong>Original Date:</strong> ${originalDate}</p>
-          <p><strong>Original Time:</strong> ${originalTime}</p>
+    // Simple owner notification email
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Appointment - ${page.title}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .header {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+      padding: 32px;
+      text-align: center;
+      color: white;
+    }
+    .content {
+      padding: 40px 32px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 20px 0;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .detail-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1 style="margin: 0; font-size: 28px;">🔔 New Appointment Request</h1>
+      <p style="margin: 8px 0 0 0; opacity: 0.9;">${page.title}</p>
+    </div>
+    <div class="content">
+      <p style="font-size: 18px; color: #2d3748; margin-bottom: 20px;">
+        You have a new appointment request!
+      </p>
+      <div class="glass-card">
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Customer</div>
+          <div style="color: #4a5568;">${appointment.customerName}</div>
         </div>
-        
-        <div style="background-color: #e8f5e8; padding: 15px; margin: 15px 0; border-radius: 5px;">
-          <h3 style="color: #333; margin-bottom: 10px;">New Appointment:</h3>
-          <p><strong>Service:</strong> ${serviceName}</p>
-          <p><strong>New Date:</strong> ${newDate}</p>
-          <p><strong>New Time:</strong> ${newTime}</p>
-        </div>
-        
-        ${note ? `
-        <div style="background-color: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 5px;">
-          <h3 style="color: #333; margin-bottom: 10px;">Additional Message:</h3>
-          <p>${note}</p>
+        ${appointment.customerEmail ? `
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Email</div>
+          <div style="color: #4a5568;">${appointment.customerEmail}</div>
         </div>
         ` : ''}
-        
-        <p>Please make note of your new appointment time. We look forward to seeing you!</p>
-        <p>If you have any questions or concerns, please contact us.</p>
-      `,
+        ${appointment.customerPhone ? `
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Phone</div>
+          <div style="color: #4a5568;">${appointment.customerPhone}</div>
+        </div>
+        ` : ''}
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Service</div>
+          <div style="color: #4a5568;">${service?.name || 'Service'}</div>
+        </div>
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Date</div>
+          <div style="color: #4a5568;">${appointment.date}</div>
+        </div>
+        <div class="detail-row">
+          <div style="font-weight: 600; color: #2d3748;">Time</div>
+          <div style="color: #4a5568;">${appointment.time}</div>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 32px;">
+        <a href="${process.env.BASE_URL || 'https://bookinggen.xyz'}/dashboard" 
+           style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                  color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; 
+                  font-weight: 600; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);">
+          View in Dashboard
+        </a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+
+    await resend.emails.send({
+      from: 'team@bookinggen.xyz',
+      to: owner.email,
+      subject: `New Appointment Request - ${page.title}`,
+      html: htmlContent,
     });
-    console.log(`Reschedule email sent to ${customerEmail}`);
+
+    console.log(`Owner notification sent to ${owner.email}`);
   } catch (error) {
-    console.error("Failed to send reschedule email:", error);
+    console.error("Failed to send owner notification:", error);
   }
 }
 
@@ -1274,32 +1354,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Send email notifications
       try {
-        // Get the page owner's profile and service details for the notification
-        const page = await storage.getPage(appointmentData.pageId);
-        if (page) {
-          const profile = await storage.getProfile(page.ownerId);
-          if (profile && profile.email) {
-            // Send notification to business owner
-            await sendNewAppointmentNotification(
-              profile.email,
-              appointmentData.customerName,
-              appointmentData.date,
-              appointmentData.time,
-              appointmentData.serviceName || 'Service'
-            );
-          }
+        // Send confirmation to customer
+        if (appointmentData.customerEmail) {
+          await sendAppointmentEmail(appointment.id, 'confirmation');
         }
         
-        // Send confirmation email to customer
-        if (appointmentData.customerEmail) {
-          await sendCustomerAppointmentConfirmation(
-            appointmentData.customerEmail,
-            appointmentData.customerName,
-            appointmentData.date,
-            appointmentData.time,
-            appointmentData.serviceName || 'Service'
-          );
-        }
+        // Send notification to business owner
+        await sendOwnerNotification(appointment.id);
       } catch (emailError) {
         console.error("Failed to send appointment notification emails:", emailError);
         // Don't fail the appointment creation if email fails
@@ -1340,17 +1401,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send email notification if status changed to approved or rejected
       if (req.body.status && appointment.customerEmail) {
         if (req.body.status === 'accepted') {
-          await sendAppointmentApprovalEmail(
-            appointment.customerEmail,
-            appointment.customerName,
-            appointment.date,
-            appointment.time
-          );
+          await sendAppointmentEmail(req.params.id, 'approved');
         } else if (req.body.status === 'declined') {
-          await sendAppointmentRejectionEmail(
-            appointment.customerEmail,
-            appointment.customerName
-          );
+          await sendAppointmentEmail(req.params.id, 'rejected');
         }
       }
       
@@ -1374,7 +1427,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized to reschedule this appointment" });
       }
 
-      const { newDate, newTime, note, customerName, customerEmail, originalDate, originalTime, serviceName } = req.body;
+      const { newDate, newTime, note } = req.body;
+
+      const originalDate = appointment.date;
+      const originalTime = appointment.time;
 
       // Update the appointment with new date and time
       const updated = await storage.updateAppointment(req.params.id, {
@@ -1384,17 +1440,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Send email notification to customer about reschedule
-      if (customerEmail) {
-        await sendAppointmentRescheduleEmail(
-          customerEmail,
-          customerName,
-          serviceName,
+      if (appointment.customerEmail) {
+        await sendAppointmentEmail(req.params.id, 'rescheduled', {
+          note,
           originalDate,
-          originalTime,
-          newDate,
-          newTime,
-          note
-        );
+          originalTime
+        });
       }
       
       res.json(updated);
@@ -1453,10 +1504,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "New date and time are required" });
       }
 
-      // Get page and service details for email
-      const page = await storage.getPage(appointment.pageId);
-      const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
-
       const originalDate = appointment.date;
       const originalTime = appointment.time;
 
@@ -1469,16 +1516,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send email notification to customer
       if (appointment.customerEmail) {
-        await sendAppointmentRescheduleEmail(
-          appointment.customerEmail,
-          appointment.customerName,
-          service?.name || 'Service',
+        await sendAppointmentEmail(req.params.id, 'rescheduled', {
+          note,
           originalDate,
-          originalTime,
-          newDate,
-          newTime,
-          note
-        );
+          originalTime
+        });
       }
 
       res.json({
