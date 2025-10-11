@@ -111,7 +111,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       value: statsLoading ? "..." : (dashboardStats?.pagesCount?.toString() || "0"),
       icon: FileText,
       color: "bg-primary/10 text-primary",
-      gradient: "from-blue-500/20 to-purple-500/20"
+      gradient: "from-blue-500/20 to-blue-600/20"
     },
     {
       title: "Total Bookings",
@@ -138,15 +138,15 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       title: "Conversion Rate",
       value: statsLoading ? "..." : `${dashboardStats?.conversionRate || 0}%`,
       icon: Percent,
-      color: "bg-purple-100 text-purple-600",
-      gradient: "from-purple-500/20 to-pink-500/20"
+      color: "bg-blue-100 text-blue-600",
+      gradient: "from-blue-500/20 to-indigo-500/20"
     },
     {
       title: "Avg Booking Value",
       value: statsLoading ? "..." : formatPrice(dashboardStats?.avgBookingValue || 0),
       icon: TrendingUp,
       color: "bg-blue-100 text-blue-600",
-      gradient: "from-blue-500/20 to-indigo-500/20"
+      gradient: "from-blue-500/20 to-cyan-500/20"
     }
   ];
 
@@ -210,7 +210,7 @@ export default function Overview({ onSectionChange }: OverviewProps) {
       title: "View Analytics",
       description: "Track your booking performance",
       icon: BarChart3,
-      iconBg: "bg-purple-100 text-purple-600",
+      iconBg: "bg-blue-100 text-blue-600",
       action: () => {
         onSectionChange?.('analytics');
       }

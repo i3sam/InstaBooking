@@ -221,7 +221,7 @@ export default function AppointmentsList() {
                               <Button 
                                 size="sm" 
                                 variant="ghost" 
-                                className="text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 p-2 rounded-lg transition-all"
+                                className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-2 rounded-lg transition-all"
                                 data-testid={`button-view-details-${appointment.id}`}
                                 onClick={() => setExpandedAppointment(isExpanded ? null : appointment.id)}
                               >
@@ -492,7 +492,7 @@ export default function AppointmentsList() {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            className="flex-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+                            className="flex-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                             data-testid={`button-view-details-${appointment.id}`}
                             onClick={() => setExpandedAppointment(isExpanded ? null : appointment.id)}
                           >

@@ -1534,24 +1534,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pages = await storage.getPagesByOwner(userId);
       const pagesCount = Math.max(0, pages?.length || 0);
       
-      // Get all appointments for this user
-      const appointments = await storage.getAppointmentsByOwner(userId);
-      const totalAppointments = Math.max(0, appointments?.length || 0);
+      // Use Supabase to get appointments with service prices
+      if (!supabase) {
+        throw new Error("Supabase not available");
+      }
+
+      const { data: appointments, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          services(price)
+        `)
+        .eq('owner_id', userId);
+
+      if (error) {
+        console.error("Error fetching appointments for stats:", error);
+        throw error;
+      }
+
+      const validAppointments = appointments || [];
+      const totalAppointments = Math.max(0, validAppointments.length);
       
       // Count pending appointments
-      const pendingAppointments = Math.max(0, appointments?.filter(apt => apt.status === 'pending')?.length || 0);
+      const pendingAppointments = Math.max(0, validAppointments.filter((apt: any) => apt.status === 'pending').length);
       
-      // Calculate total revenue (from accepted appointments)
-      const acceptedAppointments = appointments?.filter(apt => apt.status === 'accepted') || [];
-      const totalRevenue = Math.max(0, acceptedAppointments.reduce((sum, apt) => sum + (Number(apt.price) || 0), 0));
+      // Calculate total revenue (from accepted appointments with service prices)
+      const acceptedAppointments = validAppointments.filter((apt: any) => apt.status === 'accepted');
+      const totalRevenue = acceptedAppointments.reduce((sum: number, apt: any) => {
+        const servicePrice = apt.services?.price || 0;
+        return sum + Number(servicePrice);
+      }, 0);
       
       // Calculate conversion rate (safe division)
-      const conversionRate = totalAppointments > 0 && acceptedAppointments.length >= 0
+      const conversionRate = totalAppointments > 0
         ? Math.round((acceptedAppointments.length / totalAppointments * 100) * 10) / 10
         : 0;
       
       // Average booking value (safe division)
-      const avgBookingValue = acceptedAppointments.length > 0 && totalRevenue > 0
+      const avgBookingValue = acceptedAppointments.length > 0
         ? Math.round((totalRevenue / acceptedAppointments.length) * 100) / 100
         : 0;
       
