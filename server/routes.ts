@@ -308,14 +308,14 @@ async function sendOwnerNotification(appointmentId: string) {
     }
     
     .footer {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 96%, 0.8) 0%, hsla(217.2, 91.2%, 92%, 0.6) 100%);
       padding: 28px 32px;
       text-align: center;
-      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
     }
     
     .footer-text {
-      color: hsl(215, 16%, 47%);
+      color: hsl(215, 16%, 35%);
       font-size: 14px;
       margin-bottom: 8px;
     }
@@ -360,48 +360,48 @@ async function sendOwnerNotification(appointmentId: string) {
         <div class="status-badge">Pending Review</div>
         
         <div class="detail-row">
-          <div class="detail-label">👤 Customer</div>
+          <div class="detail-label"><span style="margin-right: 8px;">👤</span>Customer</div>
           <div class="detail-value">${appointment.customerName}</div>
         </div>
         
         ${appointment.customerEmail ? `
         <div class="detail-row">
-          <div class="detail-label">📧 Email</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📧</span>Email</div>
           <div class="detail-value">${appointment.customerEmail}</div>
         </div>
         ` : ''}
         
         ${appointment.customerPhone ? `
         <div class="detail-row">
-          <div class="detail-label">📞 Phone</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📞</span>Phone</div>
           <div class="detail-value">${appointment.customerPhone}</div>
         </div>
         ` : ''}
         
         <div class="detail-row">
-          <div class="detail-label">📍 Business</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📍</span>Business</div>
           <div class="detail-value">${page.title}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">💼 Service</div>
+          <div class="detail-label"><span style="margin-right: 8px;">💼</span>Service</div>
           <div class="detail-value">${service?.name || 'Service'}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">📅 Date</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📅</span>Date</div>
           <div class="detail-value">${appointment.date}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">🕐 Time</div>
+          <div class="detail-label"><span style="margin-right: 8px;">🕐</span>Time</div>
           <div class="detail-value">${appointment.time}</div>
         </div>
       </div>
       
       <div class="button-container">
         <a href="${baseUrl}/dashboard" class="button">
-          📋 View in Dashboard
+          <span style="margin-right: 8px;">📋</span>View in Dashboard
         </a>
       </div>
     </div>
@@ -410,7 +410,7 @@ async function sendOwnerNotification(appointmentId: string) {
       <div class="footer-text">
         Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
       </div>
-      <div class="footer-text" style="font-size: 12px; color: #a0aec0;">
+      <div class="footer-text" style="font-size: 12px; color: hsl(215, 16%, 47%);">
         Effortless appointment management for modern businesses
       </div>
     </div>
@@ -608,14 +608,14 @@ async function sendOwnerRescheduleNotification(
     }
     
     .footer {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 96%, 0.8) 0%, hsla(217.2, 91.2%, 92%, 0.6) 100%);
       padding: 28px 32px;
       text-align: center;
-      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
     }
     
     .footer-text {
-      color: hsl(215, 16%, 47%);
+      color: hsl(215, 16%, 35%);
       font-size: 14px;
       margin-bottom: 8px;
     }
@@ -718,7 +718,7 @@ async function sendOwnerRescheduleNotification(
       <div class="footer-text">
         Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
       </div>
-      <div class="footer-text" style="font-size: 12px; color: #a0aec0;">
+      <div class="footer-text" style="font-size: 12px; color: hsl(215, 16%, 47%);">
         Effortless appointment management for modern businesses
       </div>
     </div>
