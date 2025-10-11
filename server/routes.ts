@@ -1404,6 +1404,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public API routes (no authentication required)
+  
+  // Get appointment details for public reschedule page
+  app.get("/api/public/appointments/:id", async (req, res) => {
+    try {
+      const appointment = await storage.getAppointmentById(req.params.id);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      // Get page and service details
+      const page = await storage.getPage(appointment.pageId);
+      const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
+
+      // Return only necessary public info
+      res.json({
+        id: appointment.id,
+        customerName: appointment.customerName,
+        customerEmail: appointment.customerEmail,
+        date: appointment.date,
+        time: appointment.time,
+        status: appointment.status,
+        serviceName: service?.name || 'Service',
+        businessName: page?.title || 'Business',
+        contactEmail: page?.contactEmail,
+        contactPhone: page?.contactPhone,
+      });
+    } catch (error) {
+      console.error("Get public appointment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Public reschedule endpoint (no authentication required)
+  app.post("/api/public/appointments/:id/reschedule", async (req, res) => {
+    try {
+      const appointment = await storage.getAppointmentById(req.params.id);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      const { newDate, newTime, note } = req.body;
+
+      if (!newDate || !newTime) {
+        return res.status(400).json({ message: "New date and time are required" });
+      }
+
+      // Get page and service details for email
+      const page = await storage.getPage(appointment.pageId);
+      const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
+
+      const originalDate = appointment.date;
+      const originalTime = appointment.time;
+
+      // Update the appointment
+      const updated = await storage.updateAppointment(req.params.id, {
+        date: newDate,
+        time: newTime,
+        status: 'rescheduled'
+      });
+
+      // Send email notification to customer
+      if (appointment.customerEmail) {
+        await sendAppointmentRescheduleEmail(
+          appointment.customerEmail,
+          appointment.customerName,
+          service?.name || 'Service',
+          originalDate,
+          originalTime,
+          newDate,
+          newTime,
+          note
+        );
+      }
+
+      res.json({
+        success: true,
+        message: "Appointment rescheduled successfully",
+        appointment: updated
+      });
+    } catch (error) {
+      console.error("Public reschedule error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Dashboard statistics route
   app.get("/api/dashboard/stats", verifyToken, async (req: any, res) => {
     try {

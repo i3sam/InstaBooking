@@ -29,6 +29,7 @@ import SubscriptionSuccess from "@/pages/subscription/success";
 import SubscriptionCancel from "@/pages/subscription/cancel";
 import SubscriptionDelays from "@/pages/subscription-delays";
 import AdminPage from "@/pages/admin";
+import ReschedulePublic from "@/pages/reschedule-public";
 
 function Router() {
   return (
@@ -70,6 +71,7 @@ function Router() {
           <RequestFeature />
         </AuthGuard>
       </Route>
+      <Route path="/reschedule/:appointmentId" component={ReschedulePublic} />
       <Route path="/:slug" component={PublicBooking} />
       <Route component={NotFound} />
     </Switch>
