@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe, Sparkles, Star, FileText, BookOpen } from 'lucide-react';
+import { Bell, Crown, LogOut, Home, Menu, X, Bug, Lightbulb, User, Shield, CreditCard, AlertTriangle, Calendar, RefreshCw, CheckCircle, Zap, Smartphone, Palette, Database, Search, Mail, Globe, Sparkles, Star, FileText, BookOpen, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -947,6 +947,32 @@ function SettingsSection() {
                 <LogOut className="h-4 w-4 mr-2 text-white" />
                 Logout
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Server Status Information */}
+        <Card className="mt-8 glass-prism-card backdrop-blur-xl bg-gradient-to-r from-yellow-400/20 via-amber-400/20 to-yellow-400/20 border-yellow-500/50 dark:border-yellow-600/50 shadow-2xl">
+          <CardContent className="p-8">
+            <div className="flex items-start gap-6">
+              <div className="w-16 h-16 glass-prism rounded-full flex items-center justify-center backdrop-blur-md bg-gradient-to-br from-yellow-500/30 to-amber-500/30 border border-yellow-400/50 dark:border-yellow-600/50 flex-shrink-0">
+                <AlertTriangle className="h-8 w-8 text-yellow-700 dark:text-yellow-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-900 to-amber-900 dark:from-yellow-100 dark:to-amber-100 bg-clip-text text-transparent mb-3">
+                  Server Load Information
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  If you've recently purchased a membership, activated your free trial, or upgraded to Pro, please allow 2-5 minutes for activation. We're experiencing higher than normal traffic and are working to resolve this.
+                </p>
+                <Button
+                  onClick={() => setLocation('/subscription-delays')}
+                  className="glass-prism-button backdrop-blur-lg bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-300 dark:from-yellow-800 dark:via-yellow-700 dark:to-yellow-600 hover:from-yellow-200 hover:via-yellow-300 hover:to-yellow-400 dark:hover:from-yellow-700 dark:hover:via-yellow-600 dark:hover:to-yellow-500 text-yellow-800 dark:text-yellow-100 shadow-lg hover:scale-105 transition-all duration-300 border border-yellow-400/50 dark:border-yellow-600/50 font-semibold h-10"
+                  data-testid="button-read-more-server-info"
+                >
+                  Learn more <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

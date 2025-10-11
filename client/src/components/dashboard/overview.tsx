@@ -47,7 +47,10 @@ export default function Overview({ onSectionChange }: OverviewProps) {
   const [isTrialModalOpen, setIsTrialModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [showTrialBanner, setShowTrialBanner] = useState(true);
-  const [showCautionBanner, setShowCautionBanner] = useState(true);
+  const [showCautionBanner, setShowCautionBanner] = useState(() => {
+    const dismissed = localStorage.getItem('serverLoadBannerDismissed');
+    return dismissed !== 'true';
+  });
   const [selectedPageId, setSelectedPageId] = useState<string>('all');
 
   // Enable real-time subscriptions for live dashboard updates
@@ -298,7 +301,10 @@ export default function Overview({ onSectionChange }: OverviewProps) {
               variant="ghost"
               size="icon"
               className="absolute top-2 right-2 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 z-20"
-              onClick={() => setShowCautionBanner(false)}
+              onClick={() => {
+                localStorage.setItem('serverLoadBannerDismissed', 'true');
+                setShowCautionBanner(false);
+              }}
               data-testid="button-close-caution-banner"
             >
               <X className="h-4 w-4" />
