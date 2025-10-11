@@ -158,10 +158,8 @@ async function sendOwnerNotification(appointmentId: string) {
       return;
     }
 
-    // Get base URL from environment
-    const baseUrl = process.env.REPLIT_DOMAINS 
-      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-      : 'https://bookinggen.xyz';
+    // Use bookinggen.xyz as the base URL
+    const baseUrl = 'https://bookinggen.xyz';
 
     // Use the new business notification template
     const emailData: EmailTemplateData = {
