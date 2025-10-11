@@ -133,7 +133,8 @@ export default function PayPalSubscriptionButton({
 
       // Capture user info at render time to avoid dependency issues
       const userId = user.id;
-      const userEmail = user.email;
+      // Use email if available, otherwise use fullName if it looks like an email, otherwise use a placeholder
+      const userEmail = user.email || (user.fullName?.includes('@') ? user.fullName : 'user@example.com');
       const userName = profile?.fullName || user.fullName || userEmail;
 
       window.paypal.Buttons({
@@ -163,17 +164,25 @@ export default function PayPalSubscriptionButton({
             
             console.log('✅ PayPal subscription created:', subscriptionId);
             return subscriptionId;
-          } catch (error) {
+          } catch (error: any) {
             console.error('❌ Failed to create PayPal subscription:', error);
             console.error('Error type:', typeof error);
             console.error('Error details:', error);
             if (error && typeof error === 'object') {
               console.error('Error keys:', Object.keys(error));
-              console.error('Error stringified:', JSON.stringify(error, null, 2));
+              console.error('Error code:', error.code);
+              console.error('Error message:', error.message);
+              console.error('Error name:', error.name);
+              console.error('Error debug_id:', error.debug_id);
+              console.error('Error details array:', error.details);
+              console.error('Full error:', Object.getOwnPropertyNames(error).reduce((obj: any, prop) => {
+                obj[prop] = error[prop];
+                return obj;
+              }, {}));
             }
             toast({
               title: "Subscription Error",
-              description: "Failed to create subscription. Please check the console for details.",
+              description: error?.message || "Failed to create subscription. Please check the console for details.",
               variant: "destructive",
             });
             throw error;
