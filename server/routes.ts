@@ -432,6 +432,314 @@ async function sendOwnerNotification(appointmentId: string) {
   }
 }
 
+// Send notification to business owner about rescheduled appointment
+async function sendOwnerRescheduleNotification(
+  appointmentId: string, 
+  originalDate: string, 
+  originalTime: string
+) {
+  if (!resend) {
+    console.warn("Email service not available - skipping email notification");
+    return;
+  }
+
+  try {
+    const appointment = await storage.getAppointmentById(appointmentId);
+    if (!appointment) {
+      console.error("Appointment not found:", appointmentId);
+      return;
+    }
+
+    const page = await storage.getPage(appointment.pageId);
+    const service = appointment.serviceId ? await storage.getServiceById(appointment.serviceId) : null;
+
+    if (!page) {
+      console.error("Page not found for appointment:", appointmentId);
+      return;
+    }
+
+    const owner = await storage.getProfile(page.ownerId);
+    if (!owner || !owner.email) {
+      console.warn("Owner email not found for appointment:", appointmentId);
+      return;
+    }
+
+    const baseUrl = process.env.REPLIT_DOMAINS 
+      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+      : 'https://bookinggen.xyz';
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointment Rescheduled - ${page.title}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(217.2, 91.2%, 95%) 25%, hsl(221.2, 83.2%, 88%) 50%, hsl(217.2, 91.2%, 75%) 100%);
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.1);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, hsl(217.2, 91.2%, 59.8%) 0%, hsl(221.2, 83.2%, 53.3%) 100%);
+      padding: 40px 32px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 14px hsla(217.2, 91.2%, 59.8%, 0.3);
+    }
+    
+    .logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .tagline {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 15px;
+      font-weight: 500;
+    }
+    
+    .content {
+      padding: 40px 32px;
+    }
+    
+    .greeting {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 16px;
+    }
+    
+    .message {
+      font-size: 16px;
+      color: #4a5568;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    
+    .glass-card {
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      background: #3b82f6;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px #3b82f640;
+      border: 1px solid #3b82f650;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+    }
+    
+    .detail-value {
+      color: #4a5568;
+      font-size: 14px;
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+    }
+    
+    .button {
+      display: inline-block;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
+      color: white;
+      text-decoration: none;
+      padding: 16px 36px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
+      border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);
+    }
+    
+    .button-container {
+      text-align: center;
+      margin: 32px 0;
+    }
+    
+    .footer {
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      padding: 28px 32px;
+      text-align: center;
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+    }
+    
+    .footer-text {
+      color: hsl(215, 16%, 47%);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .footer-brand {
+      color: hsl(217.2, 91.2%, 45%);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    @media only screen and (max-width: 600px) {
+      body {
+        padding: 20px 10px;
+      }
+      
+      .content {
+        padding: 24px 20px;
+      }
+      
+      .greeting {
+        font-size: 20px;
+      }
+      
+      .glass-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <div class="logo">BookingGen</div>
+      <div class="tagline">Appointment Rescheduled</div>
+    </div>
+    
+    <div class="content">
+      <div class="greeting">📅 Appointment Rescheduled</div>
+      <div class="message">A customer has rescheduled their appointment with <strong>${page.title}</strong>. View the updated details below.</div>
+      
+      <div style="margin-bottom: 20px; padding: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+        <div style="font-size: 12px; color: #991b1b; font-weight: 600; margin-bottom: 8px;">PREVIOUS APPOINTMENT</div>
+        <div style="font-size: 14px; color: #4a5568;">
+          <strong>Date:</strong> ${originalDate} &nbsp;&nbsp; <strong>Time:</strong> ${originalTime}
+        </div>
+      </div>
+      
+      <div class="glass-card" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+        <div style="font-size: 12px; color: #065f46; font-weight: 600; margin-bottom: 12px;">NEW APPOINTMENT DETAILS</div>
+        <div class="status-badge">Rescheduled</div>
+        
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">👤</span>Customer</div>
+          <div class="detail-value">${appointment.customerName}</div>
+        </div>
+        
+        ${appointment.customerEmail ? `
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">📧</span>Email</div>
+          <div class="detail-value">${appointment.customerEmail}</div>
+        </div>
+        ` : ''}
+        
+        ${appointment.customerPhone ? `
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">📞</span>Phone</div>
+          <div class="detail-value">${appointment.customerPhone}</div>
+        </div>
+        ` : ''}
+        
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">📍</span>Business</div>
+          <div class="detail-value">${page.title}</div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">💼</span>Service</div>
+          <div class="detail-value">${service?.name || 'Service'}</div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">📅</span>Date</div>
+          <div class="detail-value">${appointment.date}</div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label"><span style="margin-right: 8px;">🕐</span>Time</div>
+          <div class="detail-value">${appointment.time}</div>
+        </div>
+      </div>
+      
+      <div class="button-container">
+        <a href="${baseUrl}/dashboard" class="button">
+          <span style="margin-right: 8px;">📋</span>View in Dashboard
+        </a>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-text">
+        Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
+      </div>
+      <div class="footer-text" style="font-size: 12px; color: #a0aec0;">
+        Effortless appointment management for modern businesses
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+
+    await resend.emails.send({
+      from: 'team@bookinggen.xyz',
+      to: owner.email,
+      subject: `Appointment Rescheduled - ${page.title}`,
+      html: htmlContent,
+    });
+
+    console.log(`Owner reschedule notification sent to ${owner.email}`);
+  } catch (error) {
+    console.error("Failed to send owner reschedule notification:", error);
+  }
+}
+
 // Middleware to verify Supabase JWT
 async function verifyToken(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
@@ -1611,6 +1919,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Send notification to business owner about reschedule
+      await sendOwnerRescheduleNotification(req.params.id, originalDate, originalTime);
+      
       res.json(updated);
     } catch (error) {
       console.error("Reschedule appointment error:", error);
@@ -1685,6 +1996,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           originalTime
         });
       }
+      
+      // Send notification to business owner about reschedule
+      await sendOwnerRescheduleNotification(req.params.id, originalDate, originalTime);
 
       res.json({
         success: true,
