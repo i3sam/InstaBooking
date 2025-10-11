@@ -759,45 +759,47 @@ export default function PublicBooking() {
                     </TooltipContent>
                   </Tooltip>
 
-                  {pageServices.length > 0 && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
-                          <div 
-                            className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
-                          >
-                            <Sparkles className="w-6 h-6 text-white" />
-                          </div>
-                          <span className="font-semibold text-foreground text-xs sm:text-sm text-center">{pageServices.length} {pageServices.length === 1 ? 'Service' : 'Services'}</span>
-                          <span className="text-xs text-muted-foreground text-center">Available</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
+                        <div 
+                          className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
+                        >
+                          <Sparkles className="w-6 h-6 text-white" />
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Multiple services to choose from</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
+                        <span className="font-semibold text-foreground text-xs sm:text-sm text-center">
+                          {pageServices.length > 0 ? `${pageServices.length} ${pageServices.length === 1 ? 'Service' : 'Services'}` : 'Services'}
+                        </span>
+                        <span className="text-xs text-muted-foreground text-center">Available</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Multiple services to choose from</p>
+                    </TooltipContent>
+                  </Tooltip>
 
-                  {pageStaff.filter((s: any) => s.isActive !== false).length > 0 && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
-                          <div 
-                            className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
-                          >
-                            <Users className="w-6 h-6 text-white" />
-                          </div>
-                          <span className="font-semibold text-foreground text-xs sm:text-sm text-center">Expert Team</span>
-                          <span className="text-xs text-muted-foreground text-center">{pageStaff.filter((s: any) => s.isActive !== false).length} {pageStaff.filter((s: any) => s.isActive !== false).length === 1 ? 'member' : 'members'}</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
+                        <div 
+                          className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
+                        >
+                          <Users className="w-6 h-6 text-white" />
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Professional team ready to serve you</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
+                        <span className="font-semibold text-foreground text-xs sm:text-sm text-center">Expert Team</span>
+                        <span className="text-xs text-muted-foreground text-center">
+                          {pageStaff.filter((s: any) => s.isActive !== false).length > 0 
+                            ? `${pageStaff.filter((s: any) => s.isActive !== false).length} ${pageStaff.filter((s: any) => s.isActive !== false).length === 1 ? 'member' : 'members'}`
+                            : 'Ready to serve'}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Professional team ready to serve you</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </TooltipProvider>
 
