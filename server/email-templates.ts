@@ -252,14 +252,14 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     }
     
     .footer {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 96%, 0.8) 0%, hsla(217.2, 91.2%, 92%, 0.6) 100%);
       padding: 28px 32px;
       text-align: center;
-      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
     }
     
     .footer-text {
-      color: hsl(215, 16%, 47%);
+      color: hsl(215, 16%, 35%);
       font-size: 14px;
       margin-bottom: 8px;
     }
@@ -385,7 +385,7 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
       <div class="footer-text">
         Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
       </div>
-      <div class="footer-text" style="font-size: 12px; color: #a0aec0;">
+      <div class="footer-text" style="font-size: 12px; color: hsl(215, 16%, 47%);">
         Effortless appointment management for modern businesses
       </div>
     </div>
