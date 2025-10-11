@@ -321,22 +321,22 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
         ` : ''}
         
         <div class="detail-row">
-          <div class="detail-label">📍 Business</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📍</span>Business</div>
           <div class="detail-value">${data.businessName}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">💼 Service</div>
+          <div class="detail-label"><span style="margin-right: 8px;">💼</span>Service</div>
           <div class="detail-value">${data.serviceName}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">📅 Date</div>
+          <div class="detail-label"><span style="margin-right: 8px;">📅</span>Date</div>
           <div class="detail-value">${data.date}</div>
         </div>
         
         <div class="detail-row">
-          <div class="detail-label">🕐 Time</div>
+          <div class="detail-label"><span style="margin-right: 8px;">🕐</span>Time</div>
           <div class="detail-value">${data.time}</div>
         </div>
         
@@ -345,7 +345,7 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
       
       ${data.note ? `
         <div class="glass-card" style="background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3);">
-          <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">📝 Note from ${data.businessName}</div>
+          <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;"><span style="margin-right: 8px;">📝</span>Note from ${data.businessName}</div>
           <div style="color: #4a5568; font-size: 14px;">${data.note}</div>
         </div>
       ` : ''}
@@ -354,7 +354,7 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
         <div class="button-container">
           ${rescheduleUrl ? `
             <a href="${rescheduleUrl}" class="button">
-              📅 Reschedule Appointment
+              <span style="margin-right: 8px;">📅</span>Reschedule Appointment
             </a>
           ` : ''}
         </div>
@@ -366,13 +366,13 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
           <div class="contact-info">
             ${data.contactEmail ? `
               <div class="contact-item">
-                <span class="contact-icon">📧</span>
+                <span style="margin-right: 6px;">📧</span>
                 <a href="mailto:${data.contactEmail}" style="color: #667eea; text-decoration: none;">${data.contactEmail}</a>
               </div>
             ` : ''}
             ${data.contactPhone ? `
               <div class="contact-item">
-                <span class="contact-icon">📞</span>
+                <span style="margin-right: 6px;">📞</span>
                 <a href="tel:${data.contactPhone}" style="color: #667eea; text-decoration: none;">${data.contactPhone}</a>
               </div>
             ` : ''}
