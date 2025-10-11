@@ -34,7 +34,13 @@ export default function PayPalSubscriptionButton({
 
     const fetchPlanId = async () => {
       try {
-        const response = await apiRequest('GET', '/api/paypal/plan-id');
+        // Use regular fetch for public endpoint (no auth required)
+        const response = await fetch('/api/paypal/plan-id');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (!data.planId) {
@@ -138,18 +144,30 @@ export default function PayPalSubscriptionButton({
           label: 'subscribe',
           height: 45,
         },
-        createSubscription: (data: any, actions: any) => {
-          // Create subscription using PayPal SDK
-          return actions.subscription.create({
-            plan_id: planId,
-            custom_id: userId, // Store user ID for webhook processing
-            subscriber: {
-              name: {
-                given_name: userName,
+        createSubscription: async (data: any, actions: any) => {
+          try {
+            console.log('🔵 Creating PayPal subscription with plan ID:', planId);
+            console.log('🔵 User info:', { userId, userEmail, userName });
+            
+            // Create subscription using PayPal SDK
+            const subscriptionId = await actions.subscription.create({
+              plan_id: planId,
+              custom_id: userId, // Store user ID for webhook processing
+              subscriber: {
+                name: {
+                  given_name: userName,
+                },
+                email_address: userEmail,
               },
-              email_address: userEmail,
-            },
-          });
+            });
+            
+            console.log('✅ PayPal subscription created:', subscriptionId);
+            return subscriptionId;
+          } catch (error) {
+            console.error('❌ Failed to create PayPal subscription:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
+            throw error;
+          }
         },
         onApprove: async (data: any) => {
           try {
