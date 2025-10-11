@@ -193,18 +193,26 @@ export default function AppointmentsList() {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <Badge 
-                            variant={appointment.status === 'pending' ? 'secondary' : 'default'}
-                            className={
-                              appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
-                              appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
-                              appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
-                              'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
-                            }
-                            data-testid={`status-${appointment.id}`}
-                          >
-                            {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1)}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant={appointment.status === 'pending' ? 'secondary' : 'default'}
+                              className={
+                                appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
+                                appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
+                                appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
+                                'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                              }
+                              data-testid={`status-${appointment.id}`}
+                            >
+                              {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1)}
+                            </Badge>
+                            {appointment.status === 'rescheduled' && (
+                              <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                                <Calendar className="h-3 w-3" />
+                                <span className="font-medium">Updated</span>
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex space-x-1">
@@ -371,6 +379,17 @@ export default function AppointmentsList() {
                                         <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-black/30 p-2 rounded-lg border border-white/30">
                                           {appointment.notes}
                                         </p>
+                                      </div>
+                                    )}
+                                    {appointment.status === 'rescheduled' && (
+                                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                                        <div className="flex items-start gap-2">
+                                          <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                                          <div>
+                                            <p className="text-xs font-semibold text-blue-800 dark:text-blue-300">Rescheduled Appointment</p>
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">This appointment has been rescheduled to a new date and time.</p>
+                                          </div>
+                                        </div>
                                       </div>
                                     )}
                                     {appointment.syncedFromGoogle && (

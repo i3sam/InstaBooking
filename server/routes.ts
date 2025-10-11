@@ -92,10 +92,8 @@ async function sendAppointmentEmail(
         break;
     }
 
-    // Get base URL from environment or construct from request (will be added via middleware)
-    const baseUrl = process.env.REPLIT_DOMAINS 
-      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-      : 'https://bookinggen.xyz';
+    // Use bookinggen.xyz as the base URL for all email links
+    const baseUrl = 'https://bookinggen.xyz';
 
     // Prepare email template data
     const emailData: EmailTemplateData = {
@@ -222,9 +220,8 @@ async function sendOwnerRescheduleNotification(
       return;
     }
 
-    const baseUrl = process.env.REPLIT_DOMAINS 
-      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-      : 'https://bookinggen.xyz';
+    // Use bookinggen.xyz as the base URL
+    const baseUrl = 'https://bookinggen.xyz';
 
     // Use the new business notification template for rescheduled appointments
     const emailData: EmailTemplateData = {
