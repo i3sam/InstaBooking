@@ -1818,10 +1818,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       createPayPalSubscription, 
       getPayPalSubscription, 
       cancelPayPalSubscription,
-      checkAndActivateSubscription 
+      checkAndActivateSubscription,
+      getPayPalPlanId
     } = await import("./paypal-subscriptions");
     
     const { handlePayPalWebhook } = await import("./paypal-webhook");
+
+    // Get PayPal plan ID (public endpoint to support PayPal SDK button)
+    app.get("/api/paypal/plan-id", async (req, res) => {
+      await getPayPalPlanId(req, res);
+    });
 
     app.post("/api/paypal/subscription", verifyToken, async (req, res) => {
       await createPayPalSubscription(req, res);

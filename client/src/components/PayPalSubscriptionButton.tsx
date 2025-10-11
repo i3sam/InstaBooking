@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
 interface PayPalSubscriptionButtonProps {
-  onSuccess?: () => void;
+  onSuccess?: (subscriptionId: string) => void;
   onError?: (error: any) => void;
 }
 
@@ -23,13 +23,44 @@ export default function PayPalSubscriptionButton({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [planId, setPlanId] = useState<string | null>(null);
   const paypalRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
   const isMountedRef = useRef(true);
   const buttonRenderedRef = useRef(false);
 
   useEffect(() => {
-    if (!user || !paypalRef.current || buttonRenderedRef.current) return;
+    if (!user) return;
+
+    const fetchPlanId = async () => {
+      try {
+        const response = await apiRequest('GET', '/api/paypal/plan-id');
+        const data = await response.json();
+        
+        if (!data.planId) {
+          throw new Error('Plan ID not found');
+        }
+        
+        setPlanId(data.planId);
+      } catch (err) {
+        console.error('Failed to fetch plan ID:', err);
+        if (isMountedRef.current) {
+          setError('Failed to load payment options');
+          setIsLoading(false);
+          toast({
+            title: "Configuration Error",
+            description: "Failed to load payment options. Please try again or contact support.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    fetchPlanId();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !planId || !paypalRef.current || buttonRenderedRef.current) return;
 
     const loadPayPalScript = async () => {
       try {
@@ -89,13 +120,15 @@ export default function PayPalSubscriptionButton({
     };
 
     const renderPayPalButton = () => {
-      if (!window.paypal || !paypalRef.current || buttonRenderedRef.current) return;
+      if (!window.paypal || !paypalRef.current || buttonRenderedRef.current || !planId) return;
 
       // Mark button as rendered to prevent re-rendering
       buttonRenderedRef.current = true;
 
-      // Capture profile at render time to avoid dependency issues
-      const userName = profile?.fullName || user.fullName;
+      // Capture user info at render time to avoid dependency issues
+      const userId = user.id;
+      const userEmail = user.email;
+      const userName = profile?.fullName || user.fullName || userEmail;
 
       window.paypal.Buttons({
         style: {
@@ -105,38 +138,30 @@ export default function PayPalSubscriptionButton({
           label: 'subscribe',
           height: 45,
         },
-        createSubscription: async (data: any, actions: any) => {
-          try {
-            // Create subscription on our backend
-            const response = await apiRequest('POST', '/api/paypal/subscription', {
-              userId: user.id,
-              userEmail: user.email,
-              userName: userName,
-            });
-
-            const result = await response.json();
-
-            if (!result.subscriptionId) {
-              throw new Error('Failed to create subscription');
-            }
-
-            return result.subscriptionId;
-          } catch (err) {
-            console.error('Subscription creation error:', err);
-            toast({
-              title: "Error",
-              description: "Failed to create subscription. Please try again.",
-              variant: "destructive",
-            });
-            throw err;
-          }
+        createSubscription: (data: any, actions: any) => {
+          // Create subscription using PayPal SDK
+          return actions.subscription.create({
+            plan_id: planId,
+            custom_id: userId, // Store user ID for webhook processing
+            subscriber: {
+              name: {
+                given_name: userName,
+              },
+              email_address: userEmail,
+            },
+          });
         },
         onApprove: async (data: any) => {
           try {
-            console.log('Subscription approved:', data.subscriptionID);
+            console.log('✅ PayPal subscription approved:', data.subscriptionID);
+
+            toast({
+              title: "Processing...",
+              description: "Activating your subscription. Please wait...",
+            });
 
             // Wait a moment for webhook to process
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
 
             // First try to check if webhook already activated it
             await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
@@ -144,13 +169,14 @@ export default function PayPalSubscriptionButton({
             let updatedProfile = await profileResponse.json();
 
             if (updatedProfile.membershipStatus === 'pro') {
+              console.log('✅ Subscription activated via webhook');
               toast({
                 title: "Success!",
                 description: "Your PayPal subscription has been activated. Welcome to Pro!",
               });
             } else {
               // Webhook might be delayed, use fallback to check and activate
-              console.log('Webhook delayed, checking subscription status...');
+              console.log('⏳ Webhook delayed, using fallback activation...');
               
               try {
                 const checkResponse = await apiRequest('POST', '/api/paypal/subscription/check-activate', {
@@ -159,44 +185,44 @@ export default function PayPalSubscriptionButton({
                 const checkResult = await checkResponse.json();
 
                 if (checkResult.success && checkResult.activated) {
-                  // Subscription was successfully activated
+                  console.log('✅ Subscription activated via fallback');
                   await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
                   toast({
                     title: "Success!",
                     description: "Your PayPal subscription has been activated. Welcome to Pro!",
                   });
                 } else if (checkResult.success && !checkResult.activated) {
-                  // Already activated
+                  console.log('✅ Subscription already active');
                   toast({
                     title: "Success!",
                     description: "Your subscription is active. Welcome to Pro!",
                   });
                 } else {
-                  // Subscription not yet active
+                  console.warn('⚠️ Subscription not yet active');
                   toast({
                     title: "Subscription Created",
-                    description: "Your subscription is being processed. Please refresh in a moment.",
+                    description: "Your subscription is being processed. It may take up to 5 minutes to activate. Please refresh the page shortly.",
                   });
                 }
               } catch (fallbackError) {
-                console.error('Fallback activation failed:', fallbackError);
+                console.error('❌ Fallback activation failed:', fallbackError);
                 toast({
                   title: "Subscription Approved",
-                  description: "Your subscription is being activated. Please refresh the page shortly.",
+                  description: "Your subscription is being activated. It may take up to 5 minutes. Please refresh the page shortly.",
                 });
               }
             }
 
             if (onSuccess) {
-              onSuccess();
+              onSuccess(data.subscriptionID);
             }
 
             // Reload to ensure all UI updates
             setTimeout(() => {
               window.location.reload();
-            }, 1500);
+            }, 2000);
           } catch (err) {
-            console.error('Approval error:', err);
+            console.error('❌ Approval error:', err);
             toast({
               title: "Subscription Approved",
               description: "Your subscription is being activated. Please refresh the page in a few moments.",
@@ -214,12 +240,25 @@ export default function PayPalSubscriptionButton({
           });
         },
         onError: (err: any) => {
-          console.error('PayPal button error:', err);
+          console.error('❌ PayPal button error:', err);
+          
+          let errorMessage = "There was an error processing your payment. Please try again.";
+          
+          // Provide more specific error messages when possible
+          if (err && typeof err === 'object') {
+            if (err.message) {
+              errorMessage = err.message;
+            } else if (err.toString) {
+              errorMessage = err.toString();
+            }
+          }
+          
           toast({
             title: "Payment Error",
-            description: "There was an error processing your payment. Please try again.",
+            description: errorMessage,
             variant: "destructive",
           });
+          
           if (onError) {
             onError(err);
           }
@@ -237,7 +276,7 @@ export default function PayPalSubscriptionButton({
       // Cleanup: mark component as unmounted
       isMountedRef.current = false;
     };
-  }, [user]);
+  }, [user, planId]);
 
   if (error) {
     return (

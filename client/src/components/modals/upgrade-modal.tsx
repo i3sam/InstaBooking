@@ -188,8 +188,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                         </p>
                       </div>
                       <PayPalSubscriptionButton
-                        onSuccess={() => {
-                          handleSubscriptionSuccess('');
+                        onSuccess={(subscriptionId) => {
+                          handleSubscriptionSuccess(subscriptionId);
                         }}
                         onError={handlePaymentError}
                       />

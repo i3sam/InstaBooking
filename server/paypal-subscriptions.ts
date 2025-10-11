@@ -185,6 +185,20 @@ export async function getOrCreateProPlan(): Promise<string> {
   }
 }
 
+// Get PayPal plan ID (creates plan if it doesn't exist)
+export async function getPayPalPlanId(req: Request, res: Response) {
+  try {
+    const planId = await getOrCreateProPlan();
+    res.json({ planId });
+  } catch (error: any) {
+    console.error("❌ Failed to get PayPal plan ID:", error);
+    res.status(500).json({ 
+      error: "Failed to get plan ID",
+      details: error.message || "Unknown error occurred"
+    });
+  }
+}
+
 // Create a subscription
 export async function createPayPalSubscription(req: Request, res: Response) {
   try {
