@@ -2317,7 +2317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trial activation endpoint (no payment required)
-  app.post("/api/trial/activate", verifyToken, async (req, res) => {
+  app.post("/api/trial/activate", verifyToken, async (req: any, res) => {
     try {
       const userId = req.user.userId;
       
