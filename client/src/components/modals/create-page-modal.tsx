@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { CloudUpload, Plus, X, Palette, Image, FileText, Settings, HelpCircle, MapPin, Calendar, Trash2, ArrowLeft, ArrowRight, Check, Edit, Users, Info as InfoIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { uploadFile } from '@/lib/supabase';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CreatePageModalProps {
   open: boolean;
@@ -956,7 +958,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           <div className="space-y-6">
             <Card className="glass-prism-card border-none shadow-lg">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                   <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
                     <Users className="h-5 w-5" />
                     Team & Staff
@@ -964,7 +966,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <Button 
                     type="button" 
                     onClick={addStaffMember} 
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg min-touch-target w-full sm:w-auto" 
                     size="sm"
                     data-testid="button-add-staff"
                   >
@@ -985,27 +987,29 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                 ) : (
                   formData.staff.map((member, index) => (
                     <Card key={index} className="glass-effect border-border/50 shadow-sm">
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                        <h4 className="text-sm font-medium">Staff Member #{index + 1}</h4>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            onClick={addStaffMember}
-                            size="sm"
-                            className="glass-effect hover-lift rounded-xl"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Another
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeStaffMember(index)}
-                            className="hover-lift"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                      <CardHeader className="pb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                          <h4 className="text-sm font-medium">Staff Member #{index + 1}</h4>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              onClick={addStaffMember}
+                              size="sm"
+                              className="glass-effect hover-lift rounded-xl min-touch-target flex-1 sm:flex-none"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Another
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeStaffMember(index)}
+                              className="hover-lift min-touch-target"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0 space-y-4">
@@ -1147,7 +1151,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
           <div className="space-y-6">
             <Card className="glass-prism-card border-none shadow-lg">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                   <h3 className="text-lg font-semibold text-blue-gradient flex items-center gap-2">
                     <FileText className="h-5 w-5" />
                     Your Services
@@ -1155,7 +1159,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                   <Button 
                     type="button" 
                     onClick={addService} 
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg min-touch-target w-full sm:w-auto" 
                     size="sm"
                     data-testid="button-add-service"
                   >
@@ -1203,7 +1207,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label className="text-base font-medium">Duration (minutes)</Label>
                           <Input
@@ -1211,7 +1215,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                             placeholder="60"
                             value={service.durationMinutes}
                             onChange={(e) => updateService(index, 'durationMinutes', parseInt(e.target.value) || 60)}
-                            className="glass-effect border-border/50 mt-2"
+                            className="glass-effect border-border/50 mt-2 min-touch-target"
                           />
                         </div>
                         
@@ -1222,7 +1226,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                               value={service.currency || 'USD'}
                               onValueChange={(value) => updateService(index, 'currency', value)}
                             >
-                              <SelectTrigger className="w-24 glass-effect border-border/50">
+                              <SelectTrigger className="w-20 sm:w-24 glass-effect border-border/50 min-touch-target">
                                 <SelectValue>
                                   {currencyOptions.find(c => c.code === (service.currency || 'USD'))?.symbol || '$'}
                                 </SelectValue>
@@ -1241,7 +1245,7 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
                               placeholder="99.00"
                               value={service.price}
                               onChange={(e) => updateService(index, 'price', e.target.value)}
-                              className="flex-1 glass-effect border-border/50"
+                              className="flex-1 glass-effect border-border/50 min-touch-target"
                             />
                           </div>
                         </div>
@@ -1330,21 +1334,21 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
               <CardContent className="space-y-6">
                 <div>
                   <Label className="text-base font-medium mb-4 block">Color Theme</Label>
-                  <div className="max-h-64 overflow-y-auto glass-effect rounded-xl p-3 border border-border/50">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="max-h-64 overflow-y-auto glass-effect rounded-xl p-2 sm:p-3 border border-border/50">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                       {colorThemes.map((theme, index) => (
                         <button
                           key={index}
                           type="button"
                           onClick={() => selectColorTheme(theme)}
-                          className={`p-3 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect ${
+                          className={`p-2 sm:p-3 rounded-xl border-2 transition-all hover:scale-105 hover-lift glass-effect min-touch-target ${
                             formData.theme === theme.name 
                               ? 'border-blue-500 shadow-lg ring-2 ring-blue-200 bg-blue-50/50' 
                               : 'border-border/50 hover:border-border'
                           }`}
                         >
-                          <div className={`w-full h-8 rounded mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
-                          <span className="text-sm font-medium">{theme.name}</span>
+                          <div className={`w-full h-6 sm:h-8 rounded mb-1 sm:mb-2 bg-gradient-to-r ${theme.gradient}`}></div>
+                          <span className="text-xs sm:text-sm font-medium break-words">{theme.name}</span>
                         </button>
                       ))}
                     </div>
@@ -1970,123 +1974,170 @@ export default function CreatePageModal({ open, onClose, editingPage }: CreatePa
     }
   };
 
+  const isMobile = useIsMobile();
+
+  const modalTitle = isEditing ? 'Edit Booking Page' : 'Create Booking Page';
+
+  const modalHeader = (
+    <div className="flex-shrink-0 relative z-10 animate-fade-in-up">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl glass-prism flex items-center justify-center">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" opacity="0.3"/>
+              <path d="M21 16L12 21L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12L12 17L3 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h3 className="text-lg sm:text-2xl font-bold text-blue-gradient">
+            {modalTitle}
+          </h3>
+        </div>
+      </div>
+      
+      {/* Mobile-friendly Progress Bar */}
+      <div className="space-y-3 sm:space-y-4">
+        <Progress value={getProgress()} className="w-full h-2 sm:h-3 glass-effect" />
+        
+        {/* Mobile: Show current step info only */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Step {currentStep} of {steps.length}
+            </span>
+            <span className="font-medium text-primary">
+              {steps[currentStep - 1]?.title}
+            </span>
+          </div>
+        </div>
+        
+        {/* Desktop: Show all steps */}
+        <div className="hidden sm:flex justify-between text-sm text-muted-foreground">
+          {steps.map((step) => (
+            <div 
+              key={step.number} 
+              className={`flex flex-col items-center transition-all duration-300 ${
+                currentStep === step.number ? 'text-primary font-medium scale-105' : 
+                currentStep > step.number ? 'text-green-600' : ''
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
+                currentStep === step.number 
+                  ? 'glass-prism text-primary shadow-lg' 
+                  : currentStep > step.number
+                  ? 'bg-green-500 text-white'
+                  : 'bg-muted text-muted-foreground'
+              }`}>
+                {currentStep > step.number ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <span className="text-xs font-bold">{step.number}</span>
+                )}
+              </div>
+              <span className="text-xs text-center leading-tight">{step.title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const modalContent = (
+    <div className="flex-1 overflow-y-auto relative z-10">
+      <div className="p-4 sm:p-6">
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl glass-prism flex items-center justify-center text-blue-gradient shadow-lg">
+              {steps[currentStep - 1] && (() => {
+                const StepIcon = steps[currentStep - 1].icon;
+                return <StepIcon className="h-5 w-5 sm:h-6 sm:w-6" />;
+              })()}
+            </div>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-blue-gradient">
+            {steps[currentStep - 1]?.title}
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            {steps[currentStep - 1]?.description}
+          </p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="glass-effect rounded-xl p-4 sm:p-6">
+            {renderStepContent()}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between pt-4 sm:pt-6 border-t border-border/20 sticky bottom-0 bg-background/95 backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-6 safe-area-bottom">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className="glass-effect hover-lift rounded-xl min-touch-target"
+              data-testid="button-prev-step"
+            >
+              <ArrowLeft className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Previous</span>
+            </Button>
+
+            {currentStep < steps.length ? (
+              <Button
+                type="button"
+                onClick={nextStep}
+                disabled={!validateStep(currentStep)}
+                className="glass-prism-button hover-lift rounded-xl min-touch-target"
+                data-testid="button-next-step"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ArrowRight className="h-4 w-4 sm:ml-2" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={createPageMutation.isPending}
+                className="glass-prism-button hover-lift rounded-xl min-touch-target"
+                data-testid="button-submit-page"
+              >
+                {createPageMutation.isPending ? 'Publishing...' : isEditing ? 'Update Page' : 'Create Page'}
+                <Check className="h-4 w-4 ml-2" />
+              </Button>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onClose}>
+        <DrawerContent className="h-[95vh] flex flex-col glass-prism-card border-none shadow-2xl">
+          <DrawerHeader className="px-4 pt-4">
+            <DrawerTitle className="sr-only">{modalTitle}</DrawerTitle>
+            {modalHeader}
+          </DrawerHeader>
+          {modalContent}
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col glass-prism-card border-none shadow-2xl animate-scale-in">
-        {/* Glass Prism Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <DialogContent className="max-w-full sm:max-w-4xl h-[95vh] sm:h-[90vh] flex flex-col glass-prism-card border-none shadow-2xl animate-scale-in p-0">
+        {/* Glass Prism Background Elements - Hidden on mobile */}
+        <div className="hidden sm:block absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 w-32 h-32 glass-prism rounded-full opacity-20 animate-float bg-overlay"></div>
           <div className="absolute top-20 right-20 w-40 h-40 glass-prism rounded-full opacity-20 animate-float bg-overlay" style={{animationDelay: '1.5s'}}></div>
           <div className="absolute bottom-20 left-1/3 w-24 h-24 glass-prism rounded-full opacity-25 animate-float bg-overlay" style={{animationDelay: '3s'}}></div>
         </div>
         
-        <DialogHeader className="flex-shrink-0 relative z-10 animate-fade-in-up">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-blue-gradient flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl glass-prism flex items-center justify-center">
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" opacity="0.3"/>
-                  <path d="M21 16L12 21L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M21 12L12 17L3 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              {isEditing ? 'Edit Booking Page' : 'Create Booking Page'}
-            </DialogTitle>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="space-y-4 mt-6">
-            <Progress value={getProgress()} className="w-full h-3 glass-effect" />
-            <div className="flex justify-between text-sm text-muted-foreground">
-              {steps.map((step, index) => (
-                <div 
-                  key={step.number} 
-                  className={`flex flex-col items-center transition-all duration-300 ${
-                    currentStep === step.number ? 'text-primary font-medium scale-105' : 
-                    currentStep > step.number ? 'text-green-600' : ''
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition-all duration-300 ${
-                    currentStep === step.number 
-                      ? 'glass-prism text-primary shadow-lg' 
-                      : currentStep > step.number
-                      ? 'bg-green-500 text-white'
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {currentStep > step.number ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <span className="text-xs font-bold">{step.number}</span>
-                    )}
-                  </div>
-                  <span className="text-xs text-center leading-tight">{step.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
+          <DialogTitle className="sr-only">{modalTitle}</DialogTitle>
+          {modalHeader}
         </DialogHeader>
-        
-        <div className="flex-1 overflow-y-auto relative z-10">
-          <div className="p-6">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-12 h-12 rounded-xl glass-prism flex items-center justify-center text-blue-gradient shadow-lg">
-                  {steps[currentStep - 1] && (() => {
-                    const StepIcon = steps[currentStep - 1].icon;
-                    return <StepIcon className="h-6 w-6" />;
-                  })()}
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-blue-gradient">
-                {steps[currentStep - 1]?.title}
-              </h2>
-              <p className="text-muted-foreground">
-                {steps[currentStep - 1]?.description}
-              </p>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="glass-effect rounded-xl p-6">
-                {renderStepContent()}
-              </div>
-
-              {/* Navigation Buttons */}
-              <div className="flex justify-between pt-6 border-t border-border/20">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="glass-effect hover-lift rounded-xl"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Previous
-                </Button>
-
-                {currentStep < steps.length ? (
-                  <Button
-                    type="button"
-                    onClick={nextStep}
-                    disabled={!validateStep(currentStep)}
-                    className="glass-prism-button hover-lift rounded-xl"
-                  >
-                    Next
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    disabled={createPageMutation.isPending}
-                    className="glass-prism-button hover-lift rounded-xl"
-                  >
-                    {createPageMutation.isPending ? 'Publishing...' : isEditing ? 'Update Page' : 'Create Page'}
-                    <Check className="h-4 w-4 ml-2" />
-                  </Button>
-                )}
-              </div>
-            </form>
-          </div>
-        </div>
+        {modalContent}
       </DialogContent>
     </Dialog>
   );
