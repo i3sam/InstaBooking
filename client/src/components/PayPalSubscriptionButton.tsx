@@ -39,7 +39,18 @@ export default function PayPalSubscriptionButton({
 
         // Load PayPal SDK
         const script = document.createElement('script');
-        const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID || 'ATMmwCMAF97M6P270q6699A0jwVpKTHLDNuijUw5-xrdTTVgT0mTzRtymFwEsBlmK5Yrjthh98j5aLPy';
+        const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+        
+        if (!clientId) {
+          setError('PayPal Client ID not configured');
+          setIsLoading(false);
+          toast({
+            title: "Configuration Error",
+            description: "PayPal is not properly configured. Please contact support.",
+            variant: "destructive",
+          });
+          return;
+        }
         
         script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&vault=true&intent=subscription`;
         script.async = true;
@@ -113,13 +124,57 @@ export default function PayPalSubscriptionButton({
           try {
             console.log('Subscription approved:', data.subscriptionID);
 
-            // The webhook will handle the profile update, but we can refresh here too
-            await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+            // Wait a moment for webhook to process
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-            toast({
-              title: "Success!",
-              description: "Your PayPal subscription has been activated. Welcome to Pro!",
-            });
+            // First try to check if webhook already activated it
+            await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+            let profileResponse = await apiRequest('GET', '/api/profile');
+            let updatedProfile = await profileResponse.json();
+
+            if (updatedProfile.membershipStatus === 'pro') {
+              toast({
+                title: "Success!",
+                description: "Your PayPal subscription has been activated. Welcome to Pro!",
+              });
+            } else {
+              // Webhook might be delayed, use fallback to check and activate
+              console.log('Webhook delayed, checking subscription status...');
+              
+              try {
+                const checkResponse = await apiRequest('POST', '/api/paypal/subscription/check-activate', {
+                  subscriptionId: data.subscriptionID
+                });
+                const checkResult = await checkResponse.json();
+
+                if (checkResult.success && checkResult.activated) {
+                  // Subscription was successfully activated
+                  await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+                  toast({
+                    title: "Success!",
+                    description: "Your PayPal subscription has been activated. Welcome to Pro!",
+                  });
+                } else if (checkResult.success && !checkResult.activated) {
+                  // Already activated
+                  toast({
+                    title: "Success!",
+                    description: "Your subscription is active. Welcome to Pro!",
+                  });
+                } else {
+                  // Subscription not yet active
+                  toast({
+                    title: "Subscription Created",
+                    description: "Your subscription is being processed. Please refresh in a moment.",
+                  });
+                }
+              } catch (fallbackError) {
+                console.error('Fallback activation failed:', fallbackError);
+                toast({
+                  title: "Subscription Approved",
+                  description: "Your subscription is being activated. Please refresh the page shortly.",
+                });
+              }
+            }
 
             if (onSuccess) {
               onSuccess();
@@ -132,9 +187,8 @@ export default function PayPalSubscriptionButton({
           } catch (err) {
             console.error('Approval error:', err);
             toast({
-              title: "Error",
-              description: "There was an issue activating your subscription. Please contact support.",
-              variant: "destructive",
+              title: "Subscription Approved",
+              description: "Your subscription is being activated. Please refresh the page in a few moments.",
             });
             if (onError) {
               onError(err);

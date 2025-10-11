@@ -191,8 +191,13 @@ export async function createPayPalSubscription(req: Request, res: Response) {
     const { userId, userEmail, userName } = req.body;
 
     if (!userId || !userEmail) {
-      return res.status(400).json({ error: "Missing required fields: userId, userEmail" });
+      return res.status(400).json({ 
+        error: "Missing required fields",
+        details: "userId and userEmail are required" 
+      });
     }
+
+    console.log(`Creating PayPal subscription for user ${userId} (${userEmail})`);
 
     const accessToken = await getAccessToken();
     const planId = await getOrCreateProPlan();
@@ -238,16 +243,25 @@ export async function createPayPalSubscription(req: Request, res: Response) {
     }
 
     const data = await response.json();
-    console.log("Created PayPal subscription:", data.id);
+    console.log("✅ Created PayPal subscription:", data.id);
+
+    const approvalUrl = data.links?.find((link: any) => link.rel === "approve")?.href;
+    
+    if (!approvalUrl) {
+      throw new Error("No approval URL returned from PayPal");
+    }
 
     res.json({
       subscriptionId: data.id,
-      approvalUrl: data.links?.find((link: any) => link.rel === "approve")?.href,
+      approvalUrl: approvalUrl,
       status: data.status,
     });
-  } catch (error) {
-    console.error("Failed to create PayPal subscription:", error);
-    res.status(500).json({ error: "Failed to create subscription" });
+  } catch (error: any) {
+    console.error("❌ Failed to create PayPal subscription:", error);
+    res.status(500).json({ 
+      error: "Failed to create subscription",
+      details: error.message || "Unknown error occurred"
+    });
   }
 }
 
@@ -271,10 +285,122 @@ export async function getPayPalSubscription(req: Request, res: Response) {
     }
 
     const data = await response.json();
+    console.log(`PayPal subscription ${subscriptionId} status: ${data.status}`);
     res.json(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to get PayPal subscription:", error);
-    res.status(500).json({ error: "Failed to get subscription details" });
+    res.status(500).json({ 
+      error: "Failed to get subscription details",
+      details: error.message || "Unknown error occurred"
+    });
+  }
+}
+
+// Check and activate subscription if needed (fallback for delayed webhooks)
+export async function checkAndActivateSubscription(req: Request, res: Response) {
+  try {
+    const { subscriptionId } = req.body;
+    const authReq = req as any;
+
+    if (!authReq.user || !authReq.user.userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    if (!subscriptionId) {
+      return res.status(400).json({ error: "Subscription ID required" });
+    }
+
+    console.log(`Checking PayPal subscription status for ${subscriptionId}...`);
+
+    // Fetch subscription details from PayPal
+    const accessToken = await getAccessToken();
+    const response = await fetch(`${PAYPAL_API_BASE}/v1/billing/subscriptions/${subscriptionId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Failed to get subscription: ${error}`);
+    }
+
+    const subscription = await response.json();
+    const userId = authReq.user.userId;
+
+    // Verify this subscription belongs to the authenticated user
+    if (subscription.custom_id !== userId) {
+      return res.status(403).json({ error: "Subscription does not belong to user" });
+    }
+
+    // Check if subscription is active or activated
+    if (subscription.status === 'ACTIVE' || subscription.status === 'APPROVED') {
+      // Import storage
+      const { storage } = await import("./storage");
+      
+      // Check if already activated in our database
+      const existingSubscription = await storage.getSubscription(subscriptionId);
+      
+      if (!existingSubscription) {
+        // Webhook hasn't processed yet, activate manually
+        const currentDate = new Date();
+        const nextBillingDate = subscription.billing_info?.next_billing_time 
+          ? new Date(subscription.billing_info.next_billing_time)
+          : new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        // Update user profile to Pro
+        await storage.updateProfile(userId, {
+          membershipStatus: "pro",
+          membershipPlan: "pro-monthly",
+          membershipExpires: nextBillingDate,
+        });
+
+        // Store subscription details
+        await storage.createSubscription({
+          id: subscriptionId,
+          userId: userId,
+          status: subscription.status,
+          planId: subscription.plan_id,
+          currentPeriodStart: currentDate,
+          currentPeriodEnd: nextBillingDate,
+          planName: "pro",
+          currency: "USD",
+          amount: "14.99",
+          startTime: currentDate,
+          nextBillingTime: nextBillingDate,
+          isTrial: false,
+        });
+
+        console.log(`✅ Manually activated subscription ${subscriptionId} for user ${userId}`);
+        
+        return res.json({ 
+          success: true,
+          activated: true,
+          message: "Subscription activated successfully" 
+        });
+      } else {
+        console.log(`Subscription ${subscriptionId} already activated`);
+        return res.json({ 
+          success: true,
+          activated: false,
+          message: "Subscription already active" 
+        });
+      }
+    } else {
+      return res.json({ 
+        success: false,
+        status: subscription.status,
+        message: `Subscription status is ${subscription.status}` 
+      });
+    }
+  } catch (error: any) {
+    console.error("❌ Failed to check subscription:", error);
+    res.status(500).json({ 
+      error: "Failed to check subscription",
+      details: error.message || "Unknown error occurred"
+    });
   }
 }
 
@@ -284,6 +410,8 @@ export async function cancelPayPalSubscription(req: Request, res: Response) {
     const { subscriptionId } = req.params;
     const { reason } = req.body;
     const accessToken = await getAccessToken();
+
+    console.log(`Cancelling PayPal subscription ${subscriptionId}...`);
 
     const response = await fetch(`${PAYPAL_API_BASE}/v1/billing/subscriptions/${subscriptionId}/cancel`, {
       method: "POST",
@@ -301,13 +429,18 @@ export async function cancelPayPalSubscription(req: Request, res: Response) {
       throw new Error(`Failed to cancel subscription: ${error}`);
     }
 
+    console.log(`✅ PayPal subscription ${subscriptionId} cancelled successfully`);
+
     res.json({ 
       success: true,
       message: "Subscription canceled successfully" 
     });
-  } catch (error) {
-    console.error("Failed to cancel PayPal subscription:", error);
-    res.status(500).json({ error: "Failed to cancel subscription" });
+  } catch (error: any) {
+    console.error("❌ Failed to cancel PayPal subscription:", error);
+    res.status(500).json({ 
+      error: "Failed to cancel subscription",
+      details: error.message || "Unknown error occurred"
+    });
   }
 }
 

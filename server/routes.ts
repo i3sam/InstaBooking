@@ -1817,7 +1817,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { 
       createPayPalSubscription, 
       getPayPalSubscription, 
-      cancelPayPalSubscription 
+      cancelPayPalSubscription,
+      checkAndActivateSubscription 
     } = await import("./paypal-subscriptions");
     
     const { handlePayPalWebhook } = await import("./paypal-webhook");
@@ -1828,6 +1829,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     app.get("/api/paypal/subscription/:subscriptionId", verifyToken, async (req, res) => {
       await getPayPalSubscription(req, res);
+    });
+
+    app.post("/api/paypal/subscription/check-activate", verifyToken, async (req, res) => {
+      await checkAndActivateSubscription(req, res);
     });
 
     app.post("/api/paypal/subscription/:subscriptionId/cancel", verifyToken, async (req, res) => {

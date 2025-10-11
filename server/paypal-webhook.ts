@@ -85,19 +85,34 @@ export async function handlePayPalWebhook(req: Request, res: Response) {
     
     console.log("Received PayPal webhook event:", event.event_type);
 
-    // Verify webhook signature
-    const isValid = await verifyWebhookSignature(
-      PAYPAL_WEBHOOK_ID,
-      req.headers,
-      rawBody
-    );
-
-    if (!isValid) {
-      console.error("Invalid PayPal webhook signature");
-      return res.status(401).json({ error: "Invalid signature" });
+    // SECURITY: Require webhook ID for signature verification
+    // Only allow unverified webhooks in development mode with explicit flag
+    const allowUnverifiedWebhooks = process.env.NODE_ENV === 'development' && process.env.PAYPAL_ALLOW_UNVERIFIED_WEBHOOKS === 'true';
+    
+    if (!PAYPAL_WEBHOOK_ID && !allowUnverifiedWebhooks) {
+      console.error("❌ PAYPAL_WEBHOOK_ID not configured and unverified webhooks are not allowed");
+      console.error("❌ Set PAYPAL_WEBHOOK_ID for production or PAYPAL_ALLOW_UNVERIFIED_WEBHOOKS=true for development");
+      return res.status(500).json({ error: "Webhook verification not configured" });
     }
 
-    console.log("PayPal webhook signature verified successfully");
+    // Verify webhook signature
+    if (PAYPAL_WEBHOOK_ID) {
+      const isValid = await verifyWebhookSignature(
+        PAYPAL_WEBHOOK_ID,
+        req.headers,
+        rawBody
+      );
+
+      if (!isValid) {
+        console.error("Invalid PayPal webhook signature");
+        return res.status(401).json({ error: "Invalid signature" });
+      }
+
+      console.log("PayPal webhook signature verified successfully");
+    } else {
+      console.warn("⚠️ DEVELOPMENT MODE: Processing webhook without signature verification");
+      console.warn("⚠️ This is ONLY safe in development. DO NOT use in production!");
+    }
 
     // Handle different event types
     switch (event.event_type) {
