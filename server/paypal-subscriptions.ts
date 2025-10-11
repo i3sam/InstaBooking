@@ -20,6 +20,9 @@ const PAYPAL_API_BASE =
 let PRO_PLAN_ID: string | null = null;
 const PRO_PLAN_NAME = "BookingGen Pro Monthly";
 
+// Track the client ID used to create the plan to detect credential changes
+let PLAN_CLIENT_ID: string | null = null;
+
 // Get PayPal access token
 async function getAccessToken(): Promise<string> {
   const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
@@ -184,6 +187,13 @@ async function findExistingPlan(accessToken: string): Promise<string | null> {
 
 // Get or create Pro subscription plan
 export async function getOrCreateProPlan(): Promise<string> {
+  // Check if client credentials have changed
+  if (PRO_PLAN_ID && PLAN_CLIENT_ID !== PAYPAL_CLIENT_ID) {
+    console.log(`PayPal client ID has changed (${PLAN_CLIENT_ID?.substring(0, 10)}... -> ${PAYPAL_CLIENT_ID?.substring(0, 10)}...), clearing plan cache`);
+    PRO_PLAN_ID = null;
+    PLAN_CLIENT_ID = null;
+  }
+  
   if (PRO_PLAN_ID) {
     // Verify the cached plan is still active
     try {
@@ -207,11 +217,13 @@ export async function getOrCreateProPlan(): Promise<string> {
         // Plan not found, clear cache
         console.log(`Cached plan ${PRO_PLAN_ID} not found, clearing cache`);
         PRO_PLAN_ID = null;
+        PLAN_CLIENT_ID = null;
       }
     } catch (error) {
       console.error(`Error verifying cached plan:`, error);
       // Clear cache on error
       PRO_PLAN_ID = null;
+      PLAN_CLIENT_ID = null;
     }
   }
 
@@ -222,6 +234,7 @@ export async function getOrCreateProPlan(): Promise<string> {
     const existingPlanId = await findExistingPlan(accessToken);
     if (existingPlanId) {
       PRO_PLAN_ID = existingPlanId;
+      PLAN_CLIENT_ID = PAYPAL_CLIENT_ID || null;
       console.log(`Using existing PayPal Pro plan: ${existingPlanId}`);
       return existingPlanId;
     }
@@ -238,6 +251,7 @@ export async function getOrCreateProPlan(): Promise<string> {
     await activatePlan(accessToken, planId);
     
     PRO_PLAN_ID = planId;
+    PLAN_CLIENT_ID = PAYPAL_CLIENT_ID || null;
     console.log(`✅ PayPal Pro Plan created and activated successfully: ${planId}`);
     return planId;
   } catch (error) {
