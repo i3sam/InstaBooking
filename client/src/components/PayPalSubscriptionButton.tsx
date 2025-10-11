@@ -165,7 +165,17 @@ export default function PayPalSubscriptionButton({
             return subscriptionId;
           } catch (error) {
             console.error('❌ Failed to create PayPal subscription:', error);
-            console.error('Error details:', JSON.stringify(error, null, 2));
+            console.error('Error type:', typeof error);
+            console.error('Error details:', error);
+            if (error && typeof error === 'object') {
+              console.error('Error keys:', Object.keys(error));
+              console.error('Error stringified:', JSON.stringify(error, null, 2));
+            }
+            toast({
+              title: "Subscription Error",
+              description: "Failed to create subscription. Please check the console for details.",
+              variant: "destructive",
+            });
             throw error;
           }
         },

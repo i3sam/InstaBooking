@@ -120,6 +120,24 @@ async function createPlan(accessToken: string, productId: string): Promise<strin
   return data.id;
 }
 
+// Activate a subscription plan
+async function activatePlan(accessToken: string, planId: string): Promise<void> {
+  const response = await fetch(`${PAYPAL_API_BASE}/v1/billing/plans/${planId}/activate`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to activate plan: ${error}`);
+  }
+
+  console.log(`✅ PayPal plan ${planId} activated successfully`);
+}
+
 // Search for existing plan by name
 async function findExistingPlan(accessToken: string): Promise<string | null> {
   try {
@@ -140,7 +158,20 @@ async function findExistingPlan(accessToken: string): Promise<string | null> {
     const existingPlan = data.plans?.find((plan: any) => plan.name === PRO_PLAN_NAME);
     
     if (existingPlan) {
-      console.log(`Found existing PayPal plan: ${existingPlan.id}`);
+      console.log(`Found existing PayPal plan: ${existingPlan.id} (status: ${existingPlan.status})`);
+      
+      // If plan is not active, activate it
+      if (existingPlan.status !== 'ACTIVE') {
+        console.log(`Plan ${existingPlan.id} is ${existingPlan.status}, activating...`);
+        try {
+          await activatePlan(accessToken, existingPlan.id);
+        } catch (activationError) {
+          console.error(`Failed to activate existing plan:`, activationError);
+          // Return null to create a new plan if activation fails
+          return null;
+        }
+      }
+      
       return existingPlan.id;
     }
     
@@ -154,7 +185,34 @@ async function findExistingPlan(accessToken: string): Promise<string | null> {
 // Get or create Pro subscription plan
 export async function getOrCreateProPlan(): Promise<string> {
   if (PRO_PLAN_ID) {
-    return PRO_PLAN_ID;
+    // Verify the cached plan is still active
+    try {
+      const accessToken = await getAccessToken();
+      const response = await fetch(`${PAYPAL_API_BASE}/v1/billing/plans/${PRO_PLAN_ID}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.ok) {
+        const planData = await response.json();
+        if (planData.status !== 'ACTIVE') {
+          console.log(`Cached plan ${PRO_PLAN_ID} is ${planData.status}, activating...`);
+          await activatePlan(accessToken, PRO_PLAN_ID);
+        }
+        return PRO_PLAN_ID;
+      } else {
+        // Plan not found, clear cache
+        console.log(`Cached plan ${PRO_PLAN_ID} not found, clearing cache`);
+        PRO_PLAN_ID = null;
+      }
+    } catch (error) {
+      console.error(`Error verifying cached plan:`, error);
+      // Clear cache on error
+      PRO_PLAN_ID = null;
+    }
   }
 
   try {
@@ -176,8 +234,11 @@ export async function getOrCreateProPlan(): Promise<string> {
     // Then create billing plan
     const planId = await createPlan(accessToken, productId);
     
+    // Activate the plan (required for subscriptions to work)
+    await activatePlan(accessToken, planId);
+    
     PRO_PLAN_ID = planId;
-    console.log(`✅ PayPal Pro Plan created successfully: ${planId}`);
+    console.log(`✅ PayPal Pro Plan created and activated successfully: ${planId}`);
     return planId;
   } catch (error) {
     console.error("Failed to create PayPal plan:", error);
