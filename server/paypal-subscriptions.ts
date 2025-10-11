@@ -435,30 +435,38 @@ export async function checkAndActivateSubscription(req: Request, res: Response) 
       if (!existingSubscription) {
         // Webhook hasn't processed yet, activate manually
         const currentDate = new Date();
-        const nextBillingDate = subscription.billing_info?.next_billing_time 
-          ? new Date(subscription.billing_info.next_billing_time)
-          : new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        
+        // Calculate next billing date (default to 30 days from now if not provided)
+        let nextBillingDate: Date;
+        if (subscription.billing_info?.next_billing_time) {
+          nextBillingDate = new Date(subscription.billing_info.next_billing_time);
+        } else {
+          // Default to 30 days from now
+          nextBillingDate = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        }
+        
+        console.log(`Activating subscription - Next billing: ${nextBillingDate.toISOString()}`);
 
-        // Update user profile to Pro
+        // Update user profile to Pro (convert dates to ISO strings)
         await storage.updateProfile(userId, {
           membershipStatus: "pro",
           membershipPlan: "pro-monthly",
-          membershipExpires: nextBillingDate,
+          membershipExpires: nextBillingDate.toISOString(),
         });
 
-        // Store subscription details
+        // Store subscription details (convert dates to ISO strings)
         await storage.createSubscription({
           id: subscriptionId,
           userId: userId,
           status: subscription.status,
           planId: subscription.plan_id,
-          currentPeriodStart: currentDate,
-          currentPeriodEnd: nextBillingDate,
+          currentPeriodStart: currentDate.toISOString(),
+          currentPeriodEnd: nextBillingDate.toISOString(),
           planName: "pro",
           currency: "USD",
           amount: "14.99",
-          startTime: currentDate,
-          nextBillingTime: nextBillingDate,
+          startTime: currentDate.toISOString(),
+          nextBillingTime: nextBillingDate.toISOString(),
           isTrial: false,
         });
 
