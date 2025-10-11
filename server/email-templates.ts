@@ -1,4 +1,4 @@
-// Email template generator with light blue glass morphism design matching BookingGen homepage
+// Email template generator optimized for email clients (including mobile)
 
 export interface EmailTemplateData {
   businessName: string;
@@ -13,7 +13,7 @@ export interface EmailTemplateData {
   note?: string;
   originalDate?: string;
   originalTime?: string;
-  baseUrl?: string; // Pass base URL from request
+  baseUrl?: string;
 }
 
 const getStatusColor = (status: string): { bg: string; text: string; label: string } => {
@@ -66,330 +66,455 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
   const greeting = getGreeting(data.status, data.customerName);
   const message = getMessage(data.status, data.businessName);
   
-  // Generate reschedule link using passed base URL
   const rescheduleUrl = data.appointmentId && data.baseUrl
     ? `${data.baseUrl}/reschedule/${data.appointmentId}`
     : null;
 
   return `
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Appointment Update - ${data.businessName}</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(217.2, 91.2%, 95%) 25%, hsl(221.2, 83.2%, 88%) 50%, hsl(217.2, 91.2%, 75%) 100%);
-      padding: 40px 20px;
-      line-height: 1.6;
-    }
-    
-    .email-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.1);
-    }
-    
-    .header {
-      background: linear-gradient(135deg, hsl(217.2, 91.2%, 59.8%) 0%, hsl(221.2, 83.2%, 53.3%) 100%);
-      padding: 40px 32px;
-      text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 14px hsla(217.2, 91.2%, 59.8%, 0.3);
-    }
-    
-    .logo {
-      font-size: 32px;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-    
-    .tagline {
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 15px;
-      font-weight: 500;
-    }
-    
-    .content {
-      padding: 40px 32px;
-    }
-    
-    .greeting {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 16px;
-    }
-    
-    .message {
-      font-size: 16px;
-      color: #4a5568;
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
-    
-    .glass-card {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
-      backdrop-filter: blur(16px);
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 24px;
-      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
-      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
-    }
-    
-    .status-badge {
-      display: inline-block;
-      background: ${statusInfo.bg};
-      color: ${statusInfo.text};
-      padding: 10px 24px;
-      border-radius: 16px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px ${statusInfo.bg}40;
-      border: 1px solid ${statusInfo.bg}50;
-    }
-    
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-    
-    .detail-label {
-      font-weight: 600;
-      color: #2d3748;
-      font-size: 14px;
-    }
-    
-    .detail-value {
-      color: #4a5568;
-      font-size: 14px;
-      text-align: right;
-    }
-    
-    .button {
-      display: inline-block;
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
-      color: white;
-      text-decoration: none;
-      padding: 16px 36px;
-      border-radius: 16px;
-      font-weight: 600;
-      font-size: 16px;
-      text-align: center;
-      box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
-      border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);
-    }
-    
-    .button:hover {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 65%, 0.98) 0%, hsla(221.2, 83.2%, 55%, 0.95) 50%, hsla(217.2, 91.2%, 45%, 0.98) 100%);
-    }
-    
-    .button-secondary {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
-      color: hsl(217.2, 91.2%, 45%);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
-    }
-    
-    .button-container {
-      text-align: center;
-      margin: 32px 0;
-    }
-    
-    .contact-section {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 95%, 0.7) 100%);
-      border-radius: 20px;
-      padding: 24px;
-      margin-top: 24px;
-      border: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
-    }
-    
-    .contact-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 12px;
-    }
-    
-    .contact-info {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    
-    .contact-item {
-      display: flex;
-      align-items: center;
-      color: #4a5568;
-      font-size: 14px;
-    }
-    
-    .contact-icon {
-      margin-right: 8px;
-    }
-    
-    .footer {
-      background: linear-gradient(145deg, hsla(217.2, 91.2%, 96%, 0.8) 0%, hsla(217.2, 91.2%, 92%, 0.6) 100%);
-      padding: 28px 32px;
-      text-align: center;
-      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
-    }
-    
-    .footer-text {
-      color: hsl(215, 16%, 35%);
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-    
-    .footer-brand {
-      color: hsl(217.2, 91.2%, 45%);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
-      margin: 24px 0;
-    }
-    
-    @media only screen and (max-width: 600px) {
-      body {
-        padding: 20px 10px;
-      }
-      
-      .content {
-        padding: 24px 20px;
-      }
-      
-      .greeting {
-        font-size: 20px;
-      }
-      
-      .glass-card {
-        padding: 16px;
-      }
-    }
-  </style>
 </head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <div class="logo">BookingGen</div>
-      <div class="tagline">Effortless Appointment Management</div>
-    </div>
-    
-    <div class="content">
-      <div class="greeting">${greeting}</div>
-      <div class="message">${message}</div>
-      
-      <div class="glass-card">
-        <div class="status-badge">${statusInfo.label}</div>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0f4f8;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
         
-        ${data.status === 'rescheduled' && data.originalDate ? `
-          <div style="margin-bottom: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
-            <div style="font-size: 12px; color: #991b1b; font-weight: 600; margin-bottom: 8px;">PREVIOUS APPOINTMENT</div>
-            <div style="font-size: 14px; color: #4a5568;">
-              <strong>Date:</strong> ${data.originalDate} &nbsp;&nbsp; <strong>Time:</strong> ${data.originalTime}
-            </div>
-          </div>
-          <div style="margin-bottom: 12px; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px;">
-            <div style="font-size: 12px; color: #065f46; font-weight: 600; margin-bottom: 8px;">NEW APPOINTMENT</div>
-        ` : ''}
+        <!-- Main Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">BookingGen</h1>
+              <p style="margin: 8px 0 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">Effortless Appointment Management</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #1a202c;">${greeting}</h2>
+              
+              <!-- Message -->
+              <p style="margin: 0 0 32px 0; font-size: 16px; color: #4a5568; line-height: 1.6;">${message}</p>
+              
+              <!-- Status Badge -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td>
+                    <div style="display: inline-block; background-color: ${statusInfo.bg}; color: ${statusInfo.text}; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 20px;">
+                      ${statusInfo.label}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              
+              ${data.status === 'rescheduled' && data.originalDate ? `
+              <!-- Previous Appointment Info -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 16px; background-color: #fef2f2; border-radius: 8px; padding: 16px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #991b1b; font-weight: 600; letter-spacing: 0.5px;">PREVIOUS APPOINTMENT</p>
+                    <p style="margin: 0; font-size: 14px; color: #4a5568;">
+                      <strong>Date:</strong> ${data.originalDate} &nbsp;&nbsp; <strong>Time:</strong> ${data.originalTime}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- New Appointment Label -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0; padding: 12px 16px 8px 16px; font-size: 12px; color: #065f46; font-weight: 600; background-color: #d1fae5; border-radius: 8px 8px 0 0; letter-spacing: 0.5px;">NEW APPOINTMENT</p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+              <!-- Appointment Details Card -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
+                
+                <!-- Customer -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">👤</span>Customer:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.customerName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Business -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📍</span>Business:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.businessName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Service -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">💼</span>Service:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.serviceName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Date -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📅</span>Date:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.date}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Time -->
+                <tr>
+                  <td style="padding: 16px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">🕐</span>Time:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.time}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+              </table>
+              
+              ${data.note ? `
+              <!-- Note Section -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px; background-color: #fef3c7; border-radius: 12px; padding: 20px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #92400e;">
+                      <span style="margin-right: 8px;">📝</span>Note from ${data.businessName}:
+                    </p>
+                    <p style="margin: 0; font-size: 14px; color: #4a5568; line-height: 1.5;">
+                      ${data.note}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+              ${data.status === 'accepted' || data.status === 'pending' || data.status === 'rescheduled' ? `
+              ${rescheduleUrl ? `
+              <!-- Reschedule Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${rescheduleUrl}" style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                      <span style="margin-right: 8px;">📅</span>Reschedule Appointment
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              ` : ''}
+              
+              ${data.contactEmail || data.contactPhone ? `
+              <!-- Contact Section -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 24px; background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+                <tr>
+                  <td>
+                    <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #2d3748;">Need Help? Contact Us</p>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      ${data.contactEmail ? `
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="margin-right: 6px;">📧</span>
+                          <a href="mailto:${data.contactEmail}" style="color: #3b82f6; text-decoration: none; font-size: 14px;">${data.contactEmail}</a>
+                        </td>
+                      </tr>
+                      ` : ''}
+                      ${data.contactPhone ? `
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="margin-right: 6px;">📞</span>
+                          <a href="tel:${data.contactPhone}" style="color: #3b82f6; text-decoration: none; font-size: 14px;">${data.contactPhone}</a>
+                        </td>
+                      </tr>
+                      ` : ''}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 4px 0; font-size: 14px; color: #64748b;">
+                Powered by <a href="https://bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                Effortless appointment management for modern businesses
+              </p>
+            </td>
+          </tr>
+          
+        </table>
         
-        <div class="detail-row">
-          <div class="detail-label"><span style="margin-right: 8px;">📍</span>Business</div>
-          <div class="detail-value">${data.businessName}</div>
-        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+// Template for business owner notifications
+export function generateBusinessNotificationTemplate(data: EmailTemplateData): string {
+  const statusInfo = getStatusColor(data.status);
+  
+  const rescheduleUrl = data.appointmentId && data.baseUrl
+    ? `${data.baseUrl}/dashboard`
+    : null;
+
+  return `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Appointment Request - ${data.businessName}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0f4f8;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
         
-        <div class="detail-row">
-          <div class="detail-label"><span style="margin-right: 8px;">💼</span>Service</div>
-          <div class="detail-value">${data.serviceName}</div>
-        </div>
+        <!-- Main Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+                <span style="margin-right: 8px;">🔔</span>You have a new appointment!
+              </h1>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              
+              <!-- Message -->
+              <p style="margin: 0 0 32px 0; font-size: 16px; color: #4a5568; line-height: 1.6;">
+                A customer has requested an appointment with <strong>${data.businessName}</strong>. Review the details below and take action in your dashboard.
+              </p>
+              
+              <!-- Status Badge -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td>
+                    <div style="display: inline-block; background-color: ${statusInfo.bg}; color: ${statusInfo.text}; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 20px;">
+                      ${statusInfo.label}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Appointment Details Card -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
+                
+                <!-- Customer -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">👤</span>Customer:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.customerName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                ${data.contactEmail ? `
+                <!-- Email -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📧</span>Email:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          <a href="mailto:${data.contactEmail}" style="color: #3b82f6; text-decoration: none;">${data.contactEmail}</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ` : ''}
+                
+                ${data.contactPhone ? `
+                <!-- Phone -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📞</span>Phone:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          <a href="tel:${data.contactPhone}" style="color: #3b82f6; text-decoration: none;">${data.contactPhone}</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ` : ''}
+                
+                <!-- Business -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📍</span>Business:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.businessName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Service -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">💼</span>Service:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.serviceName}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Date -->
+                <tr>
+                  <td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">📅</span>Date:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.date}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Time -->
+                <tr>
+                  <td style="padding: 16px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="40%" style="font-size: 14px; font-weight: 600; color: #2d3748;">
+                          <span style="margin-right: 8px;">🕐</span>Time:
+                        </td>
+                        <td width="60%" style="font-size: 14px; color: #4a5568; text-align: right;">
+                          ${data.time}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+              </table>
+              
+              ${rescheduleUrl ? `
+              <!-- Dashboard Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${rescheduleUrl}" style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                      <span style="margin-right: 8px;">📊</span>View in Dashboard
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 4px 0; font-size: 14px; color: #64748b;">
+                Powered by <a href="https://bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                Effortless appointment management for modern businesses
+              </p>
+            </td>
+          </tr>
+          
+        </table>
         
-        <div class="detail-row">
-          <div class="detail-label"><span style="margin-right: 8px;">📅</span>Date</div>
-          <div class="detail-value">${data.date}</div>
-        </div>
-        
-        <div class="detail-row">
-          <div class="detail-label"><span style="margin-right: 8px;">🕐</span>Time</div>
-          <div class="detail-value">${data.time}</div>
-        </div>
-        
-        ${data.status === 'rescheduled' && data.originalDate ? '</div>' : ''}
-      </div>
-      
-      ${data.note ? `
-        <div class="glass-card" style="background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3);">
-          <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;"><span style="margin-right: 8px;">📝</span>Note from ${data.businessName}</div>
-          <div style="color: #4a5568; font-size: 14px;">${data.note}</div>
-        </div>
-      ` : ''}
-      
-      ${data.status === 'accepted' || data.status === 'pending' || data.status === 'rescheduled' ? `
-        <div class="button-container">
-          ${rescheduleUrl ? `
-            <a href="${rescheduleUrl}" class="button">
-              <span style="margin-right: 8px;">📅</span>Reschedule Appointment
-            </a>
-          ` : ''}
-        </div>
-      ` : ''}
-      
-      ${data.contactEmail || data.contactPhone ? `
-        <div class="contact-section">
-          <div class="contact-title">Need Help? Contact Us</div>
-          <div class="contact-info">
-            ${data.contactEmail ? `
-              <div class="contact-item">
-                <span style="margin-right: 6px;">📧</span>
-                <a href="mailto:${data.contactEmail}" style="color: #667eea; text-decoration: none;">${data.contactEmail}</a>
-              </div>
-            ` : ''}
-            ${data.contactPhone ? `
-              <div class="contact-item">
-                <span style="margin-right: 6px;">📞</span>
-                <a href="tel:${data.contactPhone}" style="color: #667eea; text-decoration: none;">${data.contactPhone}</a>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      ` : ''}
-    </div>
-    
-    <div class="footer">
-      <div class="footer-text">
-        Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
-      </div>
-      <div class="footer-text" style="font-size: 12px; color: hsl(215, 16%, 47%);">
-        Effortless appointment management for modern businesses
-      </div>
-    </div>
-  </div>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `.trim();
