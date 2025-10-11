@@ -533,8 +533,8 @@ export default function PublicBooking() {
       style={themeStyles?.cssVariables}
     >
       {/* Sleek Gradient Header */}
-      <div className="pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8">
-        <header className="container mx-auto rounded-xl sm:rounded-2xl border border-border/10 backdrop-blur-2xl shadow-lg overflow-hidden"
+      <div className="pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8 pb-0">
+        <header className="container mx-auto rounded-t-xl sm:rounded-t-2xl border-x border-t border-border/10 backdrop-blur-2xl shadow-lg overflow-hidden"
           style={{
             background: themeStyles 
               ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
@@ -580,7 +580,7 @@ export default function PublicBooking() {
       {/* Mobile-First Hero Section with Glass Prism Effects */}
       <section 
         ref={heroRef}
-        className="relative overflow-hidden min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8"
+        className="relative overflow-hidden min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center px-4 sm:px-6 lg:px-8 -mt-1"
       >
         {/* Dynamic layered background */}
         <div className="absolute inset-0">
