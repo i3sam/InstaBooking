@@ -532,21 +532,24 @@ export default function PublicBooking() {
       className={`min-h-screen ${themeStyles?.backgroundColor || 'bg-background'} ${themeStyles?.fontClass || 'font-inter'} scroll-smooth`}
       style={themeStyles?.cssVariables}
     >
-      {/* Detached Glossy Header */}
-      <div className="pt-4 sm:pt-6 px-3 sm:px-6 lg:px-8">
-        <header className="container mx-auto rounded-2xl sm:rounded-3xl border border-border/20 bg-card/60 backdrop-blur-3xl shadow-2xl overflow-hidden"
+      {/* Sleek Gradient Header */}
+      <div className="pt-3 sm:pt-4 px-3 sm:px-6 lg:px-8">
+        <header className="container mx-auto rounded-xl sm:rounded-2xl border border-border/10 backdrop-blur-2xl shadow-lg overflow-hidden"
           style={{
-            boxShadow: `0 8px 32px -4px ${themeStyles?.primaryColor || '#2563eb'}20, 0 0 0 1px ${themeStyles?.primaryColor || '#2563eb'}10`
+            background: themeStyles 
+              ? `linear-gradient(135deg, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.03) 0%, rgba(${hexToRgb(themeStyles.primaryColor)}, 0.08) 100%)`
+              : 'linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(37, 99, 235, 0.08) 100%)',
+            boxShadow: `0 4px 16px -2px ${themeStyles?.primaryColor || '#2563eb'}15`
           }}
         >
-          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+          <div className="px-3 sm:px-4 lg:px-6 py-2 sm:py-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                 <div 
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0 transition-transform hover:scale-105 overflow-hidden"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 transition-transform hover:scale-105 overflow-hidden"
                   style={{
                     background: page.logoUrl ? 'transparent' : (themeStyles ? `linear-gradient(135deg, ${themeStyles.primaryColor} 0%, ${themeStyles.primaryColor}dd 100%)` : 'linear-gradient(135deg, #2563eb 0%, #2563ebdd 100%)'),
-                    boxShadow: `0 8px 24px -4px ${themeStyles?.primaryColor || '#2563eb'}50`
+                    boxShadow: `0 4px 16px -2px ${themeStyles?.primaryColor || '#2563eb'}40`
                   }}
                   data-testid="header-logo"
                 >
@@ -557,15 +560,15 @@ export default function PublicBooking() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-xl sm:text-3xl font-black text-white">
+                    <span className="text-base sm:text-xl font-black text-white">
                       {page.title?.charAt(0) || 'B'}
                     </span>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-lg sm:text-2xl lg:text-3xl font-black text-foreground truncate block">{page.title}</span>
+                  <span className="text-base sm:text-xl lg:text-2xl font-bold text-foreground truncate block">{page.title}</span>
                   {page.tagline && (
-                    <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-0.5 sm:mt-1 truncate">{page.tagline}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate">{page.tagline}</p>
                   )}
                 </div>
               </div>
