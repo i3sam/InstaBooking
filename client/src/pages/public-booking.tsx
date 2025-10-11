@@ -1544,32 +1544,45 @@ export default function PublicBooking() {
                                 Business Hours
                               </h4>
                               <div className="space-y-3">
-                                {page.business_hours && Object.entries(page.business_hours).map(([day, hours]: [string, any]) => {
-                                  const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                                  const displayHours = hours === "Closed" ? "Closed" : String(hours);
-                                  const isClosed = hours === "Closed";
-                                  
-                                  return (
-                                    <div 
-                                      key={day} 
-                                      className={`flex justify-between items-center py-2 px-3 rounded-lg transition-colors ${
-                                        isToday ? 'bg-primary/10 border border-primary/20' : 'hover:bg-background/50'
-                                      }`}
-                                      data-testid={`hours-${day.toLowerCase()}`}
-                                    >
-                                      <span className={`font-medium capitalize text-sm ${
-                                        isToday ? 'font-semibold' : ''
-                                      }`} style={isToday ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
-                                        {day}
-                                      </span>
-                                      <span className={`text-sm font-medium ${
-                                        isClosed ? 'text-muted-foreground' : isToday ? 'font-semibold' : 'text-foreground'
-                                      }`} style={isToday && !isClosed ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
-                                        {displayHours}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
+                                {page.business_hours && (() => {
+                                  const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                                  return Object.entries(page.business_hours)
+                                    .sort(([dayA], [dayB]) => {
+                                      const indexA = dayOrder.indexOf(dayA.toLowerCase());
+                                      const indexB = dayOrder.indexOf(dayB.toLowerCase());
+                                      // Unknown days (-1) go to the end
+                                      if (indexA === -1 && indexB === -1) return 0;
+                                      if (indexA === -1) return 1;
+                                      if (indexB === -1) return -1;
+                                      return indexA - indexB;
+                                    })
+                                    .map(([day, hours]: [string, any]) => {
+                                      const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                                      const displayHours = hours === "Closed" ? "Closed" : String(hours);
+                                      const isClosed = hours === "Closed";
+                                      
+                                      return (
+                                        <div 
+                                          key={day} 
+                                          className={`flex justify-between items-center py-2 px-3 rounded-lg transition-colors ${
+                                            isToday ? 'bg-primary/10 border border-primary/20' : 'hover:bg-background/50'
+                                          }`}
+                                          data-testid={`hours-${day.toLowerCase()}`}
+                                        >
+                                          <span className={`font-medium capitalize text-sm ${
+                                            isToday ? 'font-semibold' : ''
+                                          }`} style={isToday ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
+                                            {day}
+                                          </span>
+                                          <span className={`text-sm font-medium ${
+                                            isClosed ? 'text-muted-foreground' : isToday ? 'font-semibold' : 'text-foreground'
+                                          }`} style={isToday && !isClosed ? { color: themeStyles?.primaryColor || '#2563eb' } : {}}>
+                                            {displayHours}
+                                          </span>
+                                        </div>
+                                      );
+                                    });
+                                })()}
                               </div>
                             </div>
                           )}
@@ -2062,29 +2075,42 @@ export default function PublicBooking() {
                               Business Hours
                             </h4>
                             <div className="space-y-3">
-                              {Object.entries(page.businessHours).map(([day, hours]: [string, any]) => {
-                                const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-                                const displayHours = hours === "Closed" ? "Closed" : String(hours);
-                                
-                                return (
-                                  <div 
-                                    key={day} 
-                                    className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
-                                      isToday 
-                                        ? 'bg-primary/10 border border-primary/20' 
-                                        : 'bg-background/30 hover:bg-background/50'
-                                    }`}
-                                    data-testid={`hours-${day.toLowerCase()}`}
-                                  >
-                                    <span className={`font-medium capitalize ${isToday ? 'text-primary' : 'text-foreground'}`}>
-                                      {day}{isToday && ' (Today)'}
-                                    </span>
-                                    <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
-                                      {displayHours}
-                                    </span>
-                                  </div>
-                                );
-                              })}
+                              {(() => {
+                                const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                                return Object.entries(page.businessHours)
+                                  .sort(([dayA], [dayB]) => {
+                                    const indexA = dayOrder.indexOf(dayA.toLowerCase());
+                                    const indexB = dayOrder.indexOf(dayB.toLowerCase());
+                                    // Unknown days (-1) go to the end
+                                    if (indexA === -1 && indexB === -1) return 0;
+                                    if (indexA === -1) return 1;
+                                    if (indexB === -1) return -1;
+                                    return indexA - indexB;
+                                  })
+                                  .map(([day, hours]: [string, any]) => {
+                                    const isToday = day.toLowerCase() === new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+                                    const displayHours = hours === "Closed" ? "Closed" : String(hours);
+                                    
+                                    return (
+                                      <div 
+                                        key={day} 
+                                        className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
+                                          isToday 
+                                            ? 'bg-primary/10 border border-primary/20' 
+                                            : 'bg-background/30 hover:bg-background/50'
+                                        }`}
+                                        data-testid={`hours-${day.toLowerCase()}`}
+                                      >
+                                        <span className={`font-medium capitalize ${isToday ? 'text-primary' : 'text-foreground'}`}>
+                                          {day}{isToday && ' (Today)'}
+                                        </span>
+                                        <span className={`text-sm ${hours === "Closed" ? 'text-muted-foreground' : isToday ? 'text-primary font-medium' : 'text-foreground'}`}>
+                                          {displayHours}
+                                        </span>
+                                      </div>
+                                    );
+                                  });
+                              })()}
                             </div>
                           </CardContent>
                         </Card>
