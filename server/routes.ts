@@ -163,7 +163,7 @@ async function sendOwnerNotification(appointmentId: string) {
       ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
       : 'https://bookinggen.xyz';
 
-    // Owner notification email with matching light blue design
+    // Owner notification email with matching light blue glass morphism design
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -172,12 +172,19 @@ async function sendOwnerNotification(appointmentId: string) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>New Appointment - ${page.title}</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(217.2, 91.2%, 95%) 25%, hsl(221.2, 83.2%, 88%) 50%, hsl(217.2, 91.2%, 75%) 100%);
       padding: 40px 20px;
       line-height: 1.6;
     }
+    
     .email-container {
       max-width: 600px;
       margin: 0 auto;
@@ -188,86 +195,224 @@ async function sendOwnerNotification(appointmentId: string) {
       box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
       border: 1px solid rgba(59, 130, 246, 0.1);
     }
+    
     .header {
       background: linear-gradient(135deg, hsl(217.2, 91.2%, 59.8%) 0%, hsl(221.2, 83.2%, 53.3%) 100%);
       padding: 40px 32px;
       text-align: center;
-      color: white;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 4px 14px hsla(217.2, 91.2%, 59.8%, 0.3);
     }
+    
+    .logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .tagline {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 15px;
+      font-weight: 500;
+    }
+    
     .content {
       padding: 40px 32px;
     }
+    
+    .greeting {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 16px;
+    }
+    
+    .message {
+      font-size: 16px;
+      color: #4a5568;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    
     .glass-card {
       background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
       backdrop-filter: blur(16px);
       border-radius: 20px;
       padding: 28px;
-      margin: 20px 0;
+      margin-bottom: 24px;
       border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
       box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
     }
+    
+    .status-badge {
+      display: inline-block;
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px #f59e0b40;
+      border: 1px solid #f59e0b50;
+    }
+    
     .detail-row {
       display: flex;
       justify-content: space-between;
       padding: 12px 0;
-      border-bottom: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
-    .detail-row:last-child { border-bottom: none; }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+    }
+    
+    .detail-value {
+      color: #4a5568;
+      font-size: 14px;
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+    }
+    
+    .button {
+      display: inline-block;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
+      color: white;
+      text-decoration: none;
+      padding: 16px 36px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
+      border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);
+    }
+    
+    .button:hover {
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 65%, 0.98) 0%, hsla(221.2, 83.2%, 55%, 0.95) 50%, hsla(217.2, 91.2%, 45%, 0.98) 100%);
+    }
+    
+    .button-container {
+      text-align: center;
+      margin: 32px 0;
+    }
+    
+    .footer {
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      padding: 28px 32px;
+      text-align: center;
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
+    }
+    
+    .footer-text {
+      color: hsl(215, 16%, 47%);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .footer-brand {
+      color: hsl(217.2, 91.2%, 45%);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    @media only screen and (max-width: 600px) {
+      body {
+        padding: 20px 10px;
+      }
+      
+      .content {
+        padding: 24px 20px;
+      }
+      
+      .greeting {
+        font-size: 20px;
+      }
+      
+      .glass-card {
+        padding: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="email-container">
     <div class="header">
-      <h1 style="margin: 0; font-size: 32px; font-weight: 700;">🔔 New Appointment Request</h1>
-      <p style="margin: 12px 0 0 0; opacity: 0.95; font-size: 16px;">${page.title}</p>
+      <div class="logo">BookingGen</div>
+      <div class="tagline">New Appointment Request</div>
     </div>
+    
     <div class="content">
-      <p style="font-size: 18px; color: #2d3748; margin-bottom: 24px; font-weight: 500;">
-        You have a new appointment request!
-      </p>
+      <div class="greeting">🔔 You have a new appointment!</div>
+      <div class="message">A customer has requested an appointment with <strong>${page.title}</strong>. Review the details below and take action in your dashboard.</div>
+      
       <div class="glass-card">
+        <div class="status-badge">Pending Review</div>
+        
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Customer</div>
-          <div style="color: #4a5568;">${appointment.customerName}</div>
+          <div class="detail-label">👤 Customer</div>
+          <div class="detail-value">${appointment.customerName}</div>
         </div>
+        
         ${appointment.customerEmail ? `
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Email</div>
-          <div style="color: #4a5568;">${appointment.customerEmail}</div>
+          <div class="detail-label">📧 Email</div>
+          <div class="detail-value">${appointment.customerEmail}</div>
         </div>
         ` : ''}
+        
         ${appointment.customerPhone ? `
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Phone</div>
-          <div style="color: #4a5568;">${appointment.customerPhone}</div>
+          <div class="detail-label">📞 Phone</div>
+          <div class="detail-value">${appointment.customerPhone}</div>
         </div>
         ` : ''}
+        
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Service</div>
-          <div style="color: #4a5568;">${service?.name || 'Service'}</div>
+          <div class="detail-label">📍 Business</div>
+          <div class="detail-value">${page.title}</div>
         </div>
+        
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Date</div>
-          <div style="color: #4a5568;">${appointment.date}</div>
+          <div class="detail-label">💼 Service</div>
+          <div class="detail-value">${service?.name || 'Service'}</div>
         </div>
+        
         <div class="detail-row">
-          <div style="font-weight: 600; color: #2d3748;">Time</div>
-          <div style="color: #4a5568;">${appointment.time}</div>
+          <div class="detail-label">📅 Date</div>
+          <div class="detail-value">${appointment.date}</div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label">🕐 Time</div>
+          <div class="detail-value">${appointment.time}</div>
         </div>
       </div>
-      <p style="text-align: center; margin-top: 36px;">
-        <a href="${baseUrl}/dashboard" 
-           style="display: inline-block; 
-                  background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
-                  color: white; text-decoration: none; 
-                  padding: 16px 36px; border-radius: 16px; 
-                  font-weight: 600; font-size: 16px;
-                  box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
-                  border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);">
-          View in Dashboard
+      
+      <div class="button-container">
+        <a href="${baseUrl}/dashboard" class="button">
+          📋 View in Dashboard
         </a>
-      </p>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-text">
+        Powered by <a href="https://bookinggen.xyz" class="footer-brand">BookingGen</a>
+      </div>
+      <div class="footer-text" style="font-size: 12px; color: #a0aec0;">
+        Effortless appointment management for modern businesses
+      </div>
     </div>
   </div>
 </body>
