@@ -1824,6 +1824,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     const { handlePayPalWebhook } = await import("./paypal-webhook");
 
+    // Diagnostic endpoint to check PayPal configuration
+    app.get("/api/paypal/config-check", async (req, res) => {
+      const backendClientId = process.env.PAYPAL_CLIENT_ID;
+      const frontendClientId = process.env.VITE_PAYPAL_CLIENT_ID;
+      const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+      
+      res.json({
+        backendClientId: backendClientId?.substring(0, 10) + "...",
+        frontendClientId: frontendClientId?.substring(0, 10) + "...",
+        clientIdsMatch: backendClientId === frontendClientId,
+        webhookConfigured: !!webhookId,
+        environment: process.env.NODE_ENV || 'development'
+      });
+    });
+
     // Get PayPal plan ID (public endpoint to support PayPal SDK button)
     app.get("/api/paypal/plan-id", async (req, res) => {
       await getPayPalPlanId(req, res);
