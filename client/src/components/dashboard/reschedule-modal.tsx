@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, MessageSquare, Send } from 'lucide-react';
+import { Calendar, Clock, MessageSquare, Send, X } from 'lucide-react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
@@ -90,63 +90,63 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[95vh] overflow-y-auto p-0 border-0 bg-gradient-to-br from-background/95 to-background/90 backdrop-blur-xl shadow-2xl">
-        <div className="p-8">
-          <DialogHeader className="text-center space-y-4 mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-2xl flex items-center justify-center mb-4">
-              <Calendar className="h-8 w-8 text-blue-600" />
+      <DialogContent className="max-w-lg sm:max-w-xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto p-0 border-0 bg-gradient-to-br from-background/95 to-background/90 backdrop-blur-xl shadow-2xl">
+        <div className="p-4 sm:p-6">
+          <DialogHeader className="text-center space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+            <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-2 sm:mb-3">
+              <Calendar className="h-6 w-6 sm:h-7 sm:w-7 text-blue-600" />
             </div>
-            <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <DialogTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
               Reschedule Appointment
             </DialogTitle>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground px-2">
               Send new date and time to {appointment.customerName}
             </p>
           </DialogHeader>
 
           {/* Current Appointment Info */}
-          <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm mb-8">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-gray-500/20 to-gray-600/10 rounded-xl flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-gray-600" />
+          <Card className="border-0 shadow-md bg-card/50 backdrop-blur-sm mb-4 sm:mb-6">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-gray-500/20 to-gray-600/10 rounded-lg flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-gray-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">Current Appointment</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-foreground">Current Appointment</h3>
               </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Customer</p>
+                  <p className="text-xs text-muted-foreground">Customer</p>
                   <p className="font-medium">{appointment.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Service</p>
+                  <p className="text-xs text-muted-foreground">Service</p>
                   <p className="font-medium">{appointment.serviceName}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Current Date</p>
+                  <p className="text-xs text-muted-foreground">Current Date</p>
                   <p className="font-medium">{appointment.date}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Current Time</p>
+                  <p className="text-xs text-muted-foreground">Current Time</p>
                   <p className="font-medium">{appointment.time}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* New Date & Time Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-xl flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-green-600" />
+            <Card className="border-0 shadow-md bg-card/50 backdrop-blur-sm">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground">New Date & Time</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">New Date & Time</h3>
                 </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="newDate" className="text-sm font-medium text-foreground flex items-center space-x-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="newDate" className="text-xs sm:text-sm font-medium text-foreground flex items-center space-x-1">
                       <span>New Date</span>
                       <span className="text-red-500">*</span>
                     </Label>
@@ -156,12 +156,12 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
                       value={formData.date}
                       onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                       required
-                      className="h-12 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200"
+                      className="h-10 sm:h-11 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200"
                       data-testid="input-reschedule-date"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="newTime" className="text-sm font-medium text-foreground flex items-center space-x-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="newTime" className="text-xs sm:text-sm font-medium text-foreground flex items-center space-x-1">
                       <span>New Time</span>
                       <span className="text-red-500">*</span>
                     </Label>
@@ -171,7 +171,7 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
                       value={formData.time}
                       onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
                       required
-                      className="h-12 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200"
+                      className="h-10 sm:h-11 border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200"
                       data-testid="input-reschedule-time"
                     />
                   </div>
@@ -180,16 +180,16 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
             </Card>
 
             {/* Additional Note Section */}
-            <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl flex items-center justify-center">
-                    <MessageSquare className="h-5 w-5 text-purple-600" />
+            <Card className="border-0 shadow-md bg-card/50 backdrop-blur-sm">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="h-4 w-4 text-purple-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground">Additional Note</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">Additional Note</h3>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="rescheduleNote" className="text-sm font-medium text-foreground">
+                <div className="space-y-1.5">
+                  <Label htmlFor="rescheduleNote" className="text-xs sm:text-sm font-medium text-foreground">
                     Message to Customer (Optional)
                   </Label>
                   <Textarea
@@ -197,8 +197,8 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
                     placeholder="Add any additional information for the customer about this reschedule..."
                     value={formData.note}
                     onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
-                    rows={4}
-                    className="border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200 resize-none"
+                    rows={3}
+                    className="border-0 bg-background/80 backdrop-blur-sm shadow-sm focus:shadow-md transition-all duration-200 resize-none text-sm"
                     data-testid="textarea-reschedule-note"
                   />
                 </div>
@@ -206,12 +206,12 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
             </Card>
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={onClose}
-                className="px-8 py-3 glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20"
+                className="w-full sm:w-auto px-6 py-2.5 glass-prism backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 hover:bg-white/20 dark:hover:bg-black/20"
                 data-testid="button-cancel-reschedule"
                 disabled={rescheduleAppointmentMutation.isPending}
               >
@@ -219,17 +219,17 @@ export default function RescheduleModal({ open, onClose, appointment }: Reschedu
               </Button>
               <Button 
                 type="submit"
-                className="px-8 py-3 glass-prism-button text-white shadow-lg backdrop-blur-lg"
+                className="w-full sm:w-auto px-6 py-2.5 glass-prism-button text-white shadow-lg backdrop-blur-lg"
                 data-testid="button-send-reschedule"
                 disabled={rescheduleAppointmentMutation.isPending}
               >
                 {rescheduleAppointmentMutation.isPending ? (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     <span>Sending...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2">
                     <Send className="h-4 w-4" />
                     <span>Send Reschedule</span>
                   </div>
