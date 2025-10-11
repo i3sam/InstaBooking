@@ -92,6 +92,11 @@ async function sendAppointmentEmail(
         break;
     }
 
+    // Get base URL from environment or construct from request (will be added via middleware)
+    const baseUrl = process.env.REPLIT_DOMAINS 
+      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+      : 'https://bookinggen.xyz';
+
     // Prepare email template data
     const emailData: EmailTemplateData = {
       businessName: page.title,
@@ -106,6 +111,7 @@ async function sendAppointmentEmail(
       note: additionalData?.note,
       originalDate: additionalData?.originalDate,
       originalTime: additionalData?.originalTime,
+      baseUrl,
     };
 
     const htmlContent = generateEmailTemplate(emailData);
@@ -152,7 +158,12 @@ async function sendOwnerNotification(appointmentId: string) {
       return;
     }
 
-    // Simple owner notification email
+    // Get base URL from environment
+    const baseUrl = process.env.REPLIT_DOMAINS 
+      ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+      : 'https://bookinggen.xyz';
+
+    // Owner notification email with matching light blue design
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -163,7 +174,7 @@ async function sendOwnerNotification(appointmentId: string) {
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(217.2, 91.2%, 95%) 25%, hsl(221.2, 83.2%, 88%) 50%, hsl(217.2, 91.2%, 75%) 100%);
       padding: 40px 20px;
       line-height: 1.6;
     }
@@ -174,30 +185,33 @@ async function sendOwnerNotification(appointmentId: string) {
       backdrop-filter: blur(20px);
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.1);
     }
     .header {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
-      padding: 32px;
+      background: linear-gradient(135deg, hsl(217.2, 91.2%, 59.8%) 0%, hsl(221.2, 83.2%, 53.3%) 100%);
+      padding: 40px 32px;
       text-align: center;
       color: white;
+      box-shadow: 0 4px 14px hsla(217.2, 91.2%, 59.8%, 0.3);
     }
     .content {
       padding: 40px 32px;
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 24px;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px;
       margin: 20px 0;
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
     }
     .detail-row {
       display: flex;
       justify-content: space-between;
       padding: 12px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
     }
     .detail-row:last-child { border-bottom: none; }
   </style>
@@ -205,11 +219,11 @@ async function sendOwnerNotification(appointmentId: string) {
 <body>
   <div class="email-container">
     <div class="header">
-      <h1 style="margin: 0; font-size: 28px;">🔔 New Appointment Request</h1>
-      <p style="margin: 8px 0 0 0; opacity: 0.9;">${page.title}</p>
+      <h1 style="margin: 0; font-size: 32px; font-weight: 700;">🔔 New Appointment Request</h1>
+      <p style="margin: 12px 0 0 0; opacity: 0.95; font-size: 16px;">${page.title}</p>
     </div>
     <div class="content">
-      <p style="font-size: 18px; color: #2d3748; margin-bottom: 20px;">
+      <p style="font-size: 18px; color: #2d3748; margin-bottom: 24px; font-weight: 500;">
         You have a new appointment request!
       </p>
       <div class="glass-card">
@@ -242,11 +256,15 @@ async function sendOwnerNotification(appointmentId: string) {
           <div style="color: #4a5568;">${appointment.time}</div>
         </div>
       </div>
-      <p style="text-align: center; margin-top: 32px;">
-        <a href="${process.env.BASE_URL || 'https://bookinggen.xyz'}/dashboard" 
-           style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                  color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; 
-                  font-weight: 600; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);">
+      <p style="text-align: center; margin-top: 36px;">
+        <a href="${baseUrl}/dashboard" 
+           style="display: inline-block; 
+                  background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
+                  color: white; text-decoration: none; 
+                  padding: 16px 36px; border-radius: 16px; 
+                  font-weight: 600; font-size: 16px;
+                  box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
+                  border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);">
           View in Dashboard
         </a>
       </p>

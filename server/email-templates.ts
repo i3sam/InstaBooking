@@ -1,4 +1,4 @@
-// Email template generator with glass morphism design matching BookingGen branding
+// Email template generator with light blue glass morphism design matching BookingGen homepage
 
 export interface EmailTemplateData {
   businessName: string;
@@ -13,6 +13,7 @@ export interface EmailTemplateData {
   note?: string;
   originalDate?: string;
   originalTime?: string;
+  baseUrl?: string; // Pass base URL from request
 }
 
 const getStatusColor = (status: string): { bg: string; text: string; label: string } => {
@@ -65,9 +66,9 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
   const greeting = getGreeting(data.status, data.customerName);
   const message = getMessage(data.status, data.businessName);
   
-  // Generate reschedule link (will work after we create the public reschedule page)
-  const rescheduleUrl = data.appointmentId 
-    ? `${process.env.BASE_URL || 'https://bookinggen.xyz'}/reschedule/${data.appointmentId}`
+  // Generate reschedule link using passed base URL
+  const rescheduleUrl = data.appointmentId && data.baseUrl
+    ? `${data.baseUrl}/reschedule/${data.appointmentId}`
     : null;
 
   return `
@@ -86,7 +87,7 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(217.2, 91.2%, 95%) 25%, hsl(221.2, 83.2%, 88%) 50%, hsl(217.2, 91.2%, 75%) 100%);
       padding: 40px 20px;
       line-height: 1.6;
     }
@@ -98,18 +99,20 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
       backdrop-filter: blur(20px);
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.1);
     }
     
     .header {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
-      padding: 32px;
+      background: linear-gradient(135deg, hsl(217.2, 91.2%, 59.8%) 0%, hsl(221.2, 83.2%, 53.3%) 100%);
+      padding: 40px 32px;
       text-align: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 14px hsla(217.2, 91.2%, 59.8%, 0.3);
     }
     
     .logo {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
       color: white;
       margin-bottom: 8px;
@@ -117,8 +120,8 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     }
     
     .tagline {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 15px;
       font-weight: 500;
     }
     
@@ -141,24 +144,26 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     }
     
     .glass-card {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 24px;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px;
       margin-bottom: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08);
     }
     
     .status-badge {
       display: inline-block;
       background: ${statusInfo.bg};
       color: ${statusInfo.text};
-      padding: 8px 20px;
-      border-radius: 12px;
+      padding: 10px 24px;
+      border-radius: 16px;
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 20px;
+      box-shadow: 0 4px 12px ${statusInfo.bg}40;
+      border: 1px solid ${statusInfo.bg}50;
     }
     
     .detail-row {
@@ -186,28 +191,27 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     
     .button {
       display: inline-block;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 75%, 0.95) 0%, hsla(221.2, 83.2%, 65%, 0.9) 50%, hsla(217.2, 91.2%, 55%, 0.95) 100%);
       color: white;
       text-decoration: none;
-      padding: 14px 32px;
-      border-radius: 12px;
+      padding: 16px 36px;
+      border-radius: 16px;
       font-weight: 600;
       font-size: 16px;
       text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 24px hsla(217.2, 91.2%, 59.8%, 0.35);
+      border: 1px solid hsla(217.2, 91.2%, 70%, 0.5);
     }
     
     .button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 65%, 0.98) 0%, hsla(221.2, 83.2%, 55%, 0.95) 50%, hsla(217.2, 91.2%, 45%, 0.98) 100%);
     }
     
     .button-secondary {
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
-      box-shadow: none;
-      border: 1px solid rgba(102, 126, 234, 0.3);
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 96%, 0.7) 100%);
+      color: hsl(217.2, 91.2%, 45%);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+      border: 1px solid hsla(217.2, 91.2%, 80%, 0.4);
     }
     
     .button-container {
@@ -216,10 +220,11 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     }
     
     .contact-section {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-radius: 16px;
-      padding: 20px;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.9) 0%, hsla(217.2, 91.2%, 95%, 0.7) 100%);
+      border-radius: 20px;
+      padding: 24px;
       margin-top: 24px;
+      border: 1px solid hsla(217.2, 91.2%, 80%, 0.3);
     }
     
     .contact-title {
@@ -247,20 +252,20 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
     }
     
     .footer {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-      padding: 24px 32px;
+      background: linear-gradient(145deg, hsla(217.2, 91.2%, 98%, 0.5) 0%, hsla(217.2, 91.2%, 95%, 0.3) 100%);
+      padding: 28px 32px;
       text-align: center;
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-top: 1px solid hsla(217.2, 91.2%, 80%, 0.2);
     }
     
     .footer-text {
-      color: #718096;
+      color: hsl(215, 16%, 47%);
       font-size: 14px;
       margin-bottom: 8px;
     }
     
     .footer-brand {
-      color: #667eea;
+      color: hsl(217.2, 91.2%, 45%);
       font-weight: 600;
       text-decoration: none;
     }
