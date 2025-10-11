@@ -134,286 +134,500 @@ export default function AppointmentsList() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl mobile-no-blur animate-scale-in">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="glass-prism backdrop-blur-md bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-white/20">
-                <tr>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Customer</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Service</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Date & Time</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Status</th>
-                  <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {appointments.map((appointment: any, index: number) => {
-                  const isExpanded = expandedAppointment === appointment.id;
-                  return (
-                    <>
-                      <tr key={appointment.id} className="hover:bg-white/5 dark:hover:bg-black/5 transition-colors duration-200">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-11 h-11 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-300/30 dark:border-blue-600/30">
-                              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                {appointment.customerName?.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-800 dark:text-gray-100" data-testid={`customer-name-${appointment.id}`}>
-                                {appointment.customerName}
-                              </p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`customer-email-${appointment.id}`}>
-                                {appointment.customerEmail}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium text-gray-800 dark:text-gray-200" data-testid={`service-name-${appointment.id}`}>
-                              {appointment.serviceName || 'Service'}
-                            </span>
-                            {appointment.syncedFromGoogle && (
-                              <Badge 
-                                variant="outline" 
-                                className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs flex items-center gap-1"
-                                data-testid={`synced-badge-${appointment.id}`}
-                              >
-                                <SiGooglecalendar className="h-3 w-3" />
-                                Synced
-                              </Badge>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div>
-                            <p className="font-medium text-gray-800 dark:text-gray-200">{appointment.date}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.time}</p>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-2">
-                            <Badge 
-                              variant={appointment.status === 'pending' ? 'secondary' : 'default'}
-                              className={
-                                appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
-                                appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
-                                appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
-                                'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
-                              }
-                              data-testid={`status-${appointment.id}`}
-                            >
-                              {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1)}
-                            </Badge>
-                            {appointment.status === 'rescheduled' && (
-                              <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                                <Calendar className="h-3 w-3" />
-                                <span className="font-medium">Updated</span>
+        <>
+          {/* Desktop Table View - Hidden on Mobile */}
+          <Card className="hidden md:block glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-2xl animate-scale-in">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="glass-prism backdrop-blur-md bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-white/20">
+                  <tr>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Customer</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Service</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Date & Time</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {appointments.map((appointment: any, index: number) => {
+                    const isExpanded = expandedAppointment === appointment.id;
+                    return (
+                      <>
+                        <tr key={appointment.id} className="hover:bg-white/5 dark:hover:bg-black/5 transition-colors duration-200">
+                          <td className="py-4 px-6">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-11 h-11 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-300/30 dark:border-blue-600/30">
+                                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                                  {appointment.customerName?.charAt(0).toUpperCase()}
+                                </span>
                               </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex space-x-1">
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 p-2 rounded-lg transition-all"
-                              data-testid={`button-view-details-${appointment.id}`}
-                              onClick={() => setExpandedAppointment(isExpanded ? null : appointment.id)}
-                            >
-                              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                            {appointment.status === 'pending' && (
-                              <>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 p-2 rounded-lg transition-all"
-                                  data-testid={`button-accept-${appointment.id}`}
-                                  onClick={() => handleStatusUpdate(appointment.id, 'accepted')}
-                                  disabled={updateAppointmentMutation.isPending}
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
-                                  className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 p-2 rounded-lg transition-all"
-                                  data-testid={`button-decline-${appointment.id}`}
-                                  onClick={() => handleStatusUpdate(appointment.id, 'declined')}
-                                  disabled={updateAppointmentMutation.isPending}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-2 rounded-lg transition-all"
-                              data-testid={`button-reschedule-${appointment.id}`}
-                              onClick={() => handleReschedule(appointment)}
-                            >
-                              <Calendar className="h-4 w-4" />
-                            </Button>
-                            {appointment.customerEmail && (
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-all"
-                                    data-testid={`button-email-${appointment.id}`}
-                                  >
-                                    <Mail className="h-4 w-4" />
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80 glass-prism-card backdrop-blur-xl bg-white/90 dark:bg-black/90 border border-white/30 shadow-2xl">
-                                  <div className="space-y-3">
-                                    <div>
-                                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Customer Email</h4>
-                                      <p className="text-sm text-gray-600 dark:text-gray-400">Click to copy the email address</p>
-                                    </div>
-                                    <div 
-                                      onClick={() => handleCopyEmail(appointment.customerEmail)}
-                                      className="flex items-center justify-between p-3 glass-prism backdrop-blur-md bg-white/30 dark:bg-black/30 border border-white/30 rounded-lg cursor-pointer hover:bg-white/50 dark:hover:bg-black/50 transition-all group"
-                                    >
-                                      <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate flex-1">
-                                        {appointment.customerEmail}
-                                      </span>
-                                      <Copy className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 ml-2 flex-shrink-0" />
-                                    </div>
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                      {isExpanded && (
-                        <tr key={`${appointment.id}-details`} className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/30 dark:to-purple-950/30">
-                          <td colSpan={5} className="px-6 py-6">
-                            <div className="glass-prism-card backdrop-blur-lg bg-white/40 dark:bg-black/40 border border-white/30 rounded-xl p-6">
-                              <h4 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">
-                                Appointment Details
-                              </h4>
-                              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Customer Information */}
-                                <div className="space-y-3">
-                                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    Customer Information
-                                  </h5>
-                                  <div className="space-y-2">
-                                    <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
-                                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.customerName}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.customerEmail}</p>
-                                    </div>
-                                    {appointment.customerPhone && (
-                                      <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
-                                          <Phone className="h-3 w-3" />
-                                          {appointment.customerPhone}
-                                        </p>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Service & Booking Details */}
-                                <div className="space-y-3">
-                                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                                    <Calendar className="h-4 w-4" />
-                                    Service Details
-                                  </h5>
-                                  <div className="space-y-2">
-                                    <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">Service</p>
-                                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.serviceName || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">Date & Time</p>
-                                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.date} at {appointment.time}</p>
-                                    </div>
-                                    {appointment.price && (
-                                      <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
-                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
-                                          <DollarSign className="h-3 w-3" />
-                                          {formatPrice(appointment.price)}
-                                        </p>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Booking Page & Notes */}
-                                <div className="space-y-3">
-                                  <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
-                                    <FileText className="h-4 w-4" />
-                                    Additional Information
-                                  </h5>
-                                  <div className="space-y-2">
-                                    <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">Booking Page</p>
-                                      <a 
-                                        href={`/${appointment.pages?.slug}`} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                                      >
-                                        {appointment.pages?.title || 'View Page'}
-                                        <ExternalLink className="h-3 w-3" />
-                                      </a>
-                                    </div>
-                                    {appointment.notes && (
-                                      <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Customer Notes</p>
-                                        <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-black/30 p-2 rounded-lg border border-white/30">
-                                          {appointment.notes}
-                                        </p>
-                                      </div>
-                                    )}
-                                    {appointment.status === 'rescheduled' && (
-                                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                                        <div className="flex items-start gap-2">
-                                          <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
-                                          <div>
-                                            <p className="text-xs font-semibold text-blue-800 dark:text-blue-300">Rescheduled Appointment</p>
-                                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">This appointment has been rescheduled to a new date and time.</p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                    {appointment.syncedFromGoogle && (
-                                      <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                                        <SiGooglecalendar className="h-4 w-4" />
-                                        <span>Synced from Google Calendar</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
+                              <div>
+                                <p className="font-semibold text-gray-800 dark:text-gray-100" data-testid={`customer-name-${appointment.id}`}>
+                                  {appointment.customerName}
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`customer-email-${appointment.id}`}>
+                                  {appointment.customerEmail}
+                                </p>
                               </div>
                             </div>
                           </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-medium text-gray-800 dark:text-gray-200" data-testid={`service-name-${appointment.id}`}>
+                                {appointment.serviceName || 'Service'}
+                              </span>
+                              {appointment.syncedFromGoogle && (
+                                <Badge 
+                                  variant="outline" 
+                                  className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs flex items-center gap-1"
+                                  data-testid={`synced-badge-${appointment.id}`}
+                                >
+                                  <SiGooglecalendar className="h-3 w-3" />
+                                  Synced
+                                </Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div>
+                              <p className="font-medium text-gray-800 dark:text-gray-200">{appointment.date}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.time}</p>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant={appointment.status === 'pending' ? 'secondary' : 'default'}
+                                className={
+                                  appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
+                                  appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
+                                  appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
+                                  'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                                }
+                                data-testid={`status-${appointment.id}`}
+                              >
+                                {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1)}
+                              </Badge>
+                              {appointment.status === 'rescheduled' && (
+                                <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                                  <Calendar className="h-3 w-3" />
+                                  <span className="font-medium">Updated</span>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex space-x-1">
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 p-2 rounded-lg transition-all"
+                                data-testid={`button-view-details-${appointment.id}`}
+                                onClick={() => setExpandedAppointment(isExpanded ? null : appointment.id)}
+                              >
+                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                              {appointment.status === 'pending' && (
+                                <>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 p-2 rounded-lg transition-all"
+                                    data-testid={`button-accept-${appointment.id}`}
+                                    onClick={() => handleStatusUpdate(appointment.id, 'accepted')}
+                                    disabled={updateAppointmentMutation.isPending}
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    className="text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 p-2 rounded-lg transition-all"
+                                    data-testid={`button-decline-${appointment.id}`}
+                                    onClick={() => handleStatusUpdate(appointment.id, 'declined')}
+                                    disabled={updateAppointmentMutation.isPending}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-2 rounded-lg transition-all"
+                                data-testid={`button-reschedule-${appointment.id}`}
+                                onClick={() => handleReschedule(appointment)}
+                              >
+                                <Calendar className="h-4 w-4" />
+                              </Button>
+                              {appointment.customerEmail && (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 p-2 rounded-lg transition-all"
+                                      data-testid={`button-email-${appointment.id}`}
+                                    >
+                                      <Mail className="h-4 w-4" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80 glass-prism-card backdrop-blur-xl bg-white/90 dark:bg-black/90 border border-white/30 shadow-2xl">
+                                    <div className="space-y-3">
+                                      <div>
+                                        <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Customer Email</h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">Click to copy the email address</p>
+                                      </div>
+                                      <div 
+                                        onClick={() => handleCopyEmail(appointment.customerEmail)}
+                                        className="flex items-center justify-between p-3 glass-prism backdrop-blur-md bg-white/30 dark:bg-black/30 border border-white/30 rounded-lg cursor-pointer hover:bg-white/50 dark:hover:bg-black/50 transition-all group"
+                                      >
+                                        <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate flex-1">
+                                          {appointment.customerEmail}
+                                        </span>
+                                        <Copy className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 ml-2 flex-shrink-0" />
+                                      </div>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
+                            </div>
+                          </td>
                         </tr>
+                        {isExpanded && (
+                          <tr key={`${appointment.id}-details`} className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/30 dark:to-purple-950/30">
+                            <td colSpan={5} className="px-6 py-6">
+                              <div className="glass-prism-card backdrop-blur-lg bg-white/40 dark:bg-black/40 border border-white/30 rounded-xl p-6">
+                                <h4 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">
+                                  Appointment Details
+                                </h4>
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                  {/* Customer Information */}
+                                  <div className="space-y-3">
+                                    <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
+                                      <User className="h-4 w-4" />
+                                      Customer Information
+                                    </h5>
+                                    <div className="space-y-2">
+                                      <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
+                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.customerName}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.customerEmail}</p>
+                                      </div>
+                                      {appointment.customerPhone && (
+                                        <div>
+                                          <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+                                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
+                                            <Phone className="h-3 w-3" />
+                                            {appointment.customerPhone}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Service & Booking Details */}
+                                  <div className="space-y-3">
+                                    <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
+                                      <Calendar className="h-4 w-4" />
+                                      Service Details
+                                    </h5>
+                                    <div className="space-y-2">
+                                      <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Service</p>
+                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.serviceName || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Date & Time</p>
+                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{appointment.date} at {appointment.time}</p>
+                                      </div>
+                                      {appointment.price && (
+                                        <div>
+                                          <p className="text-xs text-gray-500 dark:text-gray-400">Price</p>
+                                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
+                                            <DollarSign className="h-3 w-3" />
+                                            {formatPrice(appointment.price)}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Booking Page & Notes */}
+                                  <div className="space-y-3">
+                                    <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wider flex items-center gap-2">
+                                      <FileText className="h-4 w-4" />
+                                      Additional Information
+                                    </h5>
+                                    <div className="space-y-2">
+                                      <div>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Booking Page</p>
+                                        <a 
+                                          href={`/${appointment.pages?.slug}`} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                                        >
+                                          {appointment.pages?.title || 'View Page'}
+                                          <ExternalLink className="h-3 w-3" />
+                                        </a>
+                                      </div>
+                                      {appointment.notes && (
+                                        <div>
+                                          <p className="text-xs text-gray-500 dark:text-gray-400">Customer Notes</p>
+                                          <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-black/30 p-2 rounded-lg border border-white/30">
+                                            {appointment.notes}
+                                          </p>
+                                        </div>
+                                      )}
+                                      {appointment.status === 'rescheduled' && (
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                                          <div className="flex items-start gap-2">
+                                            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                                            <div>
+                                              <p className="text-xs font-semibold text-blue-800 dark:text-blue-300">Rescheduled Appointment</p>
+                                              <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">This appointment has been rescheduled to a new date and time.</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      {appointment.syncedFromGoogle && (
+                                        <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                                          <SiGooglecalendar className="h-4 w-4" />
+                                          <span>Synced with Google Calendar</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Mobile Card View - Visible only on Mobile */}
+          <div className="md:hidden space-y-4">
+            {appointments.map((appointment: any) => {
+              const isExpanded = expandedAppointment === appointment.id;
+              return (
+                <Card key={appointment.id} className="glass-prism-card backdrop-blur-xl bg-white/10 dark:bg-black/10 border border-white/20 shadow-lg overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* Card Header */}
+                    <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 border-b border-white/10">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-300/30 dark:border-blue-600/30 flex-shrink-0">
+                            <span className="text-base font-bold text-blue-600 dark:text-blue-400">
+                              {appointment.customerName?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-800 dark:text-gray-100 truncate" data-testid={`customer-name-${appointment.id}`}>
+                              {appointment.customerName}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 truncate" data-testid={`customer-email-${appointment.id}`}>
+                              {appointment.customerEmail}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge 
+                          variant={appointment.status === 'pending' ? 'secondary' : 'default'}
+                          className={
+                            appointment.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-700' :
+                            appointment.status === 'accepted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700' :
+                            appointment.status === 'declined' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700' :
+                            'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                          }
+                          data-testid={`status-${appointment.id}`}
+                        >
+                          {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1)}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-4 space-y-3">
+                      {/* Service */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Service:</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200" data-testid={`service-name-${appointment.id}`}>
+                          {appointment.serviceName || 'Service'}
+                        </span>
+                      </div>
+
+                      {/* Date & Time */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Date:</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">{appointment.date}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Time:</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-200">{appointment.time}</span>
+                      </div>
+
+                      {/* Phone if available */}
+                      {appointment.customerPhone && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                          <a href={`tel:${appointment.customerPhone}`} className="font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                            <Phone className="h-3 w-3" />
+                            {appointment.customerPhone}
+                          </a>
+                        </div>
                       )}
-                    </>
-                  );
-                })}
-              </tbody>
-            </table>
+
+                      {/* Action Buttons */}
+                      <div className="pt-3 border-t border-white/10">
+                        <div className="flex flex-wrap gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="flex-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+                            data-testid={`button-view-details-${appointment.id}`}
+                            onClick={() => setExpandedAppointment(isExpanded ? null : appointment.id)}
+                          >
+                            {isExpanded ? (
+                              <>
+                                <ChevronUp className="h-4 w-4 mr-1" />
+                                Hide
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="h-4 w-4 mr-1" />
+                                Details
+                              </>
+                            )}
+                          </Button>
+
+                          {appointment.status === 'pending' && (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="flex-1 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                data-testid={`button-accept-${appointment.id}`}
+                                onClick={() => handleStatusUpdate(appointment.id, 'accepted')}
+                                disabled={updateAppointmentMutation.isPending}
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                Accept
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="flex-1 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                data-testid={`button-decline-${appointment.id}`}
+                                onClick={() => handleStatusUpdate(appointment.id, 'declined')}
+                                disabled={updateAppointmentMutation.isPending}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                Decline
+                              </Button>
+                            </>
+                          )}
+
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="flex-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                            data-testid={`button-reschedule-${appointment.id}`}
+                            onClick={() => handleReschedule(appointment)}
+                          >
+                            <Calendar className="h-4 w-4 mr-1" />
+                            Reschedule
+                          </Button>
+
+                          {appointment.customerEmail && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="flex-1 bg-gray-50 dark:bg-gray-800/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/30"
+                              data-testid={`button-email-${appointment.id}`}
+                              onClick={() => handleCopyEmail(appointment.customerEmail)}
+                            >
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy Email
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expanded Details */}
+                    {isExpanded && (
+                      <div className="border-t border-white/10 bg-gradient-to-r from-blue-50/30 to-purple-50/30 dark:from-blue-950/20 dark:to-purple-950/20 p-4 space-y-4">
+                        <h4 className="font-bold text-gray-900 dark:text-white mb-3">Additional Details</h4>
+                        
+                        {/* Page Name */}
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Booking Page</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{appointment.pageName || 'N/A'}</p>
+                        </div>
+
+                        {/* Price if available */}
+                        {appointment.servicePrice && (
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Price</p>
+                            <p className="text-sm font-medium text-gray-800 dark:text-gray-100 flex items-center gap-1">
+                              <DollarSign className="h-3 w-3" />
+                              {formatPrice(appointment.servicePrice)}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Notes */}
+                        {appointment.notes && (
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Customer Notes</p>
+                            <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-black/30 p-3 rounded-lg border border-white/20">
+                              {appointment.notes}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Rescheduled Notice */}
+                        {appointment.status === 'rescheduled' && (
+                          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                            <div className="flex items-start gap-2">
+                              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                              <div>
+                                <p className="text-xs font-semibold text-blue-800 dark:text-blue-300">Rescheduled Appointment</p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">This appointment has been rescheduled to a new date and time.</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Google Sync Badge */}
+                        {appointment.syncedFromGoogle && (
+                          <Badge 
+                            variant="outline" 
+                            className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 flex items-center gap-1 w-fit"
+                          >
+                            <SiGooglecalendar className="h-3 w-3" />
+                            Synced with Google Calendar
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-        </Card>
+        </>
       )}
-      
+
       <RescheduleModal
         open={rescheduleModal.open}
         onClose={closeRescheduleModal}
