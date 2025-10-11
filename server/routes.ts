@@ -93,7 +93,7 @@ async function sendAppointmentEmail(
     }
 
     // Use bookinggen.xyz as the base URL for all email links
-    const baseUrl = 'https://bookinggen.xyz';
+    const baseUrl = 'https://www.bookinggen.xyz';
 
     // Prepare email template data
     const emailData: EmailTemplateData = {
@@ -157,7 +157,7 @@ async function sendOwnerNotification(appointmentId: string) {
     }
 
     // Use bookinggen.xyz as the base URL
-    const baseUrl = 'https://bookinggen.xyz';
+    const baseUrl = 'https://www.bookinggen.xyz';
 
     // Use the new business notification template
     const emailData: EmailTemplateData = {
@@ -221,7 +221,7 @@ async function sendOwnerRescheduleNotification(
     }
 
     // Use bookinggen.xyz as the base URL
-    const baseUrl = 'https://bookinggen.xyz';
+    const baseUrl = 'https://www.bookinggen.xyz';
 
     // Use the new business notification template for rescheduled appointments
     const emailData: EmailTemplateData = {

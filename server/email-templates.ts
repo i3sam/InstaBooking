@@ -290,7 +290,7 @@ export function generateEmailTemplate(data: EmailTemplateData): string {
           <tr>
             <td style="background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0 0 4px 0; font-size: 14px; color: #64748b;">
-                Powered by <a href="https://bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
+                Powered by <a href="https://www.bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
               </p>
               <p style="margin: 0; font-size: 12px; color: #94a3b8;">
                 Effortless appointment management for modern businesses
@@ -502,7 +502,7 @@ export function generateBusinessNotificationTemplate(data: EmailTemplateData): s
           <tr>
             <td style="background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0 0 4px 0; font-size: 14px; color: #64748b;">
-                Powered by <a href="https://bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
+                Powered by <a href="https://www.bookinggen.xyz" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BookingGen</a>
               </p>
               <p style="margin: 0; font-size: 12px; color: #94a3b8;">
                 Effortless appointment management for modern businesses
