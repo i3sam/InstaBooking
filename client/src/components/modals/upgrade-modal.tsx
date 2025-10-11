@@ -3,10 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, CreditCard, AlertTriangle, Mail } from 'lucide-react';
+import { SiPaypal } from 'react-icons/si';
 import { useAuth } from '@/hooks/use-auth';
 import { DialogDescription } from '@/components/ui/dialog';
 import { apiRequest } from '@/lib/queryClient';
 import RazorpaySubscriptionButton from '@/components/RazorpaySubscriptionButton';
+import PayPalSubscriptionButton from '@/components/PayPalSubscriptionButton';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useCurrency } from '@/hooks/use-currency';
@@ -166,18 +168,50 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                       Complete Your Upgrade
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Secure payment processing with Razorpay
+                      Choose your preferred payment method
                     </p>
                   </div>
                   
-                  <div className="max-w-md mx-auto">
+                  <div className="max-w-2xl mx-auto space-y-6">
+                    {/* PayPal Payment */}
+                    <div className="glass-prism-card backdrop-blur-sm bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-800/80 dark:via-blue-950/60 dark:to-gray-800/70 border border-white/30 dark:border-white/20 rounded-xl p-6" data-testid="section-paypal-payment">
+                      <div className="text-center mb-6">
+                        <div className="w-16 h-16 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-blue-100/90 via-blue-200/80 to-blue-100/90 border border-blue-300/40">
+                          <SiPaypal className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Pay with PayPal</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          Recurring monthly subscription at $14.99/month
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          Secure PayPal subscription • Instant activation • Cancel anytime
+                        </p>
+                      </div>
+                      <PayPalSubscriptionButton
+                        onSuccess={() => {
+                          handleSubscriptionSuccess('');
+                        }}
+                        onError={handlePaymentError}
+                      />
+                    </div>
+
+                    {/* OR Divider */}
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 font-medium">OR</span>
+                      </div>
+                    </div>
+
                     {/* Credit/Debit Card Payment (Razorpay) */}
                     <div className="glass-prism-card backdrop-blur-sm bg-gradient-to-br from-white/80 via-blue-50/60 to-white/70 dark:from-gray-800/80 dark:via-blue-950/60 dark:to-gray-800/70 border border-white/30 dark:border-white/20 rounded-xl p-6" data-testid="section-payment">
                       <div className="text-center mb-6">
                         <div className="w-16 h-16 glass-prism rounded-xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md bg-gradient-to-br from-white/60 via-blue-50/50 to-white/40 border border-white/30">
                           <CreditCard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Subscribe to Pro</h4>
+                        <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Pay with Card</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                           Recurring monthly subscription at {formatPrice(14.99)}/month
                         </p>

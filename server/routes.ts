@@ -1812,6 +1812,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.warn("Razorpay credentials not found - Razorpay routes not registered");
   }
 
+  // PayPal subscription routes
+  if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
+    const { 
+      createPayPalSubscription, 
+      getPayPalSubscription, 
+      cancelPayPalSubscription 
+    } = await import("./paypal-subscriptions");
+    
+    const { handlePayPalWebhook } = await import("./paypal-webhook");
+
+    app.post("/api/paypal/subscription", verifyToken, async (req, res) => {
+      await createPayPalSubscription(req, res);
+    });
+
+    app.get("/api/paypal/subscription/:subscriptionId", verifyToken, async (req, res) => {
+      await getPayPalSubscription(req, res);
+    });
+
+    app.post("/api/paypal/subscription/:subscriptionId/cancel", verifyToken, async (req, res) => {
+      await cancelPayPalSubscription(req, res);
+    });
+
+    console.log("PayPal subscription routes registered successfully");
+  } else {
+    console.warn("PayPal credentials not found - PayPal routes not registered");
+  }
+
   // Associate anonymous demo with user account
   app.post("/api/demo/associate", verifyToken, async (req: any, res) => {
     try {
