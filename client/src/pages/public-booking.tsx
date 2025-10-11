@@ -683,26 +683,31 @@ export default function PublicBooking() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center mb-4 sm:mb-6 max-w-md sm:max-w-none mx-auto">
                 <Button 
                   onClick={() => setShowBookingModal(true)}
-                  className="px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-lg sm:rounded-xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="group relative overflow-hidden px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 rounded-xl sm:rounded-2xl text-sm sm:text-base lg:text-xl h-auto font-semibold sm:font-bold shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 border-0"
                   style={{
                     backgroundColor: themeStyles?.primaryColor || '#2563eb',
-                    color: 'white'
+                    color: 'white',
+                    willChange: 'transform'
                   }}
                   data-testid="button-book-appointment"
                 >
-                  <div className="flex items-center justify-center">
-                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 mr-2 sm:mr-3" />
-                    Book Appointment
+                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500"></div>
+                  <div className="relative flex items-center justify-center gap-2 sm:gap-3">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
+                    <span className="font-bold tracking-wide">Book Appointment</span>
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 opacity-0 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-500" />
                   </div>
                 </Button>
                 
                 {page.calendarLink && (
                   <Button
                     variant="outline"
-                    className="group px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-md sm:hover:shadow-lg transition-all duration-300"
+                    className="group px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base h-auto font-medium sm:font-semibold border-2 hover:shadow-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm"
                     style={{
                       borderColor: themeStyles?.primaryColor || '#2563eb',
-                      color: themeStyles?.primaryColor || '#2563eb'
+                      color: themeStyles?.primaryColor || '#2563eb',
+                      willChange: 'transform'
                     }}
                     asChild
                     data-testid="button-visit-calendar"
@@ -716,14 +721,14 @@ export default function PublicBooking() {
               </div>
               
               {/* Enhanced Trust indicators with better mobile design */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto mb-8">
-                <TooltipProvider>
+              <TooltipProvider delayDuration={200}>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto mb-8">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
                         <div 
                           className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
                         >
                           <Award className="w-6 h-6 text-white" />
                         </div>
@@ -735,15 +740,13 @@ export default function PublicBooking() {
                       <p>Certified and experienced professionals</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
 
-                <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                      <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
                         <div 
                           className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                          style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
                         >
                           <Shield className="w-6 h-6 text-white" />
                         </div>
@@ -755,16 +758,14 @@ export default function PublicBooking() {
                       <p>Your data is safe and secure</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
 
-                {pageServices.length > 0 && (
-                  <TooltipProvider>
+                  {pageServices.length > 0 && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
                           <div 
                             className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
                           >
                             <Sparkles className="w-6 h-6 text-white" />
                           </div>
@@ -776,17 +777,15 @@ export default function PublicBooking() {
                         <p>Multiple services to choose from</p>
                       </TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
-                )}
+                  )}
 
-                {pageStaff.filter((s: any) => s.isActive !== false).length > 0 && (
-                  <TooltipProvider>
+                  {pageStaff.filter((s: any) => s.isActive !== false).length > 0 && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <div className="group flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/30 hover:border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-105" style={{ willChange: 'transform' }}>
                           <div 
                             className="w-12 h-12 rounded-full mb-3 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300"
-                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb' }}
+                            style={{ backgroundColor: themeStyles?.primaryColor || '#2563eb', willChange: 'transform' }}
                           >
                             <Users className="w-6 h-6 text-white" />
                           </div>
@@ -798,9 +797,9 @@ export default function PublicBooking() {
                         <p>Professional team ready to serve you</p>
                       </TooltipContent>
                     </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
+                  )}
+                </div>
+              </TooltipProvider>
 
               {/* Quick Contact Buttons */}
               {(page.contactPhone || page.contactEmail) && (
