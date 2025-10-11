@@ -174,26 +174,26 @@ async function handleSubscriptionActivated(event: any) {
       ? new Date(subscription.billing_info.next_billing_time)
       : new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
 
-    // Update user profile to Pro (convert dates to ISO strings)
+    // Update user profile to Pro
     await storage.updateProfile(userId, {
       membershipStatus: "pro",
       membershipPlan: "pro-monthly",
-      membershipExpires: nextBillingDate.toISOString(),
+      membershipExpires: nextBillingDate,
     });
 
-    // Store subscription details in database (convert dates to ISO strings)
+    // Store subscription details in database
     await storage.createSubscription({
       id: subscriptionId,
       userId: userId,
       status: status,
       planId: planId,
-      currentPeriodStart: currentDate.toISOString(),
-      currentPeriodEnd: nextBillingDate.toISOString(),
+      currentPeriodStart: currentDate,
+      currentPeriodEnd: nextBillingDate,
       planName: "pro",
       currency: "USD",
       amount: "14.99",
-      startTime: currentDate.toISOString(),
-      nextBillingTime: nextBillingDate.toISOString(),
+      startTime: currentDate,
+      nextBillingTime: nextBillingDate,
       isTrial: false,
     });
 
@@ -234,16 +234,16 @@ async function handlePaymentCompleted(event: any) {
     const nextBillingDate = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
 
     await storage.updateSubscription(subscriptionId, {
-      currentPeriodStart: currentDate.toISOString(),
-      currentPeriodEnd: nextBillingDate.toISOString(),
-      nextBillingTime: nextBillingDate.toISOString(),
+      currentPeriodStart: currentDate,
+      currentPeriodEnd: nextBillingDate,
+      nextBillingTime: nextBillingDate,
       status: "ACTIVE",
     });
 
-    // Ensure user profile is still Pro (convert dates to ISO strings)
+    // Ensure user profile is still Pro
     await storage.updateProfile(subscription.userId, {
       membershipStatus: "pro",
-      membershipExpires: nextBillingDate.toISOString(),
+      membershipExpires: nextBillingDate,
     });
 
     console.log(`Subscription ${subscriptionId} renewed successfully`);

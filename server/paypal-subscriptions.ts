@@ -435,38 +435,30 @@ export async function checkAndActivateSubscription(req: Request, res: Response) 
       if (!existingSubscription) {
         // Webhook hasn't processed yet, activate manually
         const currentDate = new Date();
-        
-        // Calculate next billing date (default to 30 days from now if not provided)
-        let nextBillingDate: Date;
-        if (subscription.billing_info?.next_billing_time) {
-          nextBillingDate = new Date(subscription.billing_info.next_billing_time);
-        } else {
-          // Default to 30 days from now
-          nextBillingDate = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-        }
-        
-        console.log(`Activating subscription - Next billing: ${nextBillingDate.toISOString()}`);
+        const nextBillingDate = subscription.billing_info?.next_billing_time 
+          ? new Date(subscription.billing_info.next_billing_time)
+          : new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-        // Update user profile to Pro (convert dates to ISO strings)
+        // Update user profile to Pro
         await storage.updateProfile(userId, {
           membershipStatus: "pro",
           membershipPlan: "pro-monthly",
-          membershipExpires: nextBillingDate.toISOString(),
+          membershipExpires: nextBillingDate,
         });
 
-        // Store subscription details (convert dates to ISO strings)
+        // Store subscription details
         await storage.createSubscription({
           id: subscriptionId,
           userId: userId,
           status: subscription.status,
           planId: subscription.plan_id,
-          currentPeriodStart: currentDate.toISOString(),
-          currentPeriodEnd: nextBillingDate.toISOString(),
+          currentPeriodStart: currentDate,
+          currentPeriodEnd: nextBillingDate,
           planName: "pro",
           currency: "USD",
           amount: "14.99",
-          startTime: currentDate.toISOString(),
-          nextBillingTime: nextBillingDate.toISOString(),
+          startTime: currentDate,
+          nextBillingTime: nextBillingDate,
           isTrial: false,
         });
 
